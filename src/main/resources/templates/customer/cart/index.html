@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="vi-VN" dir="LTR" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href=""/>
+    <title>Cart</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/main.js"></script>
+</head>
+<body>
+
+<div th:include="header :: body"></div>
+<main>
+    <div>
+        <h2 class="title-page">Giỏ hàng của bạn</h2>
+        <div class="sub_title">Có 2 sản phẩm trong giỏ hàng</div>
+        <div class="inner_row">
+            <div class="inner_col_right">
+                <div class="cart_list">
+                    <div class="cart_item">
+                        <img class="cart_thumb" src="/7.1b.webp" alt=""/>
+                        <div class="cart_info">
+                            <h3>
+                                Áo Măng Tô dạ
+                                <span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                                             class="size-6">
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                        </svg>
+                                    </span>
+                            </h3>
+                            <div class="cart_item_price">5.999.000đ</div>
+                            <div class="cart_item_quantity">
+                                <div class="quantity_group">
+                                    <button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             strokeWidth="1.5" stroke="currentColor" class="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14"/>
+                                        </svg>
+                                    </button>
+                                    <input type="number"/>
+                                    <button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             strokeWidth="1.5" stroke="currentColor" class="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <b>5.999.000đ</b>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="cart_item">
+                        <img class="cart_thumb" src="/7.1b.webp" alt=""/>
+                        <div class="cart_info">
+                            <h3>
+                                Áo Măng Tô dạ
+                                <span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                                             class="size-6">
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                        </svg>
+                                    </span>
+                            </h3>
+                            <div class="cart_item_price">5.999.000đ</div>
+                            <div class="cart_item_quantity">
+                                <div class="quantity_group">
+                                    <button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             strokeWidth="1.5" stroke="currentColor" class="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14"/>
+                                        </svg>
+                                    </button>
+                                    <input type="number"/>
+                                    <button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             strokeWidth="1.5" stroke="currentColor" class="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <b>5.999.000đ</b>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="inner_col_left">
+                <div class="cart_info_left">
+                    <h2>Thông tin đơn hàng</h2>
+                    <div class="cart_total">
+                        <span>Tổng tiền (2 sản phẩm) :</span>
+                        <b>5.999.000đ</b>
+                    </div>
+                    <div class="cart_sub">
+                        Phí vận chuyển sẽ được tính ở trang
+                        thanh toán. <br/>
+                        Bạn cũng có thể nhập mã giảm giá ở
+                        trang thanh toán.
+                    </div>
+                    <div class="cart_btn">
+                        <a href="" class="button button--primary">Thanh toán</a>
+                        <a href="" class="button button--secondary">Tiếp tục mua hàng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<div th:include = "footer::body"></div>
+</body>
+</html>

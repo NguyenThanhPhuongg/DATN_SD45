@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="vi-VN" dir="LTR" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href=""/>
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/main.js"></script>
+</head>
+<body>
+
+<div th:include="header :: body"></div>
+<main>
+    <div class="wrap_login">
+        <div class="register-form__wrapper">
+            <h2>Đăng nhập</h2>
+            <div class="social_form">
+                <a href="">
+                    <img src="../images/logos_facebook.svg" alt=""> Continue with Facebook
+                </a>
+                <a href="">
+                    <img src="../images/flat-color-icons_google.svg" alt=""> Continue with Google
+                </a>
+            </div>
+            <div class="or_span"><span>or</span></div>
+            <form method="post" action="/account" id="create_customer" accept-charset="UTF-8">
+                <input type="email" name="customer[email]" placeholder="Email" class="form-field ">
+                <input type="password" name="customer[password]" placeholder="Password" class="form-field">
+                <div class="mb-15 form_text">
+                    <div class="check_custom">
+                        <input type="checkbox" id="remember"  class="styled-checkbox">
+                        <label for="remember">Ghi nhớ mật khẩu</label>
+                    </div>
+                    <a href="">Quên mật khẩu?</a>
+                </div>
+                <button class="button button--primary">
+                    Login
+                </button>
+            </form>
+        </div>
+        <div class="register-form__wrapper">
+            <h2>Quyền  lợi thành viên</h2>
+            <p class="register-form__description">
+                Sign up for early Sale access plus tailored new arrivals, trends and promotions. To opt out, click unsubscribe in our emails.
+            </p>
+            <button class="button button--primary">
+                Đăng ký
+            </button>
+        </div>
+    </div>
+</main>
+<div th:include = "footer::body"></div>
+</body>
+</html>
