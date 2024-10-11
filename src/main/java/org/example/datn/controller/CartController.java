@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping
 public class CartController {
 
+    @GetMapping("/")
+    public String home(){
+        return "customer/home/index";
+    }
+
     @GetMapping("/login")
     public String login(){
         return "customer/login/index";
