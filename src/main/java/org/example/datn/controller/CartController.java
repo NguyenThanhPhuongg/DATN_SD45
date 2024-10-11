@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping
 public class CartController {
 
-    @GetMapping("/")
-    public String login() {
+    @GetMapping("/login")
+    public String login(){
         return "customer/login/index";
     }
 
