@@ -1,0 +1,89 @@
+
+.spbc .price {
+    margin-top: 6px;
+}
+.product {
+    position: relative; /* Để dùng position:absolute bên trong .product */
+}
+
+.image-wrapper {
+    position: relative; /* Căn cứ để đặt biểu tượng */
+    display: inline-block;
+}
+
+.icon-heart {
+    position: absolute;
+    top: 5px; /* Đặt khoảng cách từ trên xuống */
+    right: 10px; /* Đặt khoảng cách từ bên phảii vào */
+    background-color: white;
+    padding: 10px;
+border-radius: 5% ;
+}
+
+.heart {
+    color: black; /* Màu sắc cho trái tim */
+    font-size: 20px; /* Kích thước biểu tượng trái tim */
+}
+
+.image-card {
+    position: relative;
+    text-align: center;
+}
+.image-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.image-label {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    /*transform: translateX(-50%);*/
+    background-color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+.card-title {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.btn-custom {
+    font-weight: bold;
+    border: 1px solid black;
+}
+.features-icon {
+    font-size: 2.5rem;
+    color: black;
+}
+.brands-section {
+    background-color: #222;
+    padding: 50px 0;
+    margin-left: calc(-50vw + 50%); /* Đảm bảo phần này không bị giới hạn */
+}
+.brand-wrapper {
+    display: flex;
+    justify-content: center;
+}
+.brands-section img {
+    max-width: 100px;
+    height: 20px;
+    margin: 10px;
+}
+.features-section .col-md-3 {
+    text-align: center;
+    padding: 0;
+}
+.features-section h5 {
+    font-weight: bold;
+    margin-top: 10px;
+}
+.features-section p {
+    color: #555;
+}
