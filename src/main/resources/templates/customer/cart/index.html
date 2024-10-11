@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" href=""/>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <title>Cart</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../js/main.js"></script>
 </head>
 <body>
-
+<!--nhúng header-->
 <div th:include="header :: body"></div>
 <main>
     <div>
@@ -102,7 +102,7 @@
                         trang thanh toán.
                     </div>
                     <div class="cart_btn">
-                        <a href="" class="button button--primary">Thanh toán</a>
+                        <a href="/checkout" class="button button--primary">Thanh toán</a>
                         <a href="" class="button button--secondary">Tiếp tục mua hàng</a>
                     </div>
                 </div>
@@ -110,6 +110,7 @@
         </div>
     </div>
 </main>
+<!--nhúng footer-->
 <div th:include = "footer::body"></div>
 </body>
 </html>

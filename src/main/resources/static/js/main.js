@@ -1,5 +1,10 @@
-
-
+//chuyen huong logo den trang Home
+document.addEventListener('DOMContentLoaded', function () {
+    const favicon = document.querySelector('link[rel="icon"]');
+    favicon.addEventListener('click', function () {
+        window.location.href = '/home';
+    });
+});
 document.addEventListener('DOMContentLoaded', function() {
     const overLay = document.createElement('div');
     overLay.classList.add('over_lay');

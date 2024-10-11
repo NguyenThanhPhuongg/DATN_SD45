@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping
 public class CartController {
 
-    @GetMapping("/")
+    @GetMapping("/home")
     public String home(){
         return "customer/home/index";
     }
@@ -23,6 +23,21 @@ public class CartController {
     @GetMapping("/cart")
     public String cart() {
         return "customer/cart/index";
+    }
+
+    @GetMapping("/checkout")
+    public String checkout() {
+        return "customer/onlineSell/checkout";
+    }
+
+    @GetMapping("/payment")
+    public String payment() {
+        return "customer/onlineSell/payment";
+    }
+
+    @GetMapping("/bill")
+    public String bill() {
+        return "customer/onlineSell/bill";
     }
 
 
