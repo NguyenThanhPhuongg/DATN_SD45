@@ -92,7 +92,7 @@ button{
 .container-fluid {
     width: 100%;
     margin: 0 auto;
-    padding: 0 60px;
+    padding: 0 60px !important;
     max-width: 1750px;
 }
 @media (max-width: 991px) {
@@ -390,10 +390,11 @@ button{
     -webkit-appearance: none;
     margin: 0;
 }
-.quantity_group button {
+.quantity_group span {
     width: 30px;
     height: 30px;
     display: inline-block;
+    cursor: pointer;
 }
 .quantity_group button svg {
     width: 16px;
@@ -537,12 +538,13 @@ button{
 }
 .header_inner .header_icon .tooltip {
     margin-bottom: 0;
-    background-color: #000 0;
+    background-color: #0000;
     border-radius: 9999px;
     cursor: pointer;
     position: relative;
     padding: 5px;
     display: inline-block;
+    opacity: 1;
 }
 .header_inner .header_icon .tooltip .tooltip__content {
     bottom: 110%;
@@ -1251,5 +1253,17 @@ footer .footer_inner .footer_col ul li a:hover:before {
 }
 
 
-
+.form-check-input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+.form-check-input[type="radio"]:checked {
+    background-color: black;
+    border-color: black;
+}
+.form-check-label{
+    vertical-align: text-top;
+}
 
