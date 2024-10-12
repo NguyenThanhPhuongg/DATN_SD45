@@ -7,9 +7,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 
-public class RegisterController {
+public class AuthController {
+
     @GetMapping("/register")
     public String register() {
-        return "customer/register/index";
+        return "customer/auth/register";
+    }
+
+    @GetMapping("/login1")
+    public String login(){
+        return "customer/auth/login";
     }
 }

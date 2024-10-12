@@ -9,20 +9,11 @@
     <script src="../js/main.js"></script>
 </head>
 <body>
-<div th:include="header :: body"></div>
+<div th:include="homeHeader :: body"></div>
 <main>
     <div class="register-form">
         <div class="register-form__wrapper">
             <h2>Register</h2>
-<!--            <div class="social_form">-->
-<!--                <a href="">-->
-<!--                    <img src="../images/logos_facebook.svg" alt=""> Continue with Facebook-->
-<!--                </a>-->
-<!--                <a href="">-->
-<!--                    <img src="../images/flat-color-icons_google.svg" alt=""> Continue with Google-->
-<!--                </a>-->
-<!--            </div>-->
-<!--            <div class="or_span"><span>register</span></div>-->
             <form method="post" action="/account" id="create_customer" accept-charset="UTF-8">
                 <input type="text" name="customer[first_name]" placeholder="First Name" class="form-field ">
                 <input type="text" name="customer[last_name]" placeholder="Last Name" class="form-field ">
@@ -38,6 +29,15 @@
                 </button>
                 <div class="" align="center">
                     Already have an account? <a href="/login1"><b>Log in</b></a>
+                </div>
+                <div class="or_span"><span>or</span></div>
+                <div class="social_form">
+                    <a href="">
+                        <img src="../images/logos_facebook.svg" alt=""> Đăng nhập với Facebook
+                    </a>
+                    <a href="">
+                        <img src="../images/flat-color-icons_google.svg" alt=""> Đăng nhập với Google
+                    </a>
                 </div>
             </form>
         </div>
