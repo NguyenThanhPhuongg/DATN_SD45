@@ -7,18 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping
+
 public class CartController {
-
-    @GetMapping("/home")
-    public String home(){
-        return "customer/home/index";
-    }
-
-    @GetMapping("/login")
-    public String login(){
-        return "customer/login/index";
-    }
 
     @GetMapping("/cart")
     public String cart() {

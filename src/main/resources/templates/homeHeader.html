@@ -1,0 +1,23 @@
+<div th:fragment="body">
+    <header>
+        <div class="container-fluid">
+            <div class="header_inner">
+                <div id="toggle_nav" class="nav_btn_mb">
+                    <span></span>
+                </div>
+                <div class="header_logo">
+                    <a href="/home"><img src="../images/monnica.png" alt=""></a>
+                </div>
+                <div class="header_icon">
+                    <a href="/login1">
+                        <button type="button" class="btn btn-dark" >Đăng nhâp</button>
+                    </a>
+                    <a href="/register">
+                        <button type="button" class="btn btn-light" style="margin-left: 10px">Đăng kí</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div th:include="customer/cart/cartDrawer :: body"></div>
+    </header>
+</div>
