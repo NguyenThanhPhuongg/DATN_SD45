@@ -24,8 +24,8 @@
     <div class="banner">
         <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
-                <div class="carousel-item active" data-bs-interval="10000">
-                    <img th:src="@{/images/banner.png}" class="d-block w-100" alt="">
+                <div class="carousel-item active" data-bs-interval="10000" >
+                        <img th:src="@{/images/banner.png}" class="d-block w-100" alt="">
                 </div>
                 <div class="carousel-item" data-bs-interval="2000">
                     <img th:src="@{/images/banner.png}" class="d-block w-100" alt="">
@@ -54,10 +54,11 @@
 
             <div class="product">
                 <div class="image-wrapper">
-                    <img th:src="@{/images/mangto.png}" alt="">
+                    <a href="/productDetail">
+                        <img th:src="@{/images/mangto.png}" alt="">
+                    </a>
                     <div class="icon-heart">
                         <a th:href="@{/wishlist}"> <i class="bi bi-heart heart"></i> </a>
-
                     </div>
                 </div>
                 <p class="price"><b>5,999,000 đ</b> <s>6,999,000 đ</s></p>
