@@ -741,6 +741,42 @@ button{
         padding: 12px 16px;
     }
 }
+@-webkit-keyframes animatedown {
+    0% {
+        -webkit-transform: translateY(-100%);
+        transform: translateY(-100%);
+    }
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+}
+@keyframes animatedown {
+    0% {
+        -webkit-transform: translateY(-100%);
+        transform: translateY(-100%);
+    }
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+}
+header.fixed-header {
+    position: fixed;
+    top: 0px;
+    z-index: 99;
+    width: 100%;
+    -webkit-transition: top 0.3s;
+    transition: top 0.3s;
+    -webkit-animation: animatedown 0.6s;
+    animation: animatedown 0.6s;
+    background: #fff;
+    box-shadow: 0 0px 3px 1px #0000003b;
+}
+header.fixed-header .header_logo img{
+        width: 120px;
+
+}
 .over_lay {
     display: none;
     position: fixed;
@@ -940,7 +976,7 @@ footer .footer_inner .footer_col ul li a:hover:before {
     position: fixed;
     top: 0;
     right: 0;
-    z-index: 10;
+    z-index: 99999;
     height: 100vh;
     background: #fff;
     padding: 30px;
@@ -1267,3 +1303,44 @@ footer .footer_inner .footer_col ul li a:hover:before {
     vertical-align: text-top;
 }
 
+.text-detail table {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.text-detail table, th, td {
+    border: 1px solid #3a3737;
+}
+
+.text-detail th, td {
+    padding: 10px;
+    text-align: center; /* Căn giữa nội dung trong bảng */
+}
+
+.text-detail th {
+    background-color: #f2f2f2;
+}
+
+.text-detail  p {
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: justify;
+    margin: 0 auto;
+    width: 100%;
+}
+.image-wrapper{
+    width: 80%;
+}
+.image-wrapper .swiper-slide img{
+    width: 100%;
+}
+.image-wrapper .mySwiper2 img{
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+.image-wrapper .mySwiper img{
+    height: 70px;
+    object-fit: contain;
+}

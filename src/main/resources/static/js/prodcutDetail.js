@@ -1,5 +1,24 @@
 
 $(document).ready(function (){
+    var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        spaceBetween: 10,
+        slidesPerView: 5,
+        freeMode: true,
+        watchSlidesProgress: true,
+    });
+    var swiper2 = new Swiper(".mySwiper2", {
+        loop: true,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        thumbs: {
+            swiper: swiper,
+        },
+    });
+
     // Tăng giá trị khi click vào nút tăng
     $('.quantity_plus').click(function() {
         var input = $(this).siblings('input[name="quantity_product"]');
@@ -29,8 +48,28 @@ $(document).ready(function (){
 
     });
 
-    $( "form" ).on( "submit", function( event ) {
-        event.preventDefault();
-        console.log( $(this).serializeArray() );
-    });
+    // Mua hàng
+    $('.btn-buy').click(function( event ) {
+        var formData = $( "form" ).serialize();
+        $.ajax({
+            url: 'https://api.example.com/data', // URL của API mua hàng
+            type: 'POST', // Phương thức POST
+            data: formData, // Dữ liệu cần gửi
+            contentType: 'application/json', // Định dạng dữ liệu là JSON
+            success: function(response) {
+                console.log('Success:', response); // Xử lý kết quả thành công
+                window.location.href = window.location.origin + '/checkout';
+            },
+            error: function(error) {
+                console.error('Error:', error); // Xử lý lỗi nếu có
+            }
+        });
+    })
+
+    // Thêm vào giỏ hàng
+    $('.btn-addcart').click(function( event ) {
+        var formData = $( "form" ).serialize();
+        $('body').addClass('open-cart');
+    })
+
 })

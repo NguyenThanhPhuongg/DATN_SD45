@@ -47,3 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+$(window).scroll(function () {
+    if ($(this).scrollTop() > 200) {
+        $('header').addClass('fixed-header');
+    } else {
+        $('header').removeClass('fixed-header');
+    }
+})
