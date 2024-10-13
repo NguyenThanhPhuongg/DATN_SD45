@@ -1,0 +1,31 @@
+<div th:fragment="body">
+    <header>
+        <div class="container-fluid">
+            <div class="header_inner">
+                <div id="toggle_nav" class="nav_btn_mb">
+                    <span></span>
+                </div>
+                <div class="header_logo">
+                    <a href="/home"><img src="../images/monnica.png" alt=""></a>
+                </div>
+                <nav class="header_nav">
+                    <ul class="header_menu">
+                        <li><a href="">NAM</a></li>
+                        <li><a href="">Nữ</a></li>
+                        <li><a href="">Trẻ em</a></li>
+                        <li><a href="">Thương hiệu</a></li>
+                    </ul>
+                </nav>
+                <div class="header_icon">
+                    <a href="/login1">
+                        <button type="button" class="btn btn-dark">Đăng nhâp</button>
+                    </a>
+                    <a href="/register">
+                        <button type="button" class="btn btn-outline-dark">Đăng ký</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div th:include="customer/cart/cartDrawer :: body"></div>
+    </header>
+</div>
