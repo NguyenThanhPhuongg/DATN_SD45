@@ -1,0 +1,252 @@
+<div class="container-fluid px-4" th:fragment="body">
+    <h2 class="mt-4">Quản lý tài khoản nhân viên</h2><br>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table me-1"></i>
+                Danh sách khách hàng
+            </div>
+            <div>
+                <!-- <button class="btn btn-primary">
+                    <i class="fa fa-plus"></i> Thêm
+                </button> -->
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">
+                    Thêm
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade col-8" id="exampleModal" tabindex="-1"
+                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-xl-4">
+                                        <div class="card mb-4">
+                                            <div class="card-header text-center">
+                                                <i class="fas fa-user-circle me-1"></i>
+                                                <!-- Icon cho ảnh đại diện -->
+                                                Ảnh đại diện
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <input type="file" class="form-control"
+                                                       id="profileImage" accept="image/*">
+                                                <div class="mt-2">
+                                                    <img id="previewImage" src="#" alt="Preview"
+                                                         style="display: none; max-width: 100%; height: auto;"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-8">
+                                        <div class="card mb-4">
+                                            <div class="card-header text-center">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                <!-- Icon cho thông tin cụ thể -->
+                                                Thông tin khách hàng
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputEmail4" class="form-label">Họ
+                                                        tên</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputEmail4">
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Số
+                                                        điện thoại</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="col-md-12 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Địa
+                                                        chỉ</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="form-group col-md-6 mt-2">
+                                                    <label>Giới tính</label>
+                                                    <div class="mt-2">
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio"
+                                                                   name="gender" id="genderMale"
+                                                                   value="male" checked>
+                                                            <label class="form-check-label"
+                                                                   for="genderMale">Nam</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio"
+                                                                   name="gender" id="genderFemale"
+                                                                   value="female">
+                                                            <label class="form-check-label"
+                                                                   for="genderFemale">Nữ</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio"
+                                                                   name="gender" id="genderOther"
+                                                                   value="other">
+                                                            <label class="form-check-label"
+                                                                   for="genderOther">Khác</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Ngày
+                                                        sinh</label>
+                                                    <input type="date" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputEmail4"
+                                                           class="form-label">CCCD/CMT</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputEmail4">
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4"
+                                                           class="form-label">Email</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="form-group col-md-12 mt-2">
+                                                    <label>Trạng thái</label>
+                                                    <div class="mt-2">
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio"
+                                                                   name="tt" id="" value="male" checked>
+                                                            <label class="form-check-label" for="">Đang
+                                                                hoạt động</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio"
+                                                                   name="tt" id="" value="female">
+                                                            <label class="form-check-label" for="">Không
+                                                                hoạt động</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio"
+                                                                   name="tt" id="" value="other">
+                                                            <label class="form-check-label"
+                                                                   for="">Khác</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Người
+                                                        tạo</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Người
+                                                        sửa</label>
+                                                    <input type="text" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Ngày
+                                                        bắt đầu</label>
+                                                    <input type="date" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <label for="inputPassword4" class="form-label">Ngày
+                                                        kết thúc</label>
+                                                    <input type="date" class="form-control"
+                                                           id="inputPassword4">
+                                                </div>
+                                            </div>
+                                            <div class="card-footer text-center mt-4">
+                                                <button class="btn btn-success me-2">
+                                                    <i class="fas fa-plus"></i> Thêm
+                                                </button>
+                                                <button class="btn btn-warning me-2">
+                                                    <i class="fas fa-edit"></i> Sửa
+                                                </button>
+                                                <button class="btn btn-danger me-2">
+                                                    <i class="fas fa-trash"></i> Xóa
+                                                </button>
+                                                <button class="btn btn-secondary">
+                                                    <i class="fas fa-redo"></i> Reset
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close
+                                </button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>CCCD</th>
+                    <th>SĐT</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>CCCD</th>
+                    <th>SĐT</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
+                </tr>
+                </tfoot>
+                <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <div class="btn-group btn-group-xs">
+                            <a href="thongtinchitiet.html">
+                                <button class="btn btn-warning">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                            </a>
+                            <button class="btn btn-danger">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
