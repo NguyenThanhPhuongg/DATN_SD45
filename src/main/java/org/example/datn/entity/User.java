@@ -1,6 +1,6 @@
 package org.example.datn.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.model.enums.UserRoles;
@@ -36,7 +36,7 @@ public class User extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private UserType type;
 
-    @Column(name = "vai_tro")
+    @Column(name = "vaitro")
     @Enumerated(EnumType.STRING)
     private UserRoles role;
 
@@ -47,6 +47,4 @@ public class User extends CommonEntity {
     @Column(name = "xac_thuc")
     private boolean xacThuc;
 
-    @Transient
-    private Profile profile;
 }

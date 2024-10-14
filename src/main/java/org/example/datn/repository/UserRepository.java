@@ -5,6 +5,7 @@ import org.example.datn.model.enums.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,4 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameAndStatus(String username, UserStatus userStatus);
 
     Optional<User> findByIdAndStatus(Long id, UserStatus userStatus);
+
+    List<User> findByIdIn(List<Long> ids);
+
+    List<User> findAllByStatus(UserStatus status);
+
+    boolean existsByUsername(String username);
+
 }
