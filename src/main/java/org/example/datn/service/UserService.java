@@ -1,7 +1,7 @@
 package org.example.datn.service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import org.example.datn.entity.User;
 import org.example.datn.model.enums.UserStatus;
 import org.example.datn.repository.UserRepository;
@@ -33,15 +33,32 @@ public class UserService {
         return "not.found";
     }
 
+    public void save(User user) {
+        repo.save(user);
+    }
+
     public String encodePassword(String raw) {
         return passwordEncoder.encode(raw);
     }
+
+    public boolean exitsUsername(String username) {
+        return repo.existsByUsername(username);
+    }
+
 
     public boolean passwordMatched(String password, User user) {
         return passwordEncoder.matches(password, user.getPassword());
     }
     public List<User> findAll() {
         return repo.findAll();
+    }
+
+    public Optional<User> findById(Long id) {
+        return repo.findById(id);
+    }
+
+    public List<User> findAllByStatus(UserStatus status) {
+        return repo.findAllByStatus(status);
     }
 
     public Optional<User> findByUsername(String userName) {
@@ -68,6 +85,10 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("not.found"));
         user.setPassword(encodePassword(password));
         repo.save(user);
+    }
+
+    public List<User> findByIdIn(List<Long> ids) {
+        return repo.findByIdIn(ids);
     }
 
 

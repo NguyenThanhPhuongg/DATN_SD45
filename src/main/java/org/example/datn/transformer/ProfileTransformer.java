@@ -1,15 +1,24 @@
 package org.example.datn.transformer;
 
 import org.example.datn.entity.Profile;
-import org.hibernate.type.descriptor.DateTimeUtils;
+import org.example.datn.model.enums.UserStatus;
+import org.example.datn.model.response.ProfileModel;
+import org.example.datn.utils.CalendarUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper(imports = {DateTimeUtils.class})
+import java.time.LocalDate;
+
+/**
+ * @author hoangKhong
+ */
+@Component
+@Mapper(componentModel = "spring", imports = {UserStatus.class, CalendarUtil.DateTimeUtils.class})
 public interface ProfileTransformer {
 
-    @Mapping(target = "id", source = "userId")
-    @Mapping(target = "ngayTao", expression = "java(DateTimeUtils.now())")
-    Profile toEntity(Long userId, String name, String phone, String email);
+    Profile toEntity(Long userId, String phone, String email, LocalDate ngaySinh);
+
     Profile toEntity(Long userId, String name);
+
+    ProfileModel toModel(Profile profile);
 }
