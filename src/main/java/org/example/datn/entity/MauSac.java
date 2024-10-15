@@ -1,6 +1,6 @@
 package org.example.datn.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
