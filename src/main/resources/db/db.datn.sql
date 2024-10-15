@@ -711,3 +711,96 @@ CREATE TABLE [yeu_cau_doi_tra_chi_tiet]
     [nguoi_cap_nhat] VARCHAR(20)
 ) ON [PRIMARY];
 GO
+
+INSERT INTO chuc_nang (ten, ma, id_cha, loai, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+('Chức năng 1', 'CN001', NULL, 1, 1, 'admin', 'admin'),
+('Chức năng 2', 'CN002', NULL, 1, 1, 'admin', 'admin'),
+('Chức năng 3', 'CN003', 1, 2, 1, 'admin', 'admin'),
+('Chức năng 4', 'CN004', 1, 2, 1, 'admin', 'admin'),
+('Chức năng 5', 'CN005', 2, 1, 1, 'admin', 'admin'),
+('Chức năng 6', 'CN006', 2, 2, 1, 'admin', 'admin'),
+('Chức năng 7', 'CN007', 3, 1, 1, 'admin', 'admin'),
+('Chức năng 8', 'CN008', 3, 2, 1, 'admin', 'admin'),
+('Chức năng 9', 'CN009', 4, 1, 1, 'admin', 'admin'),
+('Chức năng 10', 'CN010', 4, 2, 1, 'admin', 'admin');
+
+INSERT INTO nhom_chuc_nang (id_nhom, id_chuc_nang, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+(1, 1, 1, 'admin', 'admin'),
+(1, 2, 1, 'admin', 'admin'),
+(2, 3, 1, 'admin', 'admin'),
+(2, 4, 1, 'admin', 'admin'),
+(3, 5, 1, 'admin', 'admin'),
+(3, 6, 1, 'admin', 'admin'),
+(4, 7, 1, 'admin', 'admin'),
+(4, 8, 1, 'admin', 'admin'),
+(5, 9, 1, 'admin', 'admin'),
+(5, 10, 1, 'admin', 'admin');
+
+INSERT INTO nhom (ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+('Nhóm 1', 'Mô tả nhóm 1', 1, 'admin', 'admin'),
+('Nhóm 2', 'Mô tả nhóm 2', 1, 'admin', 'admin'),
+('Nhóm 3', 'Mô tả nhóm 3', 1, 'admin', 'admin'),
+('Nhóm 4', 'Mô tả nhóm 4', 1, 'admin', 'admin'),
+('Nhóm 5', 'Mô tả nhóm 5', 1, 'admin', 'admin'),
+('Nhóm 6', 'Mô tả nhóm 6', 1, 'admin', 'admin'),
+('Nhóm 7', 'Mô tả nhóm 7', 1, 'admin', 'admin'),
+('Nhóm 8', 'Mô tả nhóm 8', 1, 'admin', 'admin'),
+('Nhóm 9', 'Mô tả nhóm 9', 1, 'admin', 'admin'),
+('Nhóm 10', 'Mô tả nhóm 10', 1, 'admin', 'admin');
+
+INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, id_nhom, vaitro, xac_thuc, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+('user1', 'password1', 1, 'Admin', 1, 1, 'admin', 'admin'),
+('user2', 'password2', 2, 'Admin', 1, 1, 'admin', 'admin'),
+('user3', 'password3', 3, 'Admin', 1, 1, 'admin', 'admin'),
+('user4', 'password4', 4, 'Admin', 1, 1, 'admin', 'admin'),
+('user5', 'password5', 5, 'Admin', 1, 1, 'admin', 'admin'),
+('user6', 'password6', 6, 'Staff', 1, 1, 'admin', 'admin'),
+('user7', 'password7', 7, 'Staff', 1, 1, 'admin', 'admin'),
+('user8', 'password8', 8, 'Staff', 1, 1, 'admin', 'admin'),
+('user9', 'password9', 9, 'Customer', 1, 1, 'admin', 'admin'),
+('user10', 'password10', 10, 'Customer', 1, 1, 'admin', 'admin');
+
+INSERT INTO thong_tin_ca_nhan (id_nguoi_dung, ho_va_ten, sdt, avatar, dia_chi, gioi_tinh, ngay_sinh, cccd, email, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+(1, 'Nguyen Van A', '0912345678', 'avatar1.png', 'Hanoi', 1, '1990-01-01', '0123456789', 'a@example.com', 1, 'admin', 'admin'),
+(2, 'Nguyen Van B', '0912345679', 'avatar2.png', 'Hanoi', 1, '1991-02-01', '0123456790', 'b@example.com', 1, 'admin', 'admin'),
+(3, 'Nguyen Van C', '0912345680', 'avatar3.png', 'Hanoi', 1, '1992-03-01', '0123456801', 'c@example.com', 1, 'admin', 'admin'),
+(4, 'Nguyen Van D', '0912345681', 'avatar4.png', 'Hanoi', 1, '1993-04-01', '0123456812', 'd@example.com', 1, 'admin', 'admin'),
+(5, 'Nguyen Van E', '0912345682', 'avatar5.png', 'Hanoi', 1, '1994-05-01', '0123456823', 'e@example.com', 1, 'admin', 'admin'),
+(6, 'Nguyen Van F', '0912345683', 'avatar6.png', 'Hanoi', 1, '1995-06-01', '0123456834', 'f@example.com', 1, 'admin', 'admin'),
+(7, 'Nguyen Van G', '0912345684', 'avatar7.png', 'Hanoi', 1, '1996-07-01', '0123456845', 'g@example.com', 1, 'admin', 'admin'),
+(8, 'Nguyen Van H', '0912345685', 'avatar8.png', 'Hanoi', 1, '1997-08-01', '0123456856', 'h@example.com', 1, 'admin', 'admin'),
+(9, 'Nguyen Van I', '0912345686', 'avatar9.png', 'Hanoi', 1, '1998-09-01', '0123456867', 'i@example.com', 1, 'admin', 'admin'),
+(10, 'Nguyen Van J', '0912345687', 'avatar10.png', 'Hanoi', 1, '1999-10-01', '0123456878', 'j@example.com', 1, 'admin', 'admin');
+
+INSERT INTO danh_muc (id_danh_muc_cha, ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+(1,'Danh mục 1', 'Mô tả danh mục 1', 1, 'admin', 'admin'),
+(1,'Danh mục 2', 'Mô tả danh mục 2', 1, 'admin', 'admin'),
+(1,'Danh mục 3', 'Mô tả danh mục 3', 1, 'admin', 'admin'),
+(1,'Danh mục 4', 'Mô tả danh mục 4', 1, 'admin', 'admin'),
+(1,'Danh mục 5', 'Mô tả danh mục 5', 1, 'admin', 'admin'),
+(2,'Danh mục 6', 'Mô tả danh mục 6', 1, 'admin', 'admin'),
+(2,'Danh mục 7', 'Mô tả danh mục 7', 1, 'admin', 'admin'),
+(2,'Danh mục 8', 'Mô tả danh mục 8', 1, 'admin', 'admin'),
+(2,'Danh mục 9', 'Mô tả danh mục 9', 1, 'admin', 'admin'),
+(2,'Danh mục 10', 'Mô tả danh mục 10', 1, 'admin', 'admin');
+
+INSERT INTO thuong_hieu (id_danh_muc_cha,ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+(1,'Thương hiệu 1', 'Mô tả thương hiệu 1', 1, 'admin', 'admin'),
+(1,'Thương hiệu 2', 'Mô tả thương hiệu 2', 1, 'admin', 'admin'),
+(1,'Thương hiệu 3', 'Mô tả thương hiệu 3', 1, 'admin', 'admin'),
+(1,'Thương hiệu 4', 'Mô tả thương hiệu 4', 1, 'admin', 'admin'),
+(1,'Thương hiệu 5', 'Mô tả thương hiệu 5', 1, 'admin', 'admin'),
+(2,'Thương hiệu 6', 'Mô tả thương hiệu 6', 1, 'admin', 'admin'),
+(2,'Thương hiệu 7', 'Mô tả thương hiệu 7', 1, 'admin', 'admin'),
+(2,'Thương hiệu 8', 'Mô tả thương hiệu 8', 1, 'admin', 'admin'),
+(2,'Thương hiệu 9', 'Mô tả thương hiệu 9', 1, 'admin', 'admin'),
+(2,'Thương hiệu 10', 'Mô tả thương hiệu 10', 1, 'admin', 'admin');
+
+select * from thuong_hieu
