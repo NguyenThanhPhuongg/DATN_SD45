@@ -28,5 +28,4 @@ public class ProfileModel {
     private LocalDate ngaySinh;
     private String cccd;
     private String email;
-    private Integer trangThai;
 }

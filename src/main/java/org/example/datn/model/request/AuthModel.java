@@ -1,9 +1,6 @@
 package org.example.datn.model.request;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
@@ -23,4 +20,14 @@ public class AuthModel {
     String ipAddress;
 
     boolean rememberMe;
+
+    public AuthModel() {
+    }
+
+    public AuthModel(String username, String password, String ipAddress, boolean rememberMe) {
+        this.username = username;
+        this.password = password;
+        this.ipAddress = ipAddress;
+        this.rememberMe = rememberMe;
+    }
 }
