@@ -40,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and() // Bật CORS
                 .csrf().disable() // Tắt CSRF cho đơn giản
                 .authorizeRequests()
-                .antMatchers("/register").permitAll() // Cho phép truy cập /register
+                .antMatchers("/register", "/auth/**").permitAll()// Cho phép truy cập /register
                 .anyRequest().authenticated() // Yêu cầu xác thực cho các request khác
                 .and()
                 .formLogin().permitAll()

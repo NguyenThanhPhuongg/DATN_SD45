@@ -16,6 +16,7 @@ import org.example.datn.model.enums.UserType;
 import org.example.datn.model.request.AuthModel;
 import org.example.datn.model.request.RegisterModel;
 import org.example.datn.model.response.AuthInfoModel;
+import org.example.datn.model.response.ProfileModel;
 import org.example.datn.model.response.SessionModel;
 import org.example.datn.model.response.UserModel;
 import org.example.datn.processor.auth.AuthenticationChannelProvider;
@@ -28,6 +29,7 @@ import org.example.datn.service.UserService;
 import org.example.datn.transformer.ProfileTransformer;
 import org.example.datn.transformer.UserTransformer;
 import org.example.datn.utils.CalendarUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -97,7 +99,7 @@ public class UserProcessor {
     }
 
     public UserModel findByUsername(String username) {
-        return userService.findByUsername(username)
+        return userService.findByUserName(username)
                 .map(mapper())
                 .orElseThrow(() -> new EntityNotFoundException("not.fond"));
     }
@@ -167,7 +169,7 @@ public class UserProcessor {
 
         var hashedPass = userService.encodePassword(model.getPassword());
         var user = new User();
-        user.setUsername(model.getEmail());
+        user.setUserName(model.getEmail());
         user.setPassword(hashedPass);
         user.setRole(UserRoles.CLIENT);
         user.setStatus(UserStatus.ACTIVE);
@@ -179,7 +181,7 @@ public class UserProcessor {
         profile.setEmail(model.getEmail());
         profile.setPhone(model.getPhone());
         profile.setNgaySinh(model.getNgaySinh());
-        profile.setHoVaTen(StringUtils.substringBeforeLast(user.getUsername(), "@"));
+        profile.setHoVaTen(StringUtils.substringBeforeLast(user.getUserName(), "@"));
         profileService.save(profile);
         return new ServiceResult(SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
@@ -188,9 +190,10 @@ public class UserProcessor {
         synchronized (this) {
             var processor = provider.getProcessor(UserType.NORMAL);
             var userModel = processor.auth(() -> authModel);
-            var profile = profileService.findByUserId(userModel.getId())
-                    .orElseThrow(() -> new EntityNotFoundException("not.fond"));
-            userModel.setProfile(profileTransformer.toModel(profile));
+            var profile = profileService.findByUserId(userModel.getId()).orElseThrow(() -> new EntityNotFoundException("not.fond"));
+            ProfileModel profileModel = new ProfileModel();
+            BeanUtils.copyProperties(profile, profileModel);
+            userModel.setProfile(profileModel);
 
             var exp = now().plusDays(1L).with(LocalTime.MAX);
             List<String> type = new ArrayList<>();
@@ -204,6 +207,7 @@ public class UserProcessor {
             setSession(userModel, exp, authorities);
             setActivity(userModel);
             return AuthInfoModel.builder()
+                    .username(authModel.getUsername())
                     .email(profile.getEmail())
                     .username(userModel.getUserName())
                     .token(token)
@@ -264,7 +268,7 @@ public class UserProcessor {
     }
 
     private void validateDuplicated(RegisterModel model) throws DuplicatedException {
-        if (userService.exitsUsername(model.getEmail())) {
+        if (userService.exitsUserName(model.getEmail())) {
             throw DuplicatedException.of("user.duplicated");
         }
         if (StringUtils.isNotBlank(model.getPhone())) {

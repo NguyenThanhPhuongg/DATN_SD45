@@ -24,7 +24,7 @@ public class User extends CommonEntity {
     private Long id;
 
     @Column(name = "ten_dang_nhap")
-    private String username;
+    private String userName;
 
     @Column(name = "mat_khau")
     private String password;

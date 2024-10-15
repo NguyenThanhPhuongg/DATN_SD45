@@ -37,12 +37,16 @@ public class UserService {
         repo.save(user);
     }
 
+    public User saveEntity(User user) {
+       return repo.save(user);
+    }
+
     public String encodePassword(String raw) {
         return passwordEncoder.encode(raw);
     }
 
-    public boolean exitsUsername(String username) {
-        return repo.existsByUsername(username);
+    public boolean exitsUserName(String username) {
+        return repo.existsByUserName(username);
     }
 
 
@@ -61,12 +65,12 @@ public class UserService {
         return repo.findAllByStatus(status);
     }
 
-    public Optional<User> findByUsername(String userName) {
-        return repo.findByUsername(userName);
+    public Optional<User> findByUserName(String userName) {
+        return repo.findByUserName(userName);
     }
 
     public Optional<User> getActive(String username) {
-        return repo.findByUsernameAndStatus(username, UserStatus.ACTIVE);
+        return repo.findByUserNameAndStatus(username, UserStatus.ACTIVE);
     }
 
     public Optional<User> getActive(Long id) {
