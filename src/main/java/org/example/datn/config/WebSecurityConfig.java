@@ -40,13 +40,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and() // Bật CORS
                 .csrf().disable() // Tắt CSRF cho đơn giản
                 .authorizeRequests()
-                .antMatchers("/register", "/auth/**").permitAll()// Cho phép truy cập /register
-                .anyRequest().authenticated() // Yêu cầu xác thực cho các request khác
+                .anyRequest().permitAll() // Cho phép tất cả các request mà không cần xác thực
                 .and()
-                .formLogin().permitAll()
+                .formLogin().permitAll() // Cho phép đăng nhập cho tất cả
                 .and()
-                .logout().permitAll();
+                .logout().permitAll(); // Cho phép đăng xuất cho tất cả
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
