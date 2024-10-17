@@ -140,7 +140,7 @@ button{
 @media (max-width: 991px) {
     .wrap_login {
         flex-wrap: wrap;
-        padding: 0 0px;
+        padding: 0 0;
     }
     .wrap_login .register-form__wrapper {
         width: 100%;
