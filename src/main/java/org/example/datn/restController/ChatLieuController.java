@@ -1,9 +1,7 @@
-package org.example.datn.resrController;
+package org.example.datn.restController;
 
 import org.example.datn.entity.ChatLieu;
-import org.example.datn.entity.MauSac;
 import org.example.datn.service.ChatLieuService;
-import org.example.datn.service.MauSacService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

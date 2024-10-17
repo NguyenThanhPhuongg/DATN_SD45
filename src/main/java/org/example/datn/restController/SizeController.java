@@ -1,8 +1,6 @@
-package org.example.datn.resrController;
+package org.example.datn.restController;
 
-import org.example.datn.entity.DanhMuc;
 import org.example.datn.entity.Size;
-import org.example.datn.service.DanhMucService;
 import org.example.datn.service.SizeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -48,24 +48,55 @@ app.config(function ($routeProvider) {
         /// danh mục
         .when("/listdanhmuc",{
             templateUrl:"asset/danhmuc/listdanhmuc.html",
-            controller: "listdanhmuc-ctrl"
+            controller: "danhmuc-ctrl"
         })
         .when("/quanlydanhmuc", {
             templateUrl: "asset/danhmuc/quanlydanhmuc.html",
-            controller: "quanlydanhmuc-ctrl"
-        })
-        .when("/thongtindanhmuc", {
-            templateUrl: "asset/danhmuc/thongtindanhmuc.html",
-            controller: "thongtindanhmuc-ctrl"
+            controller: "danhmuc-ctrl"
         })
 
         /// thuong hiệu
         .when("/listthuonghieu",{
             templateUrl:"asset/thuonghieu/listthuonghieu.html",
-            controller: "listthuonghieu-ctrl"
+            controller: "thuonghieu-ctrl"
         })
         .when("/quanlythuonghieu", {
             templateUrl: "asset/thuonghieu/quanlythuonghieu.html",
-            controller: "quanlythuonghieu-ctrl"
+            controller: "thuonghieu-ctrl"
         })
+
+        /// thuộc tính
+        .when("/size",{
+            templateUrl:"asset/thuoctinh/size.html",
+            controller: "size-ctrl"
+        })
+        .when("/chatlieu",{
+            templateUrl:"asset/thuoctinh/chatlieu.html",
+            controller: "chatlieu-ctrl"
+        })
+        .when("/mausac",{
+            templateUrl:"asset/thuoctinh/mausac.html",
+            controller: "mausac-ctrl"
+        })
+
+        /// nhân viên
+        .when("/nhom",{
+            templateUrl:"asset/nhanvien/nhom.html",
+            controller: "nhom-ctrl"
+        })
+        .when("/chucnang",{
+            templateUrl:"asset/nhanvien/chucnang.html",
+            controller: "chucnang-ctrl"
+        })
+        .when("/phanquyen",{
+            templateUrl:"asset/nhanvien/phanquyen.html",
+            controller: "phanquyen-ctrl"
+        })
+
+        /// sản phâm
+        .when("/sanpham",{
+            templateUrl:"asset/sanpham/listsanpham.html",
+            controller: "sanpham-ctrl"
+        })
+
 })

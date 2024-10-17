@@ -1,10 +1,8 @@
-package org.example.datn.resrController;
+package org.example.datn.restController;
 
 import org.example.datn.entity.Thuonghieu;
 import org.example.datn.service.ThuongHieuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

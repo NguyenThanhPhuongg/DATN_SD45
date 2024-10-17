@@ -1,6 +1,7 @@
-app.controller("listthuonghieu-ctrl", function ($scope, $http) {
+app.controller("chatlieu-ctrl", function ($scope, $http) {
     $scope.items = [];
     $scope.form = {};
+    $scope.formAdd = {};
     $scope.searchText = ''; // Thêm biến tìm kiếm
     $scope.pager = {
         page: 0,
@@ -40,7 +41,7 @@ app.controller("listthuonghieu-ctrl", function ($scope, $http) {
     // Hàm khởi tạo
     $scope.initialize = function () {
         // Tải danh sách thương hiệu
-        $http.get("/rest/thuonghieu").then(resp => {
+        $http.get("/rest/chatlieu").then(resp => {
             console.log("Data from API: ", resp.data); // Kiểm tra dữ liệu từ API
             $scope.items = resp.data;
             $scope.items.forEach(item => {
@@ -66,21 +67,22 @@ app.controller("listthuonghieu-ctrl", function ($scope, $http) {
     $scope.reset = function () {
         // Giữ nguyên giá trị của id nếu có
         const currentId = $scope.form.id; // Lưu trữ giá trị ID hiện tại
-
+        const ngayTao = $scope.form.ngayTao; // Lưu trữ giá trị ID hiện tại
         // Thiết lập lại các trường khác
         $scope.form = {
             nguoiTao: 'Admin', // Mặc định người tạo là 'Admin'
             nguoiCapNhat: 'Admin', // Mặc định người cập nhật là 'Admin'
-            ngayTao: new Date(), // Ngày tạo sẽ là thời gian hiện tại
             ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
-            idCha: null, // Đặt mặc định cho idCha
+            ngayTao: ngayTao,
             ten: '', // Đặt mặc định cho tên
-            mo_ta: '', // Đặt mặc định cho mô tả
             trangThai: 1, // Đặt mặc định cho trạng thái là true
             id: currentId // Giữ nguyên giá trị ID
         };
     };
 
+    $scope.resetAdd = function () {
+        $scope.formAdd = {};
+    };
 
 
     $scope.edit = function (item) {
@@ -100,18 +102,8 @@ app.controller("listthuonghieu-ctrl", function ($scope, $http) {
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
-        if (!$scope.form.idCha) {
-            $scope.error.idCha = true;
-            isValid = false;
-        }
-
         if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
             $scope.error.ten = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.mo_ta || $scope.form.mo_ta.length < 1 || $scope.form.mo_ta.length > 100) {
-            $scope.error.mo_ta = true;
             isValid = false;
         }
 
@@ -137,7 +129,7 @@ app.controller("listthuonghieu-ctrl", function ($scope, $http) {
                 var item = angular.copy($scope.form);
                 item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
 
-                $http.put(`/rest/thuonghieu/${item.id}`, item).then(resp => {
+                $http.put(`/rest/chatlieu/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -160,7 +152,7 @@ app.controller("listthuonghieu-ctrl", function ($scope, $http) {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                $http.delete(`/rest/thuonghieu/${item.id}`).then(resp => {
+                $http.delete(`/rest/chatlieu/${item.id}`).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     $scope.reset();
                     swal("Success!", "Xóa thành công", "success");
@@ -170,6 +162,59 @@ app.controller("listthuonghieu-ctrl", function ($scope, $http) {
                 });
             } else {
                 swal("Hủy xóa", "Xóa thương hiệu đã bị hủy", "error");
+            }
+        });
+    };
+    // Thêm thương hiệu
+    $scope.create = function () {
+        $scope.error = {
+            ten: false,
+            trangThai: false
+        };
+
+        // Kiểm tra các trường dữ liệu
+        let isValid = true;
+
+
+        if (!$scope.formAdd.ten || $scope.formAdd.ten.length < 1 || $scope.formAdd.ten.length > 100) {
+            $scope.error.ten = true;
+            isValid = false;
+        }
+
+        if (!$scope.formAdd.trangThai) {
+            $scope.error.trangThai = true;
+            isValid = false;
+        }
+
+        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
+        if (!isValid) {
+            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
+            return; // Ngừng thực hiện nếu không hợp lệ
+        }
+
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn thêm thương hiệu này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willAdd) => {
+            if (willAdd) {
+                var item = angular.copy($scope.formAdd);
+                item.nguoiTao = 'Admin'; // Đặt người tạo mặc định là 'Admin'
+                item.ngayTao = new Date(); // Ngày tạo là thời gian hiện tại
+                item.ngayCapNhat = new Date(); // Ngày cập nhật là thời gian hiện tại
+
+                $http.post(`/rest/chatlieu`, item).then(resp => {
+                    $scope.initialize(); // Tải lại dữ liệu
+                    $scope.resetAdd();
+                    swal("Success!", "Thêm mới thành công", "success");
+                }).catch(error => {
+                    swal("Error!", "Thêm mới thất bại", "error");
+                    console.log("Error: ", error);
+                });
+            } else {
+                swal("Hủy thêm thương hiệu", "Thêm thương hiệu đã bị hủy", "error");
             }
         });
     };
