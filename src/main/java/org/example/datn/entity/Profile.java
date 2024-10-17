@@ -1,6 +1,6 @@
 package org.example.datn.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,15 +16,15 @@ import java.time.LocalDate;
 @Setter
 @Table(name = "thong_tin_ca_nhan")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Profile {
+public class Profile extends CommonEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @Column(name = "id_nguoi_dung")
-    private int idNguoiDung;
+    private Long userId;
 
     @Column(name = "ho_va_ten")
     private String hoVaTen;
@@ -51,6 +51,4 @@ public class Profile {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "trang_thai")
-    private int trangThai;
 }

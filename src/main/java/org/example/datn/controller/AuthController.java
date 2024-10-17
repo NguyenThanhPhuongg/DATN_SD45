@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 public class AuthController {
 
-    @GetMapping("/register")
-    public String register() {
-        return "customer/auth/register";
-    }
-
-    @GetMapping("/login1")
-    public String login(){
-        return "customer/auth/login";
-    }
+//    @GetMapping("/register")
+//    public String register() {
+//        return "customer/auth/register";
+//    }
+//
+//    @GetMapping("/login1")
+//    public String login(){
+//        return "customer/auth/login";
+//    }
 }
