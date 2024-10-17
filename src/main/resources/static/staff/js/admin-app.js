@@ -68,46 +68,4 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/thuonghieu/quanlythuonghieu.html",
             controller: "quanlythuonghieu-ctrl"
         })
-        .when("/thongtinthuonghieu/:id", {
-            templateUrl: "asset/thuonghieu/thongtinthuonghieu.html",
-            controller: "thongtinthuonghieu-ctrl"
-        })
-
 })
-
-
-// Controller for taikhoan.html
-app.controller('taikhoan-ctrl', function($scope) {
-    $scope.$on('$viewContentLoaded', function() {
-        const datatablesSimple = document.getElementById('datatablesSimple');
-        if (datatablesSimple) {
-            new simpleDatatables.DataTable(datatablesSimple);
-        }
-    });
-});
-
-// Controller for listkhachhang.html
-app.controller('listkhachhang-ctrl', function($scope) {
-    $scope.$on('$viewContentLoaded', function() {
-        const datatablesSimple = document.getElementById('datatablesSimple');
-        if (datatablesSimple) {
-            new simpleDatatables.DataTable(datatablesSimple);
-        }
-    });
-});
-app.controller('listdanhmuc-ctrl', function($scope) {
-    $scope.$on('$viewContentLoaded', function() {
-        const datatablesSimple = document.getElementById('datatablesSimple');
-        if (datatablesSimple) {
-            new simpleDatatables.DataTable(datatablesSimple);
-        }
-    });
-});
-app.controller('listthuonghieu-ctrl', function($scope) {
-    $scope.$on('$viewContentLoaded', function() {
-        const datatablesSimple = document.getElementById('datatablesSimple');
-        if (datatablesSimple) {
-            new simpleDatatables.DataTable(datatablesSimple);
-        }
-    });
-});
