@@ -74,7 +74,6 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
             nguoiCapNhat: 'Admin', // Mặc định người cập nhật là 'Admin'
             ngayTao: ngayTao, // Ngày tạo sẽ là thời gian hiện tại
             ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
-            idCha: null, // Đặt mặc định cho idCha
             ten: '', // Đặt mặc định cho tên
             mo_ta: '', // Đặt mặc định cho mô tả
             trangThai: 1, // Đặt mặc định cho trạng thái là true
@@ -92,7 +91,6 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
 
     $scope.update = function () {
         $scope.error = {
-            idCha: false,
             ten: false,
             mo_ta: false,
             trangThai: false
@@ -100,11 +98,6 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
-
-        if (!$scope.form.idCha) {
-            $scope.error.idCha = true;
-            isValid = false;
-        }
 
         if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
             $scope.error.ten = true;
@@ -137,6 +130,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
                 item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
+                item.nguoiCapNhat = 'Admin'; // Đặt người tạo mặc định là 'Admin'
 
                 $http.put(`/rest/thuonghieu/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
@@ -177,7 +171,6 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     // Thêm thương hiệu
     $scope.create = function () {
         $scope.error = {
-            idCha: false,
             ten: false,
             mo_ta: false,
             trangThai: false
@@ -185,11 +178,6 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
-
-        if (!$scope.form.idCha) {
-            $scope.error.idCha = true;
-            isValid = false;
-        }
 
         if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
             $scope.error.ten = true;

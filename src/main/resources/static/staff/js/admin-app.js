@@ -98,5 +98,15 @@ app.config(function ($routeProvider) {
             templateUrl:"asset/sanpham/listsanpham.html",
             controller: "sanpham-ctrl"
         })
+        // .when("/spct",{
+        //     templateUrl:"asset/sanpham/quanlyspct.html",
+        //     controller: "spct-ctrl"
+        // })
+        .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
+            templateUrl: "asset/sanpham/quanlyspct.html",
+            controller: "spct-ctrl"
+        })
+
+
 
 })

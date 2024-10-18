@@ -1,7 +1,7 @@
 app.controller("sanpham-ctrl", function ($scope, $http) {
     $scope.items = [];
-    $scope.thuonghieu=[];
-    $scope.danhmuc=[];
+    $scope.thuonghieu = [];
+    $scope.danhmuc = [];
     $scope.form = {};
     $scope.formAdd = {};
     $scope.searchText = ''; // Thêm biến tìm kiếm
@@ -32,12 +32,19 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                return item.id.toString().includes($scope.searchText) || // Lọc theo ID
-                    item.ten.includes($scope.searchText); // Lọc theo tên
+                // Chuyển đổi cả item và searchText thành chữ thường để so sánh không phân biệt chữ hoa chữ thường
+                const searchTextLower = $scope.searchText.toLowerCase();
+
+                return Object.values(item).some(value => {
+                    // Chuyển đổi giá trị của thuộc tính thành chuỗi và so sánh với searchText
+                    return value.toString().toLowerCase().includes(searchTextLower);
+                });
             });
+
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
+
     };
 
     // Hàm khởi tạo
@@ -100,27 +107,56 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
     };
 
     $scope.update = function () {
-        $scope.error = {
-            idCha: false,
+        $scope.error1 = {
             ten: false,
-            mo_ta: false,
-            trangThai: false
+            moTa: false,
+            xuatXu: false,
+            trangThai: false,
+            idThuongHieu: false,
+            idDanhMuc: false,
+            anh: false // Thêm trường lỗi cho ảnh
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
         if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
-            $scope.error.ten = true;
+            $scope.error1.ten = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.moTa || $scope.form.moTa.length < 1 || $scope.form.moTa.length > 100) {
+            $scope.error1.moTa = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.xuatXu) {
+            $scope.error1.xuatXu = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.idThuongHieu || !$scope.form.idThuongHieu.id) {
+            $scope.error1.idThuongHieu = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.idDanhMuc || !$scope.form.idDanhMuc.id) {
+            $scope.error1.idDanhMuc = true;
             isValid = false;
         }
 
         if (!$scope.form.trangThai) {
-            $scope.error.trangThai = true;
+            $scope.error1.trangThai = true;
             isValid = false;
         }
 
-        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện cập nhật
+        // Kiểm tra trường ảnh
+        if (!$scope.form.anh) {
+            $scope.error1.anh = true; // Đánh dấu lỗi cho ảnh
+            isValid = false;
+        }
+
+        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
         if (!isValid) {
             swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
             return; // Ngừng thực hiện nếu không hợp lệ
@@ -136,6 +172,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
                 item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
+                item.nguoiCapNhat = 'Admin'; // Đặt người tạo mặc định là 'Admin'
 
                 $http.put(`/rest/sanpham/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
@@ -177,20 +214,50 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
     $scope.create = function () {
         $scope.error = {
             ten: false,
-            trangThai: false
+            moTa: false,
+            xuatXu: false,
+            trangThai: false,
+            idThuongHieu: false,
+            idDanhMuc: false,
+            anh: false // Thêm trường lỗi cho ảnh
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
-
 
         if (!$scope.formAdd.ten || $scope.formAdd.ten.length < 1 || $scope.formAdd.ten.length > 100) {
             $scope.error.ten = true;
             isValid = false;
         }
 
+        if (!$scope.formAdd.moTa || $scope.formAdd.moTa.length < 1 || $scope.formAdd.moTa.length > 100) {
+            $scope.error.moTa = true;
+            isValid = false;
+        }
+
+        if (!$scope.formAdd.xuatXu) {
+            $scope.error.xuatXu = true;
+            isValid = false;
+        }
+
+        if (!$scope.formAdd.idThuongHieu || !$scope.formAdd.idThuongHieu.id) {
+            $scope.error.idThuongHieu = true;
+            isValid = false;
+        }
+
+        if (!$scope.formAdd.idDanhMuc || !$scope.formAdd.idDanhMuc.id) {
+            $scope.error.idDanhMuc = true;
+            isValid = false;
+        }
+
         if (!$scope.formAdd.trangThai) {
             $scope.error.trangThai = true;
+            isValid = false;
+        }
+
+        // Kiểm tra trường ảnh
+        if (!$scope.formAdd.anh) {
+            $scope.error.anh = true; // Đánh dấu lỗi cho ảnh
             isValid = false;
         }
 
@@ -226,6 +293,34 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
             }
         });
     };
+
+    document.getElementById('profileImage').addEventListener('change', function (event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('previewImage');
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // Hiển thị ảnh xem trước
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+    document.getElementById('profileImage2').addEventListener('change', function (event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('previewImage2');
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // Hiển thị ảnh xem trước
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+
+
+
 
 
 });

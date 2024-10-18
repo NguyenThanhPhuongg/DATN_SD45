@@ -889,6 +889,31 @@ VALUES
 (1, 4, 'Áo khoác dạ nam', 'Việt Nam', 'Áo khoác dạ nam ấm áp', 'mangto.png', 1, 'admin', 'admin'),
 (1, 5, 'Áo phao nam', 'Việt Nam', 'Áo phao nam chống lạnh', 'mangto.png', 1, 'admin', 'admin');
 
+INSERT INTO [chi_tiet_san_pham] ([id_san_pham], [id_size], [id_mau_sac], [id_chat_lieu], [so_luong], [gia], [ghi_chu], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
+VALUES 
+(1, 1, 1, 1, 50, 250000.00, 'Áo sơ mi nam màu đỏ, size S', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(1, 2, 2, 1, 30, 260000.00, 'Áo sơ mi nam màu xanh, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(2, 1, 3, 2, 25, 200000.00, 'Áo thun nam màu vàng, size S', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(2, 2, 4, 2, 20, 220000.00, 'Áo thun nam màu đen, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(3, 3, 5, 3, 15, 450000.00, 'Áo khoác nam màu trắng, size L', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(3, 4, 6, 3, 10, 480000.00, 'Áo khoác nam màu xám, size XL', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(4, 1, 7, 4, 50, 300000.00, 'Áo len nam màu nâu, size S', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(4, 2, 8, 4, 45, 320000.00, 'Áo len nam màu hồng, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(5, 3, 9, 5, 40, 500000.00, 'Áo jacket nam màu xanh lá, size L', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(5, 4, 10, 5, 35, 520000.00, 'Áo jacket nam màu tím, size XL', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(6, 1, 1, 1, 50, 180000.00, 'Áo hoodie nam màu đỏ, size S', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(6, 2, 2, 1, 30, 190000.00, 'Áo hoodie nam màu xanh, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(7, 3, 3, 2, 25, 150000.00, 'Áo polo nam màu vàng, size L', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(7, 4, 4, 2, 20, 160000.00, 'Áo polo nam màu đen, size XL', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(8, 1, 5, 3, 15, 200000.00, 'Áo tank top nam màu trắng, size S', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(8, 2, 6, 3, 10, 220000.00, 'Áo tank top nam màu xám, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(9, 3, 7, 4, 50, 210000.00, 'Áo thun cổ tròn nam màu nâu, size L', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(9, 4, 8, 4, 45, 230000.00, 'Áo thun cổ tròn nam màu hồng, size XL', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(10, 1, 9, 5, 40, 240000.00, 'Áo khoác denim nam màu xanh lá, size S', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(10, 2, 10, 5, 35, 260000.00, 'Áo khoác denim nam màu tím, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(11, 3, 1, 1, 30, 280000.00, 'Áo sơ mi trắng nam, size L', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
+(11, 4, 2, 1, 25, 300000.00, 'Áo sơ mi kẻ nam, size XL', 1, GETDATE(), GETDATE(), 'admin', 'admin');
+
 
 select * from thuong_hieu
 select * from danh_muc 
@@ -900,8 +925,8 @@ select * from chuc_nang
 select * from nhom 
 select * from nhom_chuc_nang 
 select * from san_pham 
-select * from nhom 
+select * from chi_tiet_san_pham 
 select * from nhom 
 select * from nhom 
 
-update  san_pham set anh = 'quan-au.png' where id =2
+update  san_pham set id_danh_muc = 1 where id =1
