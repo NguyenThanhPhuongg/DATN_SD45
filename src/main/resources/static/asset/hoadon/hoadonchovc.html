@@ -1,0 +1,170 @@
+<div class="container-fluid px-4">
+    <h2 class="mt-4">Quản lý đơn hàng chờ vận chuyển</h2><br>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table me-1"></i>
+                Danh sách đơn hàng chờ vận chuyển
+            </div>
+        </div>
+        <div class="card-body">
+            <input type="text" ng-model="searchText2" placeholder="Tìm kiếm..." class="form-control mb-3" />
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>ID Người dùng</th>
+                    <th>Địa chỉ giao hàng</th>
+                    <th>Phương thức vận chuyển</th>
+                    <th>Ngày đặt hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Điểm sử dụng</th>
+                    <th>Chức năng</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in pager2.items | filter: searchText">
+                    <td>{{$index + 1 + (pager2.page * pager2.size)}}</td>
+                    <td>{{item.id}}</td>
+                    <td>{{item.idUser.id}}</td>
+                    <td>{{item.idDiaChiGiaHang.diaChi}}</td>
+                    <td>{{item.idPhuongThucVanChuyen.ten}}</td>
+                    <td>{{item.ngayDatHang}}</td>
+                    <td>{{item.tongTien}}</td>
+                    <td>{{item.diemSuDung}}</td>
+                    <td>
+                        <div class="btn-group btn-group-xs">
+                            <button class="btn btn-link" type="button" ng-click="update1(item)">
+                                <i class="fas fa-check icon-check"></i>
+                            </button>
+                            <button class="btn btn-link" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal" ng-click="edit(item)">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button class="btn btn-link" type="button" ng-click="update4(item)">
+                                <i class="fas fa-times icon-close"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="panel-footer text-center">
+                <button ng-click="pager2.first()" class="btn btn-danger">
+                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
+                </button>
+                <button ng-click="pager2.prev()" class="btn btn-primary">
+                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
+                </button>
+                <button class="btn btn-success">{{pager2.page+1}} of {{pager2.count}}</button>
+                <button ng-click="pager2.next()" class="btn btn-primary">
+                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
+                </button>
+                <button ng-click="pager2.last()" class="btn btn-danger">
+                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!--    /// thông tin hóa đơn-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Thông tin đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid px-4">
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputNgayTao" class="form-label">Ngày đặt hàng</label>
+                                    <input type="date" class="form-control" id="inputNgayTao"
+                                           ng-model="form.ngayDatHang"
+                                           readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputNgayTao" class="form-label">Ngày thanh toán</label>
+                                    <input type="date" class="form-control" id="inputNgayTao"
+                                           ng-model="form.ngayThanhToan"
+                                           readonly>
+                                </div>
+
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputNgayTao" class="form-label">Ngày tạo</label>
+                                    <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
+                                           readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputNgayTao" class="form-label">Ngày câp nhật</label>
+                                    <input type="date" class="form-control" id="inputNgayTao1"
+                                           ng-model="form.ngayCapNhat"
+                                           readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputNguoiTao" class="form-label">Người tạo</label>
+                                    <input type="text" class="form-control" id="inputNguoiTao" ng-model="form.nguoiTao"
+                                           readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputNguoiCapNhat" class="form-label">Người cập nhật</label>
+                                    <input type="text" class="form-control" id="inputNguoiCapNhat"
+                                           ng-model="form.nguoiCapNhat" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">ID</label>
+                                    <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">ID Hóa đơn chi tiết</label>
+                                    <input type="text" class="form-control" id="inputID" ng-model="hdct.id" readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>ID SP</th>
+                                            <th>Tên SP</th>
+                                            <th>Size</th>
+                                            <th>Màu sắc</th>
+                                            <th>Chất liệu</th>
+                                            <th>Giá</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{ hdct.idSanPhamChiTiet.id }}</td>
+                                            <td>{{ hdct.idSanPhamChiTiet.idSanPham.ten }}</td>
+                                            <td>{{ hdct.idSanPhamChiTiet.idSize.ten }}</td>
+                                            <td>{{ hdct.idSanPhamChiTiet.idMauSac.ten }}</td>
+                                            <td>{{ hdct.idSanPhamChiTiet.idChatLieu.ten }}</td>
+                                            <td>{{ hdct.idSanPhamChiTiet.gia }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="card-footer text-center mt-4">
+                        <button type="button" class="btn btn-warning me-2" ng-click="update()">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button type="button" class="btn btn-secondary" ng-click="reset()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

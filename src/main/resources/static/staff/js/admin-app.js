@@ -107,6 +107,22 @@ app.config(function ($routeProvider) {
             controller: "spct-ctrl"
         })
 
-
+        /// hóa đơn
+        .when("/hoadoncho",{
+            templateUrl:"asset/hoadon/hoadoncho.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadonchovc",{
+            templateUrl:"asset/hoadon/hoadonchovc.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadondone",{
+            templateUrl:"asset/hoadon/hoadondone.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadonfail",{
+            templateUrl:"asset/hoadon/hoadonfail.html",
+            controller: "hoadon-ctrl"
+        })
 
 })
