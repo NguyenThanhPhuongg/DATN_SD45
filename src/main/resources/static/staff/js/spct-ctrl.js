@@ -1,4 +1,4 @@
-app.controller("spct-ctrl", function ($scope, $http) {
+app.controller("spct-ctrl", function ($scope, $http,$rootScope) {
     $scope.items = [];
     $scope.sanpham = [];
     $scope.size = [];
@@ -343,5 +343,7 @@ app.controller("spct-ctrl", function ($scope, $http) {
             }
         });
     };
+
+    $scope.selectedProductId = $rootScope.selectedProductId; // Lấy ID sản phẩm từ rootScope
 
 });

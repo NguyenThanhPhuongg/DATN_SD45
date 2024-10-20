@@ -43,6 +43,9 @@
                     <td>{{item.trangThai}}</td>
                     <td>
                         <div class="btn-group btn-group-xs">
+                            <button class="btn btn-link" type="button" ng-click="selectProduct(item)">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
                                     data-bs-target="#exampleModal" ng-click="edit(item)">
                                 <i class="fas fa-eye"></i>

@@ -725,7 +725,7 @@ CREATE TABLE [blog]
     (
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
-    [id_nguoi_dung] BIGINT,
+    [tac_gia] NVARCHAR(255),
     [title] NVARCHAR(255),       
     [content] NVARCHAR(MAX),
     [hinh_anh] NVARCHAR(MAX),
@@ -797,6 +797,7 @@ VALUES
 ('Chức năng 8', 'CN008', 3, 2, 1, 'admin', 'admin'),
 ('Chức năng 9', 'CN009', 4, 1, 1, 'admin', 'admin'),
 ('Chức năng 10', 'CN010', 4, 2, 1, 'admin', 'admin');
+GO
 
 INSERT INTO nhom_chuc_nang (id_nhom, id_chuc_nang, trang_thai, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -810,6 +811,7 @@ VALUES
 (4, 8, 1, 'admin', 'admin'),
 (5, 9, 1, 'admin', 'admin'),
 (5, 10, 1, 'admin', 'admin');
+GO
 
 INSERT INTO nhom (ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -823,6 +825,7 @@ VALUES
 ('Nhóm 8', 'Mô tả nhóm 8', 1, 'admin', 'admin'),
 ('Nhóm 9', 'Mô tả nhóm 9', 1, 'admin', 'admin'),
 ('Nhóm 10', 'Mô tả nhóm 10', 1, 'admin', 'admin');
+GO
 
 INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, id_nhom, vaitro, xac_thuc, trang_thai, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -836,6 +839,7 @@ VALUES
 ('user8', 'password8', 8, 'Staff', 1, 1, 'admin', 'admin'),
 ('user9', 'password9', 9, 'Customer', 1, 1, 'admin', 'admin'),
 ('user10', 'password10', 10, 'Customer', 1, 1, 'admin', 'admin');
+GO
 
 INSERT INTO thong_tin_ca_nhan (id_nguoi_dung, ho_va_ten, sdt, avatar, dia_chi, gioi_tinh, ngay_sinh, cccd, email, trang_thai, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -849,6 +853,7 @@ VALUES
 (8, 'Nguyen Van H', '0912345685', 'avatar8.png', 'Hanoi', 1, '1997-08-01', '0123456856', 'h@example.com', 1, 'admin', 'admin'),
 (9, 'Nguyen Van I', '0912345686', 'avatar9.png', 'Hanoi', 1, '1998-09-01', '0123456867', 'i@example.com', 1, 'admin', 'admin'),
 (10, 'Nguyen Van J', '0912345687', 'avatar10.png', 'Hanoi', 1, '1999-10-01', '0123456878', 'j@example.com', 1, 'admin', 'admin');
+GO
 
 INSERT INTO danh_muc (id_danh_muc_cha, ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -862,6 +867,7 @@ VALUES
 (2,'Danh mục 8', 'Mô tả danh mục 8', 1, 'admin', 'admin'),
 (2,'Danh mục 9', 'Mô tả danh mục 9', 1, 'admin', 'admin'),
 (2,'Danh mục 10', 'Mô tả danh mục 10', 1, 'admin', 'admin');
+GO
 
 INSERT INTO thuong_hieu (ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -875,6 +881,7 @@ VALUES
 ('Thương hiệu 8', 'Mô tả thương hiệu 8', 1, 'admin', 'admin'),
 ('Thương hiệu 9', 'Mô tả thương hiệu 9', 1, 'admin', 'admin'),
 ('Thương hiệu 10', 'Mô tả thương hiệu 10', 1, 'admin', 'admin');
+GO
 
 INSERT INTO [chat_lieu] ([ten], [id_danh_muc_cha], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
@@ -888,6 +895,7 @@ VALUES
 ('Vải thun', 1, 1, 'admin', 'admin'),
 ('Vải lanh', 1, 1, 'admin', 'admin'),
 ('Vải nhung', 1, 1, 'admin', 'admin');
+GO
 
 INSERT INTO [mau_sac] ([ten], [id_danh_muc_cha], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
@@ -901,6 +909,7 @@ VALUES
 ('Hồng', 1, 1, 'admin', 'admin'),
 ('Xanh lá', 1, 1, 'admin', 'admin'),
 ('Tím', 1, 1, 'admin', 'admin');
+GO
 
 INSERT INTO [size] ([ten], [id_danh_muc_cha], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
@@ -914,6 +923,7 @@ VALUES
 ('36', 1, 1, 'admin', 'admin'),
 ('38', 1, 1, 'admin', 'admin'),
 ('40', 1, 1, 'admin', 'admin');
+GO
 
 INSERT INTO [san_pham] ([id_danh_muc], [id_thuong_hieu], [ten], [xuat_xu], [mo_ta], [anh], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
@@ -932,6 +942,7 @@ VALUES
 (1, 3, 'Áo thun ôm nam', 'Việt Nam', 'Áo thun ôm nam thời trang', 'mangto.png', 1, 'admin', 'admin'),
 (1, 4, 'Áo khoác dạ nam', 'Việt Nam', 'Áo khoác dạ nam ấm áp', 'mangto.png', 1, 'admin', 'admin'),
 (1, 5, 'Áo phao nam', 'Việt Nam', 'Áo phao nam chống lạnh', 'mangto.png', 1, 'admin', 'admin');
+GO
 
 INSERT INTO [chi_tiet_san_pham] ([id_san_pham], [id_size], [id_mau_sac], [id_chat_lieu], [so_luong], [gia], [ghi_chu], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
@@ -957,6 +968,7 @@ VALUES
 (10, 2, 10, 5, 35, 260000.00, 'Áo khoác denim nam màu tím, size M', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (11, 3, 1, 1, 30, 280000.00, 'Áo sơ mi trắng nam, size L', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (11, 4, 2, 1, 25, 300000.00, 'Áo sơ mi kẻ nam, size XL', 1, GETDATE(), GETDATE(), 'admin', 'admin');
+GO
 
 INSERT INTO phuong_thuc_van_chuyen (ten, mo_ta, phi_van_chuyen, loai, ghi_chu, thoi_gian_giao_hang, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
 VALUES 
@@ -970,7 +982,7 @@ VALUES
 (N'Giao hàng đường biển', N'Dành cho hàng hóa lớn', 120000, 7, N'Hàng cồng kềnh', N'15-20 ngày', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (N'Giao hàng đường bộ', N'Qua xe tải', 50000, 6, N'An toàn cho hàng hóa nặng', N'7-10 ngày', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (N'Giao hàng bằng máy bay', N'Dịch vụ nhanh qua hàng không', 80000, 1, N'Nhanh và an toàn', N'2-3 ngày', 1, GETDATE(), GETDATE(), 'admin', 'admin');
-
+GO
 
 INSERT INTO dia_chi_giao_hang (id_nguoi_dung, ho_va_ten, sdt, dia_chi, thanh_pho, quoc_gia, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat) 
 VALUES 
@@ -984,6 +996,7 @@ VALUES
 (8, N'Hoàng Thị H', '0937894561', N'505 Trường Sa, Quận Phú Nhuận', N'TP.HCM', N'Việt Nam', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (9, N'Bùi Văn I', '0919876543', N'606 Phạm Ngũ Lão, Quận 1', N'TP.HCM', N'Việt Nam', 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (10, N'Phan Thị K', '0956789012', N'707 Nam Kỳ Khởi Nghĩa, Quận 3', N'TP.HCM', N'Việt Nam', 1, GETDATE(), GETDATE(), 'admin', 'admin');
+GO
 
 INSERT INTO hoa_don (id_nguoi_dung, id_dia_chi_giao_hang, id_phuong_thuc_van_chuyen, ngay_dat_hang, ngay_thanh_toan, tong_tien, diem_su_dung, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
 VALUES
@@ -1011,6 +1024,7 @@ VALUES
 (9, 6, 2, GETDATE(), GETDATE(), 22000000.00, 110000, 3, GETDATE(), GETDATE(), 'admin', 'admin'),
 (9, 2, 3, GETDATE(), GETDATE(), 23000000.00, 115000, 4, GETDATE(), GETDATE(), 'admin', 'admin'),
 (9, 4, 4, GETDATE(), GETDATE(), 24000000.00, 120000, 4, GETDATE(), GETDATE(), 'admin', 'admin');
+GO
 
 INSERT INTO chi_tiet_hoa_don (id_hoa_don, id_san_pham_chi_tiet, so_luong, gia, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
 VALUES
@@ -1038,6 +1052,30 @@ VALUES
 (22, 2, 5, 6000000.00, 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (23, 3, 6, 23000000.00, 1, GETDATE(), GETDATE(), 'admin', 'admin'),
 (24, 4, 2, 24000000.00, 1, GETDATE(), GETDATE(), 'admin', 'admin');
+GO
+
+INSERT INTO khuyen_mai (ten, mo_ta, loai, gia_tri, ngay_bat_dau, ngay_ket_thuc, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+('Khuyến mãi 1', 'Mô tả khuyến mãi 1', 1, 19.45, '2024-10-03', '2024-11-03', 0, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 2', 'Mô tả khuyến mãi 2', 1, 34.47, '2024-10-19', '2024-11-12', 1, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 3', 'Mô tả khuyến mãi 3', 1, 42.74, '2024-10-17', '2024-11-16', 0, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 4', 'Mô tả khuyến mãi 4', 1, 46.95, '2024-10-11', '2024-11-17', 0, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 5', 'Mô tả khuyến mãi 5', 1, 44.66, '2024-09-24', '2024-11-11', 1, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 6', 'Mô tả khuyến mãi 6', 2, 15.89, '2024-09-30', '2024-11-10', 1, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 7', 'Mô tả khuyến mãi 7', 3, 10.51, '2024-09-21', '2024-11-04', 0, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 8', 'Mô tả khuyến mãi 8', 3, 41.00, '2024-09-24', '2024-10-29', 0, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 9', 'Mô tả khuyến mãi 9', 2, 42.12, '2024-10-05', '2024-10-21', 0, '2024-10-20', '2024-10-20', 'admin', 'admin'),
+('Khuyến mãi 10', 'Mô tả khuyến mãi 10', 2, 16.13, '2024-10-10', '2024-11-13', 0, '2024-10-20', '2024-10-20', 'admin', 'admin');
+GO
+
+INSERT INTO blog (tac_gia, title, content, hinh_anh, content_2, hinh_anh_2, content_3, hinh_anh_3, trang_thai, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+(N'Chủ', 'Tiêu đề bài viết 1', 'Nội dung bài viết 1', 'mangto.png', 'Nội dung phụ 1 cho bài viết 1', 'mangto.png', 'Nội dung phụ 2 cho bài viết 1', 'mangto.png', 1, 'NguoiTao1', 'NguoiCapNhat1'),
+(N'Chủ','Tiêu đề bài viết 2', 'Nội dung bài viết 2', 'mangto.png', 'Nội dung phụ 1 cho bài viết 2', 'mangto.png', 'Nội dung phụ 2 cho bài viết 2', 'mangto.png', 1, 'NguoiTao2', 'NguoiCapNhat2'),
+(N'Chủ', 'Tiêu đề bài viết 3', 'Nội dung bài viết 3', 'mangto.png', 'Nội dung phụ 1 cho bài viết 3', 'mangto.png', 'Nội dung phụ 2 cho bài viết 3', 'mangto.png', 1, 'NguoiTao3', 'NguoiCapNhat3'),
+(N'Chủ', 'Tiêu đề bài viết 4', 'Nội dung bài viết 4', 'mangto.png', 'Nội dung phụ 1 cho bài viết 4', 'mangto.png', 'Nội dung phụ 2 cho bài viết 4', 'mangto.png', 1, 'NguoiTao4', 'NguoiCapNhat4'),
+(N'Chủ', 'Tiêu đề bài viết 5', 'Nội dung bài viết 5', 'mangto.png', 'Nội dung phụ 1 cho bài viết 5', 'mangto.png', 'Nội dung phụ 2 cho bài viết 5', 'mangto.png', 1, 'NguoiTao5', 'NguoiCapNhat5');
+GO
 
 select * from thuong_hieu
 select * from danh_muc 
@@ -1054,7 +1092,11 @@ select * from hoa_don
 select * from chi_tiet_hoa_don 
 select * from phuong_thuc_van_chuyen 
 select * from dia_chi_giao_hang 
-
+select * from khuyen_mai 
+select * from ap_dung_khuyen_mai 
+select * from blog
+select * from ap_dung_khuyen_mai 
 
 update  san_pham set id_danh_muc = 1 where id =1
 SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
+

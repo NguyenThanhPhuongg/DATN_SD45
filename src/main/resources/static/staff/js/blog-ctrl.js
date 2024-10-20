@@ -1,10 +1,6 @@
-app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
+app.controller("blog-ctrl", function ($scope, $http) {
     $scope.items = [];
-    $scope.thuonghieu = [];
-    $scope.danhmuc = [];
     $scope.form = {};
-    $scope.selectedProductId = null;
-
     $scope.formAdd = {};
     $scope.searchText = ''; // Thêm biến tìm kiếm
     $scope.pager = {
@@ -34,40 +30,29 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                // Chuyển đổi cả item và searchText thành chữ thường để so sánh không phân biệt chữ hoa chữ thường
-                const searchTextLower = $scope.searchText.toLowerCase();
-
-                return Object.values(item).some(value => {
-                    // Chuyển đổi giá trị của thuộc tính thành chuỗi và so sánh với searchText
-                    return value.toString().toLowerCase().includes(searchTextLower);
-                });
+                return item.id.toString().includes($scope.searchText) || // Lọc theo ID
+                    item.ten.includes($scope.searchText); // Lọc theo tên
             });
-
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
-
     };
 
     // Hàm khởi tạo
     $scope.initialize = function () {
         // Tải danh sách thương hiệu
-        $http.get("/rest/sanpham").then(resp => {
+        $http.get("/rest/blog").then(resp => {
             console.log("Data from API: ", resp.data); // Kiểm tra dữ liệu từ API
             $scope.items = resp.data;
             $scope.items.forEach(item => {
                 item.ngayTao = new Date(item.ngayTao); // Đổi tên trường nếu cần
                 item.ngayCapNhat = new Date(item.ngayCapNhat); // Đổi tên trường nếu cần
+                item.ngayBatDau = new Date(item.ngayBatDau); // Đổi tên trường nếu cần
+                item.ngayKetThuc = new Date(item.ngayKetThuc); // Đổi tên trường nếu cần
             });
             $scope.pager.updateItems(); // Cập nhật các mục cho pager
         }).catch(error => {
             console.log("Error loading thuong hieu: ", error);
-        });
-        $http.get("/rest/danhmuc").then(resp => {
-            $scope.danhmuc = resp.data;
-        });
-        $http.get("/rest/thuonghieu").then(resp => {
-            $scope.thuonghieu = resp.data;
         });
     };
 
@@ -85,22 +70,26 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
         // Giữ nguyên giá trị của id nếu có
         const currentId = $scope.form.id; // Lưu trữ giá trị ID hiện tại
         const ngayTao = $scope.form.ngayTao; // Lưu trữ giá trị ID hiện tại
+
         // Thiết lập lại các trường khác
         $scope.form = {
             nguoiTao: 'Admin', // Mặc định người tạo là 'Admin'
             nguoiCapNhat: 'Admin', // Mặc định người cập nhật là 'Admin'
+            ngayTao: ngayTao, // Ngày tạo sẽ là thời gian hiện tại
             ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
-            ngayTao: ngayTao,
             ten: '', // Đặt mặc định cho tên
+            moTa: '', // Đặt mặc định cho mô tả
             trangThai: 1, // Đặt mặc định cho trạng thái là true
-            id: currentId // Giữ nguyên giá trị ID
+            id: currentId, // Giữ nguyên giá trị ID
+            loai: "1" // Giữ nguyên giá trị ID
         };
     };
-
     $scope.resetAdd = function () {
-        $scope.formAdd = {};
+        $scope.formAdd = {
+            trangThai: "1", // Đặt mặc định cho trạng thái là true
+            loai: "1" // Giữ nguyên giá trị ID
+        };
     };
-
 
     $scope.edit = function (item) {
         // Chuyển timestamp thành Date object
@@ -109,56 +98,43 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
     };
 
     $scope.update = function () {
-        $scope.error1 = {
+        $scope.error = {
             ten: false,
             moTa: false,
-            xuatXu: false,
-            trangThai: false,
-            idThuongHieu: false,
-            idDanhMuc: false,
-            anh: false // Thêm trường lỗi cho ảnh
+            giaTri: false,
+            ngayBatDau: false,
+            ngayKetThuc: false,
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
+        // Kiểm tra tên không được để trống và phải có độ dài từ 1-100 ký tự
         if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
-            $scope.error1.ten = true;
+            $scope.error.ten = true;
             isValid = false;
         }
 
+        // Kiểm tra mô tả không được để trống và phải có độ dài từ 1-100 ký tự
         if (!$scope.form.moTa || $scope.form.moTa.length < 1 || $scope.form.moTa.length > 100) {
-            $scope.error1.moTa = true;
+            $scope.error.moTa = true;
             isValid = false;
         }
 
-        if (!$scope.form.xuatXu) {
-            $scope.error1.xuatXu = true;
+        // Kiểm tra giá trị không được bỏ trống và phải nằm trong khoảng từ 50,000 đến 1,000,000
+        if (!$scope.form.giaTri || $scope.form.giaTri < 50000 || $scope.form.giaTri > 1000000) {
+            $scope.error.giaTri = true;
             isValid = false;
         }
 
-        if (!$scope.form.idThuongHieu || !$scope.form.idThuongHieu.id) {
-            $scope.error1.idThuongHieu = true;
+        // Kiểm tra ngày bắt đầu phải nhỏ hơn ngày kết thúc
+        if (!$scope.form.ngayBatDau || !$scope.form.ngayKetThuc || new Date($scope.form.ngayBatDau) >= new Date($scope.form.ngayKetThuc)) {
+            $scope.error.ngayBatDau = true;
+            $scope.error.ngayKetThuc = true;
             isValid = false;
         }
 
-        if (!$scope.form.idDanhMuc || !$scope.form.idDanhMuc.id) {
-            $scope.error1.idDanhMuc = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.trangThai) {
-            $scope.error1.trangThai = true;
-            isValid = false;
-        }
-
-        // Kiểm tra trường ảnh
-        if (!$scope.form.anh) {
-            $scope.error1.anh = true; // Đánh dấu lỗi cho ảnh
-            isValid = false;
-        }
-
-        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
+        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện cập nhật
         if (!isValid) {
             swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
             return; // Ngừng thực hiện nếu không hợp lệ
@@ -174,9 +150,8 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
                 item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
-                item.nguoiCapNhat = 'Admin'; // Đặt người tạo mặc định là 'Admin'
 
-                $http.put(`/rest/sanpham/${item.id}`, item).then(resp => {
+                $http.put(`/rest/blog/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -199,7 +174,7 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                $http.delete(`/rest/sanpham/${item.id}`).then(resp => {
+                $http.delete(`/rest/blog/${item.id}`).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     $scope.reset();
                     swal("Success!", "Xóa thành công", "success");
@@ -214,56 +189,55 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
     };
     // Thêm thương hiệu
     $scope.create = function () {
-        $scope.error = {
+        $scope.error1 = {
             ten: false,
             moTa: false,
-            xuatXu: false,
+            giaTri: false,
+            ngayBatDau: false,
+            ngayKetThuc: false,
             trangThai: false,
-            idThuongHieu: false,
-            idDanhMuc: false,
-            anh: false // Thêm trường lỗi cho ảnh
+            loai: false,
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
+        // Kiểm tra tên không được để trống và phải có độ dài từ 1-100 ký tự
         if (!$scope.formAdd.ten || $scope.formAdd.ten.length < 1 || $scope.formAdd.ten.length > 100) {
-            $scope.error.ten = true;
+            $scope.error1.ten = true;
             isValid = false;
         }
 
+        // Kiểm tra mô tả không được để trống và phải có độ dài từ 1-100 ký tự
         if (!$scope.formAdd.moTa || $scope.formAdd.moTa.length < 1 || $scope.formAdd.moTa.length > 100) {
-            $scope.error.moTa = true;
+            $scope.error1.moTa = true;
             isValid = false;
         }
 
-        if (!$scope.formAdd.xuatXu) {
-            $scope.error.xuatXu = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.idThuongHieu || !$scope.formAdd.idThuongHieu.id) {
-            $scope.error.idThuongHieu = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.idDanhMuc || !$scope.formAdd.idDanhMuc.id) {
-            $scope.error.idDanhMuc = true;
+        // Kiểm tra giá trị không được bỏ trống và phải nằm trong khoảng từ 50,000 đến 1,000,000
+        if (!$scope.formAdd.giaTri || $scope.formAdd.giaTri < 50000 || $scope.formAdd.giaTri > 1000000) {
+            $scope.error1.giaTri = true;
             isValid = false;
         }
 
         if (!$scope.formAdd.trangThai) {
-            $scope.error.trangThai = true;
+            $scope.error1.trangThai = true;
             isValid = false;
         }
 
-        // Kiểm tra trường ảnh
-        if (!$scope.formAdd.anh) {
-            $scope.error.anh = true; // Đánh dấu lỗi cho ảnh
+        if (!$scope.formAdd.trangThai) {
+            $scope.error1.loai = true;
             isValid = false;
         }
 
-        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
+        // Kiểm tra ngày bắt đầu phải nhỏ hơn ngày kết thúc
+        if (!$scope.formAdd.ngayBatDau || !$scope.formAdd.ngayKetThuc || new Date($scope.formAdd.ngayBatDau) >= new Date($scope.formAdd.ngayKetThuc)) {
+            $scope.error1.ngayBatDau = true;
+            $scope.error1.ngayKetThuc = true;
+            isValid = false;
+        }
+
+        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện cập nhật
         if (!isValid) {
             swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
             return; // Ngừng thực hiện nếu không hợp lệ
@@ -281,8 +255,7 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
                 item.nguoiTao = 'Admin'; // Đặt người tạo mặc định là 'Admin'
                 item.ngayTao = new Date(); // Ngày tạo là thời gian hiện tại
                 item.ngayCapNhat = new Date(); // Ngày cập nhật là thời gian hiện tại
-
-                $http.post(`/rest/sanpham`, item).then(resp => {
+                $http.post(`/rest/blog`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     $scope.resetAdd();
                     swal("Success!", "Thêm mới thành công", "success");
@@ -295,37 +268,5 @@ app.controller("sanpham-ctrl", function ($scope, $http ,$rootScope, $location) {
             }
         });
     };
-
-    document.getElementById('profileImage').addEventListener('change', function (event) {
-        const input = event.target;
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const preview = document.getElementById('previewImage');
-                preview.src = e.target.result;
-                preview.style.display = 'block'; // Hiển thị ảnh xem trước
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    });
-    document.getElementById('profileImage2').addEventListener('change', function (event) {
-        const input = event.target;
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const preview = document.getElementById('previewImage2');
-                preview.src = e.target.result;
-                preview.style.display = 'block'; // Hiển thị ảnh xem trước
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    });
-
-    $scope.selectProduct = function (item) {
-        console.log("Selected Product ID: ", item.id); // Log để kiểm tra
-        $rootScope.selectedProductId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
-        $location.path('/spct'); // Chuyển hướng đến trang sản phẩm chi tiết
-    };
-
 
 });

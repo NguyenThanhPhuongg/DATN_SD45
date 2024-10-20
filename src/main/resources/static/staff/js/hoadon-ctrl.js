@@ -1,10 +1,11 @@
-app.controller("hoadon-ctrl", function ($scope, $http) {
+app.controller("hoadon-ctrl", function ($scope, $http,$rootScope, $location) {
     $scope.items = [];
     $scope.dcgh = [];
     $scope.hdct = [];
     $scope.hdcts = [];
     $scope.ptvc = [];
     $scope.form = {};
+    $scope.selectedInvoiceId = null;
     $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
     $scope.searchText2 = '';
     $scope.searchText3 = '';
@@ -304,19 +305,11 @@ app.controller("hoadon-ctrl", function ($scope, $http) {
         });
     };
 
-    $scope.edit = function (item) {
-        // Điền thông tin của hóa đơn vào form
-        $scope.form = angular.copy(item); // Sử dụng angular.copy để tránh thay đổi item gốc
-
-        // Gọi API để lấy danh sách chi tiết hóa đơn dựa trên id hóa đơn
-        $http.get(`/rest/hdct/hoadon/${item.id}`).then(resp => {
-            // Cập nhật danh sách chi tiết hóa đơn vào scope
-            $scope.hdcts = resp.data; // Giả sử hdct đã được khai báo ở đầu controller
-        }).catch(error => {
-            console.log("Error loading hoa don chi tiet: ", error);
-        });
+    $scope.selectInvoice = function (item) {
+        console.log("Selected Invoice ID: ", item.id); // Thêm log này
+        $rootScope.selectedInvoiceId = item.id; // Lưu ID hóa đơn vào rootScope
+        $location.path('/hdct'); // Chuyển hướng đến trang hdct
     };
-
 
     // Khởi tạo
     $scope.initialize();
