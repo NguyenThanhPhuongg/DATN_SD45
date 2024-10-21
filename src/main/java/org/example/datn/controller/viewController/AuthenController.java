@@ -17,4 +17,19 @@ public class AuthenController {
     public String login() {
         return "customer/auth/login";
     }
+
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "customer/auth/forgotPassword";
+    }
+
+    @GetMapping("/verify-reset-password")
+    public String verifyResetPassword() {
+        return "customer/auth/verify-reset-password";
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPassword() {
+        return "customer/auth/reset-password";
+    }
 }

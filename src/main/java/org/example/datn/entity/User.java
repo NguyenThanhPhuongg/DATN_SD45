@@ -29,9 +29,8 @@ public class User extends CommonEntity {
     @Column(name = "mat_khau")
     private String password;
 
-    @ManyToOne
     @JoinColumn(name = "id_nhom")
-    private Nhom idNhom;
+    private Long idNhom;
 
     @Column(name = "loai")
     @Enumerated(EnumType.STRING)
