@@ -10,6 +10,4 @@ import java.util.List;
 
 @Repository
 public interface DanhMucRepository extends JpaRepository<DanhMuc, Long> {
-    @Query("SELECT p FROM DanhMuc p WHERE p.id = ?1")
-    List<DanhMuc> findByCateId(Long cid);
 }

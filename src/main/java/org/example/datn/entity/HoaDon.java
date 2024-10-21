@@ -20,9 +20,8 @@ public class HoaDon {
     private Long id;
 //    @Column(name = "id_nguoi_dung")
 //    private String idUser;
-    @ManyToOne
-    @JoinColumn(name = "id_nguoi_dung")
-    private NguoiDung idUser;
+    @Column(name = "id_nguoi_dung")
+    private Long idUser;
     @ManyToOne
     @JoinColumn(name = "id_dia_chi_giao_hang")
     private DiaChiGiaHang idDiaChiGiaHang;

@@ -18,6 +18,7 @@
                     <th>Tên</th>
                     <th>Mô tả</th>
                     <th>Trạng thái</th>
+                    <th>Trạng thái</th>
                     <th>Chức năng</th>
                 </tr>
                 </thead>
@@ -27,8 +28,13 @@
                     <td>{{item.id}}</td>
                     <td>{{item.idCha}}</td>
                     <td>{{item.ten}}</td>
-                    <td>{{item.mo_ta}}</td>
-                    <td>{{item.trangThai}}</td>
+                    <td>{{item.moTa}}</td>
+                    <td>{{item.nguoiTao}}</td>
+                    <td>
+                        <span ng-if="item.trangThai === 1">Active</span>
+                        <span ng-if="item.trangThai === 3">Locked</span>
+                        <span ng-if="item.trangThai === 2">Khác</span>
+                    </td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
@@ -50,7 +56,7 @@
                 <button ng-click="pager.prev()" class="btn btn-primary">
                     <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
                 </button>
-                <button class="btn btn-success">{{pager.page+1}} of {{pager.count}}</button>
+                <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
                 <button ng-click="pager.next()" class="btn btn-primary">
                     <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
                 </button>
@@ -87,8 +93,8 @@
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputMoTa" class="form-label">Mô tả</label>
-                                <input type="text" class="form-control" id="inputMoTa" ng-model="form.mo_ta">
-                                <span class="text-danger" ng-show="error.mo_ta">Mô tả phải từ 1 đến 100 ký tự.</span>
+                                <input type="text" class="form-control" id="inputMoTa" ng-model="form.moTa">
+                                <span class="text-danger" ng-show="error.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
                             </div>
                             <div class="form-group col-md-7 mt-2">
                                 <label>Trạng thái</label>
@@ -100,7 +106,7 @@
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="0">
+                                               ng-model="form.trangThai" ng-value="3">
                                         <label class="form-check-label">Locked</label>
                                     </div>
                                     <div class="form-check form-check-inline">
@@ -117,8 +123,8 @@
                                        readonly>
                             </div>
                             <div class="col-md-6 mt-2">
-                                <label for="inputNgayTao" class="form-label">Ngày câp nhật</label>
-                                <input type="date" class="form-control" id="inputNgayTao1" ng-model="form.ngayCapNhat"
+                                <label for="inputNgayCapNhat" class="form-label">Ngày cập nhật</label>
+                                <input type="date" class="form-control" id="inputNgayCapNhat" ng-model="form.ngayCapNhat"
                                        readonly>
                             </div>
                             <div class="col-md-6 mt-2">
@@ -148,5 +154,4 @@
             </div>
         </div>
     </div>
-
 </div>

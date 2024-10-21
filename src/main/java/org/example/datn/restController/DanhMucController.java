@@ -1,8 +1,11 @@
 package org.example.datn.restController;
 
-import org.example.datn.entity.DanhMuc;
-import org.example.datn.service.DanhMucService;
+import org.example.datn.model.response.DanhMucModel;
+import org.example.datn.processor.DanhMucProcessor;
+import org.example.datn.service.DMService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,31 +14,47 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/rest/danhmuc")
 public class DanhMucController {
-    @Autowired
-    private DanhMucService danhMucService;
 
-    @GetMapping("{id}")
-    public DanhMuc getOne(@PathVariable("id") Long id) {
-        return danhMucService.findById(id);
+    private final DMService danhMucService;
+
+    @Autowired
+    public DanhMucController(DMService danhMucService) {
+        this.danhMucService = danhMucService;
     }
 
-    @GetMapping()
-    public List<DanhMuc> getAll() {
-        return danhMucService.findAll();
+    @GetMapping("/{id}")
+    public ResponseEntity<DanhMucModel> getById(@PathVariable Long id) {
+        DanhMucModel model = danhMucService.getById(id);
+        if (model != null) {
+            return ResponseEntity.ok(model);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<DanhMucModel> update(@PathVariable Long id, @RequestBody DanhMucModel model) {
+        DanhMucModel updatedModel = danhMucService.update(id, model);
+        if (updatedModel != null) {
+            return ResponseEntity.ok(updatedModel);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping
+    public List<DanhMucModel> getAll() {
+        return danhMucService.getAll();
     }
 
     @PostMapping
-    public DanhMuc create(@RequestBody DanhMuc product) {
-        return danhMucService.create(product);
+    public ResponseEntity<DanhMucModel> create(@RequestBody DanhMucModel model) {
+        DanhMucModel savedModel = danhMucService.save(model);
+        return ResponseEntity.ok(savedModel);
     }
 
-    @PutMapping("{id}")
-    public DanhMuc update(@PathVariable("id") Integer id, @RequestBody DanhMuc product) {
-        return danhMucService.update(product);
-    }
-
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         danhMucService.delete(id);
+        return ResponseEntity.noContent().build();
     }
+
 }
