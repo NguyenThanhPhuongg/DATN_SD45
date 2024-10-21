@@ -17,6 +17,6 @@ import java.time.LocalDateTime;
 public class CommonModel implements Serializable {
     LocalDateTime ngayTao;
     LocalDateTime ngayCapNhat;
-    Integer nguoiTao;
-    Integer nguoiCapNhat;
+    Long nguoiTao;
+    Long nguoiCapNhat;
 }

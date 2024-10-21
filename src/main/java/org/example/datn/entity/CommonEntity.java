@@ -34,12 +34,12 @@ public abstract class CommonEntity implements Serializable {
 
     @CreatedBy
     @Column(name = "nguoi_tao")
-    private Integer nguoiTao;
+    private Long nguoiTao;
 
 
     @LastModifiedBy
     @Column(name = "nguoi_cap_nhat")
-    private Integer nguoiCapNhat;
+    private Long nguoiCapNhat;
 
     @PrePersist
     public void preInsert() {
