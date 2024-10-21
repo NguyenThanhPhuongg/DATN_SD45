@@ -803,4 +803,4 @@ VALUES
 (2,'Thương hiệu 9', 'Mô tả thương hiệu 9', 1, 'admin', 'admin'),
 (2,'Thương hiệu 10', 'Mô tả thương hiệu 10', 1, 'admin', 'admin');
 
-select * from thuong_hieu
+select * from san_pham

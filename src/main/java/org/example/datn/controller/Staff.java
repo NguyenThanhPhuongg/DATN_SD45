@@ -5,6 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class Staff {
     @GetMapping("/staff")
     public String home(){
-        return "staff/index";
+        return "/staff/index";
     }
 }
