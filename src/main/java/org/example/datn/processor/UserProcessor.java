@@ -6,14 +6,16 @@ import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.Nhom;
 import org.example.datn.entity.Profile;
 import org.example.datn.entity.User;
-import org.example.datn.exception.DuplicatedException;
+import org.example.datn.exception.*;
 import org.example.datn.jwt.JwtGenerator;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.ActivityType;
 import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
 import org.example.datn.model.enums.UserType;
 import org.example.datn.model.request.AuthModel;
+import org.example.datn.model.request.ChangePasswordModel;
 import org.example.datn.model.request.RegisterModel;
 import org.example.datn.model.response.AuthInfoModel;
 import org.example.datn.model.response.ProfileModel;
@@ -276,6 +278,27 @@ public class UserProcessor {
                 throw DuplicatedException.of("phone.used");
             }
         }
+    }
+
+    public ServiceResult changePassword(ChangePasswordModel model, UserAuthentication ua)
+            throws NotFoundEntityException, AccessDeniedException, InputInvalidException, ActionNotAllowAttemptException {
+        if (!model.getPassword().equals(model.getRetypePassword())) {
+            throw InputInvalidException.of("password.not-matched");
+        }
+
+        var user = userService.getActiveOrElseThrow(ua.getPrincipal());
+        if (!user.isNormalType()) {
+            throw ActionNotAllowAttemptException.of("user-type.does-not-support.action");
+        }
+
+        if (!userService.passwordMatched(model.getOldPassword(), user)) {
+            throw AccessDeniedException.of("old-password.not-matched");
+        }
+
+        var hashedPass = userService.encodePassword(model.getPassword());
+        user.setPassword(hashedPass);
+        userService.save(user);
+        return new ServiceResult();
     }
 
 

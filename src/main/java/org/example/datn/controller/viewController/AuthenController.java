@@ -32,4 +32,10 @@ public class AuthenController {
     public String resetPassword() {
         return "customer/auth/reset-password";
     }
+
+    @GetMapping("/change-password")
+    public String changePassword() {
+        return "customer/auth/change-password";
+    }
+
 }

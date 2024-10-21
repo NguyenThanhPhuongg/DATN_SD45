@@ -7,6 +7,8 @@ import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
 import org.example.datn.model.enums.UserType;
 
+import java.util.Objects;
+
 /**
  * @author hoangKhong
  */
@@ -29,7 +31,7 @@ public class User extends CommonEntity {
     @Column(name = "mat_khau")
     private String password;
 
-    @JoinColumn(name = "id_nhom")
+    @Column(name = "id_nhom")
     private Long idNhom;
 
     @Column(name = "loai")
@@ -47,4 +49,7 @@ public class User extends CommonEntity {
     @Column(name = "xac_thuc")
     private boolean xacThuc;
 
+    public boolean isNormalType() {
+        return Objects.nonNull(type) && type == UserType.NORMAL;
+    }
 }
