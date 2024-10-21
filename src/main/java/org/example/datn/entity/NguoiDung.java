@@ -1,32 +1,40 @@
 package org.example.datn.entity;
 
-import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import javax.persistence.*;
 import java.util.Date;
 
-/**
- * @author hoangKhong
- */
 @Entity
-@Table(name = "nhom")
+@Table(name = "nguoi_dung")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Nhom {
+public class NguoiDung {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    //    @Column(name = "id_nguoi_dung")
+//    private String idUser;
+    @Column(name = "ten_dang_nhap")
+    private String userName;
 
-    @Column(name = "ten")
-    private String ten;
+    @Column(name = "mat_khau")
+    private String password;
 
-    @Column(name = "mo_ta")
-    private String moTa;
+    @ManyToOne
+    @JoinColumn(name = "id_nhom")
+    private Nhom idNhom;
+
+    @Column(name = "vaitro")
+    private String role;
+
+    @Column(name = "xac_thuc")
+    private boolean xacThuc;
 
     @Column(name = "trang_thai")
     private Integer trangThai;

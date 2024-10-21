@@ -1,6 +1,7 @@
-app.controller("thuonghieu-ctrl", function ($scope, $http) {
+app.controller("blog-ctrl", function ($scope, $http) {
     $scope.items = [];
     $scope.form = {};
+    $scope.formAdd = {};
     $scope.searchText = ''; // Thêm biến tìm kiếm
     $scope.pager = {
         page: 0,
@@ -40,12 +41,14 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     // Hàm khởi tạo
     $scope.initialize = function () {
         // Tải danh sách thương hiệu
-        $http.get("/rest/thuonghieu").then(resp => {
+        $http.get("/rest/blog").then(resp => {
             console.log("Data from API: ", resp.data); // Kiểm tra dữ liệu từ API
             $scope.items = resp.data;
             $scope.items.forEach(item => {
                 item.ngayTao = new Date(item.ngayTao); // Đổi tên trường nếu cần
                 item.ngayCapNhat = new Date(item.ngayCapNhat); // Đổi tên trường nếu cần
+                item.ngayBatDau = new Date(item.ngayBatDau); // Đổi tên trường nếu cần
+                item.ngayKetThuc = new Date(item.ngayKetThuc); // Đổi tên trường nếu cần
             });
             $scope.pager.updateItems(); // Cập nhật các mục cho pager
         }).catch(error => {
@@ -75,13 +78,18 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
             ngayTao: ngayTao, // Ngày tạo sẽ là thời gian hiện tại
             ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
             ten: '', // Đặt mặc định cho tên
-            mo_ta: '', // Đặt mặc định cho mô tả
+            moTa: '', // Đặt mặc định cho mô tả
             trangThai: 1, // Đặt mặc định cho trạng thái là true
-            id: currentId // Giữ nguyên giá trị ID
+            id: currentId, // Giữ nguyên giá trị ID
+            loai: "1" // Giữ nguyên giá trị ID
         };
     };
-
-
+    $scope.resetAdd = function () {
+        $scope.formAdd = {
+            trangThai: "1", // Đặt mặc định cho trạng thái là true
+            loai: "1" // Giữ nguyên giá trị ID
+        };
+    };
 
     $scope.edit = function (item) {
         // Chuyển timestamp thành Date object
@@ -92,25 +100,37 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.update = function () {
         $scope.error = {
             ten: false,
-            mo_ta: false,
-            trangThai: false
+            moTa: false,
+            giaTri: false,
+            ngayBatDau: false,
+            ngayKetThuc: false,
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
+        // Kiểm tra tên không được để trống và phải có độ dài từ 1-100 ký tự
         if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
             $scope.error.ten = true;
             isValid = false;
         }
 
-        if (!$scope.form.mo_ta || $scope.form.mo_ta.length < 1 || $scope.form.mo_ta.length > 100) {
-            $scope.error.mo_ta = true;
+        // Kiểm tra mô tả không được để trống và phải có độ dài từ 1-100 ký tự
+        if (!$scope.form.moTa || $scope.form.moTa.length < 1 || $scope.form.moTa.length > 100) {
+            $scope.error.moTa = true;
             isValid = false;
         }
 
-        if (!$scope.form.trangThai) {
-            $scope.error.trangThai = true;
+        // Kiểm tra giá trị không được bỏ trống và phải nằm trong khoảng từ 50,000 đến 1,000,000
+        if (!$scope.form.giaTri || $scope.form.giaTri < 50000 || $scope.form.giaTri > 1000000) {
+            $scope.error.giaTri = true;
+            isValid = false;
+        }
+
+        // Kiểm tra ngày bắt đầu phải nhỏ hơn ngày kết thúc
+        if (!$scope.form.ngayBatDau || !$scope.form.ngayKetThuc || new Date($scope.form.ngayBatDau) >= new Date($scope.form.ngayKetThuc)) {
+            $scope.error.ngayBatDau = true;
+            $scope.error.ngayKetThuc = true;
             isValid = false;
         }
 
@@ -130,9 +150,8 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
                 item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
-                item.nguoiCapNhat = 'Admin'; // Đặt người tạo mặc định là 'Admin'
 
-                $http.put(`/rest/thuonghieu/${item.id}`, item).then(resp => {
+                $http.put(`/rest/blog/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -155,7 +174,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                $http.delete(`/rest/thuonghieu/${item.id}`).then(resp => {
+                $http.delete(`/rest/blog/${item.id}`).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     $scope.reset();
                     swal("Success!", "Xóa thành công", "success");
@@ -170,31 +189,55 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     };
     // Thêm thương hiệu
     $scope.create = function () {
-        $scope.error = {
+        $scope.error1 = {
             ten: false,
-            mo_ta: false,
-            trangThai: false
+            moTa: false,
+            giaTri: false,
+            ngayBatDau: false,
+            ngayKetThuc: false,
+            trangThai: false,
+            loai: false,
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
-        if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
-            $scope.error.ten = true;
+        // Kiểm tra tên không được để trống và phải có độ dài từ 1-100 ký tự
+        if (!$scope.formAdd.ten || $scope.formAdd.ten.length < 1 || $scope.formAdd.ten.length > 100) {
+            $scope.error1.ten = true;
             isValid = false;
         }
 
-        if (!$scope.form.mo_ta || $scope.form.mo_ta.length < 1 || $scope.form.mo_ta.length > 100) {
-            $scope.error.mo_ta = true;
+        // Kiểm tra mô tả không được để trống và phải có độ dài từ 1-100 ký tự
+        if (!$scope.formAdd.moTa || $scope.formAdd.moTa.length < 1 || $scope.formAdd.moTa.length > 100) {
+            $scope.error1.moTa = true;
             isValid = false;
         }
 
-        if (!$scope.form.trangThai) {
-            $scope.error.trangThai = true;
+        // Kiểm tra giá trị không được bỏ trống và phải nằm trong khoảng từ 50,000 đến 1,000,000
+        if (!$scope.formAdd.giaTri || $scope.formAdd.giaTri < 50000 || $scope.formAdd.giaTri > 1000000) {
+            $scope.error1.giaTri = true;
             isValid = false;
         }
 
-        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
+        if (!$scope.formAdd.trangThai) {
+            $scope.error1.trangThai = true;
+            isValid = false;
+        }
+
+        if (!$scope.formAdd.trangThai) {
+            $scope.error1.loai = true;
+            isValid = false;
+        }
+
+        // Kiểm tra ngày bắt đầu phải nhỏ hơn ngày kết thúc
+        if (!$scope.formAdd.ngayBatDau || !$scope.formAdd.ngayKetThuc || new Date($scope.formAdd.ngayBatDau) >= new Date($scope.formAdd.ngayKetThuc)) {
+            $scope.error1.ngayBatDau = true;
+            $scope.error1.ngayKetThuc = true;
+            isValid = false;
+        }
+
+        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện cập nhật
         if (!isValid) {
             swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
             return; // Ngừng thực hiện nếu không hợp lệ
@@ -208,14 +251,13 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
             dangerMode: true,
         }).then((willAdd) => {
             if (willAdd) {
-                var item = angular.copy($scope.form);
+                var item = angular.copy($scope.formAdd);
                 item.nguoiTao = 'Admin'; // Đặt người tạo mặc định là 'Admin'
                 item.ngayTao = new Date(); // Ngày tạo là thời gian hiện tại
                 item.ngayCapNhat = new Date(); // Ngày cập nhật là thời gian hiện tại
-
-                $http.post(`/rest/thuonghieu`, item).then(resp => {
+                $http.post(`/rest/blog`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
-                    $scope.reset();
+                    $scope.resetAdd();
                     swal("Success!", "Thêm mới thành công", "success");
                 }).catch(error => {
                     swal("Error!", "Thêm mới thất bại", "error");

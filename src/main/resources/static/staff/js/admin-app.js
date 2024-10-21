@@ -28,12 +28,12 @@ app.config(function ($routeProvider) {
             controller: "chucnang-ctrl"
         })
         ////// khach hang
-        .when("/listkhachhang",{
-            templateUrl:"asset/khachhang/list.html",
+        .when("/listkhachhang", {
+            templateUrl: "asset/khachhang/list.html",
             controller: "listkhachhang-ctrl"
         })
-        .when("/quanlykh",{
-            templateUrl:"asset/khachhang/quanly.html",
+        .when("/quanlykh", {
+            templateUrl: "asset/khachhang/quanly.html",
             controller: "quanlykh-ctrl"
         })
         .when("/tttaikhoan_kh", {
@@ -46,8 +46,8 @@ app.config(function ($routeProvider) {
         })
 
         /// danh mục
-        .when("/listdanhmuc",{
-            templateUrl:"asset/danhmuc/listdanhmuc.html",
+        .when("/listdanhmuc", {
+            templateUrl: "asset/danhmuc/listdanhmuc.html",
             controller: "danhmuc-ctrl"
         })
         .when("/quanlydanhmuc", {
@@ -56,8 +56,8 @@ app.config(function ($routeProvider) {
         })
 
         /// thuong hiệu
-        .when("/listthuonghieu",{
-            templateUrl:"asset/thuonghieu/listthuonghieu.html",
+        .when("/listthuonghieu", {
+            templateUrl: "asset/thuonghieu/listthuonghieu.html",
             controller: "thuonghieu-ctrl"
         })
         .when("/quanlythuonghieu", {
@@ -66,37 +66,93 @@ app.config(function ($routeProvider) {
         })
 
         /// thuộc tính
-        .when("/size",{
-            templateUrl:"asset/thuoctinh/size.html",
+        .when("/size", {
+            templateUrl: "asset/thuoctinh/size.html",
             controller: "size-ctrl"
         })
-        .when("/chatlieu",{
-            templateUrl:"asset/thuoctinh/chatlieu.html",
+        .when("/chatlieu", {
+            templateUrl: "asset/thuoctinh/chatlieu.html",
             controller: "chatlieu-ctrl"
         })
-        .when("/mausac",{
-            templateUrl:"asset/thuoctinh/mausac.html",
+        .when("/mausac", {
+            templateUrl: "asset/thuoctinh/mausac.html",
             controller: "mausac-ctrl"
         })
 
         /// nhân viên
-        .when("/nhom",{
-            templateUrl:"asset/nhanvien/nhom.html",
+        .when("/nhom", {
+            templateUrl: "asset/nhanvien/nhom.html",
             controller: "nhom-ctrl"
         })
-        .when("/chucnang",{
-            templateUrl:"asset/nhanvien/chucnang.html",
+        .when("/chucnang", {
+            templateUrl: "asset/nhanvien/chucnang.html",
             controller: "chucnang-ctrl"
         })
-        .when("/phanquyen",{
-            templateUrl:"asset/nhanvien/phanquyen.html",
+        .when("/phanquyen", {
+            templateUrl: "asset/nhanvien/phanquyen.html",
             controller: "phanquyen-ctrl"
         })
 
         /// sản phâm
-        .when("/sanpham",{
-            templateUrl:"asset/sanpham/listsanpham.html",
+        .when("/sanpham", {
+            templateUrl: "asset/sanpham/listsanpham.html",
             controller: "sanpham-ctrl"
         })
+        // .when("/spct",{
+        //     templateUrl:"asset/sanpham/quanlyspct.html",
+        //     controller: "spct-ctrl"
+        // })
+        .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
+            templateUrl: "asset/sanpham/quanlyspct.html",
+            controller: "spct-ctrl"
+        })
 
+        /// hóa đơn
+        .when("/hdct", {
+            templateUrl: "asset/hoadon/chitiethoadon.html",
+            controller: "hdct-ctrl"
+        })
+        .when("/hoadoncho", {
+            templateUrl: "asset/hoadon/hoadoncho.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadonchovc", {
+            templateUrl: "asset/hoadon/hoadonchovc.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadondone", {
+            templateUrl: "asset/hoadon/hoadondone.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadonfail", {
+            templateUrl: "asset/hoadon/hoadonfail.html",
+            controller: "hoadon-ctrl"
+        })
+
+
+        /// khuyến mãi
+        .when("/listkhuyenmai", {
+            templateUrl: "asset/khuyenmai/list.html",
+            controller: "khuyenmai-ctrl"
+        })
+        .when("/quanlykhuyenmai", {
+            templateUrl: "asset/khuyenmai/quanly.html",
+            controller: "khuyenmai-ctrl"
+        })
+        .when("/apdungkhuyenmai", {
+            templateUrl: "asset/khuyenmai/apdung.html",
+            controller: "apdungkhuyenmai-ctrl"
+        })
+
+        /// Hỗ trợ
+        .when("/traloihotro", {
+            templateUrl: "asset/hotro/traloihotro.html",
+            controller: "traloihotro-ctrl"
+        })
+
+        /// Hỗ trợ
+        .when("/blog", {
+            templateUrl: "asset/blog/blog.html",
+            controller: "blog-ctrl"
+        })
 })

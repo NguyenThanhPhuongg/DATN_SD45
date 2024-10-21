@@ -1,12 +1,23 @@
 <div class="container-fluid px-4">
-    <h2 class="mt-4">Quản lý sản phẩm</h2><br>
+    <h2 class="mt-4">Quản lý sản phẩm chi tiết</h2><br>
+
+    <!-- Select để chọn ID sản phẩm -->
+    <div class="mb-3">
+        <label for="productSelect" class="form-label">Sản phẩm</label>
+        <select id="productSelect" class="form-control" ng-model="form.idSanPham.id" ng-change="updateProductDetails()">
+            <option value="" disabled selected>Chọn sản phẩm</option>
+            <option ng-repeat="c in sanpham" ng-value="c.id">{{c.ten}}</option>
+        </select>
+    </div>
+
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-table me-1"></i>
-                Danh sách sản phẩm
+                Danh sách sản phẩm chi tiết
             </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal" data-bs-target="#addModal">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal"
+                 data-bs-target="#addModal">
                 <button class="btn btn-primary" type="button">Thêm</button>
             </div>
         </div>
@@ -17,12 +28,13 @@
                 <tr>
                     <th>STT</th>
                     <th>ID</th>
-                    <th>Ảnh sản phẩm</th>
-                    <th>Tên danh mục</th>
-                    <th>Tên thương hiệu</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Xuất xứ</th>
-                    <th>Mô tả</th>
+                    <th>ID Sản phẩm</th>
+                    <th>Size</th>
+                    <th>Màu sắc</th>
+                    <th>Chất liệu</th>
+                    <th>Số lương</th>
+                    <th>Giá</th>
+                    <th>Ghi chú</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
                 </tr>
@@ -31,21 +43,16 @@
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>{{item.id}}</td>
-                    <td>
-                        <img ng-src="/images/{{item.anh}}" alt="Ảnh sản phẩm"
-                             style="width: 50px; height: 50px; object-fit: cover;"/>
-                    </td>
-                    <td>{{item.idDanhMuc.ten}}</td>
-                    <td>{{item.idThuongHieu.ten}}</td>
-                    <td>{{item.ten}}</td>
-                    <td>{{item.xuatXu}}</td>
-                    <td>{{item.moTa}}</td>
+                    <td>{{item.idSanPham.id}}</td>
+                    <td>{{item.idSize.ten}}</td>
+                    <td>{{item.idMauSac.ten}}</td>
+                    <td>{{item.idChatLieu.ten}}</td>
+                    <td>{{item.soLuong}}</td>
+                    <td>{{item.gia}}</td>
+                    <td>{{item.ghiChu}}</td>
                     <td>{{item.trangThai}}</td>
                     <td>
                         <div class="btn-group btn-group-xs">
-                            <button class="btn btn-link" type="button" ng-click="selectProduct(item)">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
                                     data-bs-target="#exampleModal" ng-click="edit(item)">
                                 <i class="fas fa-eye"></i>
@@ -80,23 +87,13 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Thông tin sản phẩm</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Thông tin sản phẩm chi tiết</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid px-4">
                         <div class="row">
                             <div class="col-md-6 mt-2">
-                                <div class="col-md-12">
-                                    <input type="file" class="form-control" id="profileImage" onchange="updateImage()">
-                                    <div class="mt-2">
-                                        <img id="previewImage" src="/images/{{form.anh}}" alt="Ảnh sản phẩm"
-                                             style="max-width: 100%; height: auto; object-fit: cover;"/>
-                                    </div>
-                                    <input type="text" class="form-control" id="imagePath" ng-model="form.anh" readonly style="display: none;">
-                                    <span class="text-danger" ng-show="error1.anh">Vui lòng chọn ảnh sản phẩm.</span> <!-- Thông báo lỗi cho ảnh -->
-                                </div>
-
                                 <div class="col-md-12 mt-2">
                                     <label for="inputNgayTao" class="form-label">Ngày tạo</label>
                                     <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
@@ -118,45 +115,11 @@
                                     <input type="text" class="form-control" id="inputNguoiCapNhat"
                                            ng-model="form.nguoiCapNhat" readonly>
                                 </div>
-                            </div>
-                            <div class="col-md-6 mt-2">
                                 <div class="col-md-12 mt-2">
-                                    <label for="inputID" class="form-label">ID</label>
-                                    <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Tên danh mục</label>
-                                    <select ng-model="form.idDanhMuc.id" class="form-control">
-                                        <option ng-repeat="c in danhmuc" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error1.idDanhMuc">Vui lòng chọn danh mục.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Tên thương hiệu</label>
-                                    <select ng-model="form.idThuongHieu.id" class="form-control">
-                                        <option ng-repeat="c in thuonghieu" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error1.idThuongHieu">Vui lòng chọn danh mục.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Tên</label>
-                                    <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
+                                    <label for="inputTen" class="form-label">Ghi chú</label>
+                                    <input type="text" class="form-control" id="inputTen" ng-model="form.ghiChu">
                                     <span class="text-danger"
-                                          ng-show="error1.ten">Tên phải từ 1 đến 100 ký tự.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputMoTa" class="form-label">Mô tả</label>
-                                    <input type="text" class="form-control" id="inputMoTa" ng-model="form.moTa">
-                                    <span class="text-danger" ng-show="error1.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputMoTa" class="form-label">Xuất xứ</label>
-                                    <select class="form-select" aria-label="Default select example" ng-model="form.xuatXu">
-                                        <option value="Anh">Anh</option>
-                                        <option value="Mĩ">Mĩ</option>
-                                        <option value="Trung Quốc">Trung Quốc</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error1.xuatXu">Vui lòng chọn xuất xứ.</span>
+                                          ng-show="error1.ghiChu">Ghi chú phải từ 1 đến 300 ký tự</span>
                                 </div>
                                 <div class="form-group col-md-12 mt-2">
                                     <label>Trạng thái</label>
@@ -177,7 +140,52 @@
                                             <label class="form-check-label">Khác</label>
                                         </div>
                                     </div>
-                                    <span class="text-danger" ng-show="error1.trangThai">Vui lòng chọn trạng thái.</span>
+                                    <span class="text-danger"
+                                          ng-show="error1.trangThai">Vui lòng chọn trạng thái.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">ID</label>
+                                    <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">ID Sản phẩm</label>
+                                    <input type="text" class="form-control" id="inputID" ng-model="form.idSanPham.id"
+                                           readonly>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="" class="form-label">Size</label>
+                                    <select ng-model="form.idSize.id" class="form-control">
+                                        <option ng-repeat="c in size" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                    <span class="text-danger" ng-show="error1.idSize">Vui lòng chọn danh mục.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="" class="form-label">Màu sắc</label>
+                                    <select ng-model="form.idMauSac.id" class="form-control">
+                                        <option ng-repeat="c in mausac" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                    <span class="text-danger" ng-show="error1.idMauSac">Vui lòng chọn danh mục.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="" class="form-label">Chất liệu</label>
+                                    <select ng-model="form.idChatLieu.id" class="form-control">
+                                        <option ng-repeat="c in chatlieu" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                    <span class="text-danger" ng-show="error1.idChatLieu">Vui lòng chọn danh mục.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputTen" class="form-label">Số lượng</label>
+                                    <input type="number" class="form-control" id="inputTen" ng-model="form.soLuong">
+                                    <span class="text-danger"
+                                          ng-show="error1.soLuong">Số lượng < 1 và ko >= 10000.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputTen" class="form-label">Giá</label>
+                                    <input type="number" class="form-control" id="inputTen" ng-model="form.gia">
+                                    <span class="text-danger"
+                                          ng-show="error1.gia">Giâ < 100000 và ko >= 100000000.</span>
                                 </div>
                             </div>
                         </div>
@@ -211,60 +219,64 @@
                         <div class="row">
                             <div class="col-md-6 mt-2">
                                 <div class="col-md-12 mt-2">
-                                    <input type="file" class="form-control" id="profileImage2" onchange="updateImage2()">
-                                    <div class="mt-2">
-                                        <img id="previewImage2" src="/images/{{formAdd.anh}}" alt="Ảnh sản phẩm"
-                                             style="max-width: 100%; height: auto; object-fit: cover;"/>
-                                    </div>
-                                    <input type="text" class="form-control" id="imagePath2" ng-model="formAdd.anh" readonly style="display: none;">
-                                    <span class="text-danger" ng-show="error.anh">Vui lòng chọn ảnh sản phẩm.</span> <!-- Thông báo lỗi cho ảnh -->
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Tên danh mục</label>
-                                    <select ng-model="formAdd.idDanhMuc.id" class="form-control">
-                                        <option ng-repeat="c in danhmuc" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error.idDanhMuc">Vui lòng chọn danh mục.</span>
+                                    <label for="inputID" class="form-label">ID Sản phẩm</label>
+                                    <input type="text" class="form-control" id="inputID" ng-model="formAdd.idSanPham.id" readonly>
                                 </div>
                                 <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Tên thương hiệu</label>
-                                    <select ng-model="formAdd.idThuongHieu.id" class="form-control">
-                                        <option ng-repeat="c in thuonghieu" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error.idThuongHieu">Vui lòng chọn thương hiệu.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Tên</label>
-                                    <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten">
-                                    <span class="text-danger" ng-show="error.ten">Tên phải từ 1 đến 100 ký tự.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputMoTa" class="form-label">Mô tả</label>
-                                    <input type="text" class="form-control" id="inputMoTa" ng-model="formAdd.moTa">
-                                    <span class="text-danger" ng-show="error.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputXuatXu" class="form-label">Xuất xứ</label>
-                                    <select class="form-select" aria-label="Default select example" ng-model="formAdd.xuatXu">
-                                        <option value="" disabled selected>Chọn xuất xứ</option>
-                                        <option value="Anh">Anh</option>
-                                        <option value="Mĩ">Mĩ</option>
-                                        <option value="Trung Quốc">Trung Quốc</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error.xuatXu">Vui lòng chọn xuất xứ.</span>
+                                    <label for="inputTen" class="form-label">Ghi chú</label>
+                                    <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ghiChu">
+                                    <span class="text-danger"
+                                          ng-show="error.ghiChu">Ghi chú phải từ 1 đến 300 ký tự</span>
                                 </div>
                                 <div class="form-group col-md-12 mt-2">
                                     <label>Trạng thái</label>
                                     <div class="mt-2">
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="radio" name="trangThai"
-                                                   ng-model="formAdd.trangThai" ng-value="1" checked>
+                                                   ng-model="formAdd.trangThai" ng-value="1">
                                             <label class="form-check-label">Active</label>
                                         </div>
                                     </div>
-                                    <span class="text-danger" ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
+                                    <span class="text-danger"
+                                          ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <div class="col-md-12 mt-2">
+                                    <label for="" class="form-label">Size</label>
+                                    <select ng-model="formAdd.idSize.id" class="form-control">
+                                        <option value="" disabled selected>Chọn size</option>
+                                        <option ng-repeat="c in size" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                    <span class="text-danger" ng-show="error.idSize">Vui lòng chọn danh mục.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="" class="form-label">Màu sắc</label>
+                                    <select ng-model="formAdd.idMauSac.id" class="form-control">
+                                        <option value="" disabled selected>Chọn màu sắc</option>
+                                        <option ng-repeat="c in mausac" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                    <span class="text-danger" ng-show="error.idMauSac">Vui lòng chọn danh mục.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="" class="form-label">Chất liệu</label>
+                                    <select ng-model="formAdd.idChatLieu.id" class="form-control">
+                                        <option value="" disabled selected>Chọn chất liệu</option>
+                                        <option ng-repeat="c in chatlieu" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                    <span class="text-danger" ng-show="error.idChatLieu">Vui lòng chọn danh mục.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputTen" class="form-label">Số lượng</label>
+                                    <input type="number" class="form-control" id="inputTen" ng-model="formAdd.soLuong">
+                                    <span class="text-danger"
+                                          ng-show="error.soLuong">Số lượng < 1 và ko >= 10000.</span>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputTen" class="form-label">Giá</label>
+                                    <input type="number" class="form-control" id="inputTen" ng-model="formAdd.gia">
+                                    <span class="text-danger"
+                                          ng-show="error.gia">Giâ < 100000 và ko >= 100000000.</span>
                                 </div>
                             </div>
                         </div>
@@ -286,4 +298,3 @@
     </div>
 
 </div>
-
