@@ -1,19 +1,36 @@
 package org.example.datn.service;
 
-import org.example.datn.entity.DiaChiGiaHang;
+import org.example.datn.entity.DiaChiGiaoHang;
+import org.example.datn.repository.DiaChiGiaoHangRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface DiaChiGiaoHangService {
+@Service
+public class DiaChiGiaoHangService {
+    @Autowired
+    private DiaChiGiaoHangRepository repo;
 
-    List<DiaChiGiaHang> findAll();
-    DiaChiGiaHang findById(Long id);
+    public List<DiaChiGiaoHang> getAll() {
+        return repo.findAll();
+    }
 
-    List<DiaChiGiaHang> findByCateId(Long cid);
+    public Optional<DiaChiGiaoHang> findById(Long id) {
+        return repo.findById(id);
+    }
 
-    DiaChiGiaHang create(DiaChiGiaHang product);
+    public void save(DiaChiGiaoHang diaChiGiaoHang) {
+        repo.save(diaChiGiaoHang);
+    }
 
-    DiaChiGiaHang update(DiaChiGiaHang product);
+    public void delete(DiaChiGiaoHang diaChiGiaoHang) {
+        repo.delete(diaChiGiaoHang);
+    }
 
-    void delete(Long id);
+    public List<DiaChiGiaoHang> findByIdNguoiDung(Long idNguoiDung) {
+        return repo.findByIdNguoiDung(idNguoiDung);
+    }
+
 }

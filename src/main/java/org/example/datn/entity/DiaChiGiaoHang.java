@@ -13,11 +13,13 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DiaChiGiaHang {
+public class DiaChiGiaoHang extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @Column(name = "id_nguoi_dung")
+    private Long idNguoiDung;
     @Column(name = "ho_va_ten")
     private String hoTen;
     @Column(name = "sdt")
@@ -30,12 +32,4 @@ public class DiaChiGiaHang {
     private String quocGia;
     @Column(name = "trang_thai")
     private Integer trangThai;
-    @Column(name = "nguoi_tao")
-    private String nguoiTao;
-    @Column(name = "nguoi_cap_nhat")
-    private String nguoiCapNhat;
-    @Column(name = "ngay_tao")
-    private Date ngayTao;
-    @Column(name = "ngay_cap_nhat")
-    private Date ngayCapNhat;
 }

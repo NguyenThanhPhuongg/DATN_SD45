@@ -12,4 +12,5 @@ public final class SystemConstant {
     public static final String CODE_400 = "400";
     public static final String PASSWORD_DEFAULT = "Abc@12345";
 
+
 }

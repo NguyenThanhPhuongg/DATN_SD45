@@ -1,13 +1,12 @@
 package org.example.datn.restController;
 
-import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.service.SanPhamChiTietService;
-import org.example.datn.service.SanPhamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -17,7 +16,7 @@ public class SanPhamChiTietController {
     private SanPhamChiTietService sanPhamChiTietService;
 
     @GetMapping("{id}")
-    public SanPhamChiTiet getOne(@PathVariable("id") Long id) {
+    public Optional<SanPhamChiTiet> getOne(@PathVariable("id") Long id) {
         return sanPhamChiTietService.findById(id);
     }
 
@@ -28,17 +27,17 @@ public class SanPhamChiTietController {
 
     @PostMapping
     public SanPhamChiTiet create(@RequestBody SanPhamChiTiet product) {
-        return sanPhamChiTietService.create(product);
+        return sanPhamChiTietService.save(product);
     }
 
     @PutMapping("{id}")
     public SanPhamChiTiet update(@PathVariable("id") Integer id, @RequestBody SanPhamChiTiet product) {
-        return sanPhamChiTietService.update(product);
+        return sanPhamChiTietService.save(product);
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Long id) {
-        sanPhamChiTietService.delete(id);
+        sanPhamChiTietService.deleteById(id);
     }
 
 

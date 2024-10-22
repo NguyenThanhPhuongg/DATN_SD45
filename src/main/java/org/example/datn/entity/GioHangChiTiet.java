@@ -5,23 +5,23 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Entity
-@Table(name = "chi_tiet_hoa_don")
+@Table(name = "chi_tiet_gio_hang")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HoaDonChiTiet extends CommonEntity{
+public class GioHangChiTiet {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "id_hoa_don")
-    private Long idHoaDon;
+    @Column(name = "id_gio_hang")
+    private Long idGioHang;
 
     @Column(name = "id_san_pham_chi_tiet")
     private Long idSanPhamChiTiet;
@@ -29,9 +29,10 @@ public class HoaDonChiTiet extends CommonEntity{
     @Column(name = "so_luong")
     private Integer soLuong;
 
-    @Column(name = "gia", precision = 10, scale = 2)
+    @Column(name = "gia")
     private BigDecimal gia;
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+
 }

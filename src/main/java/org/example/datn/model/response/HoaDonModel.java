@@ -4,6 +4,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.model.CommonModel;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -14,15 +20,17 @@ import java.util.Date;
 public class HoaDonModel extends CommonModel {
 
     private Long id;
-    private Long idUser;
-    private Long idDiaChiGiaHang;  // Chuyển quan hệ sang kiểu Long
-    private Long idPhuongThucVanChuyen;  // Chuyển quan hệ sang kiểu Long
-    private Date ngayDatHang;
-    private Date ngayThanhToan;
-    private Double tongTien;
+
+    private Long idNguoiDung;
+    private Long idDiaChiGiaoHang;
+    private Long idPhuongThucVanChuyen;
+    private LocalDateTime ngayDatHang;
+    private LocalDateTime ngayThanhToan;
+    private BigDecimal tongTien;
     private Integer diemSuDung;
     private Integer trangThai;
 
-    UserModel userModel;
-
+    private UserModel userModel;
+    private DiaChiGiaoHangModel diaChiGiaoHangModel;
+    private PhuongThucVanChuyenModel phuongThucVanChuyenModel;
 }

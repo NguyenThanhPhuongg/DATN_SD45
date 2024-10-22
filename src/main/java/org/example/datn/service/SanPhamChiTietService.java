@@ -1,20 +1,41 @@
 package org.example.datn.service;
 
-import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.repository.SanPhamChiTietRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface SanPhamChiTietService {
+@Service
+public class SanPhamChiTietService {
 
-    List<SanPhamChiTiet> findAll();
-    SanPhamChiTiet findById(Long id);
+    @Autowired
+    private SanPhamChiTietRepository repo;
 
-    List<SanPhamChiTiet> findByCateId(Long cid);
+    public Optional<SanPhamChiTiet> findById(Long id) {
+        return repo.findById(id);
+    }
 
-    SanPhamChiTiet create(SanPhamChiTiet product);
+    public List<SanPhamChiTiet> findAll() {
+        return repo.findAll();
+    }
 
-    SanPhamChiTiet update(SanPhamChiTiet product);
+    public List<SanPhamChiTiet> findByCateId(Long cid) {
+        return repo.findByCateId(cid);
+    }
 
-    void delete(Long id);
+    public SanPhamChiTiet save(SanPhamChiTiet sanPhamChiTiet) {
+        return repo.save(sanPhamChiTiet);
+    }
+
+    public void deleteById(Long id) {
+        repo.deleteById(id);
+    }
+
+    public List<SanPhamChiTiet> findByIdIn(List<Long> ids) {
+        return repo.findByIdIn(ids);
+    }
+
 }

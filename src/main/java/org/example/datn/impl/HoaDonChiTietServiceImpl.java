@@ -12,39 +12,39 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class HoaDonChiTietServiceImpl implements HoaDonChiTietService {
+public class HoaDonChiTietServiceImpl {
 
     @Autowired
     HoaDonChiTietRepository hoaDonChiTietRepository;
 
-    @Override
-    public List<HoaDonChiTiet> findAll() {
-        return hoaDonChiTietRepository.findAll();
-    }
-
-    @Override
-    public HoaDonChiTiet findById(Long id) {
-        return hoaDonChiTietRepository.findById(id).get();
-    }
-
-    @Override
-    public List<HoaDonChiTiet> findByCateId(Long cid) {
-        return hoaDonChiTietRepository.findByCateId(cid);
-    }
-
-    @Override
-    public HoaDonChiTiet create(HoaDonChiTiet product) {
-        return hoaDonChiTietRepository.save(product);
-    }
-
-    @Override
-    public HoaDonChiTiet update(HoaDonChiTiet product) {
-        return hoaDonChiTietRepository.save(product);
-    }
-
-    @Override
-    public void delete(Long id) {
-        hoaDonChiTietRepository.deleteById(id);
-    }
+//    @Override
+//    public List<HoaDonChiTiet> findAll() {
+//        return hoaDonChiTietRepository.findAll();
+//    }
+//
+//    @Override
+//    public HoaDonChiTiet findById(Long id) {
+//        return hoaDonChiTietRepository.findById(id).get();
+//    }
+//
+//    @Override
+//    public List<HoaDonChiTiet> findByCateId(Long cid) {
+//        return hoaDonChiTietRepository.findByCateId(cid);
+//    }
+//
+//    @Override
+//    public HoaDonChiTiet create(HoaDonChiTiet product) {
+//        return hoaDonChiTietRepository.save(product);
+//    }
+//
+//    @Override
+//    public HoaDonChiTiet update(HoaDonChiTiet product) {
+//        return hoaDonChiTietRepository.save(product);
+//    }
+//
+//    @Override
+//    public void delete(Long id) {
+//        hoaDonChiTietRepository.deleteById(id);
+//    }
 
 }

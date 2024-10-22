@@ -13,33 +13,33 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/rest/hdct")
 public class HoaDonChiTietController {
-    @Autowired
-    private HoaDonChiTietService hoaDonChiTietService;
-
-    @GetMapping("{id}")
-    public HoaDonChiTiet getByHoaDonId(@PathVariable("id") Long id) {
-        return hoaDonChiTietService.findById(id);
-    }
-    @GetMapping()
-    public List<HoaDonChiTiet> getAll() {
-        return hoaDonChiTietService.findAll();
-    }
-
-    @PostMapping
-    public HoaDonChiTiet create(@RequestBody HoaDonChiTiet product) {
-        return hoaDonChiTietService.create(product);
-    }
-
-    @PutMapping("{id}")
-    public HoaDonChiTiet update(@PathVariable("id") Integer id, @RequestBody HoaDonChiTiet product) {
-        return hoaDonChiTietService.update(product);
-    }
-
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Long id) {
-        hoaDonChiTietService.delete(id);
-    }
-
+//    @Autowired
+//    private HoaDonChiTietService hoaDonChiTietService;
+//
+//    @GetMapping("{id}")
+//    public HoaDonChiTiet getByHoaDonId(@PathVariable("id") Long id) {
+//        return hoaDonChiTietService.findById(id);
+//    }
+//    @GetMapping()
+//    public List<HoaDonChiTiet> getAll() {
+//        return hoaDonChiTietService.findAll();
+//    }
+//
+//    @PostMapping
+//    public HoaDonChiTiet create(@RequestBody HoaDonChiTiet product) {
+//        return hoaDonChiTietService.create(product);
+//    }
+//
+//    @PutMapping("{id}")
+//    public HoaDonChiTiet update(@PathVariable("id") Integer id, @RequestBody HoaDonChiTiet product) {
+//        return hoaDonChiTietService.update(product);
+//    }
+//
+//    @DeleteMapping("{id}")
+//    public void delete(@PathVariable("id") Long id) {
+//        hoaDonChiTietService.delete(id);
+//    }
+//
 
 
 }

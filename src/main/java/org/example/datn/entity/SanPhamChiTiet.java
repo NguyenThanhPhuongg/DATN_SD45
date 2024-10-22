@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -36,7 +37,7 @@ public class SanPhamChiTiet {
     @Column(name = "so_luong")
     private Integer soLuong;
     @Column(name = "gia")
-    private Double gia;
+    private BigDecimal gia;
     @Column(name = "ghi_chu")
     private String ghiChu;
     @Column(name = "trang_thai")

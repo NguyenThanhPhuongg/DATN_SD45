@@ -1,20 +1,41 @@
 package org.example.datn.service;
 
-import org.example.datn.entity.ChatLieu;
 import org.example.datn.entity.HoaDon;
+import org.example.datn.repository.HoaDonRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface HoaDonService {
+@Service
+public class HoaDonService {
 
-    List<HoaDon> findAll();
-    HoaDon findById(Long id);
+    @Autowired
+    private HoaDonRepository repo;
 
-    List<HoaDon> findByCateId(Long cid);
+    public List<HoaDon> getAll(){
+        return repo.findAll();
+    }
+    public void save(HoaDon hoaDon) {
+        repo.save(hoaDon);
+    }
 
-    HoaDon create(HoaDon product);
+    public Optional<HoaDon> findById(Long id) {
+        return repo.findById(id);
+    }
 
-    HoaDon update(HoaDon product);
-
-    void delete(Long id);
+    public void delete(HoaDon hoaDon) {
+        repo.delete(hoaDon);
+    }
+//    List<HoaDon> findAll();
+//    HoaDon findById(Long id);
+//
+//    List<HoaDon> findByCateId(Long cid);
+//
+//    HoaDon create(HoaDon product);
+//
+//    HoaDon update(HoaDon product);
+//
+//    void delete(Long id);
 }

@@ -12,4 +12,6 @@ import java.util.List;
 public interface PhuongThucVanChuyenRepository extends JpaRepository<PhuongThucVanChuyen, Long> {
     @Query("SELECT p FROM PhuongThucVanChuyen p WHERE p.id = ?1")
     List<PhuongThucVanChuyen> findByCateId(Long cid);
+
+    List<PhuongThucVanChuyen> findByTrangThai(Integer active);
 }

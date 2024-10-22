@@ -12,4 +12,6 @@ import java.util.List;
 public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, Long> {
     @Query("SELECT p FROM SanPhamChiTiet p WHERE p.id = ?1")
     List<SanPhamChiTiet> findByCateId(Long cid);
+
+    List<SanPhamChiTiet> findByIdIn(List<Long> ids);
 }

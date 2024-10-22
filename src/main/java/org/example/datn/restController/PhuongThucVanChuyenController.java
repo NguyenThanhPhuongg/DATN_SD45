@@ -13,33 +13,33 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/rest/ptvc")
 public class PhuongThucVanChuyenController {
-    @Autowired
-    private PhuongThucVanChuyenService phuongThucVanChuyenService;
-
-    @GetMapping("{id}")
-    public PhuongThucVanChuyen getOne(@PathVariable("id") Long id) {
-        return phuongThucVanChuyenService.findById(id);
-    }
-
-    @GetMapping()
-    public List<PhuongThucVanChuyen> getAll() {
-        return phuongThucVanChuyenService.findAll();
-    }
-
-    @PostMapping
-    public PhuongThucVanChuyen create(@RequestBody PhuongThucVanChuyen product) {
-        return phuongThucVanChuyenService.create(product);
-    }
-
-    @PutMapping("{id}")
-    public PhuongThucVanChuyen update(@PathVariable("id") Integer id, @RequestBody PhuongThucVanChuyen product) {
-        return phuongThucVanChuyenService.update(product);
-    }
-
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Long id) {
-        phuongThucVanChuyenService.delete(id);
-    }
+//    @Autowired
+//    private PhuongThucVanChuyenService phuongThucVanChuyenService;
+//
+//    @GetMapping("{id}")
+//    public PhuongThucVanChuyen getOne(@PathVariable("id") Long id) {
+//        return phuongThucVanChuyenService.findById(id);
+//    }
+//
+//    @GetMapping()
+//    public List<PhuongThucVanChuyen> getAll() {
+//        return phuongThucVanChuyenService.findAll();
+//    }
+//
+//    @PostMapping
+//    public PhuongThucVanChuyen create(@RequestBody PhuongThucVanChuyen product) {
+//        return phuongThucVanChuyenService.create(product);
+//    }
+//
+//    @PutMapping("{id}")
+//    public PhuongThucVanChuyen update(@PathVariable("id") Integer id, @RequestBody PhuongThucVanChuyen product) {
+//        return phuongThucVanChuyenService.update(product);
+//    }
+//
+//    @DeleteMapping("{id}")
+//    public void delete(@PathVariable("id") Long id) {
+//        phuongThucVanChuyenService.delete(id);
+//    }
 
 
 }

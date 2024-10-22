@@ -3,6 +3,7 @@ package org.example.datn.processor;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.constants.SystemConstant;
+import org.example.datn.entity.GioHang;
 import org.example.datn.entity.Nhom;
 import org.example.datn.entity.Profile;
 import org.example.datn.entity.User;
@@ -10,10 +11,7 @@ import org.example.datn.exception.*;
 import org.example.datn.jwt.JwtGenerator;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
-import org.example.datn.model.enums.ActivityType;
-import org.example.datn.model.enums.UserRoles;
-import org.example.datn.model.enums.UserStatus;
-import org.example.datn.model.enums.UserType;
+import org.example.datn.model.enums.*;
 import org.example.datn.model.request.AuthModel;
 import org.example.datn.model.request.ChangePasswordModel;
 import org.example.datn.model.request.RegisterModel;
@@ -24,10 +22,7 @@ import org.example.datn.model.response.UserModel;
 import org.example.datn.processor.auth.AuthenticationChannelProvider;
 import org.example.datn.processor.auth.AuthoritiesValidator;
 import org.example.datn.repository.UserRepository;
-import org.example.datn.service.ChucNangService;
-import org.example.datn.service.NhomService;
-import org.example.datn.service.ProfileService;
-import org.example.datn.service.UserService;
+import org.example.datn.service.*;
 import org.example.datn.transformer.ProfileTransformer;
 import org.example.datn.transformer.UserTransformer;
 import org.example.datn.utils.CalendarUtil;
@@ -71,9 +66,10 @@ public class UserProcessor {
     AuthoritiesValidator authoritiesValidator;
     NhomService nhomService;
     ChucNangService chucNangService;
+    GioHangService gioHangService;
 
 
-    public UserProcessor(UserTransformer userTransformer, UserService userService, ProfileTransformer profileTransformer, ProfileService profileService, AuthenticationChannelProvider provider, JwtGenerator jwtGenerator, AuthoritiesValidator authoritiesValidator, NhomService nhomService, ChucNangService chucNangService) {
+    public UserProcessor(UserTransformer userTransformer, UserService userService, ProfileTransformer profileTransformer, ProfileService profileService, AuthenticationChannelProvider provider, JwtGenerator jwtGenerator, AuthoritiesValidator authoritiesValidator, NhomService nhomService, ChucNangService chucNangService, GioHangService gioHangService) {
         this.userTransformer = userTransformer;
         this.userService = userService;
         this.profileTransformer = profileTransformer;
@@ -83,6 +79,7 @@ public class UserProcessor {
         this.authoritiesValidator = authoritiesValidator;
         this.nhomService = nhomService;
         this.chucNangService = chucNangService;
+        this.gioHangService = gioHangService;
     }
 
     public List<UserModel> findByIdIn(List<Long> ids) {
@@ -185,6 +182,11 @@ public class UserProcessor {
         profile.setNgaySinh(model.getNgaySinh());
         profile.setHoVaTen(StringUtils.substringBeforeLast(user.getUserName(), "@"));
         profileService.save(profile);
+
+        var gioGang = new GioHang();
+        gioGang.setIdNguoiDung(user.getId());
+        gioGang.setTrangThai(StatusGioHang.ACTIVE.getValue());
+        gioHangService.save(gioGang);
         return new ServiceResult(SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
@@ -192,7 +194,7 @@ public class UserProcessor {
         synchronized (this) {
             var processor = provider.getProcessor(UserType.NORMAL);
             var userModel = processor.auth(() -> authModel);
-            var profile = profileService.findByUserId(userModel.getId()).orElseThrow(() -> new EntityNotFoundException("not.fond"));
+            var profile = profileService.findByUserId(userModel.getId()).orElseThrow(() -> new EntityNotFoundException("not.found"));
             ProfileModel profileModel = new ProfileModel();
             BeanUtils.copyProperties(profile, profileModel);
             userModel.setProfile(profileModel);

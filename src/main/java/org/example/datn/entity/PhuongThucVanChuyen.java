@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -13,31 +14,31 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PhuongThucVanChuyen {
+public class PhuongThucVanChuyen extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "ten")
+
+    @Column(name = "ten", length = 200)
     private String ten;
-    @Column(name = "mo_ta")
+
+    @Column(name = "mo_ta", length = 500)
     private String moTa;
-    @Column(name = "phi_van_chuyen")
-    private String diaChi;
+
+    @Column(name = "phi_van_chuyen", precision = 10, scale = 2)
+    private BigDecimal phiVanChuyen;
+
     @Column(name = "loai")
     private Integer loai;
-    @Column(name = "ghi_chu")
+
+    @Column(name = "ghi_chu", length = 250)
     private String ghiChu;
-    @Column(name = "thoi_gian_giao_hang")
-    private String thoiGianDuKien;
+
+    @Column(name = "thoi_gian_giao_hang", length = 100)
+    private String thoiGianGiaoHang;
+
     @Column(name = "trang_thai")
     private Integer trangThai;
-    @Column(name = "nguoi_tao")
-    private String nguoiTao;
-    @Column(name = "nguoi_cap_nhat")
-    private String nguoiCapNhat;
-    @Column(name = "ngay_tao")
-    private Date ngayTao;
-    @Column(name = "ngay_cap_nhat")
-    private Date ngayCapNhat;
+
 }

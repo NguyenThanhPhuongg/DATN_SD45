@@ -12,38 +12,38 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class HoaDonServiceImpl implements HoaDonService {
+public class HoaDonServiceImpl{
 
-    @Autowired
-    HoaDonRepository hoaDonRepository;
-
-    @Override
-    public List<HoaDon> findAll() {
-        return hoaDonRepository.findAll();
-    }
-
-    @Override
-    public HoaDon findById(Long id) {
-        return hoaDonRepository.findById(id).get();
-    }
-
-    @Override
-    public List<HoaDon> findByCateId(Long cid) {
-        return hoaDonRepository.findByCateId(cid);
-    }
-    @Override
-    public HoaDon create(HoaDon product) {
-        return hoaDonRepository.save(product);
-    }
-
-    @Override
-    public HoaDon update(HoaDon product) {
-        return hoaDonRepository.save(product);
-    }
-
-    @Override
-    public void delete(Long id) {
-        hoaDonRepository.deleteById(id);
-    }
+//    @Autowired
+//    HoaDonRepository hoaDonRepository;
+//
+//    @Override
+//    public List<HoaDon> findAll() {
+//        return hoaDonRepository.findAll();
+//    }
+//
+//    @Override
+//    public HoaDon findById(Long id) {
+//        return hoaDonRepository.findById(id).get();
+//    }
+//
+//    @Override
+//    public List<HoaDon> findByCateId(Long cid) {
+//        return hoaDonRepository.findByCateId(cid);
+//    }
+//    @Override
+//    public HoaDon create(HoaDon product) {
+//        return hoaDonRepository.save(product);
+//    }
+//
+//    @Override
+//    public HoaDon update(HoaDon product) {
+//        return hoaDonRepository.save(product);
+//    }
+//
+//    @Override
+//    public void delete(Long id) {
+//        hoaDonRepository.deleteById(id);
+//    }
 
 }

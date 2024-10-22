@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.model.CommonModel;
 import org.example.datn.model.enums.GioiTinh;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProfileModel {
+public class ProfileModel extends CommonModel {
 
     private Long id;
     private Long idNguoiDung;
