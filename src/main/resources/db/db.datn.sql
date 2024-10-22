@@ -511,6 +511,7 @@ CREATE TABLE [san_pham]
     [ten] NVARCHAR(200),
     [xuat_xu] NVARCHAR(200),
     [mo_ta] NVARCHAR(MAX),
+    [gia] DECIMAL(10,2),
     [anh] NVARCHAR(MAX),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
@@ -1112,6 +1113,7 @@ VALUES
 (N'Chủ', 'Tiêu đề bài viết 4', 'Nội dung bài viết 4', 'mangto.png', 'Nội dung phụ 1 cho bài viết 4', 'mangto.png', 'Nội dung phụ 2 cho bài viết 4', 'mangto.png', 1, 1, 1),
 (N'Chủ', 'Tiêu đề bài viết 5', 'Nội dung bài viết 5', 'mangto.png', 'Nội dung phụ 1 cho bài viết 5', 'mangto.png', 'Nội dung phụ 2 cho bài viết 5', 'mangto.png', 1, 1, 1);
 GO
+select * from thong_tin_ca_nhan
 
 select * from thuong_hieu
 select * from danh_muc 
