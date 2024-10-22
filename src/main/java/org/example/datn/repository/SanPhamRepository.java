@@ -1,5 +1,14 @@
 package org.example.datn.repository;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import org.example.datn.entity.SanPham;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
+=======
+>>>>>>> hieupt
 import org.example.datn.entity.ChatLieu;
 import org.example.datn.entity.SanPham;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +21,8 @@ import java.util.List;
 public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     @Query("SELECT p FROM SanPham p WHERE p.id = ?1")
     List<SanPham> findByCateId(Long cid);
+<<<<<<< HEAD
+=======
+>>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
+>>>>>>> hieupt
 }

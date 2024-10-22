@@ -1,5 +1,18 @@
 package org.example.datn.entity;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+
+=======
+>>>>>>> hieupt
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,16 +24,59 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "san_pham")
+<<<<<<< HEAD
+=======
+>>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
+>>>>>>> hieupt
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+<<<<<<< HEAD
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SanPham {
+=======
+<<<<<<< HEAD
+@Entity
+@Table(name = "san_pham")
+public class SanPham extends CommonEntity {
+=======
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class SanPham {
+>>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
+>>>>>>> hieupt
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    @Column(name = "id_danh_muc")
+    private Integer danhMuc;
+
+    @Column(name = "id_thuong_hieu")
+    private Integer thuongHieu;
+
+    @Column(name = "ten")
+    private String ten;
+
+    @Column(name = "xuat_xu")
+    private String xuatXu;
+
+    @Column(name = "mo_ta")
+    private String moTa;
+
+    @Column(name = "gia")
+    private BigDecimal gia;
+
+    @Column(name = "anh")
+    private String anh;
+
+    @Column(name = "trang_thai")
+    private Integer trangThai;
+=======
+>>>>>>> hieupt
     @ManyToOne
     @JoinColumn(name = "id_danh_muc")
     private DanhMuc idDanhMuc;
@@ -45,4 +101,8 @@ public class SanPham {
     private Date ngayTao;
     @Column(name = "ngay_cap_nhat")
     private Date ngayCapNhat;
+<<<<<<< HEAD
+=======
+>>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
+>>>>>>> hieupt
 }
