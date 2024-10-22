@@ -1,5 +1,6 @@
 package org.example.datn.entity;
 
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,12 +10,13 @@ import java.util.Date;
 /**
  * @author hoangKhong
  */
-@Entity
-@Table(name = "san_pham")
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "san_pham")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SanPham {
     @Id
@@ -45,4 +47,5 @@ public class SanPham {
     private Date ngayTao;
     @Column(name = "ngay_cap_nhat")
     private Date ngayCapNhat;
+
 }
