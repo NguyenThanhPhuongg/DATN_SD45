@@ -1,0 +1,70 @@
+<div class="container-fluid px-4">
+    <h2 class="mt-4">Thêm mới khuyến mãi sản phẩm</h2><br>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="row">
+            <div class="col-md-12 mt-2">
+                <label for="inputTen" class="form-label">Tên khuyến mãi</label>
+                <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten">
+                <span class="text-danger"
+                      ng-show="error1.ten">.Tên khuyến mãi phải từ 1 đến 100 ký tự.</span>
+            </div>
+            <div class="col-md-12 mt-2">
+                <label for="inputMoTa" class="form-label">Mô tả</label>
+                <input type="text" class="form-control" id="inputMoTa" ng-model="formAdd.moTa">
+                <span class="text-danger" ng-show="error1.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
+            </div>
+            <div class="col-md-12 mt-2">
+                <label for="inputTen" class="form-label">Giá trị</label>
+                <input type="number" class="form-control" id="inputTekn" ng-model="formAdd.giaTri">
+                <span class="text-danger" ng-show="error1.giaTri">Giá trị phải từ 50,000 đến 1,000,000.</span>
+            </div>
+            <div class="col-md-6 mt-2">
+                <label for="inputMoTa" class="form-label">Loại</label>
+                <select class="form-select" aria-label="Default select example" ng-model="formAdd.loai">
+                    <option disabled selected>Chọn loại</option>
+                    <option value="1">Vip</option>
+                    <option value="2">Pro Vip</option>
+                    <option value="3">Súp pơ víp</option>
+                </select>
+                <span class="text-danger" ng-show="error1.loai">Vui lòng chọn loại.</span>
+            </div>
+            <div class="form-group col-md-6 mt-2">
+                <label>Trạng thái</label>
+                <div class="mt-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="trangThai"
+                               ng-model="formAdd.trangThai" value="1">
+                        <label class="form-check-label">Active</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="trangThai"
+                               ng-model="formAdd.trangThai" value="2">
+                        <label class="form-check-label">Khác</label>
+                    </div>
+                </div>
+                <span class="text-danger" ng-show="error1.trangThai">Vui lòng chọn trạng thái.</span>
+            </div>
+            <div class="col-md-12 mt-2">
+                <label for="inputNgayTao" class="form-label">Ngày bắt đầu</label>
+                <input type="date" class="form-control" id="inputNgayTao" ng-model="formAdd.ngayBatDau">
+                <span class="text-danger" ng-show="error1.ngayBatDau">Ngày bắt đầu phải nhỏ hơn ngày kết thúc.</span>
+            </div>
+            <div class="col-md-12 mt-2">
+                <label for="inputNgayTao" class="form-label">Ngày kết thức</label>
+                <input type="date" class="form-control" id="inputNgayTao1" ng-model="formAdd.ngayKetThuc">
+                <span class="text-danger" ng-show="error1.ngayKetThuc">Ngày kết thúc không được trống or < hơn ngày bắt đầu.</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-center mt-4">
+        <div class="btn-group" style="width: 30%;">
+            <button class="btn btn-success" style="flex: 1; margin-right: 5px;" ng-click="create()">
+                <i class="fas fa-plus"></i> Thêm mới
+            </button>
+            <button type="button" class="btn btn-secondary" style="flex: 1; margin-left: 5px;" ng-click="resetAdd()">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+    </div>
+    <br><br>
+</div>

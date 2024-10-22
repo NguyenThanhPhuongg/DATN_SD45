@@ -3,6 +3,7 @@ package org.example.datn.service;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import org.example.datn.entity.User;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.enums.UserStatus;
 import org.example.datn.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,11 @@ public class UserService {
 
     public Optional<User> getActive(String username) {
         return repo.findByUserNameAndStatus(username, UserStatus.ACTIVE);
+    }
+
+    public User getActiveOrElseThrow(Long id) throws NotFoundEntityException {
+        return getActive(id)
+                .orElseThrow(NotFoundEntityException.ofSupplier(notFoundMessage()));
     }
 
     public Optional<User> getActive(Long id) {

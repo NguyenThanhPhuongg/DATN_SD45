@@ -8,61 +8,150 @@
             </div>
         </div>
         <div class="card-body">
-            <table id="datatablesSimple">
+            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3" />
+            <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>STT</th>
                     <th>ID</th>
-                    <th>Tên đăng nhập</th>
-                    <th>Mật khẩu</th>
-                    <th>ID nhóm</th>
-                    <th>Vai trò</th>
-                    <th>Xác thực</th>
+                    <th>ID Cha</th>
+                    <th>Tên</th>
+                    <th>Mô tả</th>
+                    <th>Trạng thái</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
                 </tr>
                 </thead>
-                <tfoot>
-                <tr>
-                    <th>STT</th>
-                    <th>ID</th>
-                    <th>Tên đăng nhập</th>
-                    <th>Mật khẩu</th>
-                    <th>ID nhóm</th>
-                    <th>Vai trò</th>
-                    <th>Xác thực</th>
-                    <th>Trạng thái</th>
-                    <th>Chức năng</th>
-                </tr>
-                </tfoot>
                 <tbody>
-                <tr ng-repeat="item in pager.items">
-                    <td>{{ $index + 1 }}</td>
+                <tr ng-repeat="item in pager.items | filter: searchText">
+                    <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>{{item.id}}</td>
-                    <td>{{item.id}}</td>
-                    <td>{{item.id}}</td>
-                    <td>{{item.id}}</td>
-                    <td>{{item.id}}</td>
-                    <td></td>
-                    <td></td>
+                    <td>{{item.idCha}}</td>
+                    <td>{{item.ten}}</td>
+                    <td>{{item.moTa}}</td>
+                    <td>{{item.nguoiTao}}</td>
+                    <td>
+                        <span ng-if="item.trangThai === 1">Active</span>
+                        <span ng-if="item.trangThai === 3">Locked</span>
+                        <span ng-if="item.trangThai === 2">Khác</span>
+                    </td>
                     <td>
                         <div class="btn-group btn-group-xs">
-                            <a href="#!/thongtindanhmuc">
-                                <button class="btn btn-link">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                            </a>
-                            <a href="#!/">
-                                <button class="btn btn-info">
-                                    <i class="fas fa-info"></i>
-                                </button>
-                            </a>
+                            <button class="btn btn-link" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal" ng-click="edit(item)">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button class="btn btn-link" type="button" ng-click="delete(item)">
+                                <i class="fas fa-times icon-close"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
+            <div class="panel-footer text-center">
+                <button ng-click="pager.first()" class="btn btn-danger">
+                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
+                </button>
+                <button ng-click="pager.prev()" class="btn btn-primary">
+                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
+                </button>
+                <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
+                <button ng-click="pager.next()" class="btn btn-primary">
+                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
+                </button>
+                <button ng-click="pager.last()" class="btn btn-danger">
+                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
+                </button>
+            </div>
         </div>
     </div>
 
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Thông tin danh mục sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid px-4">
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="inputID" class="form-label">ID</label>
+                                <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputIDCha" class="form-label">ID Cha</label>
+                                <input type="text" class="form-control" id="inputIDCha" ng-model="form.idCha">
+                                <span class="text-danger" ng-show="error.idCha">Vui lòng nhập ID Cha.</span>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputTen" class="form-label">Tên danh mục</label>
+                                <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
+                                <span class="text-danger" ng-show="error.ten">Tên danh mục phải từ 1 đến 100 ký tự.</span>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputMoTa" class="form-label">Mô tả</label>
+                                <input type="text" class="form-control" id="inputMoTa" ng-model="form.moTa">
+                                <span class="text-danger" ng-show="error.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
+                            </div>
+                            <div class="form-group col-md-7 mt-2">
+                                <label>Trạng thái</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="trangThai"
+                                               ng-model="form.trangThai" ng-value="1">
+                                        <label class="form-check-label">Active</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="trangThai"
+                                               ng-model="form.trangThai" ng-value="3">
+                                        <label class="form-check-label">Locked</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="trangThai"
+                                               ng-model="form.trangThai" ng-value="2">
+                                        <label class="form-check-label">Khác</label>
+                                    </div>
+                                </div>
+                                <span class="text-danger" ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputNgayTao" class="form-label">Ngày tạo</label>
+                                <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
+                                       readonly>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputNgayCapNhat" class="form-label">Ngày cập nhật</label>
+                                <input type="date" class="form-control" id="inputNgayCapNhat" ng-model="form.ngayCapNhat"
+                                       readonly>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputNguoiTao" class="form-label">Người tạo</label>
+                                <input type="text" class="form-control" id="inputNguoiTao" ng-model="form.nguoiTao"
+                                       readonly>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="inputNguoiCapNhat" class="form-label">Người cập nhật</label>
+                                <input type="text" class="form-control" id="inputNguoiCapNhat"
+                                       ng-model="form.nguoiCapNhat" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="card-footer text-center mt-4">
+                        <button type="button" class="btn btn-warning me-2" ng-click="update()">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button type="button" class="btn btn-secondary" ng-click="reset()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

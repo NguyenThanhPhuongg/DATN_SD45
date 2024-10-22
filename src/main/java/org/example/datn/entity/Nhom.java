@@ -4,6 +4,8 @@ import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 /**
  * @author hoangKhong
  */
@@ -14,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Nhom extends CommonEntity {
+public class Nhom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -28,4 +30,12 @@ public class Nhom extends CommonEntity {
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+    @Column(name = "nguoi_tao")
+    private String nguoiTao;
+    @Column(name = "nguoi_cap_nhat")
+    private String nguoiCapNhat;
+    @Column(name = "ngay_tao")
+    private Date ngayTao;
+    @Column(name = "ngay_cap_nhat")
+    private Date ngayCapNhat;
 }

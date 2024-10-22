@@ -99,6 +99,7 @@
     color: #555;
 }
 
+<<<<<<< HEAD
 .product {
     margin-bottom: 20px;
     width: calc(20% - 20px); /* 5 products in a row, 20px gap */
@@ -117,4 +118,54 @@
     color: #929191;
     font-weight: bold;
 
+=======
+#userInfo {
+    position: relative;
+}
+
+.user-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; /* Bo góc biểu tượng */
+}
+
+.username {
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 8px 12px; /* Khoảng cách bên trong */
+    border-radius: 5px; /* Bo góc cho tên người dùng */
+    transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+.username:hover {
+    background-color: #e0f7fa; /* Màu nền khi hover */
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Bo góc cho menu */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px 0;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px; /* Khoảng cách bên trong mỗi mục */
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px; /* Bo góc cho các mục */
+    transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+    text-align: center; /* Căn giữa chữ */
+}
+
+.dropdown-menu a:hover {
+    background-color: #b2ebf2;
+>>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
 }

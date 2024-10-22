@@ -55,3 +55,59 @@ $(window).scroll(function () {
         $('header').removeClass('fixed-header');
     }
 })
+document.addEventListener('DOMContentLoaded', function () {
+    const token = localStorage.getItem('token');
+    const userInfoContainer = document.getElementById('userInfo');
+    const authButtons = document.getElementById('authButtons');
+
+    if (token) {
+        try {
+            const decodedToken = jwt_decode(token);
+            const username = decodedToken.fullName;
+
+            userInfoContainer.style.display = 'block';
+            document.getElementById('usernameDisplay').innerText = username;
+            authButtons.style.display = 'none';
+        } catch (error) {
+            console.error('Error decoding token:', error);
+        }
+    } else {
+        userInfoContainer.style.display = 'none';
+        authButtons.style.display = 'block';
+    }
+});
+
+function toggleDropdown() {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Đóng menu khi nhấp ra ngoài
+document.addEventListener('click', function(event) {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const usernameDisplay = document.getElementById('usernameDisplay');
+
+    if (!usernameDisplay.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.style.display = 'none';
+    }
+});
+
+function logout() {
+    localStorage.removeItem('token');
+    location.reload();
+}
+
+// Để tự động ẩn menu khi người dùng nhấn ra ngoài
+window.onclick = function(event) {
+    if (!event.target.matches('.username') && !event.target.matches('.user-icon')) {
+        const dropdowns = document.getElementsByClassName("dropdown-menu");
+        for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
+            if (openDropdown.style.display === 'block') {
+                openDropdown.style.display = 'none';
+            }
+        }
+    }
+}
+
+

@@ -1,0 +1,64 @@
+<div class="container-fluid px-4">
+    <h2 class="mt-4">Quản lý đơn hàng thành công</h2><br>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table me-1"></i>
+                Danh sách đơn hàng thành công
+            </div>
+        </div>
+        <div class="card-body">
+            <input type="text" ng-model="searchText1" placeholder="Tìm kiếm..." class="form-control mb-3" />
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>ID Người dùng</th>
+                    <th>Địa chỉ giao hàng</th>
+                    <th>Phương thức vận chuyển</th>
+                    <th>Ngày đặt hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Điểm sử dụng</th>
+                    <th>Chức năng</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in pager1.items | filter: searchText">
+                    <td>{{$index + 1 + (pager1.page * pager1.size)}}</td>
+                    <td>{{item.id}}</td>
+                    <td>{{item.idUser.id}}</td>
+                    <td>{{item.idDiaChiGiaHang.diaChi}}</td>
+                    <td>{{item.idPhuongThucVanChuyen.ten}}</td>
+                    <td>{{item.ngayDatHang}}</td>
+                    <td>{{item.tongTien}}</td>
+                    <td>{{item.diemSuDung}}</td>
+                    <td>
+                        <div class="btn-group btn-group-xs">
+                            <button class="btn btn-link" type="button" ng-click="selectInvoice(item)">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="panel-footer text-center">
+                <button ng-click="pager1.first()" class="btn btn-danger">
+                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
+                </button>
+                <button ng-click="pager1.prev()" class="btn btn-primary">
+                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
+                </button>
+                <button class="btn btn-success">{{pager1.page+1}} of {{pager1.count}}</button>
+                <button ng-click="pager1.next()" class="btn btn-primary">
+                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
+                </button>
+                <button ng-click="pager1.last()" class="btn btn-danger">
+                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -21,3 +21,38 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     }
 });
+
+function updateImage() {
+    var profileImage = document.getElementById("profileImage");
+    var scope = angular.element(document.getElementById("imagePath")).scope(); // Lấy scope của Angular
+
+    // Kiểm tra nếu file đã được chọn
+    if (profileImage.files.length > 0) {
+        var fileName = profileImage.files[0].name; // Lấy tên file
+        scope.$apply(function() {
+            scope.form.anh = fileName; // Cập nhật ng-model trong Angular
+        });
+    } else {
+        scope.$apply(function() {
+            scope.form.anh = ""; // Nếu không có file, thì xóa giá trị
+        });
+    }
+}
+
+function updateImage2() {
+    var profileImage = document.getElementById("profileImage2");
+    var scope = angular.element(document.getElementById("imagePath2")).scope(); // Lấy scope của Angular
+
+    // Kiểm tra nếu file đã được chọn
+    if (profileImage.files.length > 0) {
+        var fileName = profileImage.files[0].name; // Lấy tên file
+        scope.$apply(function() {
+            scope.formAdd.anh = fileName; // Cập nhật ng-model trong Angular
+        });
+    } else {
+        scope.$apply(function() {
+            scope.form.anh = ""; // Nếu không có file, thì xóa giá trị
+        });
+    }
+}
+

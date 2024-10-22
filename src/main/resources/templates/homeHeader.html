@@ -17,13 +17,29 @@
                     </ul>
                 </nav>
                 <div class="header_icon">
-                    <a href="/login1">
-                        <button type="button" class="btn btn-dark">Đăng nhâp</button>
-                    </a>
-                    <a href="/register">
-                        <button type="button" class="btn btn-outline-dark">Đăng ký</button>
-                    </a>
+                    <div id="userInfo" style="display: none;">
+                        <img src="../images/user-icon.png" alt="User Icon" class="user-icon" />
+                        <span id="usernameDisplay" class="username" onclick="toggleDropdown()">Tên người dùng</span>
+                        <div id="dropdownMenu" class="dropdown-menu" style="display: none;">
+                            <a href="/">Xem thông tin</a>
+                            <a href="/">Chỉnh sửa</a>
+                            <a href="/v1/auth/change-password">Đổi mật khẩu</a>
+                            <a href="#" onclick="logout()">Đăng xuất</a>
+                        </div>
+                    </div>
+
+
+
+                    <div id="authButtons">
+                        <a href="/v1/auth/login">
+                            <button type="button" class="btn btn-dark">Đăng nhập</button>
+                        </a>
+                        <a href="/v1/auth/register">
+                            <button type="button" class="btn btn-outline-dark">Đăng ký</button>
+                        </a>
+                    </div>
                 </div>
+
             </div>
         </div>
         <div th:include="customer/cart/cartDrawer :: body"></div>

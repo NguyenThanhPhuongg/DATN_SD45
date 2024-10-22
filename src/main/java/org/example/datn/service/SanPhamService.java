@@ -1,5 +1,6 @@
 package org.example.datn.service;
 
+<<<<<<< HEAD
 import org.example.datn.entity.SanPham;
 import org.example.datn.repository.SanPhamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +44,23 @@ public class SanPhamService {
     public Page<SanPham> getAllProducts(Pageable pageable) {
         return this.sanPhamRepository.findAll(pageable);
     }
+=======
+import org.example.datn.entity.ChatLieu;
+import org.example.datn.entity.SanPham;
+
+import java.util.List;
+
+public interface SanPhamService {
+
+    List<SanPham> findAll();
+    SanPham findById(Long id);
+
+    List<SanPham> findByCateId(Long cid);
+
+    SanPham create(SanPham product);
+
+    SanPham update(SanPham product);
+
+    void delete(Long id);
+>>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
 }

@@ -2,6 +2,7 @@ package org.example.datn.service;
 
 import org.example.datn.entity.Profile;
 import org.example.datn.entity.User;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,5 +53,9 @@ public class ProfileService {
         return profileRepository.findByUserId(userId);
     }
 
+    public Profile getByEmailOrElseThrow(String email) throws NotFoundEntityException {
+        return profileRepository.findByEmail(email)
+                .orElseThrow(NotFoundEntityException.ofSupplier("email.not-found"));
+    }
 
 }

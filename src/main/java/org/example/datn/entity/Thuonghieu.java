@@ -18,11 +18,8 @@ public class Thuonghieu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "id_danh_muc_cha")
-    private Integer idCha;
     @Column(name = "ten")
     private String ten;
-
     @Column(name = "mo_ta")
     private String mo_ta;
     @Column(name = "trang_thai")

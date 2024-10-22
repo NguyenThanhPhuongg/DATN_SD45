@@ -61,7 +61,7 @@ public class UserAuthentication implements Authentication {
     /**
      * return userId;
      */
-    public Object getPrincipal() {
+    public Long getPrincipal() {
         return userId;
     }
 
