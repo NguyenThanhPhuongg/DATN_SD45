@@ -19,11 +19,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-//        try {
-//            model.addAttribute("data", this.sanPhamService.findAll());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
         return "customer/home/index";
     }
 
