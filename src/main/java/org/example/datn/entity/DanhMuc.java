@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DanhMuc {
+public class DanhMuc extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,15 +31,5 @@ public class DanhMuc {
     @Column(name = "trang_thai")
     private Integer trangThai;
 
-    @Column(name = "ngay_tao")
-    private Date ngayTao;
 
-    @Column(name = "ngay_cap_nhat")
-    private Date ngayCapNhat;
-
-    @Column(name = "nguoi_tao")
-    private Long nguoiTao;
-
-    @Column(name = "nguoi_cap_nhat")
-    private Long nguoiCapNhat;
 }

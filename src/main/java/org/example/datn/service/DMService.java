@@ -39,7 +39,7 @@ public class DMService {
             danhMuc.setMoTa(model.getMoTa());
             danhMuc.setTrangThai(model.getTrangThai());
             danhMuc.setNgayCapNhat(new Date()); // cập nhật thời gian
-
+            danhMuc.setNguoiCapNhat(model.getNguoiCapNhat());
             return danhMucProcessor.toModel(danhMucRepository.save(danhMuc));
         } else {
             return null; // Không tìm thấy

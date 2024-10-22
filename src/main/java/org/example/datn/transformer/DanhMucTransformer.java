@@ -18,6 +18,8 @@ public class DanhMucTransformer {
         model.setTen(danhMuc.getTen());
         model.setMoTa(danhMuc.getMoTa());
         model.setTrangThai(danhMuc.getTrangThai());
+        model.setNgayTao(danhMuc.getNgayTao());
+        model.setNgayCapNhat(danhMuc.getNgayCapNhat());
         return model;
     }
 
@@ -31,6 +33,8 @@ public class DanhMucTransformer {
         danhMuc.setTen(model.getTen());
         danhMuc.setMoTa(model.getMoTa());
         danhMuc.setTrangThai(model.getTrangThai());
+        model.setNgayTao(model.getNgayTao());
+        model.setNgayCapNhat(model.getNgayCapNhat());
         return danhMuc;
     }
 

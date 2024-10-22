@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author hoangKhong
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommonModel implements Serializable {
-    LocalDateTime ngayTao;
-    LocalDateTime ngayCapNhat;
+    Date ngayTao;
+    Date ngayCapNhat;
     Long nguoiTao;
     Long nguoiCapNhat;
 }

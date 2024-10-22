@@ -35,10 +35,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -102,7 +99,7 @@ public class HoaDonProcessor {
         hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
         hoaDon.setDiemSuDung(0);
         hoaDon.setTrangThai(StatusHoaDon.CHO_XU_LY.getValue());
-        hoaDon.setNgayTao(LocalDateTime.now());
+        hoaDon.setNgayTao(new Date());
         hoaDon.setNguoiTao(ua.getPrincipal());
 
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal());
@@ -115,7 +112,7 @@ public class HoaDonProcessor {
             hdct.setSoLuong(ghct.getSoLuong());
             hdct.setGia(ghct.getGia());
             tongTien = tongTien.add(ghct.getGia());
-            hdct.setNgayTao(LocalDateTime.now());
+            hdct.setNgayTao(new Date());
             hdct.setNguoiTao(ua.getPrincipal());
             hoaDonChiTietService.save(hdct);
         }

@@ -5,19 +5,17 @@ import lombok.experimental.FieldDefaults;
 import org.example.datn.entity.CommonEntity;
 import org.example.datn.model.CommonModel;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
+import javax.persistence.Column;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DanhMucModel extends CommonModel {
+public class ThuongHieuModel extends CommonModel {
     private Long id;
-    private Long idCha;
     private String ten;
     private String moTa;
     private Integer trangThai;
+
 }

@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Thuonghieu {
+public class Thuonghieu extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -21,15 +21,8 @@ public class Thuonghieu {
     @Column(name = "ten")
     private String ten;
     @Column(name = "mo_ta")
-    private String mo_ta;
+    private String moTa;
     @Column(name = "trang_thai")
     private Integer trangThai;
-    @Column(name = "nguoi_tao")
-    private String nguoiTao;
-    @Column(name = "nguoi_cap_nhat")
-    private String nguoiCapNhat;
-    @Column(name = "ngay_tao")
-    private Date ngayTao;
-    @Column(name = "ngay_cap_nhat")
-    private Date ngayCapNhat;
+
 }

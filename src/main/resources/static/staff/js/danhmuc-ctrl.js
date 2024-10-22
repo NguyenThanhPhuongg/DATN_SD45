@@ -132,8 +132,8 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         }).then((willUpdate) => {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
-                item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
                 item.nguoiCapNhat = 1; // Cập nhật người cập nhật
+                item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
                 $http.put(`/rest/danhmuc/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
@@ -173,7 +173,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
 
     // Thêm danh mục
     $scope.create = function () {
-        $scope.error = {idCha: false, ten: false, moTa: false, trangThai: false};
+        $scope.error = {idCha: false, ten: false, moTa: false};
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
@@ -193,10 +193,6 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
             isValid = false;
         }
 
-        if (!$scope.form.trangThai) {
-            $scope.error.trangThai = true;
-            isValid = false;
-        }
 
         // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
         if (!isValid) {
@@ -216,6 +212,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
                 item.nguoiTao = 1; // Đặt người tạo mặc định là 'Admin'
                 item.ngayTao = new Date(); // Ngày tạo là thời gian hiện tại
                 item.ngayCapNhat = new Date(); // Ngày cập nhật là thời gian hiện tại
+                item.trangThai = 1; // Đặt người tạo mặc định là 'Admin'
 
                 $http.post(`/rest/danhmuc`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu

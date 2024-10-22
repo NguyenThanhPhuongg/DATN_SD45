@@ -919,12 +919,6 @@ VALUES
 ('Thương hiệu 10', 'Mô tả thương hiệu 10', 1, 1, 1);
 GO
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-select * from san_pham
-=======
->>>>>>> hieupt
 INSERT INTO [chat_lieu] ([ten], [id_danh_muc_cha], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
 ('Cotton', 1, 1, 1, 1),
@@ -1144,7 +1138,4 @@ SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
 
 drop database [DB.DATN]
 SELECT * FROM danh_muc WHERE id = 1; -- hoặc điều kiện khác
-<<<<<<< HEAD
-=======
->>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
->>>>>>> hieupt
+

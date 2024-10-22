@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author hoangKhong
@@ -24,12 +25,12 @@ public abstract class CommonEntity implements Serializable {
 
     @CreatedDate
     @Column(name = "ngay_tao")
-    private LocalDateTime ngayTao;
+    private Date ngayTao;
 
 
     @LastModifiedDate
     @Column(name = "ngay_cap_nhat")
-    private LocalDateTime ngayCapNhat;
+    private Date ngayCapNhat;
 
 
     @CreatedBy
