@@ -173,6 +173,7 @@ public class UserProcessor {
         user.setRole(UserRoles.CLIENT);
         user.setStatus(UserStatus.ACTIVE);
         user.setType(UserType.NORMAL);
+        user.setXacThuc(false);
         userService.save(user);
 
         var profile = new Profile();

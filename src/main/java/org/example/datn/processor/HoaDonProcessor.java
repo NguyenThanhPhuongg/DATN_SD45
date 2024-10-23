@@ -72,6 +72,12 @@ public class HoaDonProcessor {
     @Autowired
     HoaDonChiTietService hoaDonChiTietService;
 
+    @Autowired
+    PhuongThucThanhToanService phuongThucThanhToanService;
+
+    @Autowired
+    ThanhToanService thanhToanService;
+
     public ServiceResult getAll() {
         var list = service.getAll();
         var models = list.stream().map(transformer::toModel).collect(Collectors.toList());
@@ -102,8 +108,8 @@ public class HoaDonProcessor {
         hoaDon.setNgayTao(new Date());
         hoaDon.setNguoiTao(ua.getPrincipal());
 
-        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal());
-        var gioHangChiTiet = gioHangChiTietService.findByIdGioHang(gioHang.get().getId());
+        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+        var gioHangChiTiet = gioHangChiTietService.findByIdGioHang(gioHang.getId());
         BigDecimal tongTien = BigDecimal.ZERO;
         for (GioHangChiTiet ghct: gioHangChiTiet){
             HoaDonChiTiet hdct = new HoaDonChiTiet();
@@ -118,9 +124,34 @@ public class HoaDonProcessor {
         }
         hoaDon.setTongTien(tongTien);
         service.save(hoaDon);
-
+        var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
+                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
+        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.COD)){
+            ThanhToan thanhToan = new ThanhToan();
+            thanhToan.setIdHoaDon(hoaDon.getId());
+            thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
+            thanhToan.setSoTien(hoaDon.getTongTien());
+            thanhToan.setTrangThai(StatusThanhToan.CHUA_THANH_TOAN.getValue());
+        }
+//        else if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
+//            // Tạo bản ghi thanh toán trước khi chuyển hướng
+//            ThanhToan thanhToan = new ThanhToan();
+//            thanhToan.setIdHoaDon(hoaDon.getId());
+//            thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
+//            thanhToan.setSoTien(hoaDon.getTongTien());
+//            thanhToan.setTrangThai(StatusThanhToan.CHUA_THANH_TOAN.getValue());
+//            thanhToanService.save(thanhToan);
+//
+//            // Xử lý thanh toán qua VNPAY
+//            String vnpayUrl = createVnpayRequest(hoaDon, tongTien, ua);
+//            return new ServiceResult(vnpayUrl, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+//        }
         return new ServiceResult();
 
     }
+
+//    private String createVnpayRequest(HoaDon hoaDon, BigDecimal tongTien, UserAuthentication ua) {
+//
+//    }
 
 }

@@ -1,6 +1,7 @@
 package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
+import org.example.datn.entity.GioHangChiTiet;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
@@ -10,6 +11,7 @@ import org.example.datn.service.GioHangChiTietService;
 import org.example.datn.service.GioHangService;
 import org.example.datn.service.SanPhamChiTietService;
 import org.example.datn.transformer.GioHangChiTietTranformer;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,10 +41,10 @@ public class GioHangChiTietProcessor {
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua){
 
-        var userId = ua.getPrincipal();
-        var gioHang = gioHangService.findByIdNguoiDung(userId).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
-        request.setIdGioHang(gioHang.getId());
-        var gioHangChiTiet = tranformer.toEntity(request);
+        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+        var gioHangChiTiet = new GioHangChiTiet();
+        BeanUtils.copyProperties(request, gioHangChiTiet);
+        gioHangChiTiet.setIdGioHang(gioHang.getId());
         var spct = spctService.findById(request.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("spct.not.found"));
         var soLuong = spct.getSoLuong() - request.getSoLuong();
         if (soLuong < 0) {

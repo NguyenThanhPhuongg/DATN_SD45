@@ -20,26 +20,29 @@ import java.util.Date;
 public class SanPhamChiTiet extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "id_san_pham")
-    private SanPham idSanPham;
-    @ManyToOne
-    @JoinColumn(name = "id_mau_sac")
-    private MauSac idMauSac;
-    @ManyToOne
-    @JoinColumn(name = "id_size")
-    private Size idSize;
-    @ManyToOne
-    @JoinColumn(name = "id_chat_lieu")
-    private ChatLieu idChatLieu;
+
+    @Column(name = "id_san_pham")
+    private Long idSanPham;
+
+    @Column(name = "id_size")
+    private Long idSize;
+
+    @Column(name = "id_mau_sac")
+    private Long idMauSac;
+
+    @Column(name = "id_chat_lieu")
+    private Long idChatLieu;
+
     @Column(name = "so_luong")
     private Integer soLuong;
+
     @Column(name = "gia")
     private BigDecimal gia;
+
     @Column(name = "ghi_chu")
     private String ghiChu;
+
     @Column(name = "trang_thai")
     private Integer trangThai;
 }

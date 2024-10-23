@@ -8,6 +8,7 @@ import org.example.datn.model.response.PhuongThucVanChuyenModel;
 import org.example.datn.service.PhuongThucVanChuyenService;
 import org.example.datn.transformer.PhuongThucVanChuyenTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.BeanUtils;
 
@@ -20,6 +21,7 @@ public class PhuongThucVanChuyenProcessor {
     @Autowired
     private PhuongThucVanChuyenService service;
 
+//    @Qualifier("phuongThucVanChuyenTransformer")
     @Autowired
     private PhuongThucVanChuyenTransformer transformer;
 

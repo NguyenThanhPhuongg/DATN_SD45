@@ -48,12 +48,12 @@ public class UserAuthentication implements Authentication {
     /**
      * return userName
      */
-    public Object getCredentials() {
+    public String getCredentials() {
         return userName;
     }
 
     @Override
-    public Object getDetails() {
+    public UserAuthentication getDetails() {
         return null;
     }
 
@@ -71,7 +71,7 @@ public class UserAuthentication implements Authentication {
     }
 
     @Override
-    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+    public void setAuthenticated(boolean b) throws IllegalArgumentException {
         throw new IllegalArgumentException("method.not.allowed");
     }
 

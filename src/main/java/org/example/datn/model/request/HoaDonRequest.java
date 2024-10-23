@@ -9,5 +9,6 @@ public class HoaDonRequest {
 
     private Long idDiaChiGiaoHang;
     private Long idPhuongThucVanChuyen;
+    private Long idPhuongThucThanhToan;
     private Integer diemSuDung;
 }
