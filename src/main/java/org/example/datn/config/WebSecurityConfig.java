@@ -60,20 +60,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .logout().permitAll(); // Cho phép đăng xuất cho tất cả
 //    }
-//
-//
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList("*")); // Cho phép tất cả các origin
-//        configuration.setAllowCredentials(false); // Không cho phép gửi thông tin xác thực
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        configuration.setAllowedHeaders(Arrays.asList("*"));
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration); // Áp dụng cho tất cả các endpoint
-//        return source;
-//    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*")); // Cho phép tất cả các origin
+        configuration.setAllowCredentials(false); // Không cho phép gửi thông tin xác thực
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Áp dụng cho tất cả các endpoint
+        return source;
+    }
 
     String favicon = "/favicon.ico";
     String defaultPermitAll = "/actuator/**,/v*/internal/**,/swagger-ui/**,/v*/api-docs/**,/v*/public/**,/api-docs/**,/tmgs-socket/**";
@@ -105,16 +105,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .cors().and() // Bật CORS
+                .csrf().disable() // Tắt CSRF cho đơn giản
                 .headers().cacheControl().disable().addHeaderWriter(myHeaderWriter)
                 .and()
-                .csrf().disable()
-                // make sure we use stateless session; session won't be used to store user's state.
+                // Use stateless session; session won't be used to store user's state.
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                // handle an authorized attempts
+                // Handle unauthorized attempts
                 .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED));
 
-        // Add a filter to validate the tokens with every request
+        // Add filters
         filterConfigRegister.getBeforeFilterRegistered()
                 .forEach(pair -> http.addFilterBefore(pair.getLeft(), pair.getRight()));
 
@@ -124,19 +125,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         filterConfigRegister.getAfterFilterRegistered()
                 .forEach(pair -> http.addFilterAfter(pair.getLeft(), pair.getRight()));
 
-        // allow all who are accessing service
+        // Allow all requests without authentication
         http
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, URI_POST_PERMIT).permitAll()
                 .antMatchers(HttpMethod.GET, URI_GET_PERMIT).permitAll()
                 .antMatchers(HttpMethod.PUT, URI_PUT_PERMIT).permitAll()
-                .antMatchers(HttpMethod.DELETE, URI_DELETE_PERMIT).permitAll();
+                .antMatchers(HttpMethod.DELETE, URI_DELETE_PERMIT).permitAll()
+                .anyRequest().permitAll(); // Cho phép tất cả các request mà không cần xác thực
 
-        // Any other request must be authenticated
-        http
-                .authorizeRequests()
-                .anyRequest().authenticated();
+        // Optional: Uncomment if you want to allow form login and logout
+        // http
+        //         .formLogin().permitAll() // Cho phép đăng nhập cho tất cả
+        //         .and()
+        //         .logout().permitAll(); // Cho phép đăng xuất cho tất cả
     }
+
 
     @Override
     public void configure(WebSecurity web) throws Exception {

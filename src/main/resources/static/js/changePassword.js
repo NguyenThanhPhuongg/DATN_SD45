@@ -1,5 +1,5 @@
-$(document).ready(function() {
-    $('#changePassword').on('click', async function() {
+$(document).ready(function () {
+    $('#changePassword').on('click', async function () {
         const oldPassword = $('#oldPassword').val();
         const newPassword = $('#newPassword').val();
         const retypePassword = $('#retypeNewPassword').val();
@@ -39,9 +39,11 @@ $(document).ready(function() {
                 })
             });
 
-            $('#message').text('Đổi mật khẩu thành công!').css('color', 'green');
-            // Chuyển hướng về trang chủ
-            window.location.href = '/';
+            $('#message').html('<div class="alert alert-success">Đổi mật khẩu thành công!</div>');
+            hideMessageAfterDelay();
+            setTimeout(function () {
+                window.location.href = '/';
+            }, 500);
         } catch (xhr) {
             let errorMessage;
             if (xhr.status === 400) {
@@ -52,4 +54,14 @@ $(document).ready(function() {
             $('#message').text(errorMessage).css('color', 'red');
         }
     });
+
+    function hideMessageAfterDelay() {
+        setTimeout(function () {
+            $('#message').fadeOut('slow', function () {
+                $(this).empty().show();
+            });
+        }, 2000);
+    }
 });
+
+
