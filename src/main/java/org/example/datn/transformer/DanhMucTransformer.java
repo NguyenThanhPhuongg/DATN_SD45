@@ -17,7 +17,19 @@ import java.util.stream.Collectors;
 public interface DanhMucTransformer {
 
     DanhMucModel toModel(DanhMuc danhMuc);
-    DanhMuc toEntity(DanhMucRequest request);
 
+    static DanhMuc toEntity(DanhMucRequest request) {
+        DanhMuc danhMuc = new DanhMuc();
+        danhMuc.setTen(request.getTen()); // Đảm bảo rằng trường 'ten' được gán
+        danhMuc.setMoTa(request.getMoTa());
+        danhMuc.setTrangThai(request.getTrangThai());
+        danhMuc.setIdCha(request.getIdCha());
+        danhMuc.setNguoiTao(request.getNguoiTao());
+        danhMuc.setNguoiCapNhat(request.getNguoiCapNhat());
+        danhMuc.setNgayTao(request.getNgayTao());
+        danhMuc.setNgayCapNhat(request.getNgayCapNhat());
+
+        return danhMuc;
+    }
 
 }

@@ -83,8 +83,11 @@
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputIDCha" class="form-label">ID Cha</label>
-                                <input type="text" class="form-control" id="inputIDCha" ng-model="form.idCha">
-                                <span class="text-danger" ng-show="error.idCha">Vui lòng nhập ID Cha.</span>
+                                <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
+                                    <option ng-value="1" selected>NAM</option>
+                                    <option ng-value="2">NỮ</option>
+                                    <option ng-value="3">KHÁC</option>
+                                </select>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputTen" class="form-label">Tên danh mục</label>

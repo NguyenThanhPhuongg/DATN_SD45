@@ -4,16 +4,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.example.datn.model.CommonModel;
+
+import javax.sql.rowset.serial.SerialArray;
+import java.io.Serializable;
+import java.util.Date;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DanhMucRequest extends CommomRequest{
-
-    private Long idCha;
-    private String ten;
-    private String moTa;
-    private Integer trangThai;
-
+public class CommomRequest {
+    Date ngayTao;
+    Date ngayCapNhat;
+    Long nguoiTao;
+    Long nguoiCapNhat;
 }
