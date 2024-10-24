@@ -1,0 +1,168 @@
+/* Customize the tabs */
+.nav-tabs .nav-link {
+    color: #333;
+    border: none;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #db4242;
+}
+
+.nav-tabs .nav-link.active {
+    color: #000;
+    border-bottom: 3px solid rgb(0, 0, 0);
+    background-color: transparent;
+}
+
+.tab-content {
+    margin-top: 20px;
+}
+
+.tab-pane {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
+.product-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+.product-info img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.product-price {
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+}
+
+/* Custom menu */
+body {
+    background-color: #f9f9f9;
+}
+
+.profile-menu {
+    width: 300px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-menu .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-menu .profile-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.profile-menu .profile-header .username {
+    font-weight: bold;
+}
+
+.profile-menu .profile-header .edit-profile {
+    font-size: 12px;
+    color: gray;
+    cursor: pointer;
+}
+
+.profile-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-menu ul li {
+    margin: 10px 0;
+    transition: background-color 0.3s ease-in-out;
+}
+
+
+.profile-menu ul li:hover {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.profile-menu ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    transition: color 0.3s ease-in-out;
+}
+
+
+.profile-menu ul li a i {
+    margin-right: 10px;
+}
+
+
+.profile-menu ul li .sub-menu {
+    padding-left: 40px;
+    display: none;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.4s ease;
+}
+
+.profile-menu ul li .sub-menu li a {
+    font-size: 15px;
+    font-weight: 400;
+}
+
+
+
+.profile-menu ul li a:hover,
+.profile-menu ul li a.active {
+    color: #000;
+}
+
+
+.profile-menu ul li.show .sub-menu {
+    display: block;
+    opacity: 1;
+    max-height: 500px;
+}
+
+
+.profile-menu ul li a .arrow {
+    margin-left: auto;
+    transition: transform 0.4s ease;
+}
+
+
+.profile-menu ul li.show a .arrow {
+    transform: rotate(90deg);
+}
+
+
+.profile-menu ul li .sub-menu li a {
+    padding: 5px 10px;
+}
+
+.profile-menu ul li .sub-menu li:hover {
+    background-color: #e8e8e8;
+    border-radius: 5px;
+}
