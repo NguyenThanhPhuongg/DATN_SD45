@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
-    @Query("SELECT p FROM SanPham p WHERE p.id = ?1")
-    List<SanPham> findByCateId(Long cid);
+//    @Query("SELECT p FROM SanPham p WHERE p.id = ?1")
+//    List<SanPham> findByCateId(Long cid);
 
 }

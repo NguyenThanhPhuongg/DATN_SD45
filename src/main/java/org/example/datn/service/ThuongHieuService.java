@@ -6,17 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface ThuongHieuService {
+@Service
+public class ThuongHieuService {
 
-    List<Thuonghieu> findAll();
-    Thuonghieu findById(Long id);
+    @Autowired
+    private ThuongHieuRepository repo;
 
-    List<Thuonghieu> findByCateId(Long cid);
-
-    Thuonghieu create(Thuonghieu product);
-
-    Thuonghieu update(Thuonghieu product);
-
-    void delete(Long id);
+    public Optional<Thuonghieu> findById(Long id) {
+        return repo.findById(id);
+    }
 }

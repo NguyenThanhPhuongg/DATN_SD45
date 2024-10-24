@@ -12,38 +12,38 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class SanPhamServiceImpl implements SanPhamService {
+public class SanPhamServiceImpl  {
 
-    @Autowired
-    SanPhamRepository sanPhamRepository;
-
-    @Override
-    public List<SanPham> findAll() {
-        return sanPhamRepository.findAll();
-    }
-
-    @Override
-    public SanPham findById(Long id) {
-        return sanPhamRepository.findById(id).get();
-    }
-
-    @Override
-    public List<SanPham> findByCateId(Long cid) {
-        return sanPhamRepository.findByCateId(cid);
-    }
-    @Override
-    public SanPham create(SanPham product) {
-        return sanPhamRepository.save(product);
-    }
-
-    @Override
-    public SanPham update(SanPham product) {
-        return sanPhamRepository.save(product);
-    }
-
-    @Override
-    public void delete(Long id) {
-        sanPhamRepository.deleteById(id);
-    }
+//    @Autowired
+//    SanPhamRepository sanPhamRepository;
+//
+//    @Override
+//    public List<SanPham> findAll() {
+//        return sanPhamRepository.findAll();
+//    }
+//
+//    @Override
+//    public SanPham findById(Long id) {
+//        return sanPhamRepository.findById(id).get();
+//    }
+//
+//    @Override
+//    public List<SanPham> findByCateId(Long cid) {
+//        return sanPhamRepository.findByCateId(cid);
+//    }
+//    @Override
+//    public SanPham create(SanPham product) {
+//        return sanPhamRepository.save(product);
+//    }
+//
+//    @Override
+//    public SanPham update(SanPham product) {
+//        return sanPhamRepository.save(product);
+//    }
+//
+//    @Override
+//    public void delete(Long id) {
+//        sanPhamRepository.deleteById(id);
+//    }
 
 }

@@ -2,19 +2,20 @@ package org.example.datn.service;
 
 import org.example.datn.entity.DanhMuc;
 import org.example.datn.entity.Thuonghieu;
+import org.example.datn.repository.DanhMucRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface DanhMucService {
+@Service
+public class DanhMucService {
 
-    List<DanhMuc> findAll();
-    DanhMuc findById(Long id);
+    @Autowired
+    DanhMucRepository repo;
 
-    List<DanhMuc> findByCateId(Long cid);
-
-    DanhMuc create(DanhMuc product);
-
-    DanhMuc update(DanhMuc product);
-
-    void delete(Long id);
+    public Optional<DanhMuc> findById(Long id) {
+        return repo.findById(id);
+    }
 }

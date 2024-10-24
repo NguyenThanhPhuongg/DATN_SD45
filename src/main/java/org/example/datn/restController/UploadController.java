@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
 import java.io.File;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -32,30 +33,30 @@ public class UploadController {
     @Autowired
     SanPhamService sanPhamService; // Dịch vụ để quản lý sản phẩm
 
-    @PostMapping("/rest/update-image/{id}")
-    public JsonNode updateImage(@PathVariable("id") Long id,
-                                @RequestParam("file") MultipartFile file) {
-        // Tìm sản phẩm theo ID
-        SanPham product = sanPhamService.findById(id);
-
-        if (product == null) {
-            throw new RuntimeException("Product not found");
-        }
-
-        // Lưu ảnh mới
-        File savedFile = uploadService.save(file, "images"); // Cập nhật đường dẫn nếu cần
-
-        // Cập nhật thông tin ảnh của sản phẩm
-        product.setAnh(savedFile.getName());
-
-        // Lưu sản phẩm đã cập nhật
-        sanPhamService.create(product);
-
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
-        node.put("name", savedFile.getName());
-        node.put("size", savedFile.length());
-        return node;
-    }
+//    @PostMapping("/rest/update-image/{id}")
+//    public JsonNode updateImage(@PathVariable("id") Long id,
+//                                @RequestParam("file") MultipartFile file) {
+//        // Tìm sản phẩm theo ID
+//        Optional<SanPham> product = sanPhamService.findById(id);
+//
+//        if (product == null) {
+//            throw new RuntimeException("Product not found");
+//        }
+//
+//        // Lưu ảnh mới
+//        File savedFile = uploadService.save(file, "images"); // Cập nhật đường dẫn nếu cần
+//
+//        // Cập nhật thông tin ảnh của sản phẩm
+//        product.setAnh(savedFile.getName());
+//
+//        // Lưu sản phẩm đã cập nhật
+//        sanPhamService.create(product);
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode node = mapper.createObjectNode();
+//        node.put("name", savedFile.getName());
+//        node.put("size", savedFile.length());
+//        return node;
+//    }
 
 }

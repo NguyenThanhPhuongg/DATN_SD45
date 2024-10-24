@@ -8,39 +8,39 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class ThuongHieuServiceImpl implements ThuongHieuService{
+public class ThuongHieuServiceImpl{
 
-    @Autowired
-    ThuongHieuRepository thuongHieuRepository;
-
-    @Override
-    public List<Thuonghieu> findAll() {
-        return thuongHieuRepository.findAll();
-    }
-
-    @Override
-    public Thuonghieu findById(Long id) {
-        return thuongHieuRepository.findById(id).get();
-    }
-
-    @Override
-    public List<Thuonghieu> findByCateId(Long cid) {
-        return thuongHieuRepository.findByCateId(cid);
-    }
-
-    @Override
-    public Thuonghieu create(Thuonghieu product) {
-        return thuongHieuRepository.save(product);
-    }
-
-    @Override
-    public Thuonghieu update(Thuonghieu product) {
-        return thuongHieuRepository.save(product);
-    }
-
-    @Override
-    public void delete(Long id) {
-        thuongHieuRepository.deleteById(id);
-    }
+//    @Autowired
+//    ThuongHieuRepository thuongHieuRepository;
+//
+//    @Override
+//    public List<Thuonghieu> findAll() {
+//        return thuongHieuRepository.findAll();
+//    }
+//
+//    @Override
+//    public Thuonghieu findById(Long id) {
+//        return thuongHieuRepository.findById(id).get();
+//    }
+//
+//    @Override
+//    public List<Thuonghieu> findByCateId(Long cid) {
+//        return thuongHieuRepository.findByCateId(cid);
+//    }
+//
+//    @Override
+//    public Thuonghieu create(Thuonghieu product) {
+//        return thuongHieuRepository.save(product);
+//    }
+//
+//    @Override
+//    public Thuonghieu update(Thuonghieu product) {
+//        return thuongHieuRepository.save(product);
+//    }
+//
+//    @Override
+//    public void delete(Long id) {
+//        thuongHieuRepository.deleteById(id);
+//    }
 
 }

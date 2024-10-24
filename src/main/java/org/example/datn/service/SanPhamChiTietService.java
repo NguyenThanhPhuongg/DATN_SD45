@@ -38,4 +38,8 @@ public class SanPhamChiTietService {
         return repo.findByIdIn(ids);
     }
 
+    public Optional<SanPhamChiTiet> findByIdSanPhamAndIdSizeAndIdMauSac(Long idSanPham, Long idSize, Long idMauSac) {
+        return repo.findByIdSanPhamAndIdSizeAndIdMauSac(idSanPham, idSize, idMauSac);
+    }
+
 }

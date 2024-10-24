@@ -2,19 +2,29 @@ package org.example.datn.service;
 
 import org.example.datn.entity.DanhMuc;
 import org.example.datn.entity.Size;
+import org.example.datn.repository.SizeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface SizeService {
+@Service
+public class SizeService {
 
-    List<Size> findAll();
-    Size findById(Long id);
+    @Autowired
+    private SizeRepository repo;
 
-    List<Size> findByCateId(Long cid);
+    public Optional<Size> findById(Long id) {
+        return repo.findById(id);
+    }
 
-    Size create(Size product);
+    public List<Size> findAll() {
+        return repo.findAll();
+    }
 
-    Size update(Size product);
+    public void save(Size size) {
+        repo.save(size);
+    }
 
-    void delete(Long id);
 }

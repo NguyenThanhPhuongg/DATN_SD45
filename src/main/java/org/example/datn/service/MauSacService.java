@@ -2,19 +2,26 @@ package org.example.datn.service;
 
 import org.example.datn.entity.MauSac;
 import org.example.datn.entity.Size;
+import org.example.datn.repository.MauSacRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface MauSacService {
+@Service
+public class MauSacService {
 
-    List<MauSac> findAll();
-    MauSac findById(Long id);
+    @Autowired
+    private MauSacRepository repo;
 
-    List<MauSac> findByCateId(Long cid);
+    public Optional<MauSac> findById(Long id) {
+        return repo.findById(id);
+    }
 
-    MauSac create(MauSac product);
+    public List<MauSac> findAll() {
+        return repo.findAll();
+    }
 
-    MauSac update(MauSac product);
 
-    void delete(Long id);
 }

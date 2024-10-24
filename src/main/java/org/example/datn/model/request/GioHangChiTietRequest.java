@@ -10,7 +10,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GioHangChiTietRequest {
 
-    private Long idSanPhamChiTiet;
+    private Long idSanPham;
+    private Long idSize;
+    private Long idMauSac;
     private Integer soLuong;
 
 }

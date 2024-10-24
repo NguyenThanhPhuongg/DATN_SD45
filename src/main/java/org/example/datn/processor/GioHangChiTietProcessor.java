@@ -39,13 +39,14 @@ public class GioHangChiTietProcessor {
     private SanPhamChiTietService spctService;
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua){
+    public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua) {
 
-        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
         var gioHangChiTiet = new GioHangChiTiet();
         BeanUtils.copyProperties(request, gioHangChiTiet);
         gioHangChiTiet.setIdGioHang(gioHang.getId());
-        var spct = spctService.findById(request.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("spct.not.found"));
+        var spct = spctService.findByIdSanPhamAndIdSizeAndIdMauSac(request.getIdSanPham(), request.getIdSize(), request.getIdMauSac())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var soLuong = spct.getSoLuong() - request.getSoLuong();
         if (soLuong < 0) {
             throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
@@ -61,10 +62,10 @@ public class GioHangChiTietProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult update(Long id, GioHangChiTietRequest request, UserAuthentication ua){
-        var gioHangChiTiet = service.findById(id).orElseThrow(() -> new EntityNotFoundException("gioHangChiTiet.not.found"));
+    public ServiceResult update(Long id, GioHangChiTietRequest request, UserAuthentication ua) {
+        var gioHangChiTiet = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết giỏ hàng"));
 
-        var spct = spctService.findById(gioHangChiTiet.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("spct.not.found"));
+        var spct = spctService.findById(gioHangChiTiet.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết sản phẩm"));
         gioHangChiTiet.setSoLuong(request.getSoLuong());
         var currentQuantity = gioHangChiTiet.getSoLuong();
         var newQuantity = spct.getSoLuong() + currentQuantity - request.getSoLuong();
@@ -85,9 +86,9 @@ public class GioHangChiTietProcessor {
 
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult delete(Long id, UserAuthentication ua) {
-        var gioHangChiTiet = service.findById(id).orElseThrow(() -> new EntityNotFoundException("gioHangChiTiet.not.found"));
+        var gioHangChiTiet = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết giỏ hàng"));
 
-        var spct = spctService.findById(gioHangChiTiet.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("spct.not.found"));
+        var spct = spctService.findById(gioHangChiTiet.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết sản phẩm"));
 
         var newQuantity = spct.getSoLuong() + gioHangChiTiet.getSoLuong();
         spct.setSoLuong(newQuantity);
@@ -99,8 +100,8 @@ public class GioHangChiTietProcessor {
         return new ServiceResult();
     }
 
-    public ServiceResult getList(UserAuthentication ua){
-        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
+    public ServiceResult getList(UserAuthentication ua) {
+        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
         var list = service.findByIdGioHang(gioHang.getId());
         var models = list.stream().map(tranformer::toModel).collect(Collectors.toList());
         var spctIds = models.stream().map(GioHangChiTietModel::getIdSanPhamChiTiet).collect(Collectors.toList());
@@ -114,7 +115,7 @@ public class GioHangChiTietProcessor {
         if (spcts.isEmpty()) {
             return;
         }
-        Map<Long, SanPhamChiTiet> spctMap = spcts.stream().collect(Collectors.toMap(SanPhamChiTiet::getId,  Function.identity(), (existing, replacement) -> existing));
+        Map<Long, SanPhamChiTiet> spctMap = spcts.stream().collect(Collectors.toMap(SanPhamChiTiet::getId, Function.identity(), (existing, replacement) -> existing));
         models.forEach(model -> model.setSanPhamChiTiet(spctMap.get(model.getIdSanPhamChiTiet())));
 
     }

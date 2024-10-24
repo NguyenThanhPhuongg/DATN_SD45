@@ -12,38 +12,38 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class MauSacServiceImpl implements MauSacService {
+public class MauSacServiceImpl{
 
-    @Autowired
-    MauSacRepository mauSacRepository;
-
-    @Override
-    public List<MauSac> findAll() {
-        return mauSacRepository.findAll();
-    }
-
-    @Override
-    public MauSac findById(Long id) {
-        return mauSacRepository.findById(id).get();
-    }
-
-    @Override
-    public List<MauSac> findByCateId(Long cid) {
-        return mauSacRepository.findByCateId(cid);
-    }
-    @Override
-    public MauSac create(MauSac product) {
-        return mauSacRepository.save(product);
-    }
-
-    @Override
-    public MauSac update(MauSac product) {
-        return mauSacRepository.save(product);
-    }
-
-    @Override
-    public void delete(Long id) {
-        mauSacRepository.deleteById(id);
-    }
+//    @Autowired
+//    MauSacRepository mauSacRepository;
+//
+//    @Override
+//    public List<MauSac> findAll() {
+//        return mauSacRepository.findAll();
+//    }
+//
+//    @Override
+//    public MauSac findById(Long id) {
+//        return mauSacRepository.findById(id).get();
+//    }
+//
+//    @Override
+//    public List<MauSac> findByCateId(Long cid) {
+//        return mauSacRepository.findByCateId(cid);
+//    }
+//    @Override
+//    public MauSac create(MauSac product) {
+//        return mauSacRepository.save(product);
+//    }
+//
+//    @Override
+//    public MauSac update(MauSac product) {
+//        return mauSacRepository.save(product);
+//    }
+//
+//    @Override
+//    public void delete(Long id) {
+//        mauSacRepository.deleteById(id);
+//    }
 
 }

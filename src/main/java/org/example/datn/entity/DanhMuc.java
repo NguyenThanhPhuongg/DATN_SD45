@@ -16,7 +16,6 @@ import java.util.Date;
 public class DanhMuc extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @Column(name = "id_danh_muc_cha")

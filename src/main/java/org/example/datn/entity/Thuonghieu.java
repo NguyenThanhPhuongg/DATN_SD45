@@ -16,7 +16,6 @@ import java.util.Date;
 public class Thuonghieu extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
     @Column(name = "ten")
     private String ten;
