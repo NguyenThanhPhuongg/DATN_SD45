@@ -1,60 +1,53 @@
 package org.example.datn.restController;
 
-import org.example.datn.model.response.DanhMucModel;
+import org.example.datn.model.ServiceResult;
+import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.processor.DanhMucProcessor;
-import org.example.datn.service.DMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/rest/danhmuc")
 public class DanhMucController {
 
-    private final DMService danhMucService;
-
     @Autowired
-    public DanhMucController(DMService danhMucService) {
-        this.danhMucService = danhMucService;
-    }
+    private DanhMucProcessor danhMucProcessor;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DanhMucModel> getById(@PathVariable Long id) {
-        DanhMucModel model = danhMucService.getById(id);
-        if (model != null) {
-            return ResponseEntity.ok(model);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<DanhMucModel> update(@PathVariable Long id, @RequestBody DanhMucModel model) {
-        DanhMucModel updatedModel = danhMucService.update(id, model);
-        if (updatedModel != null) {
-            return ResponseEntity.ok(updatedModel);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    // Lấy danh sách tất cả các danh mục
     @GetMapping
-    public List<DanhMucModel> getAll() {
-        return danhMucService.getAll();
+    public ResponseEntity<ServiceResult> findAll() {
+        ServiceResult result = danhMucProcessor.findAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // Lấy danh mục theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<ServiceResult> getById(@PathVariable Long id) {
+        ServiceResult result = danhMucProcessor.getById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // Tạo mới danh mục
     @PostMapping
-    public ResponseEntity<DanhMucModel> create(@RequestBody DanhMucModel model) {
-        DanhMucModel savedModel = danhMucService.save(model);
-        return ResponseEntity.ok(savedModel);
+    public ResponseEntity<ServiceResult> create(@RequestBody DanhMucRequest request) {
+        ServiceResult result = danhMucProcessor.save(request);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    // Cập nhật danh mục theo ID
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody DanhMucRequest request) {
+        ServiceResult result = danhMucProcessor.update(id, request);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // Xóa danh mục theo ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        danhMucService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
+        ServiceResult result = danhMucProcessor.delete(id);
+        return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
     }
-
 }

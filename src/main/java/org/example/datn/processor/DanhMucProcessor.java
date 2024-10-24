@@ -1,55 +1,59 @@
 package org.example.datn.processor;
 
-import org.example.datn.entity.DanhMuc;
+import org.example.datn.constants.SystemConstant;
+import org.example.datn.model.ServiceResult;
+import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.model.response.DanhMucModel;
 import org.example.datn.service.DMService;
-import org.example.datn.service.DanhMucService;
+import org.example.datn.transformer.DanhMucTransformer;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class DanhMucProcessor {
-
-    public DanhMuc toEntity(DanhMucModel model) {
-        if (model == null) {
-            return null;
-        }
-        DanhMuc entity = new DanhMuc();
-        entity.setId(model.getId());
-        entity.setIdCha(model.getIdCha());
-        entity.setTen(model.getTen());
-        entity.setMoTa(model.getMoTa());
-        entity.setTrangThai(model.getTrangThai());
-        entity.setNgayTao(model.getNgayTao());
-        entity.setNgayCapNhat(model.getNgayCapNhat());
-        entity.setNguoiTao(model.getNguoiTao());
-        entity.setNguoiCapNhat(model.getNguoiCapNhat());
-        return entity;
+    @Autowired
+    private DMService service;
+    @Autowired
+    private DanhMucTransformer transformer;
+    public ServiceResult save(DanhMucRequest request){
+        var p = transformer.toEntity(request);
+        service.save(p);
+        return new ServiceResult();
     }
 
-    public DanhMucModel toModel(DanhMuc entity) {
-        if (entity == null) {
-            return null;
-        }
-        DanhMucModel model = new DanhMucModel();
-        model.setId(entity.getId());
-        model.setIdCha(entity.getIdCha());
-        model.setTen(entity.getTen());
-        model.setMoTa(entity.getMoTa());
-        model.setTrangThai(entity.getTrangThai());
-        model.setNgayTao(entity.getNgayTao());
-        model.setNgayCapNhat(entity.getNgayCapNhat());
-        model.setNguoiTao(entity.getNguoiTao());
-        model.setNguoiCapNhat(entity.getNguoiCapNhat());
-        return model;
+    public ServiceResult update(Long id, DanhMucRequest request){
+        var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
+        BeanUtils.copyProperties(request, p);
+        service.save(p);
+        return new ServiceResult();
     }
 
-    public List<DanhMucModel> toModels(List<DanhMuc> entities) {
-        return entities.stream()
-                .map(this::toModel)
-                .collect(Collectors.toList());
+    public ServiceResult delete(Long id){
+        var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
+        service.delete(p);
+        return new ServiceResult();
+    }
+
+    public ServiceResult findAll(){
+        var list = service.getActive();
+        var models = list.stream().map(transformer::toModel).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult getById(Long id){
+        var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
+        var model = transformer.toModel(p);
+        return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public DanhMucModel findById(Long id) {
+        return service.findById(id)
+                .map(transformer::toModel)
+                .orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
     }
 }
