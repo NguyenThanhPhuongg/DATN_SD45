@@ -1,11 +1,8 @@
 package org.example.datn.impl;
 
 import org.example.datn.entity.Blog;
-import org.example.datn.entity.KhuyenMai;
 import org.example.datn.repository.BlogRepository;
-import org.example.datn.repository.KhuyenMaiRepository;
 import org.example.datn.service.BlogService;
-import org.example.datn.service.KhuyenMaiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

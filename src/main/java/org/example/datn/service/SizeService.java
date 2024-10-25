@@ -1,6 +1,5 @@
 package org.example.datn.service;
 
-import org.example.datn.entity.DanhMuc;
 import org.example.datn.entity.Size;
 import org.example.datn.repository.SizeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,4 +26,7 @@ public class SizeService {
         repo.save(size);
     }
 
+    public void deleteById(Long id) {
+        repo.deleteById(id);
+    }
 }

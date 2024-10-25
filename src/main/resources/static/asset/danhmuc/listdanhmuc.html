@@ -31,9 +31,11 @@
                     <td>{{item.moTa}}</td>
                     <td>{{item.nguoiTao}}</td>
                     <td>
-                        <span ng-if="item.trangThai === 1">Active</span>
-                        <span ng-if="item.trangThai === 3">Locked</span>
-                        <span ng-if="item.trangThai === 2">Khác</span>
+                        <div class="badge" ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                            <span ng-if="item.trangThai === 1">Active</span>
+                            <span ng-if="item.trangThai === 3">Locked</span>
+                            <span ng-if="item.trangThai === 2">Khác</span>
+                        </div>
                     </td>
                     <td>
                         <div class="btn-group btn-group-xs">

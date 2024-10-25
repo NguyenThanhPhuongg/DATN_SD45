@@ -19,6 +19,8 @@ public class Size extends CommonEntity{
     private Long id;
     @Column(name = "ten")
     private String ten;
+    @Column(name = "id_danh_muc_cha")
+    private Integer idCha;
     @Column(name = "trang_thai")
     private Integer trangThai;
 
