@@ -31,9 +31,6 @@ public class SanPhamChiTiet extends CommonEntity{
     @Column(name = "id_mau_sac")
     private Long idMauSac;
 
-    @Column(name = "id_chat_lieu")
-    private Long idChatLieu;
-
     @Column(name = "so_luong")
     private Integer soLuong;
 

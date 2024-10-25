@@ -42,22 +42,35 @@ public class GioHangChiTietProcessor {
     public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua) {
 
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
-        var gioHangChiTiet = new GioHangChiTiet();
-        BeanUtils.copyProperties(request, gioHangChiTiet);
-        gioHangChiTiet.setIdGioHang(gioHang.getId());
+//        var gioHangChiTiet = new GioHangChiTiet();
+//        BeanUtils.copyProperties(request, gioHangChiTiet);
+//        gioHangChiTiet.setIdGioHang(gioHang.getId());
         var spct = spctService.findByIdSanPhamAndIdSizeAndIdMauSac(request.getIdSanPham(), request.getIdSize(), request.getIdMauSac())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
-        var soLuong = spct.getSoLuong() - request.getSoLuong();
-        if (soLuong < 0) {
+        var soLuongConLai = spct.getSoLuong();
+        if (request.getSoLuong() > soLuongConLai) {
             throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
         }
-        spct.setSoLuong(soLuong);
-        var gia = spct.getGia().multiply(BigDecimal.valueOf(request.getSoLuong()));
-        gioHangChiTiet.setGia(gia);
 
+        var gioHangChiTiet = service.findByIdGioHangAndIdSanPhamChiTiet(gioHang.getId(), spct.getId());
+
+        if (gioHangChiTiet.isPresent()) {
+            var currentQuantity = gioHangChiTiet.get().getSoLuong();
+            var newQuantity = currentQuantity + request.getSoLuong();
+
+            gioHangChiTiet.get().setSoLuong(newQuantity);
+            service.save(gioHangChiTiet.get());
+
+            spct.setSoLuong(soLuongConLai - request.getSoLuong());
+        } else {
+            GioHangChiTiet ghct = new GioHangChiTiet();
+            BeanUtils.copyProperties(request, ghct);
+            ghct.setIdGioHang(gioHang.getId());
+            ghct.setGia(spct.getGia().multiply(BigDecimal.valueOf(request.getSoLuong())));
+            service.save(ghct);
+            spct.setSoLuong(soLuongConLai - request.getSoLuong());
+        }
         spctService.save(spct);
-        service.save(gioHangChiTiet);
-
         return new ServiceResult();
     }
 
