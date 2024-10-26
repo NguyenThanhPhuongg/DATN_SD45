@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 public interface HoaDonTransformer {
     HoaDonModel toModel(HoaDon hoaDon);
-    HoaDon toEntity(HoaDonRequest request);
+//    HoaDon toEntity(HoaDonRequest request);
 }
 
