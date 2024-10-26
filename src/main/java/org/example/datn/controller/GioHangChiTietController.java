@@ -36,7 +36,7 @@ public class GioHangChiTietController {
         return ResponseEntity.ok(processor.delete(id, ua));
     }
 
-    @GetMapping("/")
+    @GetMapping("/getList")
     public ResponseEntity<ServiceResult> getGioHangChiTiet(UserAuthentication ua) {
         return ResponseEntity.ok(processor.getList(ua));
     }
