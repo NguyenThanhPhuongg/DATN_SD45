@@ -1,4 +1,4 @@
-app.controller("hoadon-ctrl", function ($scope, $http,$rootScope, $location) {
+app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.items = [];
     $scope.dcgh = [];
     $scope.hdct = [];
@@ -13,42 +13,64 @@ app.controller("hoadon-ctrl", function ($scope, $http,$rootScope, $location) {
     // Thêm searchText cho các trạng thái khác nếu cần
 
     // Hàm khởi tạo
+    // $scope.initialize = function () {
+    //     // Tải danh sách hóa đơn
+    //     $http.get("/rest/hoadon").then(resp => {
+    //         console.log("Data from API: ", resp.data);
+    //         $scope.items = resp.data;
+    //
+    //         // Chuyển đổi định dạng ngày
+    //         $scope.items.forEach(item => {
+    //             item.ngayTao = new Date(item.ngayTao);
+    //             item.ngayCapNhat = new Date(item.ngayCapNhat);
+    //             if (item.ngayThanhToan) {
+    //                 item.ngayThanhToan = new Date(item.ngayThanhToan); // Chuyển đổi timestamp thành Date
+    //             }
+    //             if (item.ngayDatHang) {
+    //                 item.ngayDatHang = new Date(item.ngayDatHang); // Chuyển đổi timestamp thành Date
+    //             }
+    //         });
+    //
+    //         // Cập nhật các mục cho pager
+    //         $scope.pager1.updateItems();
+    //         $scope.pager2.updateItems();
+    //         $scope.pager3.updateItems();
+    //         $scope.pager4.updateItems();
+    //     }).catch(error => {
+    //         console.log("Error loading hoadon: ", error);
+    //     });
+    //
+    //     // Tải các dữ liệu khác
+    //     $http.get("/rest/hdct").then(resp => {
+    //         $scope.hdct = resp.data;
+    //     });
+    //     $http.get("/rest/dcgh").then(resp => {
+    //         $scope.dcgh = resp.data;
+    //     });
+    //     $http.get("/rest/ptvc").then(resp => {
+    //         $scope.ptvc = resp.data;
+    //     });
+    // };
     $scope.initialize = function () {
-        // Tải danh sách hóa đơn
+        // Gọi API và kiểm tra dữ liệu
         $http.get("/rest/hoadon").then(resp => {
-            console.log("Data from API: ", resp.data);
-            $scope.items = resp.data;
-
-            // Chuyển đổi định dạng ngày
-            $scope.items.forEach(item => {
-                item.ngayTao = new Date(item.ngayTao);
-                item.ngayCapNhat = new Date(item.ngayCapNhat);
-                if (item.ngayThanhToan) {
-                    item.ngayThanhToan = new Date(item.ngayThanhToan); // Chuyển đổi timestamp thành Date
-                }
-                if (item.ngayDatHang) {
-                    item.ngayDatHang = new Date(item.ngayDatHang); // Chuyển đổi timestamp thành Date
-                }
-            });
-
-            // Cập nhật các mục cho pager
-            $scope.pager1.updateItems();
-            $scope.pager2.updateItems();
-            $scope.pager3.updateItems();
-            $scope.pager4.updateItems();
+            console.log("Dữ liệu từ API: ", resp.data); // Kiểm tra dữ liệu từ API
+            // Kiểm tra xem resp.data.data có phải là mảng không
+            if (Array.isArray(resp.data.data)) {
+                $scope.items = resp.data.data.map(item => ({
+                    ...item,
+                    ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
+                    ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
+                }));
+                $scope.pager1.updateItems();
+                $scope.pager2.updateItems();
+                $scope.pager3.updateItems();
+                $scope.pager4.updateItems();
+            } else {
+                console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
+            }
         }).catch(error => {
-            console.log("Error loading hoadon: ", error);
-        });
-
-        // Tải các dữ liệu khác
-        $http.get("/rest/hdct").then(resp => {
-            $scope.hdct = resp.data;
-        });
-        $http.get("/rest/dcgh").then(resp => {
-            $scope.dcgh = resp.data;
-        });
-        $http.get("/rest/ptvc").then(resp => {
-            $scope.ptvc = resp.data;
+            console.error("Lỗi khi tải danh mục: ", error);
         });
     };
 

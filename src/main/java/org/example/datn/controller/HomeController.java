@@ -26,4 +26,8 @@ public class HomeController {
     public String category() {
         return "customer/category/category";
     }
+    @GetMapping("/staff")
+    public String home(){
+        return "/staff/index";
+    }
 }

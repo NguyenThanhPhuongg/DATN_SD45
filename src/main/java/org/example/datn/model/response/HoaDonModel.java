@@ -33,4 +33,6 @@ public class HoaDonModel extends CommonModel {
     private UserModel userModel;
     private DiaChiGiaoHangModel diaChiGiaoHangModel;
     private PhuongThucVanChuyenModel phuongThucVanChuyenModel;
+
+
 }

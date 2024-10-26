@@ -22,4 +22,12 @@ public class ChatLieuService {
     public List<ChatLieu> findAll() {
         return repo.findAll();
     }
+
+    public void save(ChatLieu chatLieu) {
+        repo.save(chatLieu);
+    }
+
+    public void deleteById(Long id) {
+        repo.deleteById(id);
+    }
 }

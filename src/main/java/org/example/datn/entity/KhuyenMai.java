@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -25,7 +26,7 @@ public class KhuyenMai extends CommonEntity{
     @Column(name = "loai")
     private Integer loai;
     @Column(name = "gia_tri")
-    private Double giaTri;
+    private BigDecimal giaTri;
     @Column(name = "ngay_bat_dau")
     private Date ngayBatDau;
     @Column(name = "ngay_ket_thuc")

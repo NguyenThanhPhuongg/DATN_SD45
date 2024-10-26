@@ -6,17 +6,27 @@
                 <i class="fas fa-table me-1"></i>
                 Danh sách size sản phẩm
             </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal" data-bs-target="#addModal">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal"
+                 data-bs-target="#addModal">
                 <button class="btn btn-primary" type="button">Thêm</button>
             </div>
         </div>
         <div class="card-body">
-            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3"/>
+            <div class="d-flex align-items-center mb-3">
+                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
+                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">
+                    <option value="">Tất cả Size</option>
+                    <option value="1">Áo</option>
+                    <option value="2">Giầy</option>
+                    <option value="3">Quần</option>
+                </select>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>STT</th>
                     <th>ID</th>
+                    <th>Size cha</th>
                     <th>Tên</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
@@ -26,8 +36,20 @@
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>{{item.id}}</td>
+                    <td>
+                        <span ng-if="item.idCha === 1">Áo</span>
+                        <span ng-if="item.idCha === 3">Quần</span>
+                        <span ng-if="item.idCha === 2">Giầy</span>
+                    </td>
                     <td>{{item.ten}}</td>
-                    <td>{{item.trangThai}}</td>
+                    <td>
+                        <div class="badge"
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                            <span ng-if="item.trangThai === 1">Active</span>
+                            <span ng-if="item.trangThai === 3">Locked</span>
+                            <span ng-if="item.trangThai === 2">Khác</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
@@ -80,7 +102,16 @@
                                 <span class="text-danger"
                                       ng-show="error.ten">Tên size phải từ 1 đến 100 ký tự.</span>
                             </div>
-                            <div class="form-group col-md-7 mt-2">
+                            <div class="col-md-6 mt-2">
+                                <label for="inputIDCha" class="form-label">Size cha</label>
+                                <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
+                                    <option ng-value="1" selected>Áo</option>
+                                    <option ng-value="2">Quần</option>
+                                    <option ng-value="3">Giầy</option>
+                                </select>
+                                <span class="text-danger" ng-show="error.idCha">Phải chọn Size cha.</span>
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
                                 <label>Trạng thái</label>
                                 <div class="mt-2">
                                     <div class="form-check form-check-inline">
@@ -90,7 +121,7 @@
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="0">
+                                               ng-model="form.trangThai" ng-value="3">
                                         <label class="form-check-label">Locked</label>
                                     </div>
                                     <div class="form-check form-check-inline">
@@ -151,27 +182,19 @@
                     <div class="container-fluid px-4">
                         <div class="row">
                             <div class="col-md-12 mt-2">
+                                <label for="inputIDCha" class="form-label">Size cha</label>
+                                <select class="form-select" aria-label="Default select example"
+                                        ng-model="formAdd.idCha">
+                                    <option value="1" selected>Áo</option>
+                                    <option value="2">Quần</option>
+                                    <option value="3">Giầy</option>
+                                </select>
+                                <span class="text-danger" ng-show="error1.idCha">Phải Size mục cha.</span>
+                            </div>
+                            <div class="col-md-12 mt-2">
                                 <label for="inputTen" class="form-label">Tên size</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten">
-                                <span class="text-danger" ng-show="error.ten">Tên size phải từ 1 đến 100 ký tự.</span>
-                            </div>
-                            <div class="form-group col-md-12 mt-2">
-                                <label>Trạng thái</label>
-                                <div class="mt-2">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai" ng-model="formAdd.trangThai" value="1" checked>
-                                        <label class="form-check-label">Active</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai" ng-model="formAdd.trangThai" value="0">
-                                        <label class="form-check-label">Locked</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai" ng-model="formAdd.trangThai" value="2">
-                                        <label class="form-check-label">Khác</label>
-                                    </div>
-                                </div>
-                                <span class="text-danger" ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
+                                <span class="text-danger" ng-show="error1.ten">Tên size phải từ 1 đến 100 ký tự.</span>
                             </div>
                         </div>
                     </div>

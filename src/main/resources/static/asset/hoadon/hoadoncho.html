@@ -27,9 +27,9 @@
                 <tr ng-repeat="item in pager3.items | filter: searchText">
                     <td>{{$index + 1 + (pager3.page * pager3.size)}}</td>
                     <td>{{item.id}}</td>
-                    <td>{{item.idUser.id}}</td>
-                    <td>{{item.idDiaChiGiaHang.diaChi}}</td>
-                    <td>{{item.idPhuongThucVanChuyen.ten}}</td>
+                    <td>{{item.idNguoiDung}}</td>
+                    <td>{{item.idDiaChiGiaoHang}}</td>
+                    <td>{{item.idPhuongThucVanChuyen}}</td>
                     <td>{{item.ngayDatHang}}</td>
                     <td>{{item.tongTien}}</td>
                     <td>{{item.diemSuDung}}</td>
