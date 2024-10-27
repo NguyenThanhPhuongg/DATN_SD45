@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,16 +61,61 @@ public class DiaChiGiaoHangProcessor {
         return new ServiceResult();
     }
 
-    public ServiceResult findByIdNguoiDung(Long idNguoiDung){
-        var list = service.findByIdNguoiDung(idNguoiDung);
-        var models = list.stream().map(transformer::toModel).collect(Collectors.toList());
+    public ServiceResult findByIdNguoiDung(UserAuthentication ua){
+        var list = service.findByIdNguoiDung(ua.getPrincipal());
+        var models = list.stream().map(this :: mapToModel).collect(Collectors.toList());
+
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+
+    }
+
+    public ServiceResult getActive(UserAuthentication ua){
+        var list = service.findByIdNguoiDungAndTrangThai(ua.getPrincipal(), SystemConstant.ACTIVE);
+        var models = list.stream().map(this :: mapToModel);
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+
     }
 
     public DiaChiGiaoHangModel findById(Long id) {
         return service.findById(id)
                 .map(transformer::toModel)
                 .orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
+    }
+
+
+    private DiaChiGiaoHangModel mapToModel(DiaChiGiaoHang diaChiGiaoHang) {
+        DiaChiGiaoHangModel model = new DiaChiGiaoHangModel();
+        model.setId(diaChiGiaoHang.getId());
+        model.setIdNguoiDung(diaChiGiaoHang.getIdNguoiDung());
+        model.setHoTen(diaChiGiaoHang.getHoTen());
+        model.setSdt(diaChiGiaoHang.getSdt());
+        model.setDiaChi(diaChiGiaoHang.getDiaChi());
+        model.setThanhPho(diaChiGiaoHang.getThanhPho());
+        model.setQuocGia(diaChiGiaoHang.getQuocGia());
+        model.setTrangThai(diaChiGiaoHang.getTrangThai());
+        // Có thể thêm logic để lấy UserModel nếu cần
+        return model;
+    }
+
+    private DiaChiGiaoHang mapToEntity(DiaChiGiaoHangRequest model) {
+        DiaChiGiaoHang diaChiGiaoHang = new DiaChiGiaoHang();
+        diaChiGiaoHang.setHoTen(model.getHoTen());
+        diaChiGiaoHang.setSdt(model.getSdt());
+        diaChiGiaoHang.setDiaChi(model.getDiaChi());
+        diaChiGiaoHang.setThanhPho(model.getThanhPho());
+        diaChiGiaoHang.setQuocGia(model.getQuocGia());
+        // Nếu cần, có thể thêm logic để thiết lập UserModel hoặc các thuộc tính khác
+        return diaChiGiaoHang;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult insert(DiaChiGiaoHangRequest request, UserAuthentication ua){
+        var entity = mapToEntity(request);
+        entity.setIdNguoiDung(ua.getPrincipal());
+        entity.setTrangThai(0);
+        service.save(entity);
+        return new ServiceResult();
+
     }
 
 

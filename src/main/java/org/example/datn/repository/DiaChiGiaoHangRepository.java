@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DiaChiGiaoHangRepository extends JpaRepository<DiaChiGiaoHang, Long> {
@@ -13,4 +14,6 @@ public interface DiaChiGiaoHangRepository extends JpaRepository<DiaChiGiaoHang, 
     List<DiaChiGiaoHang> findByCateId(Long cid);
 
     List<DiaChiGiaoHang> findByIdNguoiDung(Long idNguoiDung);
+
+    Optional<DiaChiGiaoHang> findByIdNguoiDungAndTrangThai(Long idNguoiDung, Integer trangThai);
 }

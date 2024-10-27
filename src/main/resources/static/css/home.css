@@ -99,10 +99,6 @@
     color: #555;
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> hieupt
 .product {
     margin-bottom: 20px;
     width: calc(20% - 20px); /* 5 products in a row, 20px gap */
@@ -121,9 +117,7 @@
     color: #929191;
     font-weight: bold;
 
-<<<<<<< HEAD
-=======
-=======
+}
 #userInfo {
     position: relative;
 }
@@ -172,6 +166,4 @@
 
 .dropdown-menu a:hover {
     background-color: #b2ebf2;
->>>>>>> ed8b9726fd62aaec701e33c3fcf229779dfeab88
->>>>>>> hieupt
 }

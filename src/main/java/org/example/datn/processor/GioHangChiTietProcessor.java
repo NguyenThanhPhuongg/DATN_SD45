@@ -116,7 +116,11 @@ public class GioHangChiTietProcessor {
     public ServiceResult getList(UserAuthentication ua) {
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
         var list = service.findByIdGioHang(gioHang.getId());
-        var models = list.stream().map(tranformer::toModel).collect(Collectors.toList());
+        var models = list.stream().map(gioHangChiTiet -> {
+            GioHangChiTietModel model = new GioHangChiTietModel();
+            BeanUtils.copyProperties(gioHangChiTiet,model);
+            return model;
+        }).collect(Collectors.toList());
         var spctIds = models.stream().map(GioHangChiTietModel::getIdSanPhamChiTiet).collect(Collectors.toList());
         var spcts = spctService.findByIdIn(spctIds);
         mapSpctsToModels(models, spcts);

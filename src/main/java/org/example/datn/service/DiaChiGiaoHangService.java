@@ -33,4 +33,8 @@ public class DiaChiGiaoHangService {
         return repo.findByIdNguoiDung(idNguoiDung);
     }
 
+    public Optional<DiaChiGiaoHang> findByIdNguoiDungAndTrangThai(Long idNguoiDung, Integer trangThai) {
+        return repo.findByIdNguoiDungAndTrangThai(idNguoiDung, trangThai);
+    }
+
 }

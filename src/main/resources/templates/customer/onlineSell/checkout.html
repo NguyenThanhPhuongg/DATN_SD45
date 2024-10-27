@@ -6,115 +6,259 @@
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <title>Checkout</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/diaChi.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
     <script src="../js/main.js"></script>
+<!--    <style>-->
+<!--        /* Thêm một chút style để hiển thị form khác */-->
+<!--        .custom-address {-->
+<!--            display: none; /* Ẩn form này mặc định */-->
+<!--        }-->
+<!--    </style>-->
+    <script src="../js/address.js"></script>
+
 </head>
 <body>
-
-<main>
-    <div class="page_checkouts">
-        <div class="inner_row">
-            <div class="inner_col_right">
-                <a href="/"><img src="/images/monnica.png" alt=""/></a>
-                <h2 class="text-2xl font-bold my-3">Thông tin giao hàng</h2>
-                <form action="">
-                    <input type="text" name="" placeholder="Họ và tên" class="form-field "/>
-                    <div class="flex -mx-2">
-                        <div class="w-6/12 px-2">
-                            <input type="email" name="" placeholder="Email" class="form-field "/>
-                        </div>
-                        <div class="w-6/12 px-2">
-                            <input type="text" name="" placeholder="Số điện thoại" class="form-field "/>
-                        </div>
-                    </div>
-                    <div class="flex -mx-2">
-                        <div class="w-6/12 px-2">
-                            <input type="text" name="" placeholder="Quốc gia" class="form-field "/>
-                        </div>
-                        <div class="w-6/12 px-2">
-                            <input type="text" name="" placeholder="Tỉnh / TP" class="form-field "/>
-                        </div>
-                    </div>
-                    <div class="flex -mx-2">
-                        <div class="w-6/12 px-2">
-                            <input type="text" name="" placeholder="Huyện / Quận" class="form-field "/>
-                        </div>
-                        <div class="w-6/12 px-2">
-                            <input type="text" name="" placeholder="Phường / Xã" class="form-field "/>
-                        </div>
-                    </div>
-                    <input type="text" name="" placeholder="Địa chỉ chi tiết : Số 22, Ngõ 222, Di Trạch, Hoài Đức" class="form-field "/>
-                    <textarea name="" placeholder="Ghi chú" rows="3"  class="form-field "></textarea>
-                    <div class="check_custom mb-3">
-                        <input type="checkbox" id="remember" class="styled-checkbox"/>
-                        <label for="remember">Yêu cầu hóa đơn</label>
-                    </div>
-                    <div class="row_btn">
-                        <a href="/cart" class="button button--secondary">
-                        <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                              strokeWidth="1.5" stroke="currentColor" class="size-6 mr-3">
-                            <path strokeLinecap="round" strokeLinejoin="round"
-                                  d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
-                        </svg>
-                        Giỏ hàng
-                        </a>
-                        <a href="payment" class="button button--primary">
-                        Tiếp tục
-                        </a>
-                    </div>
-                </form>
-            </div>
-            <div class="inner_col_left">
-                <div class="cart_info_bg_bg">
-                    <div class="CartDrawer_item">
-                        <a href="" class="CartDrawer_thumb">
-                        <img src="/images/7.1b.webp" alt=""/>
-                        </a>
-                        <div class="CartDrawer_item_info">
-                            <h3>
-                                Áo măng tô
-                            </h3>
-                            <span>Số lượng: 2</span>
-                            <div>1,699,999đ</div>
-                        </div>
-                    </div>
-                    <div class="CartDrawer_item">
-                        <a href="" class="CartDrawer_thumb">
-                        <img src="/images/7.1b.webp" alt=""/>
-                        </a>
-                        <div class="CartDrawer_item_info">
-                            <h3>
-                                Áo măng tô
-                            </h3>
-                            <span>Số lượng: 2</span>
-                            <div>1,699,999đ</div>
-                        </div>
-                    </div>
-                    <div class="flex -mx-2">
-                        <div class="w-9/12 px-2">
-                            <input type="text" name="" placeholder="Mã miễn phí vận chuyển" class="form-field mb-0"/>
-                        </div>
-                        <div class="w-3/12 px-2">
-                            <button class="button button--secondary mb-0" style="height: 45px">Apply</button>
-                        </div>
-                    </div>
-                    <div class="CartDrawer_footer">
-                        <div class="CartDrawer_total">
-                            <span>Thành tiền</span>
-                            <b>2,787,787đ</b>
-                        </div>
-                        <div class="CartDrawer_total">
-                            <span>Phí vận chuyển</span>
-                            <b>50.000đ</b>
-                        </div>
-                        <div class="CartDrawer_total_bot">
-                            <span>Tổng tiền</span>
-                            <b>50.000đ</b>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div th:include="header :: body"></div>
+<div class="container">
+    <div class="address_deliver">
+        <div>
+            <h2> <img src="/images/address.png" alt="" style="height: 25px"> Địa Chỉ Nhận Hàng</h2>
+        </div>
+       <div class="info_address">
+           <p id="delivery-address">Loading...</p>
+           <button class="btn btn-light" id="change-address" onclick="showModal()">Thay Đổi</button>
+       </div>
+    </div>
+    <!-- Modal -->
+    <div id="address-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>Danh Sách Địa Chỉ</h2>
+            <div id="address-list">Loading...</div>
+            <button id="select-address" onclick="selectAddress()">Chọn Địa Chỉ</button>
         </div>
     </div>
-</main>
+
+    <div class="pay_item_product">
+        <div class="product">
+            <img src="/images/brand1.webp" alt="" class="product-img">
+            <div class="product-info">
+                <span class="product-title">Áo Khoác Nam</span>
+                <span class="product-price">250.000 ₫</span>
+                <span class="product-quantity">x1</span>
+                <span class="product-total">250.000 ₫</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-left">
+                <div class="voucher-image">
+                    <img src="/images/fast-delivery.png" alt="Voucher Image">
+                </div>
+                <div class="voucher-text">
+                    <h2>Mã Giảm Giá 10%</h2>
+                    <p>Áp dụng cho đơn hàng trên 500.000 ₫</p>
+                </div>
+            </div>
+            <div class="col-right">
+                <input type="text" class="input-field" placeholder="Nhập mã giảm giá">
+                <button class="button">Áp Dụng</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="shipping-method">
+                <img src="/images/fast-delivery.png" alt="Shipping Icon" class="shipping-icon">
+                <span class="shipping-text">Giao Hàng Nhanh</span>
+            </div>
+            <div class="guarantee">
+                <img src="/images/fast-delivery.png" alt="Guarantee Icon" class="guarantee-icon">
+                <span class="guarantee-text">Bảo Hành 1 Năm</span>
+            </div>
+        </div>
+        <div class="row">
+            <span class="price">Tổng Cộng: 250.000 ₫</span>
+            <span class="total-price">Tổng Cộng: 225.000 ₫</span>
+        </div>
+    </div>
+
+    <div class="payment">
+        <table>
+            <tr>
+                <td>Phương thức thanh toán</td>
+                <td><button>Thẻ Tín dụng/Ghi nợ</button></td>
+                <td><button>Google Pay</button></td>
+                <td><button>Ví ShopeePay</button></td>
+                <td><button>Thanh toán khi nhận hàng</button></td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>Tổng tiền hàng</td>
+                <td>₫499.000</td>
+            </tr>
+            <tr>
+                <td>Tổng tiền phí vận chuyển</td>
+                <td>₫50.400</td>
+            </tr>
+            <tr>
+                <td>Tổng cộng Voucher giảm giá</td>
+                <td>-₫25.000</td>
+            </tr>
+            <tr>
+                <td>Tổng thanh toán</td>
+                <td>₫524.400</td>
+            </tr>
+        </table>
+        <br>
+        <span>Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#">Điều khoản Shopee</a></span>
+        <br>
+        <button>Đặt hàng</button>
+    </div>
+</div>
+<!--<main>-->
+<!--    <div class="page_checkouts">-->
+<!--        <div class="inner_row">-->
+<!--            <div class="inner_col_right">-->
+<!--                <a href="/"><img src="/images/monnica.png" alt=""/></a>-->
+<!--                <h2 class="text-2xl font-bold my-3">Thông tin giao hàng</h2>-->
+<!--                <form action="">-->
+<!--                    <input type="text" name="" placeholder="Họ và tên" class="form-field "/>-->
+<!--                    <div class="flex -mx-2">-->
+<!--                        <div class="w-6/12 px-2">-->
+<!--                            <input type="email" name="" placeholder="Email" class="form-field "/>-->
+<!--                        </div>-->
+<!--                        <div class="w-6/12 px-2">-->
+<!--                            <input type="text" name="" placeholder="Số điện thoại" class="form-field "/>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Thêm phần chọn địa chỉ &ndash;&gt;-->
+<!--                    <div class="flex -mx-2">-->
+<!--                        <div class="w-full px-2">-->
+<!--                            <label for="addressSelect">Chọn địa chỉ giao hàng:</label>-->
+<!--                            <select id="addressSelect" class="form-field" onchange="toggleCustomAddress()">-->
+<!--                                <option value="">&#45;&#45; Chọn địa chỉ &#45;&#45;</option>-->
+<!--                                <option value="address1">Địa chỉ 1</option>-->
+<!--                                <option value="address2">Địa chỉ 2</option>-->
+<!--                                <option value="address3">Địa chỉ 3</option>-->
+<!--                                <option value="other">Khác</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Form nhập địa chỉ khác &ndash;&gt;-->
+<!--                    <div class="custom-address">-->
+<!--                        <input type="text" name="" placeholder="Địa chỉ chi tiết : Số 22, Ngõ 222, Di Trạch, Hoài Đức" class="form-field "/>-->
+<!--                    </div>-->
+
+<!--                    <div class="flex -mx-2">-->
+<!--                        <div class="w-6/12 px-2">-->
+<!--                            <input type="text" name="" placeholder="Quốc gia" class="form-field "/>-->
+<!--                        </div>-->
+<!--                        <div class="w-6/12 px-2">-->
+<!--                            <input type="text" name="" placeholder="Tỉnh / TP" class="form-field "/>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="flex -mx-2">-->
+<!--                        <div class="w-6/12 px-2">-->
+<!--                            <input type="text" name="" placeholder="Huyện / Quận" class="form-field "/>-->
+<!--                        </div>-->
+<!--                        <div class="w-6/12 px-2">-->
+<!--                            <input type="text" name="" placeholder="Phường / Xã" class="form-field "/>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <textarea name="" placeholder="Ghi chú" rows="3"  class="form-field "></textarea>-->
+<!--                    <div class="check_custom mb-3">-->
+<!--                        <input type="checkbox" id="remember" class="styled-checkbox"/>-->
+<!--                        <label for="remember">Yêu cầu hóa đơn</label>-->
+<!--                    </div>-->
+<!--                    <div class="row_btn">-->
+<!--                        <a href="/cart" class="button button&#45;&#45;secondary">-->
+<!--                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6 mr-3">-->
+<!--                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>-->
+<!--                            </svg>-->
+<!--                            Giỏ hàng-->
+<!--                        </a>-->
+<!--                        <a href="payment" class="button button&#45;&#45;primary">-->
+<!--                            Tiếp tục-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--            <div class="inner_col_left">-->
+<!--                <div class="cart_info_bg_bg">-->
+<!--                    <div class="CartDrawer_item">-->
+<!--                        <a href="" class="CartDrawer_thumb">-->
+<!--                            <img src="/images/7.1b.webp" alt=""/>-->
+<!--                        </a>-->
+<!--                        <div class="CartDrawer_item_info">-->
+<!--                            <h3>-->
+<!--                                Áo măng tô-->
+<!--                            </h3>-->
+<!--                            <span>Số lượng: 2</span>-->
+<!--                            <div>1,699,999đ</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="CartDrawer_item">-->
+<!--                        <a href="" class="CartDrawer_thumb">-->
+<!--                            <img src="/images/7.1b.webp" alt=""/>-->
+<!--                        </a>-->
+<!--                        <div class="CartDrawer_item_info">-->
+<!--                            <h3>-->
+<!--                                Áo măng tô-->
+<!--                            </h3>-->
+<!--                            <span>Số lượng: 2</span>-->
+<!--                            <div>1,699,999đ</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="flex -mx-2">-->
+<!--                        <div class="w-9/12 px-2">-->
+<!--                            <input type="text" name="" placeholder="Mã miễn phí vận chuyển" class="form-field mb-0"/>-->
+<!--                        </div>-->
+<!--                        <div class="w-3/12 px-2">-->
+<!--                            <button class="button button&#45;&#45;secondary mb-0" style="height: 45px">Apply</button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="CartDrawer_footer">-->
+<!--                        <div class="CartDrawer_total">-->
+<!--                            <span>Thành tiền</span>-->
+<!--                            <b>2,787,787đ</b>-->
+<!--                        </div>-->
+<!--                        <div class="CartDrawer_total">-->
+<!--                            <span>Phí vận chuyển</span>-->
+<!--                            <b>50.000đ</b>-->
+<!--                        </div>-->
+<!--                        <div class="CartDrawer_total_bot">-->
+<!--                            <span>Tổng tiền</span>-->
+<!--                            <b>50.000đ</b>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</main>-->
+
+<script>
+    function toggleCustomAddress() {
+        const addressSelect = document.getElementById('addressSelect');
+        const customAddress = document.querySelector('.custom-address');
+
+        // Hiển thị hoặc ẩn form nhập địa chỉ khác
+        if (addressSelect.value === 'other') {
+            customAddress.style.display = 'block'; // Hiện form
+        } else {
+            customAddress.style.display = 'none'; // Ẩn form
+        }
+    }
+</script>
+
 </body>
 </html>
+

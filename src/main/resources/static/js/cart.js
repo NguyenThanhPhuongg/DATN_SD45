@@ -1,71 +1,69 @@
+let data; // Biến lưu trữ dữ liệu giỏ hàng
+
 async function fetchCartData() {
     try {
-        // Lấy token từ local storage
-        const token = localStorage.getItem('token'); // Thay 'token' bằng tên key của bạn
-
-        // Cấu hình headers
+        const token = localStorage.getItem('token');
         const headers = new Headers();
         if (token) {
-            headers.append('Authorization', `Bearer ${token}`); // Nếu dùng Bearer token
+            headers.append('Authorization', `Bearer ${token}`);
         }
 
         const response = await fetch('/gio-hang-chi-tiet/getList', {
             method: 'GET',
-            headers: headers, // Thêm headers vào yêu cầu
+            headers: headers,
         });
 
-        // Kiểm tra trạng thái phản hồi
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        data = await response.json();
 
-        // Kiểm tra nếu dữ liệu trả về đúng
-        if (data && data.productCount && data.cartItems) {
-            // Hiển thị số lượng sản phẩm
-            document.getElementById('productCount').textContent = data.productCount;
-            document.getElementById('productCountSummary').textContent = data.productCount;
+        if (data && data.code === "200" && data.data) {
+            const productCount = data.data.length;
+            document.getElementById('productCount').textContent = productCount;
+            document.getElementById('productCountSummary').textContent = productCount;
 
-            // Hiển thị tổng tiền
-            document.getElementById('totalPrice').textContent = `${data.totalPrice.toLocaleString()} đ`;
+            const totalPrice = data.data.reduce((total, item) => total + (item.gia * item.soLuong), 0);
+            document.getElementById('totalPrice').textContent = `${totalPrice.toLocaleString()} đ`;
 
-            // Render các sản phẩm trong giỏ hàng
             const cartList = document.getElementById('cartList');
-            cartList.innerHTML = '';
-            data.cartItems.forEach(item => {
+            cartList.innerHTML = ''; // Xóa danh sách hiện tại
+            data.data.forEach(item => {
+                const productDetail = item.sanPhamChiTiet;
                 const cartItem = document.createElement('div');
                 cartItem.classList.add('cart_item');
                 cartItem.innerHTML = `
-                        <img class="cart_thumb" src="${item.imageUrl}" alt=""/>
-                        <div class="cart_info">
-                            <h3>
-                                <span>${item.nameProduct}</span>
-                                <span>
+                    <input type="checkbox" class="product-checkbox" id="product-${item.id}" />
+                    <img class="cart_thumb" src="${productDetail.imageUrl || 'default-image.png'}" alt=""/>
+                    <div class="cart_info">
+                        <h3>
+                            <span>${productDetail.ghiChu || productDetail.idSanPham}</span>
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </span>
+                        </h3>
+                        <div class="cart_item_price">${item.gia.toLocaleString()} đ</div>
+                        <div class="cart_item_quantity">
+                            <div class="quantity_group">
+                                <button onclick="decreaseQuantity(this, ${item.id})">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14"/>
                                     </svg>
-                                </span>
-                            </h3>
-                            <div class="cart_item_price">${item.price.toLocaleString()} đ</div>
-                            <div class="cart_item_quantity">
-                                <div class="quantity_group">
-                                    <button onclick="decreaseQuantity(this, ${item.id})">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14"/>
-                                        </svg>
-                                    </button>
-                                    <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(this, ${item.id})"/>
-                                    <button onclick="increaseQuantity(this, ${item.id})">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <b>${(item.price * item.quantity).toLocaleString()} đ</b>
+                                </button>
+                                <input type="number" value="${item.soLuong}" min="1" onchange="updateQuantity(this, ${item.id})"/>
+                                <button onclick="increaseQuantity(this, ${item.id})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                    </svg>
+                                </button>
                             </div>
+                            <b id="totalItemPrice-${item.id}">${(item.gia * item.soLuong).toLocaleString()} đ</b>
                         </div>
-                    `;
+                    </div>
+                `;
                 cartList.appendChild(cartItem);
             });
         } else {
@@ -76,5 +74,53 @@ async function fetchCartData() {
     }
 }
 
-// Load cart data on page load
-document.addEventListener('DOMContentLoaded', fetchCartData);
+function increaseQuantity(button, itemId) {
+    const quantityInput = button.previousElementSibling;
+    let quantity = parseInt(quantityInput.value);
+    quantity++;
+    quantityInput.value = quantity;
+    updateTotalPrice(itemId, quantity);
+}
+
+function decreaseQuantity(button, itemId) {
+    const quantityInput = button.nextElementSibling;
+    let quantity = parseInt(quantityInput.value);
+    if (quantity > 1) {
+        quantity--;
+        quantityInput.value = quantity;
+        updateTotalPrice(itemId, quantity);
+    }
+}
+
+function updateQuantity(input, itemId) {
+    const quantity = parseInt(input.value);
+    if (quantity < 1) {
+        input.value = 1;
+    }
+    updateTotalPrice(itemId, parseInt(input.value));
+}
+
+function updateTotalPrice(itemId, quantity) {
+    const item = data.data.find(i => i.id === itemId);
+    const price = item.gia;
+    const totalPriceElement = document.getElementById('totalPrice');
+
+    const totalItemPrice = price * quantity;
+
+    // Cập nhật giá trị tổng cho từng mặt hàng
+    const totalItemPriceElement = document.getElementById(`totalItemPrice-${itemId}`);
+    totalItemPriceElement.textContent = `${totalItemPrice.toLocaleString()} đ`;
+
+    // Tính tổng giá trị của tất cả mặt hàng
+    const allItems = document.querySelectorAll('.cart_item');
+    const grandTotal = Array.from(allItems).reduce((sum, item) => {
+        const itemQuantity = parseInt(item.querySelector('input[type="number"]').value);
+        const itemPrice = parseInt(item.querySelector('.cart_item_price').textContent.replace(/ đ/g, '').replace(/,/g, ''));
+        return sum + (itemQuantity * itemPrice);
+    }, 0);
+
+    totalPriceElement.textContent = `${grandTotal.toLocaleString()} đ`;
+}
+
+// Gọi hàm fetchCartData để tải dữ liệu giỏ hàng khi trang được tải
+window.onload = fetchCartData;
