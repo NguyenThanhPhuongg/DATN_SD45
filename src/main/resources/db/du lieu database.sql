@@ -303,14 +303,19 @@ select * from nhom
 select * from nhom_chuc_nang 
 select * from san_pham 
 select * from chi_tiet_san_pham 
-select * from hoa_don 
-select * from chi_tiet_hoa_don 
-select * from phuong_thuc_van_chuyen 
-select * from dia_chi_giao_hang 
 select * from khuyen_mai 
 select * from ap_dung_khuyen_mai 
 select * from blog
 select * from ap_dung_khuyen_mai 
+
+select * from thanh_toan
+select * from phuong_thuc_thanh_toan
+select * from chi_tiet_hoa_don 
+select * from gio_hang 
+select * from chi_tiet_gio_hang 
+select * from hoa_don 
+select * from phuong_thuc_van_chuyen 
+select * from dia_chi_giao_hang 
 
 update  danh_muc set ngay_tao = GETDATE() where id =1
 SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
