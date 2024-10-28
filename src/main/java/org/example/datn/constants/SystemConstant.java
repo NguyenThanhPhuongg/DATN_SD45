@@ -8,6 +8,8 @@ public final class SystemConstant {
     public static final Integer LOCKED = 0;
     public static final String  ROLE_LAYER_MAP_VIEW = "LAYER_MAP_VIEW";
     public static final String STATUS_SUCCESS = "Thành công";
+    public static final String STATUS_FAIL = "Thất bại";
+
     public static final String CODE_200 = "200";
     public static final String CODE_400 = "400";
     public static final String PASSWORD_DEFAULT = "Abc@12345";

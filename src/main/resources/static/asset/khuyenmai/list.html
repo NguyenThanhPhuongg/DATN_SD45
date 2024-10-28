@@ -1,14 +1,22 @@
 <div class="container-fluid px-4">
-    <h2 class="mt-4">Quản lý khuyến mãi sản phẩm</h2><br>
+    <h2 class="mt-4">Quản lý khuyến mại sản phẩm</h2><br>
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-table me-1"></i>
-                Danh sách khuyến mãi sản phẩm
+                Danh sách khuyến mại sản phẩm
             </div>
         </div>
         <div class="card-body">
-            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3"/>
+            <div class="d-flex align-items-center mb-3">
+                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
+                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">
+                    <option value="">Tất cả Loại</option>
+                    <option value="1">Vip</option>
+                    <option value="2">Pro Vip</option>
+                    <option value="3">Súp Pờ Vip</option>
+                </select>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -18,8 +26,6 @@
                     <th>Mô tả</th>
                     <th>Loại</th>
                     <th>Giá trị</th>
-                    <th>Ngày bắt đầu</th>
-                    <th>Ngày kết thúc</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
                 </tr>
@@ -30,11 +36,20 @@
                     <td>{{item.id}}</td>
                     <td>{{item.ten}}</td>
                     <td>{{item.moTa}}</td>
-                    <td>{{item.loai}}</td>
+                    <td>
+                        <span ng-if="item.loai === 1">Vip</span>
+                        <span ng-if="item.loai === 2">Pro Vip</span>
+                        <span ng-if="item.loai === 3">Súp pờ Vip</span>
+                    </td>
                     <td>{{item.giaTri}}</td>
-                    <td>{{item.ngayBatDau}}</td>
-                    <td>{{item.ngayKetThuc}}</td>
-                    <td>{{item.trangThai}}</td>
+                    <td>
+                        <div class="badge"
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                            <span ng-if="item.trangThai === 1">Active</span>
+                            <span ng-if="item.trangThai === 3">Locked</span>
+                            <span ng-if="item.trangThai === 2">Khác</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
@@ -96,9 +111,9 @@
                                 <label for="inputMoTa" class="form-label">Loại</label>
                                 <select class="form-select" aria-label="Default select example" ng-model="form.loai">
                                     <option disabled selected>Chọn loại</option>
-                                    <option value="1">Vip</option>
-                                    <option value="2">Pro Vip</option>
-                                    <option value="3">Súp pơ víp</option>
+                                    <option ng-value="1">Vip</option>
+                                    <option ng-value="2">Pro Vip</option>
+                                    <option ng-value="3">Súp pơ víp</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mt-2">
@@ -113,8 +128,9 @@
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputTen" class="form-label">Giá trị</label>
-                                <input type="number" class="form-control" id="inputTen" ng-model="form.giaTri">
-                                <span class="text-danger" ng-show="error.giaTri">Giá trị phải từ 50,000 đến 1,000,000.</span>
+                                <input type="number" class="form-control" id="inputGiaTri" ng-model="form.giaTri"
+                                       ng-init="form.giaTri = 0" min="1000" max="200000" placeholder="000">
+                                <span class="text-danger" ng-show="error.giaTri">Giá trị phải từ 1,000 đến 200,000.</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                                 <label>Trạng thái</label>
@@ -126,7 +142,7 @@
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="0">
+                                               ng-model="form.trangThai" ng-value="3">
                                         <label class="form-check-label">Locked</label>
                                     </div>
                                     <div class="form-check form-check-inline">

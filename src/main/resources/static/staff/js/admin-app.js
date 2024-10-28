@@ -2,6 +2,7 @@ const app = angular.module("admin-app", ["ngRoute"]);
 
 app.config(function ($routeProvider) {
     $routeProvider
+
         /// nhan vien
         .when("/taikhoan", {
             templateUrl: "asset/nhanvien/taikhoan.html",
@@ -107,6 +108,12 @@ app.config(function ($routeProvider) {
             controller: "spct-ctrl"
         })
 
+        /// Bán tại quầy
+        .when("/bhtq", {
+            templateUrl: "asset/banhang/banhang.html",
+            controller: "hoadon-ctrl"
+        })
+
         /// hóa đơn
         .when("/hdct", {
             templateUrl: "asset/hoadon/chitiethoadon.html",
@@ -150,9 +157,12 @@ app.config(function ($routeProvider) {
             controller: "traloihotro-ctrl"
         })
 
-        /// Hỗ trợ
+        /// BLog
         .when("/blog", {
             templateUrl: "asset/blog/blog.html",
             controller: "blog-ctrl"
         })
+
+
+
 })

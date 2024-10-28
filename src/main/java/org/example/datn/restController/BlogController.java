@@ -1,9 +1,7 @@
 package org.example.datn.restController;
 
 import org.example.datn.entity.Blog;
-import org.example.datn.entity.KhuyenMai;
 import org.example.datn.service.BlogService;
-import org.example.datn.service.KhuyenMaiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

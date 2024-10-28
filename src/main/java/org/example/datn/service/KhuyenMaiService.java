@@ -2,19 +2,35 @@ package org.example.datn.service;
 
 import org.example.datn.entity.ChatLieu;
 import org.example.datn.entity.KhuyenMai;
+import org.example.datn.entity.Size;
+import org.example.datn.repository.ChatLieuRepository;
+import org.example.datn.repository.KhuyenMaiRepository;
+import org.example.datn.repository.SizeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface KhuyenMaiService {
+@Service
+public class KhuyenMaiService {
 
-    List<KhuyenMai> findAll();
-    KhuyenMai findById(Long id);
+    @Autowired
+    private KhuyenMaiRepository repo;
 
-    List<KhuyenMai> findByCateId(Long cid);
+    public Optional<KhuyenMai> findById(Long id) {
+        return repo.findById(id);
+    }
 
-    KhuyenMai create(KhuyenMai product);
+    public List<KhuyenMai> findAll() {
+        return repo.findAll();
+    }
 
-    KhuyenMai update(KhuyenMai product);
+    public void save(KhuyenMai chatLieu) {
+        repo.save(chatLieu);
+    }
 
-    void delete(Long id);
+    public void deleteById(Long id) {
+        repo.deleteById(id);
+    }
 }

@@ -80,7 +80,16 @@ public class HoaDonProcessor {
 
     public ServiceResult getAll() {
         var list = service.getAll();
-        var models = list.stream().map(transformer::toModel).collect(Collectors.toList());
+        var models = list.stream().map(hoaDon -> {
+            var model = transformer.toModel(hoaDon);
+            var diaChiGiaoHang = diaChiGiaoHangProcessor.findById(hoaDon.getIdDiaChiGiaoHang());
+            var phuongThucVanChuyen = phuongThucVanChuyenProcessor.findById(hoaDon.getIdPhuongThucVanChuyen());
+            var user = userProcessor.findById(hoaDon.getIdDiaChiGiaoHang());
+            model.setUserModel(user);
+            model.setDiaChiGiaoHangModel(diaChiGiaoHang);
+            model.setPhuongThucVanChuyenModel(phuongThucVanChuyen);
+            return model;
+        }).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
