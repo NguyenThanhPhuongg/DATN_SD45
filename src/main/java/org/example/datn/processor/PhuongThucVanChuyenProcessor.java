@@ -58,7 +58,11 @@ public class PhuongThucVanChuyenProcessor {
 
     public PhuongThucVanChuyenModel findById(Long id) {
         return service.findById(id)
-                .map(transformer::toModel)
+                .map(entity -> {
+                    PhuongThucVanChuyenModel model = new PhuongThucVanChuyenModel();
+                    BeanUtils.copyProperties(entity, model);
+                    return model;
+                })
                 .orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
     }
 

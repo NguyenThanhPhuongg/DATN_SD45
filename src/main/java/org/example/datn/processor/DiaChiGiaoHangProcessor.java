@@ -10,6 +10,7 @@ import org.example.datn.model.response.UserModel;
 import org.example.datn.service.DiaChiGiaoHangService;
 import org.example.datn.service.UserService;
 import org.example.datn.transformer.DiaChiGiaoHangTransformer;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,7 +79,11 @@ public class DiaChiGiaoHangProcessor {
 
     public DiaChiGiaoHangModel findById(Long id) {
         return service.findById(id)
-                .map(transformer::toModel)
+                .map(entity -> {
+                    DiaChiGiaoHangModel model = new DiaChiGiaoHangModel();
+                    BeanUtils.copyProperties(entity, model);
+                    return model;
+                })
                 .orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
     }
 

@@ -116,8 +116,19 @@ public class UserProcessor {
 
     public UserModel findById(Long id) {
         return userService.findById(id)
-                .map(mapper())
-                .orElseThrow(() -> new EntityNotFoundException("not.fond"));
+                .map(userEntity -> {
+                    UserModel userModel = new UserModel();
+
+                    BeanUtils.copyProperties(userEntity, userModel);
+
+                    Profile profile = profileService.findByUserId(userEntity.getId()).orElse(null);
+                    ProfileModel profileModel = new ProfileModel();
+                    BeanUtils.copyProperties(profile, profileModel);
+                    userModel.setProfile(profileModel);
+
+                    return userModel;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("not found"));
     }
 
     public AuthInfoModel authByFacebook(String token) throws Exception {

@@ -14,10 +14,7 @@ import org.example.datn.model.request.AuthModel;
 import org.example.datn.model.request.ChangePasswordModel;
 import org.example.datn.model.request.HoaDonRequest;
 import org.example.datn.model.request.RegisterModel;
-import org.example.datn.model.response.AuthInfoModel;
-import org.example.datn.model.response.ProfileModel;
-import org.example.datn.model.response.SessionModel;
-import org.example.datn.model.response.UserModel;
+import org.example.datn.model.response.*;
 import org.example.datn.processor.auth.AuthenticationChannelProvider;
 import org.example.datn.processor.auth.AuthoritiesValidator;
 import org.example.datn.service.*;
@@ -81,16 +78,36 @@ public class HoaDonProcessor {
     public ServiceResult getAll() {
         var list = service.getAll();
         var models = list.stream().map(hoaDon -> {
-            var model = transformer.toModel(hoaDon);
+            var model = toModel(hoaDon);
             var diaChiGiaoHang = diaChiGiaoHangProcessor.findById(hoaDon.getIdDiaChiGiaoHang());
             var phuongThucVanChuyen = phuongThucVanChuyenProcessor.findById(hoaDon.getIdPhuongThucVanChuyen());
-            var user = userProcessor.findById(hoaDon.getIdDiaChiGiaoHang());
+            var user = userProcessor.findById(hoaDon.getIdNguoiDung());
             model.setUserModel(user);
             model.setDiaChiGiaoHangModel(diaChiGiaoHang);
             model.setPhuongThucVanChuyenModel(phuongThucVanChuyen);
             return model;
         }).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    private HoaDonModel toModel(HoaDon hoaDon) {
+        if (hoaDon == null) {
+            return null;
+        }
+
+        HoaDonModel model = new HoaDonModel();
+        model.setId(hoaDon.getId());
+        model.setIdNguoiDung(hoaDon.getIdNguoiDung());
+        model.setIdDiaChiGiaoHang(hoaDon.getIdDiaChiGiaoHang());
+        model.setIdPhuongThucVanChuyen(hoaDon.getIdPhuongThucVanChuyen());
+        model.setMa(hoaDon.getMa());
+        model.setNgayDatHang(hoaDon.getNgayDatHang());
+        model.setNgayThanhToan(hoaDon.getNgayThanhToan());
+        model.setTongTien(hoaDon.getTongTien());
+        model.setDiemSuDung(hoaDon.getDiemSuDung());
+        model.setTrangThai(hoaDon.getTrangThai());
+
+        return model;
     }
 
     public ServiceResult getById(Long id) {
@@ -173,7 +190,6 @@ public class HoaDonProcessor {
         int nextNumber = (lastInvoice == null) ? 1 : Integer.parseInt(lastInvoice.getMa().substring(4)) + 1;
         return String.format("CODE%04d", nextNumber);
     }
-
 
 
 }
