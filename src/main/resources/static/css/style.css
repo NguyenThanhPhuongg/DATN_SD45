@@ -421,8 +421,7 @@ button{
 .inner_row .inner_col_right {
     width: 80%;
     padding: 0 20px;
-    margin-left: 160px
-;
+    margin-left: 160px;
 }
 @media (max-width: 991px) {
     .inner_row .inner_col_right {
@@ -776,7 +775,7 @@ header.fixed-header {
     box-shadow: 0 0px 3px 1px #0000003b;
 }
 header.fixed-header .header_logo img{
-    width: 120px;
+        width: 120px;
 
 }
 .over_lay {

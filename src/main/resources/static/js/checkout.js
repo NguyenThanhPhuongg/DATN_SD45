@@ -485,29 +485,23 @@ async function placeOrder() {
 
         const result = await response.json();
         if (result.code === "200") {
-            // Chuyển hướng đến trang /bill
-
-            $('#message').html('<div class="alert alert-success">Đặt hàng thành công!</div>');
-            hideMessageAfterDelay();
+            alert('Đặt hàng thành công!');
             window.location.href = '/bill';
         } else {
             alert(`Có lỗi xảy ra: ${result.message}`);
         }
     } catch (error) {
         console.error('Error placing order:', error);
-        $('#message').html('<div class="alert alert-danger">Có lỗi xảy ra khi đặt hàng!</div>');
-        hideMessageAfterDelay();
+        alert('Có lỗi xảy ra khi đặt hàng.');
+    }
+    function hideMessageAfterDelay() {
+        setTimeout(function() {
+            $('#message').fadeOut('slow', function() {
+                $(this).empty().show();
+            });
+        }, 2000);
     }
 }
-
-function hideMessageAfterDelay() {
-    setTimeout(function() {
-        $('#message').fadeOut('slow', function() {
-            $(this).empty().show();
-        });
-    }, 2000);
-}
-
 
 
 
