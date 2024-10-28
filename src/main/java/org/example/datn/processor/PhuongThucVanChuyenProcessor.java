@@ -21,36 +21,36 @@ public class PhuongThucVanChuyenProcessor {
     @Autowired
     private PhuongThucVanChuyenService service;
 
-//    @Qualifier("phuongThucVanChuyenTransformer")
+    //    @Qualifier("phuongThucVanChuyenTransformer")
     @Autowired
     private PhuongThucVanChuyenTransformer transformer;
 
-    public ServiceResult save(PhuongThucVanChuyenRequest request){
+    public ServiceResult save(PhuongThucVanChuyenRequest request) {
         var p = transformer.toEntity(request);
         service.save(p);
         return new ServiceResult();
     }
 
-    public ServiceResult update(Long id, PhuongThucVanChuyenRequest request){
+    public ServiceResult update(Long id, PhuongThucVanChuyenRequest request) {
         var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
         BeanUtils.copyProperties(request, p);
         service.save(p);
         return new ServiceResult();
     }
 
-    public ServiceResult delete(Long id){
+    public ServiceResult delete(Long id) {
         var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
         service.delete(p);
         return new ServiceResult();
     }
 
-    public ServiceResult findAll(){
+    public ServiceResult findAll() {
         var list = service.getActive();
         var models = list.stream().map(transformer::toModel).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult getById(Long id){
+    public ServiceResult getById(Long id) {
         var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
         var model = transformer.toModel(p);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
@@ -60,5 +60,9 @@ public class PhuongThucVanChuyenProcessor {
         return service.findById(id)
                 .map(transformer::toModel)
                 .orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
+    }
+
+    public ServiceResult getActive() {
+        return new ServiceResult(service.getActive(), SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 }

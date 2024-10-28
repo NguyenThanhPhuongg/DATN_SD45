@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController("GioHangChiTietApi")
 @RequestMapping("/gio-hang-chi-tiet")
 @RequiredArgsConstructor
@@ -39,6 +41,11 @@ public class GioHangChiTietController {
     @GetMapping("/get-list")
     public ResponseEntity<ServiceResult> getGioHangChiTiet(UserAuthentication ua) {
         return ResponseEntity.ok(processor.getList(ua));
+    }
+
+    @PostMapping("/get-by-ids")
+    public ResponseEntity<ServiceResult> getByIdIn(@RequestBody List<Long> ids) {
+        return ResponseEntity.ok(processor.getByIdIn(ids));
     }
 
 }

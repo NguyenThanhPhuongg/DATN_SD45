@@ -28,14 +28,8 @@ public class HoaDonService {
     public void delete(HoaDon hoaDon) {
         repo.delete(hoaDon);
     }
-//    List<HoaDon> findAll();
-//    HoaDon findById(Long id);
-//
-//    List<HoaDon> findByCateId(Long cid);
-//
-//    HoaDon create(HoaDon product);
-//
-//    HoaDon update(HoaDon product);
-//
-//    void delete(Long id);
+
+    public HoaDon findTopByOrderByNgayTaoDesc(){
+        return repo.findTopByOrderByNgayTaoDesc();
+    }
 }

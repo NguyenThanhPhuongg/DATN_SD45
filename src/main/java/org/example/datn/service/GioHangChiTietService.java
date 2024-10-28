@@ -35,4 +35,8 @@ public class GioHangChiTietService {
         return repo.findByIdGioHangAndIdSanPhamChiTiet(idGioHang, idSanPhamChiTiet);
     }
 
+    public List<GioHangChiTiet> findByIdIn(List<Long> ids){
+        return repo.findByIdIn(ids);
+    }
+
 }

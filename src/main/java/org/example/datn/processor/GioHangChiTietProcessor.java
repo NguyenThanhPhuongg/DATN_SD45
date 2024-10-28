@@ -8,11 +8,9 @@ import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.GioHangChiTietRequest;
 import org.example.datn.model.response.GioHangChiTietModel;
+import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
-import org.example.datn.service.GioHangChiTietService;
-import org.example.datn.service.GioHangService;
-import org.example.datn.service.SanPhamChiTietService;
-import org.example.datn.service.SanPhamService;
+import org.example.datn.service.*;
 import org.example.datn.transformer.GioHangChiTietTranformer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -44,6 +43,10 @@ public class GioHangChiTietProcessor {
 
     @Autowired
     private SanPhamService sanPhamService;
+    @Autowired
+    private SizeService sizeService;
+    @Autowired
+    private MauSacService mauSacService;
 
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua) {
@@ -74,7 +77,7 @@ public class GioHangChiTietProcessor {
             GioHangChiTiet ghct = new GioHangChiTiet();
             BeanUtils.copyProperties(request, ghct);
             ghct.setIdGioHang(gioHang.getId());
-            ghct.setGia(spct.getGia().multiply(BigDecimal.valueOf(request.getSoLuong())));
+            ghct.setGia(spct.getGia());
             service.save(ghct);
             spct.setSoLuong(soLuongConLai - request.getSoLuong());
         }
@@ -122,10 +125,17 @@ public class GioHangChiTietProcessor {
     }
 
     public ServiceResult getList(UserAuthentication ua) {
+        if (ua == null || ua.getPrincipal() == null) {
+            return new ServiceResult(SystemConstant.STATUS_FAIL, SystemConstant.CODE_401);
+        }
+
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy giỏ hàng cho người dùng"));
 
         var list = service.findByIdGioHang(gioHang.getId());
+        if (list.isEmpty()) {
+            return new ServiceResult(Collections.emptyList(), SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_204);
+        }
 
         var models = list.stream()
                 .map(this::mapToModel)
@@ -133,13 +143,63 @@ public class GioHangChiTietProcessor {
 
         var spctIds = models.stream()
                 .map(GioHangChiTietModel::getIdSanPhamChiTiet)
+                .distinct()
                 .collect(Collectors.toList());
 
         var spcts = spctService.findByIdIn(spctIds);
-        var spIds = spcts.stream().map(SanPhamChiTiet::getIdSanPham).collect(Collectors.toList());
+        List<SanPhamChiTietModel> sanPhamChiTietList = spcts.stream()
+                .map(this::convertToSanPhamChiTietModel)
+                .collect(Collectors.toList());
+        var spIds = spcts.stream()
+                .map(SanPhamChiTiet::getIdSanPham)
+                .distinct()
+                .collect(Collectors.toList());
         var sanPhams = sanPhamService.findByIdIn(spIds);
-        mapSpctsToModels(models, spcts, sanPhams);
 
+        List<SanPhamModel> sanPhamList = sanPhams.stream()
+                .map(this::convertToSanPhamModel)
+                .collect(Collectors.toList());
+
+        mapSpctsToModels(models, sanPhamChiTietList, sanPhamList);
+
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+
+    public ServiceResult getByIdIn(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ServiceResult(Collections.emptyList(), SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
+        }
+
+        var list = service.findByIdIn(ids);
+        if (list.isEmpty()) {
+            return new ServiceResult(Collections.emptyList(), SystemConstant.STATUS_FAIL, SystemConstant.CODE_404);
+        }
+
+        var models = list.stream()
+                .map(this::mapToModel)
+                .collect(Collectors.toList());
+
+        var spctIds = models.stream()
+                .map(GioHangChiTietModel::getIdSanPhamChiTiet)
+                .distinct()
+                .collect(Collectors.toList());
+
+        var spcts = spctService.findByIdIn(spctIds);
+        List<SanPhamChiTietModel> sanPhamChiTietList = spcts.stream()
+                .map(this::convertToSanPhamChiTietModel)
+                .collect(Collectors.toList());
+        var spIds = spcts.stream()
+                .map(SanPhamChiTiet::getIdSanPham)
+                .distinct()
+                .collect(Collectors.toList());
+        var sanPhams = sanPhamService.findByIdIn(spIds);
+
+        List<SanPhamModel> sanPhamList = sanPhams.stream()
+                .map(this::convertToSanPhamModel)
+                .collect(Collectors.toList());
+
+        mapSpctsToModels(models, sanPhamChiTietList, sanPhamList);
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
@@ -166,18 +226,51 @@ public class GioHangChiTietProcessor {
     }
 
 
-    private void mapSpctsToModels(List<GioHangChiTietModel> models, List<SanPhamChiTiet> spcts, List<SanPham> sanPhamModels) {
+    private void mapSpctsToModels(List<GioHangChiTietModel> models, List<SanPhamChiTietModel> spcts, List<SanPhamModel> sanPhamModels) {
         if (spcts.isEmpty()) {
             return;
         }
-        Map<Long, SanPhamChiTiet> spctMap = spcts.stream().collect(Collectors.toMap(SanPhamChiTiet::getId, Function.identity(), (existing, replacement) -> existing));
-        Map<Long, SanPham> sanPhamMap = sanPhamModels.stream().collect(Collectors.toMap(SanPham::getId, Function.identity(), (existing, replacement) -> existing));
+        Map<Long, SanPhamChiTietModel> spctMap = spcts.stream().collect(Collectors.toMap(SanPhamChiTietModel::getId, Function.identity(), (existing, replacement) -> existing));
+        Map<Long, SanPhamModel> sanPhamMap = sanPhamModels.stream().collect(Collectors.toMap(SanPhamModel::getId, Function.identity(), (existing, replacement) -> existing));
         models.forEach(model -> {
-            SanPhamChiTiet spct = spctMap.get(model.getIdSanPhamChiTiet());
+            SanPhamChiTietModel spct = spctMap.get(model.getIdSanPhamChiTiet());
             model.setSanPhamChiTiet(spct);
             model.setSanPham(sanPhamMap.get(spct.getIdSanPham()));
         });
 
+    }
+
+    private SanPhamModel convertToSanPhamModel(SanPham entity) {
+        SanPhamModel model = new SanPhamModel();
+        model.setId(entity.getId());
+        model.setIdDanhMuc(entity.getIdDanhMuc());
+        model.setIdThuongHieu(entity.getIdThuongHieu());
+        model.setIdChatLieu(entity.getIdChatLieu());
+        model.setTen(entity.getTen());
+        model.setMa(entity.getMa());
+        model.setXuatXu(entity.getXuatXu());
+        model.setMoTa(entity.getMoTa());
+        model.setGia(entity.getGia());
+        model.setAnh(entity.getAnh());
+        model.setTrangThai(entity.getTrangThai());
+        return model;
+    }
+
+    private SanPhamChiTietModel convertToSanPhamChiTietModel(SanPhamChiTiet entity) {
+        SanPhamChiTietModel model = new SanPhamChiTietModel();
+        model.setId(entity.getId());
+        model.setIdSanPham(entity.getIdSanPham());
+        model.setIdSize(entity.getIdSize());
+        model.setIdMauSac(entity.getIdMauSac());
+        model.setSoLuong(entity.getSoLuong());
+        model.setGia(entity.getGia());
+        model.setGhiChu(entity.getGhiChu());
+        model.setTrangThai(entity.getTrangThai());
+        var size = sizeService.findById(model.getIdSize()).orElse(null);
+        model.setSize(size);
+        var mauSac = mauSacService.findById(model.getIdMauSac()).orElse(null);
+        model.setMauSac(mauSac);
+        return model;
     }
 
 

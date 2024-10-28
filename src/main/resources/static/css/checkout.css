@@ -1,0 +1,34 @@
+.payment-method {
+    display: flex;
+    justify-content: space-between; /* Căn chỉnh tiêu đề và bảng */
+    align-items: center; /* Giữa dọc */
+}
+
+.payment-method h2 {
+    margin: 0; /* Xóa margin để không bị lệch */
+}
+
+table {
+    margin-left: auto; /* Đẩy bảng về bên phải */
+}
+
+.alert {
+    position: absolute;
+    bottom: 20px; /* Cách dưới cùng */
+    left: 50%;
+    transform: translateX(-50%); /* Đưa nó về giữa */
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    width: auto; /* Hoặc thiết lập chiều rộng tùy ý */
+}
+
+.alert-success {
+    background-color: #4caf50; /* Màu nền xanh */
+    color: white;
+}
+
+.alert-danger {
+    background-color: #f44336; /* Màu nền đỏ */
+    color: white;
+}

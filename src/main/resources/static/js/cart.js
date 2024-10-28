@@ -8,7 +8,7 @@ async function fetchCartData() {
             headers.append('Authorization', `Bearer ${token}`);
         }
 
-        const response = await fetch('/gio-hang-chi-tiet/getList', {
+        const response = await fetch('gio-hang-chi-tiet/get-list', {
             method: 'GET',
             headers: headers,
         });
@@ -31,19 +31,21 @@ async function fetchCartData() {
             cartList.innerHTML = ''; // Xóa danh sách hiện tại
             data.data.forEach(item => {
                 const productDetail = item.sanPhamChiTiet;
+                const product = item.sanPham;
                 const cartItem = document.createElement('div');
                 cartItem.classList.add('cart_item');
                 cartItem.innerHTML = `
-                    <input type="checkbox" class="product-checkbox" id="product-${item.id}" />
+                    <input type="checkbox" class="product-checkbox" id="product-${item.id}" onclick="handleCheckboxChange(${item.id})" />
                     <img class="cart_thumb" src="${productDetail.imageUrl || 'default-image.png'}" alt=""/>
                     <div class="cart_info">
                         <h3>
-                            <span>${productDetail.ghiChu || productDetail.idSanPham}</span>
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </span>
+                            <h2>${product.ten}</h2>
+                           <span>(Màu: ${productDetail.mauSac.ten}, Size: ${productDetail.size.ten})</span>
+<!--                            <span>-->
+<!--                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">-->
+<!--                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>-->
+<!--                                </svg>-->
+<!--                            </span>-->
                         </h3>
                         <div class="cart_item_price">${item.gia.toLocaleString()} đ</div>
                         <div class="cart_item_quantity">
@@ -121,6 +123,40 @@ function updateTotalPrice(itemId, quantity) {
 
     totalPriceElement.textContent = `${grandTotal.toLocaleString()} đ`;
 }
+
+function handleCheckboxChange(itemId) {
+    const checkbox = document.getElementById(`product-${itemId}`);
+    const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
+
+    console.log(`Checkbox for item ${itemId} is now ${checkbox.checked}.`);
+    console.log(`Current selected items:`, selectedItems);
+
+    // Kiểm tra nếu checkbox được đánh dấu
+    if (checkbox.checked) {
+        // Nếu chưa có, thêm itemId vào danh sách đã chọn
+        if (!selectedItems.includes(itemId)) {
+            selectedItems.push(itemId);
+            console.log(`Added item ${itemId} to selected items.`);
+        } else {
+            console.log(`Item ${itemId} is already selected.`);
+        }
+    } else {
+        // Nếu không, tìm vị trí của itemId trong danh sách và xóa nó
+        const index = selectedItems.indexOf(itemId);
+        if (index > -1) {
+            selectedItems.splice(index, 1); // Xóa itemId khỏi danh sách đã chọn
+            console.log(`Removed item ${itemId} from selected items.`);
+        } else {
+            console.log(`Item ${itemId} was not found in selected items.`);
+        }
+    }
+
+    // Cập nhật localStorage với danh sách mới
+    localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+    console.log(`Updated selected items in localStorage:`, selectedItems);
+}
+
+
 
 // Gọi hàm fetchCartData để tải dữ liệu giỏ hàng khi trang được tải
 window.onload = fetchCartData;

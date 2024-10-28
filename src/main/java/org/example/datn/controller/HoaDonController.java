@@ -46,4 +46,9 @@ public class HoaDonController {
         ServiceResult result = processor.save(request, ua);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
+
+    @PostMapping("/save")
+    public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.save(request, ua));
+    }
 }

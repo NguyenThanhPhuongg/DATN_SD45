@@ -12,4 +12,6 @@ import java.util.List;
 public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     @Query("SELECT p FROM HoaDon p WHERE p.id = ?1")
     List<HoaDon> findByCateId(Long cid);
+
+    HoaDon findTopByOrderByNgayTaoDesc();
 }

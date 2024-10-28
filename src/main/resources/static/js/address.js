@@ -58,7 +58,7 @@ async function fetchAddressList() {
                 <div>
                     <input type="radio" name="address" value="${address.id}" id="address-${address.id}">
                     <label for="address-${address.id}">
-                        <strong>${address.hoTen}</strong><br>
+                        <strong style="font-size: 1.5em;">${address.hoTen}</strong> <span style="font-size: 1em;">(${address.sdt})</span><br>
                         ${address.diaChi}, ${address.thanhPho}, ${address.quocGia}
                     </label>
                 </div>
@@ -93,12 +93,22 @@ function selectAddress() {
 
 function showModal() {
     document.getElementById('address-modal').style.display = 'block';
+    document.body.style.overflow = "hidden"; //
     fetchAddressList(); // Gọi hàm lấy danh sách địa chỉ khi hiển thị modal
 }
 
 function closeModal() {
     document.getElementById('address-modal').style.display = 'none';
+    document.body.style.overflow = "";
 }
 
 // Gọi hàm khi trang được tải
 document.addEventListener('DOMContentLoaded', fetchDeliveryAddress);
+
+// Đóng modal khi nhấp bên ngoài
+window.onclick = function(event) {
+    const modal = document.getElementById("address-modal");
+    if (event.target === modal) {
+        closeModal();
+    }
+};

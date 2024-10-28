@@ -112,35 +112,44 @@ public class HoaDonProcessor {
         hoaDon.setIdNguoiDung(ua.getPrincipal());
         hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
         hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
+        hoaDon.setMa(generateNextInvoiceNumber());
         hoaDon.setDiemSuDung(0);
         hoaDon.setTrangThai(StatusHoaDon.CHO_XU_LY.getValue());
         hoaDon.setNgayTao(LocalDateTime.now());
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiTao(ua.getPrincipal());
+        hoaDon.setNguoiCapNhat(ua.getPrincipal());
+        hoaDon.setNgayDatHang(LocalDateTime.now());
+        service.save(hoaDon);
 
-        var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
-        var gioHangChiTiet = gioHangChiTietService.findByIdGioHang(gioHang.getId());
+        var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
         BigDecimal tongTien = BigDecimal.ZERO;
-        for (GioHangChiTiet ghct: gioHangChiTiet){
+        for (GioHangChiTiet ghct : gioHangChiTiet) {
             HoaDonChiTiet hdct = new HoaDonChiTiet();
             hdct.setIdHoaDon(hoaDon.getId());
             hdct.setIdSanPhamChiTiet(ghct.getIdSanPhamChiTiet());
             hdct.setSoLuong(ghct.getSoLuong());
             hdct.setGia(ghct.getGia());
-            tongTien = tongTien.add(ghct.getGia());
+            BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
+            tongTien = tongTien.add(giaTien);
+            hdct.setTrangThai(StatusHoaDon.CHO_XU_LY.getValue());
             hdct.setNgayTao(LocalDateTime.now());
+            hdct.setNgayCapNhat(LocalDateTime.now());
             hdct.setNguoiTao(ua.getPrincipal());
+            hdct.setNguoiCapNhat(ua.getPrincipal());
             hoaDonChiTietService.save(hdct);
         }
         hoaDon.setTongTien(tongTien);
         service.save(hoaDon);
         var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
                 .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
-        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.COD)){
+        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH)) {
             ThanhToan thanhToan = new ThanhToan();
             thanhToan.setIdHoaDon(hoaDon.getId());
             thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
             thanhToan.setSoTien(hoaDon.getTongTien());
             thanhToan.setTrangThai(StatusThanhToan.CHUA_THANH_TOAN.getValue());
+            thanhToanService.save(thanhToan);
         }
 //        else if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
 //            // Tạo bản ghi thanh toán trước khi chuyển hướng
@@ -159,8 +168,12 @@ public class HoaDonProcessor {
 
     }
 
-//    private String createVnpayRequest(HoaDon hoaDon, BigDecimal tongTien, UserAuthentication ua) {
-//
-//    }
+    public String generateNextInvoiceNumber() {
+        HoaDon lastInvoice = service.findTopByOrderByNgayTaoDesc();
+        int nextNumber = (lastInvoice == null) ? 1 : Integer.parseInt(lastInvoice.getMa().substring(4)) + 1;
+        return String.format("CODE%04d", nextNumber);
+    }
+
+
 
 }

@@ -22,6 +22,7 @@ public class PhuongThucThanhToan extends CommonEntity {
     @Column(name = "ten")
     private String ten;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "loai")
     private TypeThanhToan loai; // COD hoặc VNPAY
 
@@ -29,6 +30,6 @@ public class PhuongThucThanhToan extends CommonEntity {
     private String moTa;
 
     @Column(name = "trang_thai")
-    private int trangThai;
+    private Integer trangThai;
 
 }

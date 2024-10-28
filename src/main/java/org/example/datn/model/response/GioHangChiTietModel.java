@@ -23,6 +23,6 @@ public class GioHangChiTietModel extends CommonModel {
     private BigDecimal gia;
     private Integer trangThai;
 
-    private SanPham sanPham;
-    private SanPhamChiTiet sanPhamChiTiet;
+    private SanPhamModel sanPham;
+    private SanPhamChiTietModel sanPhamChiTiet;
 }

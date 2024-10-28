@@ -30,6 +30,9 @@ public class HoaDon extends CommonEntity{
     @Column(name = "id_phuong_thuc_van_chuyen")
     private Long idPhuongThucVanChuyen;
 
+    @Column(name = "ma")
+    private String ma;
+
     @Column(name = "ngay_dat_hang")
     private LocalDateTime ngayDatHang;
 
