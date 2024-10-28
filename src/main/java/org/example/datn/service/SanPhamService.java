@@ -17,4 +17,8 @@ public class SanPhamService {
         return repo.findById(id);
     }
 
+    public List<SanPham> findByIdIn(List<Long> ids) {
+        return repo.findByIdIn(ids);
+    }
+
 }

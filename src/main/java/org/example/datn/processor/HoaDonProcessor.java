@@ -105,7 +105,7 @@ public class HoaDonProcessor {
         hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
         hoaDon.setDiemSuDung(0);
         hoaDon.setTrangThai(StatusHoaDon.CHO_XU_LY.getValue());
-        hoaDon.setNgayTao(new Date());
+        hoaDon.setNgayTao(LocalDateTime.now());
         hoaDon.setNguoiTao(ua.getPrincipal());
 
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("user.not.found"));
@@ -118,7 +118,7 @@ public class HoaDonProcessor {
             hdct.setSoLuong(ghct.getSoLuong());
             hdct.setGia(ghct.getGia());
             tongTien = tongTien.add(ghct.getGia());
-            hdct.setNgayTao(new Date());
+            hdct.setNgayTao(LocalDateTime.now());
             hdct.setNguoiTao(ua.getPrincipal());
             hoaDonChiTietService.save(hdct);
         }

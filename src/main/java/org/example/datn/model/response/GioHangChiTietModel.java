@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.CommonModel;
 
@@ -22,5 +23,6 @@ public class GioHangChiTietModel extends CommonModel {
     private BigDecimal gia;
     private Integer trangThai;
 
+    private SanPham sanPham;
     private SanPhamChiTiet sanPhamChiTiet;
 }

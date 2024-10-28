@@ -103,3 +103,16 @@ $(document).ready(function () {
     });
 
 });
+
+
+document.querySelector('.quantity_plus').addEventListener('click', function() {
+    const input = document.querySelector('input[name="quantity_product"]');
+    input.value = parseInt(input.value) + 1;
+});
+
+document.querySelector('.quantity_minius').addEventListener('click', function() {
+    const input = document.querySelector('input[name="quantity_product"]');
+    if (input.value > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+});

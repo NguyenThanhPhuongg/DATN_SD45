@@ -25,12 +25,12 @@ public abstract class CommonEntity implements Serializable {
 
     @CreatedDate
     @Column(name = "ngay_tao")
-    private Date ngayTao;
+    private LocalDateTime ngayTao;
 
 
     @LastModifiedDate
     @Column(name = "ngay_cap_nhat")
-    private Date ngayCapNhat;
+    private LocalDateTime ngayCapNhat;
 
 
     @CreatedBy

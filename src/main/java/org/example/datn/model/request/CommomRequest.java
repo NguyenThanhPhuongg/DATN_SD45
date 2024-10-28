@@ -7,14 +7,15 @@ import lombok.experimental.FieldDefaults;
 
 import javax.sql.rowset.serial.SerialArray;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommomRequest {
-    Date ngayTao;
-    Date ngayCapNhat;
+    LocalDateTime ngayTao;
+    LocalDateTime ngayCapNhat;
     Long nguoiTao;
     Long nguoiCapNhat;
 }

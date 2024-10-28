@@ -1346,3 +1346,33 @@ footer .footer_inner .footer_col ul li a:hover:before {
 }
 
 
+.quantity_group {
+    display: flex;
+    align-items: center;
+}
+
+.quantity_minius, .quantity_plus {
+    background-color: #4CAF50; /* Màu nền */
+    color: white; /* Màu chữ */
+    border: none; /* Không viền */
+    padding: 10px; /* Khoảng cách bên trong */
+    cursor: pointer; /* Con trỏ chuột */
+}
+
+.quantity_input {
+    width: 50px; /* Độ rộng của ô nhập */
+    text-align: center; /* Canh giữa chữ */
+    margin: 0 10px; /* Khoảng cách giữa các phần tử */
+    border: 1px solid #ccc; /* Viền ô nhập */
+    border-radius: 4px; /* Bo góc */
+}
+
+
+.cart-icon {
+    width: 30px; /* Hoặc kích thước mong muốn */
+    height: 30px;
+    margin-left: 10px; /* Khoảng cách giữa biểu tượng giỏ hàng và tên người dùng */
+    cursor: pointer; /* Con trỏ khi di chuột qua */
+}
+
+

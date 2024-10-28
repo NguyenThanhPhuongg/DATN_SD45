@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController("GioHangChiTietApi")
 @RequestMapping("/gio-hang-chi-tiet")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -36,7 +36,7 @@ public class GioHangChiTietController {
         return ResponseEntity.ok(processor.delete(id, ua));
     }
 
-    @GetMapping("/")
+    @GetMapping("/get-list")
     public ResponseEntity<ServiceResult> getGioHangChiTiet(UserAuthentication ua) {
         return ResponseEntity.ok(processor.getList(ua));
     }

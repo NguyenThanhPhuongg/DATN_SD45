@@ -16,8 +16,8 @@ import java.util.Date;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommonModel implements Serializable {
-    Date ngayTao;
-    Date ngayCapNhat;
+    LocalDateTime ngayTao;
+    LocalDateTime ngayCapNhat;
     Long nguoiTao;
     Long nguoiCapNhat;
 }
