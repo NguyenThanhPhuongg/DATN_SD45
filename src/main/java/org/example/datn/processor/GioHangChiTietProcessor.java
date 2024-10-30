@@ -6,6 +6,7 @@ import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.enums.StatusGioHang;
 import org.example.datn.model.request.GioHangChiTietRequest;
 import org.example.datn.model.response.GioHangChiTietModel;
 import org.example.datn.model.response.SanPhamChiTietModel;
@@ -78,6 +79,7 @@ public class GioHangChiTietProcessor {
             BeanUtils.copyProperties(request, ghct);
             ghct.setIdGioHang(gioHang.getId());
             ghct.setGia(spct.getGia());
+            ghct.setTrangThai(StatusGioHang.DANG_CHO.getValue());
             service.save(ghct);
             spct.setSoLuong(soLuongConLai - request.getSoLuong());
         }
@@ -132,7 +134,7 @@ public class GioHangChiTietProcessor {
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy giỏ hàng cho người dùng"));
 
-        var list = service.findByIdGioHang(gioHang.getId());
+        var list = service.findByIdGioHangAndTrangThai(gioHang.getId(), StatusGioHang.DANG_CHO.getValue());
         if (list.isEmpty()) {
             return new ServiceResult(Collections.emptyList(), SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_204);
         }
@@ -273,5 +275,13 @@ public class GioHangChiTietProcessor {
         return model;
     }
 
+
+    public ServiceResult changeSoLuong(Long id, Integer soLuong, UserAuthentication ua){
+        var g = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
+        g.setSoLuong(soLuong);
+        g.setNguoiCapNhat(ua.getPrincipal());
+        service.save(g);
+        return new ServiceResult();
+     }
 
 }

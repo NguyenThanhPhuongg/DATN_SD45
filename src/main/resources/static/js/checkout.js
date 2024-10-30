@@ -494,9 +494,10 @@ async function placeOrder() {
         console.error('Error placing order:', error);
         alert('Có lỗi xảy ra khi đặt hàng.');
     }
+
     function hideMessageAfterDelay() {
-        setTimeout(function() {
-            $('#message').fadeOut('slow', function() {
+        setTimeout(function () {
+            $('#message').fadeOut('slow', function () {
                 $(this).empty().show();
             });
         }, 2000);

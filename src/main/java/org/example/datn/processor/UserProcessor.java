@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserProcessor {
 
-    UserTransformer userTransformer;
+   final UserTransformer userTransformer;
     UserService userService;
     ProfileTransformer profileTransformer;
     ProfileService profileService;
