@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum StatusGioHang {
 
-    ACTIVE(1),               // Đang hoạt động
-    INACTIVE(0),             // Không hoạt động
-    DA_HOAN_TAT(2),           // Đã hoàn tất
-    DA_HUY(3),                // Đã hủy
-    DANG_GIAO(4),             // Đang giao
-    DA_GIAO(5),               // Đã giao
-    GIAO_KHONG_THANH_CONG(6), // Giao không thành công
-    DANG_CHO(7);              // Đang chờ
+    CHUA_DAT_HANG(0), // Khi sản phẩm vẫn còn trong giỏ hàng và bạn chưa quyết định đặt mua.
+    DA_DAT_HANG(1), //Khi đã xác nhận mua sản phẩm và gửi đơn hàng cho người bán.
+    DA_THANH_TOAN(2), // Khi đã hoàn tất thanh toán cho đơn hàng.
+    DANG_XU_LY(3), // Khi đơn hàng đang được người bán chuẩn bị và đóng gói để giao.
+    DA_GIAO_HANG(4); // Khi sản phẩm đã được giao đến địa chỉ của bạn.
 
     StatusGioHang(Integer value) {
         this.value = value;

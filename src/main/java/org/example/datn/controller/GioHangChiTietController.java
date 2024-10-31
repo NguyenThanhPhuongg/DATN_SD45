@@ -48,4 +48,10 @@ public class GioHangChiTietController {
         return ResponseEntity.ok(processor.getByIdIn(ids));
     }
 
+    @PutMapping("/change/{id}")
+    public ResponseEntity<ServiceResult> changeSoLuong(@PathVariable Long id, @RequestBody Integer soLuong, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.changeSoLuong(id, soLuong, ua));
+    }
+
+
 }

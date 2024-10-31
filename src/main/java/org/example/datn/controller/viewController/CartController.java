@@ -18,7 +18,7 @@ public class CartController {
 
     @GetMapping("/cart")
     public String cart() {
-        return "customer/cart/index";
+        return "customer/cart/cart";
     }
     @Autowired
     private GioHangService gioHangService;

@@ -131,7 +131,7 @@ public class HoaDonProcessor {
         hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
         hoaDon.setMa(generateNextInvoiceNumber());
         hoaDon.setDiemSuDung(0);
-        hoaDon.setTrangThai(StatusHoaDon.CHO_XU_LY.getValue());
+        hoaDon.setTrangThai(StatusHoaDon.CHO_THANH_TOAN.getValue());
         hoaDon.setNgayTao(LocalDateTime.now());
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiTao(ua.getPrincipal());
@@ -149,12 +149,14 @@ public class HoaDonProcessor {
             hdct.setGia(ghct.getGia());
             BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
             tongTien = tongTien.add(giaTien);
-            hdct.setTrangThai(StatusHoaDon.CHO_XU_LY.getValue());
+            hdct.setTrangThai(StatusHoaDon.CHO_THANH_TOAN.getValue());
             hdct.setNgayTao(LocalDateTime.now());
             hdct.setNgayCapNhat(LocalDateTime.now());
             hdct.setNguoiTao(ua.getPrincipal());
             hdct.setNguoiCapNhat(ua.getPrincipal());
             hoaDonChiTietService.save(hdct);
+            ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
+            gioHangChiTietService.save(ghct);
         }
         hoaDon.setTongTien(tongTien);
         service.save(hoaDon);

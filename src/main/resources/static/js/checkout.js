@@ -2,7 +2,7 @@ let fetchedAddresses = []; // Biến toàn cục để lưu địa chỉ đã fe
 let addressDataId;
 let phuongThucVanChuyenId;
 let phuongThucThanhToanId;
-
+let isAddingNewAddress = false;
 async function fetchDeliveryAddress() {
     try {
         const token = localStorage.getItem('token');
@@ -59,10 +59,10 @@ async function fetchAddressList() {
 
         if (fetchedAddresses && fetchedAddresses.length > 0) {
             addressListElement.innerHTML = fetchedAddresses.map(address => `
-                <div>
-                    <input type="radio" name="address" value="${address.id}" id="address-${address.id}" onchange="selectAddress()">
+                 <div style="background-color: #f0f0f0; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                    <input type="radio" name="address" value="${address.id}" id="address-${address.id}">
                     <label for="address-${address.id}">
-                        <strong style="font-size: 1.5em;">${address.hoTen}</strong> <span style="font-size: 1em;">(${address.sdt})</span><br>
+                        <strong style="font-size: 1.5em;">${address.hoTen}</strong> <span style="font-size: 1em;">(${address.sdt})</span> ${address.trangThai === 1 ? '<span style="color: red; font-weight: bold; margin-left: 10px;">Mặc định</span>' : ''}<br>
                         ${address.diaChi}, ${address.thanhPho}, ${address.quocGia}
                     </label>
                 </div>
@@ -100,16 +100,125 @@ function selectAddress() {
     }
 }
 
+function showNewAddressForm() {
+    document.getElementById('address-list').style.display = 'none';
+    document.getElementById('new-address-form').style.display = 'block';
+    document.getElementById('add-address-button').style.display = 'none';
+    document.getElementById('back-button').style.display = 'block';
+    isAddingNewAddress = true;
+}
+
+async function addNewAddress() {
+    const newHoTen = document.getElementById('new-hoTen').value;
+    const newSdt = document.getElementById('new-sdt').value;
+    const newDiaChi = document.getElementById('new-diaChi').value;
+    const newThanhPho = document.getElementById('new-thanhPho').value;
+    const newQuocGia = document.getElementById('new-quocGia').value;
+
+    // Kiểm tra các điều kiện ràng buộc
+    if (!newHoTen || newHoTen.length > 100) {
+        document.getElementById('error-message').innerText = 'Họ tên không được để trống và không vượt quá 100 ký tự.';
+        return;
+    }
+    if (!newSdt || newSdt.length < 10 || newSdt.length > 15) {
+        document.getElementById('error-message').innerText = 'Số điện thoại không được để trống và phải có từ 10 đến 15 ký tự.';
+        return;
+    }
+    if (!newDiaChi) {
+        document.getElementById('error-message').innerText = 'Địa chỉ không được để trống.';
+        return;
+    }
+    if (!newThanhPho) {
+        document.getElementById('error-message').innerText = 'Thành phố không được để trống.';
+        return;
+    }
+    if (!newQuocGia) {
+        document.getElementById('error-message').innerText = 'Quốc gia không được để trống.';
+        return;
+    }
+
+    // Dữ liệu gửi đi
+    const requestData = {
+        hoTen: newHoTen,
+        sdt: newSdt,
+        diaChi: newDiaChi,
+        thanhPho: newThanhPho,
+        quocGia: newQuocGia
+    };
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('dia-chi/insert', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const result = await response.json();
+
+        // Hiển thị thông báo thành công và cập nhật lại danh sách địa chỉ
+        console.log(result);
+        document.getElementById('new-address-form').style.display = 'none';
+        document.getElementById('address-list').style.display = 'block';
+        document.getElementById('error-message').innerText = ''; // Xóa thông báo lỗi
+        isAddingNewAddress = false;
+
+        // Cập nhật lại danh sách địa chỉ sau khi thêm mới
+        fetchAddressList();
+        clearFormModal();
+
+    } catch (error) {
+        console.error('Error adding new address:', error);
+        document.getElementById('error-message').innerText = 'Lỗi khi thêm địa chỉ mới.';
+    }
+}
+function handleConfirmButton() {
+    if (isAddingNewAddress) {
+        addNewAddress();
+    } else {
+        selectAddress();
+    }
+}
+function cancelNewAddress() {
+    // Ẩn form và hiển thị lại danh sách địa chỉ
+    document.getElementById('new-address-form').style.display = 'none';
+    document.getElementById('address-list').style.display = 'block';
+    document.getElementById('add-address-button').style.display = 'block';
+    document.getElementById('back-button').style.display = 'none';
+    isAddingNewAddress = false;
+    document.getElementById('error-message').innerText = ''; // Xóa thông báo lỗi
+}
+
+
 function showModal() {
     document.getElementById('address-modal').style.display = 'block';
     document.body.style.overflow = "hidden"; //
     fetchAddressList(); // Gọi hàm lấy danh sách địa chỉ khi hiển thị modal
 }
 
+function clearFormModal(){
+    document.getElementById('add-address-button').style.display = 'block';
+    document.getElementById('new-hoTen').value = '';
+    document.getElementById('new-sdt').value = '';
+    document.getElementById('new-diaChi').value = '';
+    document.getElementById('new-thanhPho').value = '';
+    document.getElementById('new-quocGia').value = '';
+}
+
 function closeModal() {
     document.getElementById('address-modal').style.display = 'none';
     document.body.style.overflow = "";
+    cancelNewAddress();
+    clearFormModal();
 }
+
 
 // Gọi hàm khi trang được tải
 document.addEventListener('DOMContentLoaded', fetchDeliveryAddress);
@@ -180,7 +289,7 @@ async function fetchCartData() {
                                     </svg>
                                 </button>
                             </div>
-                            <b id="totalItemPrice-${item.id}">${(item.gia * item.soLuong).toLocaleString()} đ</b>
+                            <b style="color: red;"  id="totalItemPrice-${item.id}">${(item.gia * item.soLuong).toLocaleString()} đ</b>
                         </div>
                     </div>
                 `;
@@ -326,8 +435,8 @@ function populateTable(data) {
         row.innerHTML = `
             <td>${item.sanPham.ten}</td>
             <td>${gia.toLocaleString()} đ</td>
-            <td>${soLuong}</td>
-            <td>${tongCong.toLocaleString()} đ</td>
+            <td style="padding-right: 20px;">${soLuong}</td>
+           <td style="color: red; text-align: right; padding-right: 100px;">${tongCong.toLocaleString()} đ</td>
         `;
         tableBody.appendChild(row);
     });
@@ -494,9 +603,10 @@ async function placeOrder() {
         console.error('Error placing order:', error);
         alert('Có lỗi xảy ra khi đặt hàng.');
     }
+
     function hideMessageAfterDelay() {
-        setTimeout(function() {
-            $('#message').fadeOut('slow', function() {
+        setTimeout(function () {
+            $('#message').fadeOut('slow', function () {
                 $(this).empty().show();
             });
         }, 2000);

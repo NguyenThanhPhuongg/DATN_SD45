@@ -12,9 +12,6 @@ import javax.validation.constraints.Size;
 @Setter
 public class DiaChiGiaoHangRequest {
 
-    @NotNull(message = "ID người dùng không được để trống.")
-    private Long idNguoiDung;
-
     @NotBlank(message = "Họ tên không được để trống.")
     @Size(max = 100, message = "Họ tên không được vượt quá 100 ký tự.")
     private String hoTen;

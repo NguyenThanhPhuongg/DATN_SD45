@@ -10,10 +10,7 @@ import org.example.datn.processor.DiaChiGiaoHangProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController("DiaChiGiaoHangApi")
 @RequestMapping("/dia-chi")
@@ -35,7 +32,7 @@ public class DiaChiGiaoHangController {
 
 
     @PostMapping("/insert")
-    public ResponseEntity<ServiceResult> insert(DiaChiGiaoHangRequest request, UserAuthentication ua) {
+    public ResponseEntity<ServiceResult> insert(@RequestBody DiaChiGiaoHangRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.insert(request,ua));
     }
 

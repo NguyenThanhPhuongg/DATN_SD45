@@ -10,12 +10,13 @@ import org.example.datn.utils.CalendarUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author hoangKhong
  */
+@Mapper(componentModel = "spring")
 @Component
-@Mapper(componentModel = "spring", imports = {UserStatus.class, CalendarUtil.DateTimeUtils.class})
 public interface UserTransformer {
 
 //    @Mapping(target = "status", expression = "java(UserStatus.ACTIVE)")
