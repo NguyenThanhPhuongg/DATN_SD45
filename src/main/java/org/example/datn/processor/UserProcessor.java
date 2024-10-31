@@ -197,7 +197,6 @@ public class UserProcessor {
 
         var gioGang = new GioHang();
         gioGang.setIdNguoiDung(user.getId());
-        gioGang.setTrangThai(StatusGioHang.ACTIVE.getValue());
         gioHangService.save(gioGang);
         return new ServiceResult(SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }

@@ -89,7 +89,7 @@ function handleQuantityChange(itemId, isIncreasing) {
     })
         .then(response => response.json())
         .then(result => {
-            if (result.success) {
+            if (result.code == '200') {
                 // Cập nhật hiển thị số lượng và tổng tiền
                 productItem.querySelector('.quantity span').textContent = newQuantity;
                 const price = parseFloat(productItem.querySelector('.price').textContent.replace(/[^\d.-]/g, ''));
@@ -101,6 +101,33 @@ function handleQuantityChange(itemId, isIncreasing) {
             }
         })
         .catch(error => console.error('Lỗi khi gọi API', error));
+}
+
+function handleDelete(itemId) {
+    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');
+    if (confirmDelete) {
+        // Gọi đến API để xóa sản phẩm
+        const token = localStorage.getItem('token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+
+        fetch(`/gio-hang-chi-tiet/${itemId}`, {
+            method: 'DELETE',
+            headers: headers
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Fetch lại dữ liệu giỏ hàng sau khi xóa thành công
+                    fetchCartData();
+                } else {
+                    console.error('Xóa sản phẩm thất bại', result.message);
+                }
+            })
+            .catch(error => console.error('Lỗi khi gọi API', error));
+    }
 }
 
 function renderCart(items) {
@@ -118,7 +145,7 @@ function renderCart(items) {
         const itemHtml = `
             <div>
                 <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} data-id="${item.id}">
-                <img src="${sanPham.anh}" alt="${sanPham.ten}">
+                <img src="${sanPham.anh}">
                 <span>${sanPham.ten}<br>Phân loại: ${sanPhamChiTiet.mauSac.ten}, Size: ${sanPhamChiTiet.size.ten}</span>
             </div>
             <div class="price">₫${item.gia}</div>
@@ -128,7 +155,7 @@ function renderCart(items) {
                 <button>+</button>
             </div>
             <div class="total">₫${total}</div>
-            <div><button class="btn">Xóa</button></div>
+            <div><button class="btn delete-btn">Xóa</button></div>
         `;
         productItem.innerHTML = itemHtml;
         productSection.appendChild(productItem);
@@ -151,6 +178,13 @@ function renderCart(items) {
         });
     });
 
+    // Thêm sự kiện cho nút Xóa
+    document.querySelectorAll('.product-item .delete-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const itemId = e.target.closest('.product-item').querySelector('input[data-id]').dataset.id;
+            handleDelete(itemId);
+        });
+    });
 
     // Thêm sự kiện cho nút Mua Hàng
     document.querySelector('.checkout-btn').addEventListener('click', handleCheckout);

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class DiaChiGiaoHangProcessor {
     @Autowired
     private UserProcessor userProcessor;
 
-    public ServiceResult getById(Long id){
+    public ServiceResult getById(Long id) {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
         var model = transformer.toModel(entity);
         var user = userProcessor.findById(entity.getId());
@@ -38,14 +39,14 @@ public class DiaChiGiaoHangProcessor {
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult create(DiaChiGiaoHangRequest request, UserAuthentication ua){
+    public ServiceResult create(DiaChiGiaoHangRequest request, UserAuthentication ua) {
         var a = transformer.toEntity(request);
         a.setIdNguoiDung(ua.getPrincipal());
         service.save(a);
         return new ServiceResult();
     }
 
-    public ServiceResult update(Long id, DiaChiGiaoHangRequest request, UserAuthentication ua){
+    public ServiceResult update(Long id, DiaChiGiaoHangRequest request, UserAuthentication ua) {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
         entity.setHoTen(request.getHoTen());
         entity.setSdt(request.getSdt());
@@ -56,23 +57,23 @@ public class DiaChiGiaoHangProcessor {
         return new ServiceResult();
     }
 
-    public ServiceResult deleteById(Long id){
+    public ServiceResult deleteById(Long id) {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
         service.delete(entity);
         return new ServiceResult();
     }
 
-    public ServiceResult findByIdNguoiDung(UserAuthentication ua){
+    public ServiceResult findByIdNguoiDung(UserAuthentication ua) {
         var list = service.findByIdNguoiDung(ua.getPrincipal());
-        var models = list.stream().map(this :: mapToModel).collect(Collectors.toList());
+        var models = list.stream().map(this::mapToModel).collect(Collectors.toList());
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
 
     }
 
-    public ServiceResult getActive(UserAuthentication ua){
+    public ServiceResult getActive(UserAuthentication ua) {
         var list = service.findByIdNguoiDungAndTrangThai(ua.getPrincipal(), SystemConstant.ACTIVE);
-        var models = list.stream().map(this :: mapToModel);
+        var models = list.stream().map(this::mapToModel);
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
 
     }
@@ -102,25 +103,17 @@ public class DiaChiGiaoHangProcessor {
         return model;
     }
 
-    private DiaChiGiaoHang mapToEntity(DiaChiGiaoHangRequest model) {
-        DiaChiGiaoHang diaChiGiaoHang = new DiaChiGiaoHang();
-        diaChiGiaoHang.setHoTen(model.getHoTen());
-        diaChiGiaoHang.setSdt(model.getSdt());
-        diaChiGiaoHang.setDiaChi(model.getDiaChi());
-        diaChiGiaoHang.setThanhPho(model.getThanhPho());
-        diaChiGiaoHang.setQuocGia(model.getQuocGia());
-        // Nếu cần, có thể thêm logic để thiết lập UserModel hoặc các thuộc tính khác
-        return diaChiGiaoHang;
-    }
-
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult insert(DiaChiGiaoHangRequest request, UserAuthentication ua){
-        var entity = mapToEntity(request);
+    public ServiceResult insert(DiaChiGiaoHangRequest request, UserAuthentication ua) {
+        var entity = transformer.toEntity(request);
         entity.setIdNguoiDung(ua.getPrincipal());
         entity.setTrangThai(0);
+        entity.setNgayTao(LocalDateTime.now());
+        entity.setNgayCapNhat(LocalDateTime.now());
+        entity.setNguoiTao(ua.getPrincipal());
+        entity.setNguoiCapNhat(ua.getPrincipal());
         service.save(entity);
         return new ServiceResult();
-
     }
 
 

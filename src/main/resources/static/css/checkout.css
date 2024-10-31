@@ -32,3 +32,18 @@ table {
     background-color: #f44336; /* Màu nền đỏ */
     color: white;
 }
+.product-item {
+    border: 1px solid #ccc; /* Border for each product */
+    border-radius: 10px; /* Rounded corners */
+    background-color: #f0f0f0; /* Light grey background */
+    margin-bottom: 10px; /* Spacing between items */
+    padding: 10px; /* Padding inside the product box */
+}
+
+.product-title {
+    font-weight: bold;
+}
+
+.product-price, .product-quantity, .product-total {
+    margin-top: 5px;
+}

@@ -18,7 +18,7 @@
     <!--    <script src="../js/address.js"></script>-->
     <!--    <script src="../js/shipping.js"></script>-->
     <!--    <script src="../js/order.js"></script>-->
-    <script src="../js/checkout.js"></script>
+    <script src="/js/checkout.js"></script>
 </head>
 <body>
 <div th:include="header :: body"></div>
@@ -38,33 +38,42 @@
             <h2>Danh Sách Địa Chỉ</h2>
             <div class="divider"></div>
             <div id="address-list">Loading...</div>
-            <button id="add-address-button" onclick="addNewAddress()">+ Thêm địa chỉ mới</button>
-            <div id="button-section-address">
-                <button id="cancel-button" onclick="closeModal()">Hủy</button>
-                <button id="confirm-button" onclick="selectAddress()">Xác Nhận</button>
+            <div id="new-address-form" style="display: none;">
+                <input type="text" id="new-hoTen" placeholder="Họ và tên" maxlength="100" required>
+                <input type="text" id="new-sdt" placeholder="Số điện thoại" minlength="10" maxlength="15" required>
+                <input type="text" id="new-diaChi" placeholder="Địa chỉ" required>
+                <input type="text" id="new-thanhPho" placeholder="Thành phố" required>
+                <input type="text" id="new-quocGia" placeholder="Quốc gia" required>
+                <div id="error-message" style="color: red;"></div>
             </div>
+            <button id="add-address-button" onclick="showNewAddressForm()">+ Thêm địa chỉ mới</button>
+            <div id="button-section-address">
+                <button id="back-button" style="display: none;" onclick="cancelNewAddress()">Quay lại</button>
+                <button id="cancel-button" onclick="closeModal()">Hủy</button>
+                <button id="confirm-button" onclick="handleConfirmButton()">Xác Nhận</button>
+            </div>
+        </div>
+
+    </div>
+    <!-- Separate Product Section -->
+    <div class="product">
+        <div class="title_product">
+            <div><h2>Sản phẩm</h2></div>
+            <div class="spacer"></div>
+            <div><span>Đơn giá</span></div>
+            <div><span>Số lượng</span></div>
+            <div><span>Thành tiền</span></div>
+        </div>
+        <div>
+            <table id="products">
+                <tbody>
+                <!-- Dữ liệu sẽ được thêm vào đây -->
+                </tbody>
+            </table>
         </div>
     </div>
-
-
+    <!-- Payment and Shipping Section -->
     <div class="pay_item_product">
-        <div class="product">
-            <div class="title_product">
-                <div><h2>Sản phẩm</h2></div>
-                <div class="spacer"></div>
-                <div><span>Đơn giá</span></div>
-                <div><span>Số lượng</span></div>
-                <div><span>Thành tiền</span></div>
-            </div>
-            <div>
-                <table id="products">
-                    <tbody>
-                    <!-- Dữ liệu sẽ được thêm vào đây -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         <div class="row">
             <div class="col-left">
                 <div class="voucher-image">
@@ -80,7 +89,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-right">
                 <input type="text" class="input-field" placeholder="Nhập mã giảm giá">
                 <button class="button"><span>Áp Dụng</span></button>
@@ -93,13 +101,11 @@
                 <span class="shipping-text"></span>
                 <button class="change-button" onclick="openShippingModal()">Thay đổi</button>
             </div>
-
             <div class="guarantee">
                 <img src="/images/fast-delivery.png" alt="Guarantee Icon" class="guarantee-icon">
                 <span class="guarantee-text">Bảo Hành 1 Năm</span>
             </div>
         </div>
-
         <div id="shipping-modal" class="modal" style="display: none;">
             <div class="modal-content">
                 <h2>Danh Sách Phương Thức Vận Chuyển</h2>
@@ -111,13 +117,10 @@
                 </div>
             </div>
         </div>
-
-
         <div class="row">
             <span class="total-price" style="font-size: 1.5em; color: red;">Tổng Cộng: 0₫</span>
         </div>
     </div>
-
     <div class="payment">
         <div class="payment-method">
             <h2>Phương thức thanh toán</h2>
@@ -129,11 +132,11 @@
         <table>
             <tr>
                 <td>Tổng tiền hàng</td>
-                <td id="totalItemPrice"></td>
+                <td id="totalItemPrice" style="color: red;"></td>
             </tr>
             <tr>
                 <td>Tổng tiền phí vận chuyển</td>
-                <td>₫30.000</td>
+                <td style="color: red;">₫30.000</td>
             </tr>
             <tr>
                 <td>Tổng cộng Voucher giảm giá</td>
@@ -152,6 +155,7 @@
 </div>
 <div id="message"></div>
 <div th:include="footer::body"></div>
+
 </body>
 </html>
 
