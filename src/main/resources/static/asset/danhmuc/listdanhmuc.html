@@ -8,16 +8,22 @@
             </div>
         </div>
         <div class="card-body">
-            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3" />
+            <div class="d-flex align-items-center mb-3">
+                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
+                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">
+                    <option value=""> Tất cả sản phẩm</option>
+                    <option value="1">Nam</option>
+                    <option value="2">Nữ</option>
+                    <option value="3">Khác</option>
+                </select>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>STT</th>
-                    <th>ID</th>
-                    <th>ID Cha</th>
+                    <th>Sản phẩm</th>
                     <th>Tên</th>
                     <th>Mô tả</th>
-                    <th>Người tạo</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
                 </tr>
@@ -25,13 +31,18 @@
                 <tbody>
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
-                    <td>{{item.id}}</td>
-                    <td>{{item.idCha}}</td>
+                    <td>
+                        <div>
+                            <span ng-if="item.idCha === 1">Nam</span>
+                            <span ng-if="item.idCha === 2">Nữ</span>
+                            <span ng-if="item.idCha === 3">Khác</span>
+                        </div>
+                    </td>
                     <td>{{item.ten}}</td>
                     <td>{{item.moTa}}</td>
-                    <td>{{item.nguoiTao}}</td>
                     <td>
-                        <div class="badge" ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                        <div class="badge"
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
                             <span ng-if="item.trangThai === 1">Active</span>
                             <span ng-if="item.trangThai === 3">Locked</span>
                             <span ng-if="item.trangThai === 2">Khác</span>
@@ -51,20 +62,34 @@
                 </tr>
                 </tbody>
             </table>
-            <div class="panel-footer text-center">
-                <button ng-click="pager.first()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
-                </button>
-                <button ng-click="pager.prev()" class="btn btn-primary">
-                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
-                </button>
-                <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
-                <button ng-click="pager.next()" class="btn btn-primary">
-                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
-                </button>
-                <button ng-click="pager.last()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
-                </button>
+            <div class="panel-footer d-flex justify-content-between align-items-center">
+                <!-- Bộ chọn số lượng dữ liệu hiển thị -->
+                <div class="me-auto">
+                    <label for="pageSizeSelect" class="me-2">Hiển thị:</label>
+                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()" class="form-select d-inline-block w-auto">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+
+                <!-- Điều hướng trang -->
+                <div class="text-center">
+                    <button ng-click="pager.first()" class="btn btn-danger">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button ng-click="pager.prev()" class="btn btn-primary">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
+                    <button ng-click="pager.next()" class="btn btn-primary">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button ng-click="pager.last()" class="btn btn-danger">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -94,14 +119,10 @@
                             <div class="col-md-6 mt-2">
                                 <label for="inputTen" class="form-label">Tên danh mục</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
-                                <span class="text-danger" ng-show="error.ten">Tên danh mục phải từ 1 đến 100 ký tự.</span>
+                                <span class="text-danger"
+                                      ng-show="error.ten">Tên danh mục phải từ 1 đến 100 ký tự.</span>
                             </div>
-                            <div class="col-md-6 mt-2">
-                                <label for="inputMoTa" class="form-label">Mô tả</label>
-                                <input type="text" class="form-control" id="inputMoTa" ng-model="form.moTa">
-                                <span class="text-danger" ng-show="error.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
-                            </div>
-                            <div class="form-group col-md-7 mt-2">
+                            <div class="form-group col-md-6 mt-2">
                                 <label>Trạng thái</label>
                                 <div class="mt-2">
                                     <div class="form-check form-check-inline">
@@ -122,13 +143,21 @@
                                 </div>
                                 <span class="text-danger" ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
                             </div>
+                            <div class="col-md-12 mt-3">
+                                <label for="inputMoTa" class="form-label">Mô tả</label>
+                                <textarea class="form-control" placeholder="Mô tả tại đây" ng-model="form.moTa"
+                                          id="floatingTextarea2" style="height: 100px"></textarea>
+                                <span class="text-danger" ng-show="error.moTa">Mô tả phải từ 1 đến 100 ký tự.</span>
+                            </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputNgayTao" class="form-label">Ngày tạo</label>
-                                <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao" readonly>
+                                <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
+                                       readonly>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputNgayCapNhat" class="form-label">Ngày cập nhật</label>
-                                <input type="date" class="form-control" id="inputNgayCapNhat" ng-model="form.ngayCapNhat" readonly>
+                                <input type="date" class="form-control" id="inputNgayCapNhat"
+                                       ng-model="form.ngayCapNhat" readonly>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputNguoiTao" class="form-label">Người tạo</label>

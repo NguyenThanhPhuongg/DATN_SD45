@@ -109,7 +109,7 @@ CREATE TABLE [thong_tin_ca_nhan]
     [sdt] NVARCHAR(20),
     [avatar] NVARCHAR(255),
     [dia_chi] NVARCHAR(255),
-    [gioi_tinh] INT DEFAULT 1,
+    [gioi_tinh] NVARCHAR(20),
     [ngay_sinh] DATETIME,
     [cccd] NVARCHAR(20),
     [email] NVARCHAR(200),
@@ -353,6 +353,7 @@ CREATE TABLE [hoa_don]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_nguoi_dung] BIGINT,
+    [ma] NVARCHAR(50),
     [id_dia_chi_giao_hang] BIGINT,
     [id_phuong_thuc_van_chuyen] BIGINT,
     [ngay_dat_hang] DATETIME DEFAULT GETDATE(),
@@ -368,6 +369,7 @@ CREATE TABLE [hoa_don]
 GO
 
 --- chi tiet hoa don
+
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

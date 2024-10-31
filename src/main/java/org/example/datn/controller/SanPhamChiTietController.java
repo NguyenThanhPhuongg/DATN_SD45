@@ -4,22 +4,24 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
-import org.example.datn.processor.SanPhamProcessor;
+import org.example.datn.processor.SanPhamChiTietProcessor;
+import org.example.datn.entity.SanPhamChiTiet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("SanPhamApi")
-@RequestMapping("/san-pham")
+@RestController
+@RequestMapping("/spct")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SanPhamController {
+public class SanPhamChiTietController {
 
     @Autowired
-    SanPhamProcessor processor;
+    SanPhamChiTietProcessor processor;
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResult> getById(@PathVariable Long id) {
@@ -32,12 +34,12 @@ public class SanPhamController {
     }
 
     @PostMapping
-    public ResponseEntity<ServiceResult> add(@RequestBody SanPhamModel model) {
+    public ResponseEntity<ServiceResult> add(@RequestBody SanPhamChiTietModel model) {
         return ResponseEntity.ok(processor.save(model));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody SanPhamModel model) {
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody SanPhamChiTietModel model) {
         return ResponseEntity.ok(processor.update(id, model));
     }
 

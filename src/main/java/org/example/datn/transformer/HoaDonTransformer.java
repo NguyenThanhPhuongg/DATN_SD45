@@ -11,5 +11,6 @@ import org.springframework.stereotype.Component;
 public interface HoaDonTransformer {
     HoaDonModel toModel(HoaDon hoaDon);
 //    HoaDon toEntity(HoaDonRequest request);
+
 }
 

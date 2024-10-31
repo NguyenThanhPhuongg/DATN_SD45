@@ -21,4 +21,19 @@ public class SanPhamService {
         return repo.findByIdIn(ids);
     }
 
+    public List<SanPham> findAll() {
+        return repo.findAll();
+    }
+
+    public void save(SanPham sanPham) {
+        repo.save(sanPham);
+    }
+
+    public void update(SanPham sanPham) {
+        repo.save(sanPham); // save() sẽ tự động cập nhật nếu đã có id
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
+    }
 }
