@@ -47,19 +47,47 @@
             margin-top: 20px;
         }
 
-        .address-item {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
         .address-item h4 {
             margin: 0 0 5px 0;
         }
 
         .address-item p {
             margin: 0;
+        }
+        .address-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .address-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .address-info {
+            flex-grow: 1;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 10px; /* Hiển thị các nút bên cạnh nhau */
+            align-items: center;
+        }
+
+        button.edit-address-btn,
+        button.delete-address-btn,
+        button.default-address-btn {
+            background-color: #fff; /* Khung không màu cam */
+            color: #ff5722;
+            border: 2px solid #ff5722;
+            padding: 10px 20px;
+            border-radius: 4px; /* Bo góc */
+            cursor: pointer;
         }
 
     </style>
@@ -374,7 +402,7 @@
     // Hàm để gọi API lấy danh sách địa chỉ
     async function layDanhSachDiaChi() {
         const token = localStorage.getItem('token');
-        const response = await fetch('/dia-chi/get', {
+        const response = await fetch('/dia-chi/get-list', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -382,7 +410,7 @@
         });
         if (response.ok) {
             const data = await response.json();
-            return data.listData; // Điều chỉnh theo cấu trúc phản hồi API của bạn
+            return data.data; // Điều chỉnh theo cấu trúc phản hồi API của bạn
         } else {
             console.error('Lỗi khi lấy danh sách địa chỉ');
         }
@@ -394,20 +422,42 @@
         const addressListContainer = document.getElementById('address-list');
         addressListContainer.innerHTML = ''; // Xóa nội dung cũ
 
-        if (diaChiList) {
+        if (diaChiList && diaChiList.length > 0) {
             diaChiList.forEach(diaChi => {
                 const addressItem = document.createElement('div');
                 addressItem.classList.add('address-item');
                 addressItem.innerHTML = `
-                <h4>${diaChi.hoVaTen} (+${diaChi.maQuocGia}) ${diaChi.soDienThoai}</h4>
-                <p>${diaChi.diaChi}</p>
-                <p>${diaChi.phuongXa}, ${diaChi.quanHuyen}, ${diaChi.tinhThanhPho}</p>
+                <div class="address-content">
+                    <div class="address-info">
+                        <h4>${diaChi.hoTen} ${diaChi.sdt}</h4>
+                        <p>${diaChi.diaChi}</p>
+                        <p>${diaChi.thanhPho}, ${diaChi.quocGia}</p>
+                    </div>
+                    <div class="address-actions">
+                        <button class="edit-address-btn" onclick="chinhSuaDiaChi(${diaChi.id})">Chỉnh sửa</button>
+                        <button class="delete-address-btn" onclick="xoaDiaChi(${diaChi.id})">Xóa</button>
+                        <button class="default-address-btn" onclick="thietLapMacDinh(${diaChi.id})">Thiết lập mặc định</button>
+                    </div>
+                </div>
             `;
                 addressListContainer.appendChild(addressItem);
             });
         } else {
             addressListContainer.innerHTML = '<p>Không có địa chỉ nào.</p>';
         }
+    }
+
+
+    // Hàm để chỉnh sửa địa chỉ (Cần triển khai thêm chi tiết)
+    function chinhSuaDiaChi(id) {
+        // Thêm code xử lý chỉnh sửa địa chỉ ở đây
+        alert('Chỉnh sửa địa chỉ với ID: ' + id);
+    }
+
+    // Hàm để thiết lập địa chỉ mặc định (Cần triển khai thêm chi tiết)
+    function thietLapMacDinh(id) {
+        // Thêm code xử lý thiết lập địa chỉ mặc định ở đây
+        alert('Thiết lập địa chỉ mặc định với ID: ' + id);
     }
 
     // Gọi hàm hiển thị danh sách địa chỉ khi form "Địa chỉ" được kích hoạt
@@ -421,7 +471,7 @@
 
     // Gán sự kiện click cho nút "Thêm địa chỉ mới"
     document.getElementById('add-address-button').addEventListener('click', function() {
-        // Code to handle adding a new address can go here
+        // Code để xử lý thêm địa chỉ mới có thể đặt ở đây
         hienThiThongBao('Chức năng Thêm địa chỉ mới sẽ được triển khai.');
     });
 
