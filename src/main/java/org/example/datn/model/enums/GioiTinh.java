@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public enum GioiTinh {
-    MALE("Nam"), FEMALE("Nữ");
-
-    String text;
+    NAM, NU;
 }
+

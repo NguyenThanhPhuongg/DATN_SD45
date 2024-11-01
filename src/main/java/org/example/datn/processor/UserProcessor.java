@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserProcessor {
 
-   final UserTransformer userTransformer;
+    final UserTransformer userTransformer;
     UserService userService;
     ProfileTransformer profileTransformer;
     ProfileService profileService;
@@ -85,6 +85,13 @@ public class UserProcessor {
     public List<UserModel> findByIdIn(List<Long> ids) {
         var userModel = userService.findByIdIn(ids).stream().map(mapper()).collect(Collectors.toList());
         return userModel;
+    }
+
+    public ServiceResult get(UserAuthentication ua) {
+        var model = userService.findById(ua.getPrincipal())
+                .map(mapper())
+                .orElseThrow(() -> new EntityNotFoundException("not.fond"));
+        return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public List<UserModel> findAll(String username) {
