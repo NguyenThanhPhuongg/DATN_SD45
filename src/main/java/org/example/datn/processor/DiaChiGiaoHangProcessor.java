@@ -26,27 +26,27 @@ public class DiaChiGiaoHangProcessor {
     private DiaChiGiaoHangService service;
 
     @Autowired
-    private DiaChiGiaoHangTransformer transformer;
+    private DiaChiGiaoHangTransformer diaChiGiaoHangTransformer;
 
     @Autowired
     private UserProcessor userProcessor;
 
     public ServiceResult getById(Long id) {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
-        var model = transformer.toModel(entity);
-        var user = userProcessor.findById(entity.getId());
+        var model = diaChiGiaoHangTransformer.toModel(entity);
+        var user = userProcessor.findById(entity.getIdNguoiDung());
         model.setUserModel(user);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public ServiceResult create(DiaChiGiaoHangRequest request, UserAuthentication ua) {
-        var a = transformer.toEntity(request);
+        var a = diaChiGiaoHangTransformer.toEntity(request);
         a.setIdNguoiDung(ua.getPrincipal());
         service.save(a);
         return new ServiceResult();
     }
 
-    public ServiceResult update(Long id, DiaChiGiaoHangRequest request, UserAuthentication ua) {
+    public ServiceResult update(Long id, DiaChiGiaoHangRequest request) {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
         entity.setHoTen(request.getHoTen());
         entity.setSdt(request.getSdt());
@@ -105,13 +105,24 @@ public class DiaChiGiaoHangProcessor {
 
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult insert(DiaChiGiaoHangRequest request, UserAuthentication ua) {
-        var entity = transformer.toEntity(request);
+        var entity = diaChiGiaoHangTransformer.toEntity(request);
         entity.setIdNguoiDung(ua.getPrincipal());
         entity.setTrangThai(0);
         entity.setNgayTao(LocalDateTime.now());
         entity.setNgayCapNhat(LocalDateTime.now());
         entity.setNguoiTao(ua.getPrincipal());
         entity.setNguoiCapNhat(ua.getPrincipal());
+        service.save(entity);
+        return new ServiceResult();
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult changeDefault(Long id) {
+        service.findByTrangThaiDefault(SystemConstant.DEFAULT).forEach(diaChiGiaoHang -> {
+            diaChiGiaoHang.setTrangThai(SystemConstant.UNDEFAULT);
+        });
+        var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
+        entity.setTrangThai(SystemConstant.DEFAULT);
         service.save(entity);
         return new ServiceResult();
     }
