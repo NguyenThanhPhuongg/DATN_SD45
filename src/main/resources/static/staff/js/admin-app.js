@@ -111,7 +111,7 @@ app.config(function ($routeProvider) {
         /// Bán tại quầy
         .when("/bhtq", {
             templateUrl: "asset/banhang/banhang.html",
-            controller: "hoadon-ctrl"
+            controller: "banhang-ctrl"
         })
 
         /// hóa đơn
