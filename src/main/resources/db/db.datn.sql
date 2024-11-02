@@ -109,7 +109,7 @@ CREATE TABLE [thong_tin_ca_nhan]
     [sdt] NVARCHAR(20),
     [avatar] NVARCHAR(255),
     [dia_chi] NVARCHAR(255),
-    [gioi_tinh] INT DEFAULT 1,
+    [gioi_tinh] NVARCHAR(10),
     [ngay_sinh] DATETIME,
     [cccd] NVARCHAR(20),
     [email] NVARCHAR(200),
