@@ -125,18 +125,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [otp]
+CREATE TABLE otp
 (
-    [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED 
-    (
-        [id] ASC
-    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
-    [code] NVARCHAR(200),
-    [receiver] NVARCHAR(200),
-    [loai] INT,
-    [nguoi_tao] BIGINT,
-    [nguoi_cap_nhat] BIGINT
-) ON [PRIMARY];
+    id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,  -- Tạo cột id tự động tăng
+    code CHAR(8),                                   -- Cột code kiểu ký tự cố định
+    receiver VARCHAR(255),                          -- Cột receiver kiểu chuỗi biến
+    type VARCHAR(15),                               -- Cột type kiểu chuỗi biến
+    expired DATETIMEOFFSET,                         -- Cột expired kiểu timestamp với timezone
+    created DATETIMEOFFSET DEFAULT SYSDATETIME(),  -- Cột created với giá trị mặc định là thời gian hiện tại
+    modified DATETIMEOFFSET DEFAULT SYSDATETIME()  -- Cột modified với giá trị mặc định là thời gian hiện tại
+);
 GO
 
 --- OTP
@@ -144,16 +142,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [otp_retry]
+CREATE TABLE otp_retry
 (
-    [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED 
-    (
-        [id] ASC
-    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
-    [time] INT,
-    [nguoi_tao] BIGINT,
-    [nguoi_cap_nhat] BIGINT
-) ON [PRIMARY];
+    id VARCHAR(255) NOT NULL,                             -- Cột id kiểu chuỗi biến
+    times BIGINT,                                        -- Cột times kiểu số nguyên lớn
+    expired DATETIMEOFFSET,                              -- Cột expired kiểu timestamp với timezone
+    created DATETIMEOFFSET DEFAULT SYSDATETIME(),       -- Cột created với giá trị mặc định là thời gian hiện tại
+    modified DATETIMEOFFSET DEFAULT SYSDATETIME(),      -- Cột modified với giá trị mặc định là thời gian hiện tại
+    PRIMARY KEY (id)                                    -- Đặt id là khóa chính
+);
+
 GO
 
 --- Dia chi giao hang

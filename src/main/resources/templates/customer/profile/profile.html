@@ -838,7 +838,7 @@
                 <div class="actions">
                     ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
                     ${order.trangThai === 5 ? '<button class="cancel-details">Xem chi tiết hủy đơn</button>' : ''}
-                    ${order.trangThai === 1 ? '<button class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>' : ''}
+                    ${order.trangThai === 1 || order.trangThai === 0 ? '<button class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>' : ''}
                     ${order.trangThai === 6 ? `<div class="refund"><span class="refund-label">Số tiền hoàn lại:</span> <span class="refund-amount">₫${thanhTien}</span></div>` : ''}
                 </div>
             `;
