@@ -2,6 +2,7 @@ package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.DiaChiGiaoHang;
+import org.example.datn.exception.AccessDeniedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DiaChiGiaoHangRequest;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,19 +59,25 @@ public class DiaChiGiaoHangProcessor {
         return new ServiceResult();
     }
 
-    public ServiceResult deleteById(Long id) {
+    public ServiceResult deleteById(Long id) throws AccessDeniedException {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
+        if (entity.getTrangThai().equals(SystemConstant.DEFAULT)){
+            throw AccessDeniedException.of("Địa chỉ mặc định không được phép xóa!");
+        }
         service.delete(entity);
         return new ServiceResult();
     }
 
     public ServiceResult findByIdNguoiDung(UserAuthentication ua) {
         var list = service.findByIdNguoiDung(ua.getPrincipal());
-        var models = list.stream().map(this::mapToModel).collect(Collectors.toList());
+        var models = list.stream()
+                .sorted(Comparator.comparingInt(item -> item.getTrangThai() == 1 ? 0 : 1))
+                .map(this::mapToModel)
+                .collect(Collectors.toList());
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
-
     }
+
 
     public ServiceResult getActive(UserAuthentication ua) {
         var list = service.findByIdNguoiDungAndTrangThai(ua.getPrincipal(), SystemConstant.ACTIVE);

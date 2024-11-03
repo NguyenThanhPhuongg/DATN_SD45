@@ -18,14 +18,18 @@
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng */
         }
 
+        /* CSS cho sidebar */
         .sidebar {
-            width: 200px;
-            padding: 20px;
-            background-color: #f5f5f5;
-            text-align: left;
-            height: 800px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            width: auto; /* Chiều rộng tự động dựa trên nội dung */
+            min-width: 200px; /* Chiều rộng tối thiểu */
+            max-width: 300px; /* Chiều rộng tối đa */
+            overflow: auto; /* Thêm cuộn nếu nội dung vượt quá chiều rộng tối đa */
+            background-color: #f9f9f9; /* Màu nền cho sidebar */
+            border: 1px solid #ddd; /* Viền cho sidebar */
+            padding: 10px; /* Khoảng cách bên trong */
+            box-sizing: border-box; /* Bao gồm cả padding và border trong chiều rộng và chiều cao */
         }
+
 
         .user-icon {
             font-size: 50px;
@@ -193,7 +197,15 @@
         .sub-menu a:hover {
             background-color: #ff5722;
             color: #fff;
+            font-size: 14px;
         }
+        .sub-menu a {
+            display: block;
+            padding-left: 40px; /* Dịch chữ bên trong sang phải 20px */
+            text-decoration: none;
+            color: inherit;
+        }
+
 
         .sidebar a.active, .sidebar a:hover {
             background-color: #ff5722;
@@ -463,6 +475,69 @@
             color: #333;
         }
 
+        .refund {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .refund-label {
+            color: black;
+            margin-right: 5px;
+        }
+
+        .refund-amount {
+            color: red;
+            font-size: 20px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-size: 20px;
+        }
+
+
+
+        #orders-link {
+            display: flex;
+            align-items: center; #account-link, #orders-link {
+            font-size: 16px; /* Đặt cỡ chữ */
+        }
+            font-size: 16px; /* Đặt cỡ chữ */
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #orders-link .link-icon {
+            width: 20px;
+            height: 18px;
+            margin-right: 8px; /* Khoảng cách giữa hình ảnh và văn bản */
+        }
+        #account-link {
+            display: flex;
+            align-items: center;
+            font-size: 16px; /* Đặt cỡ chữ */
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #account-link .link-icon {
+            width: 20px;
+            height: 18px;
+            margin-right: 8px; /* Khoảng cách giữa hình ảnh và văn bản */
+        }
+
 
 
     </style>
@@ -472,17 +547,26 @@
 <div th:include="homeHeader :: body"></div>
 <div class="container">
     <div class="sidebar">
-        <div class="user-icon"></div>
-        <div class="user-name">Tên người dùng</div>
-        <div class="edit-profile">Sửa hồ sơ</div>
-        <a href="#" id="account-link">Tài khoản của tôi</a>
+        <div class="user-info">
+            <img src="../images/user-icon.png" alt="User Icon" class="user-icon"/>
+            <div class="user-name" id="user-name">Tên người dùng</div>
+        </div>
+
+        <a href="#" id="account-link">
+            <img src="https://down-vn.img.susercontent.com/file/ba61750a46794d8847c3f463c5e71cc4" alt="Icon" class="link-icon">
+            Tài khoản của tôi
+        </a>
         <div class="sub-menu" id="account-submenu" style="display:none;">
             <a href="#" id="profile-link">Hồ sơ</a>
             <a href="#" id="change-password-link">Đổi mật khẩu</a>
             <a href="#" id="address-link">Địa chỉ</a>
             <a href="#">Tích điểm</a>
         </div>
-        <a href="#" id="orders-link">Đơn mua</a>
+        <a href="#" id="orders-link">
+            <img src="https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078" alt="Icon" class="link-icon">
+            Đơn mua
+        </a>
+
     </div>
     <div class="content">
         <div id="profile-form" class="tabs active">
@@ -572,7 +656,7 @@
                 <!-- Danh sách địa chỉ sẽ được hiển thị tại đây -->
             </div>
             <div id="add-address-form" style="display: none;">
-                <h3>Thêm mới địa chỉ</h3>
+                <h3 id="form-title">Thêm mới địa chỉ</h3>
                 <label for="hoTen">Họ và tên:</label>
                 <input type="text" id="hoTen" name="hoTen"><br><br>
                 <label for="diaChi">Địa chỉ:</label>
@@ -583,8 +667,13 @@
                 <input type="text" id="thanhPho" name="thanhPho"><br><br>
                 <label for="quocGia">Quốc gia:</label>
                 <input type="text" id="quocGia" name="quocGia"><br><br>
-                <button onclick="submitNewAddress()">Lưu</button>
+                <button id="save-button" onclick="submitNewAddress()">Lưu</button>
                 <button onclick="cancelNewAddress()">Hủy</button>
+            </div>
+            <div id="confirm-dialog" class="confirm-dialog" style="display: none;">
+                <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+                <button id="confirm-yes">Có</button>
+                <button id="confirm-no">Không</button>
             </div>
         </div>
 
@@ -593,8 +682,8 @@
                 <ul>
                     <li><a href="#" class="tab-link" data-status="null">Tất cả</a></li>
                     <li><a href="#" class="tab-link" data-status="1">Chờ thanh toán</a></li>
-                    <li><a href="#" class="tab-link" data-status="3">Vận chuyển</a></li>
                     <li><a href="#" class="tab-link" data-status="2">Chờ giao hàng</a></li>
+                    <li><a href="#" class="tab-link" data-status="3">Vận chuyển</a></li>
                     <li><a href="#" class="tab-link" data-status="4">Hoàn thành</a></li>
                     <li><a href="#" class="tab-link" data-status="5">Đã hủy</a></li>
                     <li><a href="#" class="tab-link" data-status="6">Trả hàng/Hoàn tiền</a></li>
@@ -609,11 +698,11 @@
 </div>
 
 <div id="notification" class="notification"></div>
-<div id="confirm-dialog" class="confirm-dialog" style="display: none;">
-    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
-    <button id="confirm-yes">Có</button>
-    <button id="confirm-no">Không</button>
-</div>
+<!--<div id="confirm-dialog" class="confirm-dialog" style="display: none;">-->
+<!--    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>-->
+<!--    <button id="confirm-yes">Có</button>-->
+<!--    <button id="confirm-no">Không</button>-->
+<!--</div>-->
 
 
 
@@ -621,6 +710,39 @@
 <script>
     let diaChiIdToHandle = null; // Biến lưu trữ ID địa chỉ cho hành động cần thực hiện
     let confirmAction = null; // Biến lưu trữ loại hành động cần xác nhận
+    let isEditing = false;
+
+
+    // Hàm để lấy và giải mã token
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        } catch (error) {
+            console.error('Lỗi khi giải mã token:', error);
+            return null;
+        }
+    }
+
+    // Hàm để cập nhật thông tin người dùng
+    function updateUserInfo() {
+        const token = localStorage.getItem('token');
+        const userInfo = parseJwt(token);
+
+        if (userInfo) {
+            const userName = userInfo.fullName;
+
+            document.getElementById('user-name').innerText = userName;
+        }
+    }
+
+    // Gọi hàm updateUserInfo để cập nhật thông tin người dùng khi trang tải
+    document.addEventListener('DOMContentLoaded', updateUserInfo);
 
     document.getElementById('account-link').addEventListener('click', function () {
         var submenu = document.getElementById('account-submenu');
@@ -689,7 +811,7 @@
         3: 'VẬN CHUYỂN',
         4: 'HOÀN THÀNH',
         5: 'ĐÃ HỦY',
-        6: 'TRẢ HÀNG'
+        6: 'ĐÃ HOÀN TIỀN'
     };
 
     // Hàm để hiển thị dữ liệu đơn hàng lên giao diện
@@ -704,17 +826,20 @@
 
                 const trangThaiMoTa = trangThaiMap[order.trangThai] || 'Không xác định';
                 const thanhTien = order.soLuong * order.gia;
+
                 orderItem.innerHTML = `
                 <h3>Sản phẩm: ${order.sanPhamChiTietModel.sanPhamModel.ten} <span class="status">${trangThaiMoTa}</span></h3>
-                 <div class="classification">
+                <div class="classification">
                     <p>Phân loại hàng: màu ${order.sanPhamChiTietModel.mauSac.ten}, size ${order.sanPhamChiTietModel.size.ten}</p>
                     <p class="price">₫${order.gia}</p>
                 </div>
-                 <p>x${order.soLuong}</p>
-                 <div class="total">Thành tiền: ₫${thanhTien}</div>
-                  <div class="actions">
-                    <button class="buy-again">Mua lại</button>
-                    <button class="cancel-details">Xem chi tiết hủy đơn</button>
+                <p>x${order.soLuong}</p>
+                ${order.trangThai !== 6 ? `<div class="total">Thành tiền: ₫${thanhTien}</div>` : ''}
+                <div class="actions">
+                    ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
+                    ${order.trangThai === 5 ? '<button class="cancel-details">Xem chi tiết hủy đơn</button>' : ''}
+                    ${order.trangThai === 1 ? '<button class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>' : ''}
+                    ${order.trangThai === 6 ? `<div class="refund"><span class="refund-label">Số tiền hoàn lại:</span> <span class="refund-amount">₫${thanhTien}</span></div>` : ''}
                 </div>
             `;
                 orderContents.appendChild(orderItem); // Thêm thông tin đơn hàng vào nội dung hiển thị
@@ -723,6 +848,7 @@
             orderContents.innerHTML = '<p>Không có đơn hàng nào.</p>'; // Hiển thị thông báo nếu không có đơn hàng
         }
     }
+
 
     // Gọi dữ liệu đơn hàng khi tab "Tất cả" được kích hoạt lần đầu
     document.querySelector('.tab-link[data-status="null"]').classList.add('active');
@@ -948,6 +1074,24 @@
         document.getElementById('add-address-form').style.display = 'block'; // Hiển thị form thêm mới
     });
 
+    // Đảm bảo rằng DOM đã tải xong trước khi gán sự kiện
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('add-address-button').addEventListener('click', function() {
+            document.getElementById('address-list').style.display = 'none'; // Ẩn danh sách địa chỉ
+            document.getElementById('add-address-form').style.display = 'block'; // Hiển thị form thêm mới
+            document.getElementById('form-title').innerText = 'Thêm mới địa chỉ';
+            document.getElementById('save-button').onclick = submitNewAddress;
+            isEditing = false; // Đặt lại trạng thái
+        });
+
+        document.getElementById('confirm-yes').addEventListener('click', xacNhanHanhDong);
+        document.getElementById('confirm-no').addEventListener('click', function() {
+            document.getElementById('confirm-dialog').style.display = 'none';
+            diaChiIdToHandle = null; // Reset biến lưu trữ ID
+            confirmAction = null; // Reset biến lưu trữ hành động
+        });
+    });
+
 
         // Hàm để xóa địa chỉ
     async function xoaDiaChi() {
@@ -959,7 +1103,7 @@
                 hienThiThongBao('Địa chỉ đã được xóa thành công!');
                 hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi xóa thành công
             } else {
-                console.error('Lỗi khi xóa địa chỉ');
+                hienThiThongBao('Lỗi khi xóa địa chỉ, vui lòng kim tra lại!', false);
             }
             document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
@@ -977,6 +1121,7 @@
                 hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi thay đổi mặc định thành công
             } else {
                 console.error('Lỗi khi thiết lập địa chỉ mặc định');
+                hienThiThongBao('Lỗi khi thiết lập địa chỉ mặc định, vui lòng kim tra lại!', false);
             }
             document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
@@ -1019,6 +1164,9 @@
     });
 
 
+
+
+
     // Hàm để hủy thêm mới địa chỉ
     function cancelNewAddress() {
         document.getElementById('add-address-form').style.display = 'none'; // Ẩn form thêm mới
@@ -1036,10 +1184,12 @@
         errorElements.forEach(el => el.remove());
     }
 
-    // Hàm để xử lý khi gửi form thêm mới địa chỉ
+    // Hàm xử lý khi gửi form thêm mới địa chỉ
     async function submitNewAddress() {
-        clearFormErrors(); // Xóa tất cả lỗi trước khi kiểm tra mới
+        // Xóa tất cả lỗi trước khi kiểm tra mới
+        clearFormErrors();
 
+        // Lấy giá trị từ các input
         const hoTen = document.getElementById('hoTen').value.trim();
         const diaChi = document.getElementById('diaChi').value.trim();
         const sdt = document.getElementById('sdt').value.trim();
@@ -1048,6 +1198,7 @@
 
         let valid = true;
 
+        // Kiểm tra hợp lệ
         if (!hoTen || hoTen.length > 100) {
             showError('hoTen', 'Họ tên không được để trống và không vượt quá 100 ký tự.');
             valid = false;
@@ -1079,17 +1230,32 @@
             quocGia
         };
 
-        const response = await fetch('/dia-chi/insert', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(newAddress)
-        });
+        // Gọi API tương ứng dựa trên trạng thái (thêm mới hoặc chỉnh sửa)
+        let response;
+        if (isEditing) {
+            response = await fetch(`/dia-chi/${diaChiIdToHandle}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(newAddress)
+            });
+        } else {
+            response = await fetch('/dia-chi/insert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(newAddress)
+            });
+        }
 
+        // Xử lý phản hồi từ API
         if (response.ok) {
-            hienThiThongBao('Địa chỉ mới đã được thêm thành công!');
+            hienThiThongBao(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!');
+            // Xóa các giá trị đã nhập trong form sau khi thêm thành công
             document.getElementById('hoTen').value = '';
             document.getElementById('diaChi').value = '';
             document.getElementById('sdt').value = '';
@@ -1098,11 +1264,43 @@
             cancelNewAddress(); // Ẩn form và hiển thị lại danh sách địa chỉ
             hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ
         } else {
-            console.error('Lỗi khi thêm địa chỉ mới');
+            console.error('Lỗi khi thêm hoặc cập nhật địa chỉ');
             const errorData = await response.json();
             hienThiThongBao(`Lỗi: ${errorData.message}`);
         }
     }
+
+    async function chinhSuaDiaChi(id) {
+        // Hiển thị form trước khi gọi API lấy thông tin địa chỉ
+        document.getElementById('address-list').style.display = 'none'; // Ẩn danh sách địa chỉ
+        document.getElementById('add-address-form').style.display = 'block'; // Hiển thị form thêm mới
+        document.getElementById('form-title').innerText = 'Chỉnh sửa địa chỉ';
+        document.getElementById('save-button').onclick = submitNewAddress;
+        document.getElementById('add-address-button').style.display = 'none';
+        isEditing = true;
+        diaChiIdToHandle = id;
+
+        const response = await fetch(`/dia-chi/${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const diaChi = data.data;
+            document.getElementById('hoTen').value = diaChi.hoTen;
+            document.getElementById('diaChi').value = diaChi.diaChi;
+            document.getElementById('sdt').value = diaChi.sdt;
+            document.getElementById('thanhPho').value = diaChi.thanhPho;
+            document.getElementById('quocGia').value = diaChi.quocGia;
+        } else {
+            console.error('Lỗi khi lấy thông tin địa chỉ');
+        }
+    }
+
+
     // Hàm để hiển thị thông báo lỗi dưới input
     function showError(inputId, message) {
         const inputElement = document.getElementById(inputId);

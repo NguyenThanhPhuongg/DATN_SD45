@@ -3,6 +3,7 @@ package org.example.datn.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.exception.AccessDeniedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DiaChiGiaoHangRequest;
@@ -37,7 +38,7 @@ public class DiaChiGiaoHangController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceResult> deleteById(@PathVariable Long id) {
+    public ResponseEntity<ServiceResult> deleteById(@PathVariable Long id) throws AccessDeniedException {
         return ResponseEntity.ok(processor.deleteById(id));
     }
 
