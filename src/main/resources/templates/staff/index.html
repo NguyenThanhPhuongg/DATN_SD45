@@ -63,6 +63,57 @@
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
         crossorigin="anonymous"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="module">
+    // Import các hàm cần thiết từ SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
+    // Cấu hình Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyANR8qTVpHAtEFuX_r6IfQpRUrG5dDj7B8",
+        authDomain: "datn-b37cf.firebaseapp.com",
+        databaseURL: "https://datn-b37cf-default-rtdb.firebaseio.com",
+        projectId: "datn-b37cf",
+        storageBucket: "datn-b37cf.firebasestorage.app",
+        messagingSenderId: "400761989681",
+        appId: "1:400761989681:web:be0412e159f3c923b94310",
+        measurementId: "G-D9XQ6JY5L1"
+    };
+
+    // Khởi tạo Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Tham chiếu tới nhánh `qrResults`
+    const qrResultsRef = ref(database, 'qrResults');
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString(); // Định dạng theo múi giờ hệ thống của người dùng
+    }
+     let results = {}
+    // Lắng nghe dữ liệu từ `qrResults`
+    onValue(qrResultsRef, (snapshot) => {
+        results = snapshot.val() || {};
+        const displayResultElement = document.getElementById('display-result');
+        // Kiểm tra nếu có kết quả nào không
+        if (results) {
+            // displayResultElement.innerHTML = ''; // Xóa nội dung cũ
+            // Duyệt qua từng mục kết quả và hiển thị
+            Object.values(results).forEach((result) => {
+                const resultId = `display-result-${result.id_hd}`;
+                let resultContainer = document.getElementById(resultId);
+                const resultText = `Kết quả: ${result.result} - Thời gian: ${formatTimestamp(result.timestamp)} - ID hóa đơn: ${result.id_hd}`;
+                const resultElement = document.createElement('p');
+                resultElement.className = `result-${result.id_hd}`;
+                resultElement.textContent = resultText;
+                resultContainer.appendChild(resultElement);
+            });
+        } else {
+            displayResultElement.innerText = 'Không có kết quả nào được lưu.';
+        }
+    });
+
+
+</script>
 </body>
 </html>
