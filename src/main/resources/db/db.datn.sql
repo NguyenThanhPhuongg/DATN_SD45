@@ -127,13 +127,13 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE otp
 (
-    id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,  -- Tạo cột id tự động tăng
-    code CHAR(8),                                   -- Cột code kiểu ký tự cố định
-    receiver VARCHAR(255),                          -- Cột receiver kiểu chuỗi biến
-    type VARCHAR(15),                               -- Cột type kiểu chuỗi biến
-    expired DATETIMEOFFSET,                         -- Cột expired kiểu timestamp với timezone
-    created DATETIMEOFFSET DEFAULT SYSDATETIME(),  -- Cột created với giá trị mặc định là thời gian hiện tại
-    modified DATETIMEOFFSET DEFAULT SYSDATETIME()  -- Cột modified với giá trị mặc định là thời gian hiện tại
+    id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    code CHAR(8),
+    receiver VARCHAR(255),
+    type VARCHAR(15),
+    expired DATETIME,
+    created DATETIME DEFAULT GETDATE(),
+    modified DATETIME DEFAULT GETDATE()
 );
 GO
 
@@ -144,12 +144,12 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE otp_retry
 (
-    id VARCHAR(255) NOT NULL,                             -- Cột id kiểu chuỗi biến
-    times BIGINT,                                        -- Cột times kiểu số nguyên lớn
-    expired DATETIMEOFFSET,                              -- Cột expired kiểu timestamp với timezone
-    created DATETIMEOFFSET DEFAULT SYSDATETIME(),       -- Cột created với giá trị mặc định là thời gian hiện tại
-    modified DATETIMEOFFSET DEFAULT SYSDATETIME(),      -- Cột modified với giá trị mặc định là thời gian hiện tại
-    PRIMARY KEY (id)                                    -- Đặt id là khóa chính
+    id VARCHAR(255) NOT NULL,
+    times BIGINT,
+    expired DATETIME,
+    created DATETIME DEFAULT GETDATE(),
+    modified DATETIME DEFAULT GETDATE(),
+    PRIMARY KEY (id)
 );
 
 GO
