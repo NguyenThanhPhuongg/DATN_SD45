@@ -6,6 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -63,6 +64,11 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
+
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:D:/FPT Polytechnic/DUANTOTNGHIEP/DATN_SD45/src/main/resources/static/images/")
+                .setCacheControl(CacheControl.noCache());
     }
+
 
 }

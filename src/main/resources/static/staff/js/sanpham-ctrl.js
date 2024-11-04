@@ -6,143 +6,275 @@ app.controller("sanpham-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.danhmuc = [];
     $scope.thuonghieu = [];
     $scope.chatlieu = [];
-    $scope.filteredChatLieu = []; // Mảng chứa danh sách chất liệu được lọc theo idCha
+    $scope.filteredChatLieu = [];
     $scope.filteredDanhMuc = [];
-    $scope.filteredSize = [];
-    $scope.filteredMauSac = [];
     $scope.filteredSizes = [];
     $scope.filteredColors = [];
+    $scope.productDetails = [];
 
+    // Initialize to load lists and set default selections
     $scope.initialize = function () {
-        // Tải danh sách danh mục, thương hiệu, chất liệu
+
         $http.get("/rest/danhmuc").then(resp => {
             $scope.danhmuc = resp.data.data;
-            console.log("Danh mục đã tải: ", $scope.danhmuc);
+            $scope.filterDanhMuc();
         });
 
         $http.get("/rest/thuonghieu").then(resp => {
             $scope.thuonghieu = resp.data.data;
-            console.log("Danh mục đã tải: ", $scope.thuonghieu);
         });
 
         $http.get("/chat-lieu/get-list").then(resp => {
             $scope.chatlieu = resp.data.data;
-            console.log("Danh mục đã tải: ", $scope.chatlieu);
+            $scope.filterChatLieu();
         });
 
         $http.get("/size/get-list").then(resp => {
             $scope.size = resp.data.data;
-            console.log("Danh mục đã tải: ", $scope.size);
+            $scope.filterSizesByIdCha();
         });
 
         $http.get("/mau-sac/get-list").then(resp => {
             $scope.mausac = resp.data.data;
-            console.log("Danh mục đã tải: ", $scope.mausac);
+            $scope.filterColorsByIdCha();
         });
+
     };
 
+    // Filter functions
     $scope.filterChatLieu = function () {
         if ($scope.selectedIdChaCL) {
-            // Lọc danh sách chatlieu có idCha trùng với selectedIdCha
             $scope.filteredChatLieu = $scope.chatlieu.filter(c => c.idCha == $scope.selectedIdChaCL);
         } else {
-            // Nếu chưa chọn idCha thì làm rỗng filteredChatLieu
-            $scope.filteredChatLieu = [];
+            $scope.filteredChatLieu = $scope.chatlieu;
         }
     };
 
-    $scope.filterMauSac = function () {
-        if ($scope.selectedIdChaMS) {
-            // Lọc danh sách chatlieu có idCha trùng với selectedIdCha
-            $scope.filteredMauSac = $scope.mausac.filter(c => c.idCha == $scope.selectedIdChaMS);
-        } else {
-            // Nếu chưa chọn idCha thì làm rỗng filteredChatLieu
-            $scope.filteredMauSac = [];
-        }
-    };
-    $scope.filterSize = function () {
-        if ($scope.selectedIdChaS) {
-            // Lọc danh sách chatlieu có idCha trùng với selectedIdCha
-            $scope.filteredSize = $scope.size.filter(c => c.idCha == $scope.selectedIdChaS);
-        } else {
-            // Nếu chưa chọn idCha thì làm rỗng filteredChatLieu
-            $scope.filteredSize = [];
-        }
-    };
     $scope.filterDanhMuc = function () {
         if ($scope.selectedIdChaDM) {
-            // Lọc danh sách chatlieu có idCha trùng với selectedIdCha
             $scope.filteredDanhMuc = $scope.danhmuc.filter(c => c.idCha == $scope.selectedIdChaDM);
         } else {
-            // Nếu chưa chọn idCha thì làm rỗng filteredChatLieu
-            $scope.filteredDanhMuc = [];
+            $scope.filteredDanhMuc = $scope.danhmuc;
         }
     };
 
-    // Lọc sizes dựa vào idCha
     $scope.filterSizesByIdCha = function () {
-        $scope.filteredSizes = $scope.size.filter(function (size) {
-            return size.idCha == $scope.selectedSizeIdCha;
-        });
+        if ($scope.selectedSizeIdCha) {
+            $scope.filteredSizes = $scope.size.filter(size => size.idCha == $scope.selectedSizeIdCha);
+        } else {
+            $scope.filteredSizes = $scope.size;
+        }
     };
 
-    // Lọc colors dựa vào idCha
     $scope.filterColorsByIdCha = function () {
-        $scope.filteredColors = $scope.mausac.filter(function (mausac) {
-            return mausac.idCha == $scope.selectedColorIdCha;
+        if ($scope.selectedColorIdCha) {
+            $scope.filteredColors = $scope.mausac.filter(mausac => mausac.idCha == $scope.selectedColorIdCha);
+        } else {
+            $scope.filteredColors = $scope.mausac;
+        }
+    };
+
+    $scope.filterColorsAndSizes = function () {
+        $scope.productDetails = [];
+        const selectedColors = $scope.filteredColors.filter(color => color.selected);
+        const selectedSizes = $scope.filteredSizes.filter(size => size.selected);
+
+        selectedColors.forEach(function (color) {
+            selectedSizes.forEach(function (size) {
+                $scope.productDetails.push({
+                    idSize: size.id,
+                    idMauSac: color.id,
+                    soLuong: 100,
+                    gia: 100000,
+                    ghiChu: '',
+                    size: size,
+                    mauSac: color
+                });
+            });
         });
     };
 
-    $scope.initialize();
-
-
-    // Hàm để thêm sản phẩm
-    $scope.addProduct = function () {
-        // Thêm sản phẩm
-        $http.post("/san-pham", $scope.form).then(function (response) {
-            if (response.data.status === "success") {
-                // Nếu thêm sản phẩm thành công, bạn có thể thêm SPCT ở đây
-                const sanPhamId = response.data.data.id; // Giả sử API trả về ID sản phẩm mới tạo
-                $scope.addProductDetails(sanPhamId);
-            } else {
-                // Nếu không thành công, hiển thị lỗi
-                swal("Thất bại!", response.data.message || "Không thể thêm sản phẩm.", "error");
-            }
-        }, function (error) {
-            // Xử lý lỗi ở đây
-            console.error("Error adding product: ", error);
-            swal("Thất bại!", "Đã có lỗi xảy ra. Vui lòng thử lại.", "error");
-        });
-    };
-
-    // Hàm để thêm sản phẩm chi tiết
-    $scope.addProductDetails = function (sanPhamId) {
-        const spct = {
-            idSanPham: sanPhamId,
-            idSize: $scope.form.idSize.id,
-            idMauSac: $scope.form.idMauSac.id,
-            soLuong: $scope.form.soLuong, // Bạn có thể cần thêm trường này vào form
-            gia: $scope.form.gia, // Giá từ form
-            ghiChu: $scope.form.ghiChu // Ghi chú từ form
+    $scope.reset = function () {
+        $scope.form = {
+            ten: '', // Đặt mặc định cho tên
+            moTa: '', // Đặt mặc định cho mô tả
+            gia: 100000, // Đặt mặc định cho giá
+            idDanhMuc: 1,
+            idThuongHieu: 1,
+            idChatLieu: 1,
+            xuatXu: '',
+            anh: ''
         };
 
-        // Gọi API để thêm sản phẩm chi tiết
-        $http.post("/spct", spct).then(function (response) {
-            if (response.data.status === "success") {
-                // Thông báo thành công
-                swal("Thành công!", "Sản phẩm chi tiết đã được thêm thành công!", "success");
-                $scope.resetForm(); // Đặt lại form
+    };
+
+    $scope.addProductWithDetails = function () {
+        // validate
+        $scope.error = {
+            ten: false,
+            gia: false,
+            moTa: false,
+            idDanhMuc: false,
+            idThuongHieu: false,
+            idChatLieu: false,
+            xuatXu: false,
+            anh: false
+        };
+        let isValid = true;
+
+        if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 250) {
+            $scope.error.ten = true;
+            isValid = false;
+        }
+        if (!$scope.form.moTa || $scope.form.moTa.length < 1 || $scope.form.moTa.length > 100) {
+            $scope.error.moTa = true;
+            isValid = false;
+        }
+        if (!$scope.form.gia || $scope.form.gia < 100000 || $scope.form.gia > 100000000) {
+            $scope.error.gia = true;
+            isValid = false;
+        }
+        if (!$scope.form.idDanhMuc) {
+            $scope.error.idDanhMuc = true;
+            isValid = false;
+        }
+        if (!$scope.form.idThuongHieu) {
+            $scope.error.idThuongHieu = true;
+            isValid = false;
+        }
+        if (!$scope.form.idChatLieu) {
+            $scope.error.idChatLieu = true;
+            isValid = false;
+        }
+        if (!$scope.form.xuatXu) {
+            $scope.error.xuatXu = true;
+            isValid = false;
+        }
+        if (!$scope.form.anh) {
+            $scope.error.anh = true;
+            isValid = false;
+        }
+        if (!isValid) {
+            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
+            return; // Ngừng thực hiện nếu không hợp lệ
+        }
+
+        // Tạo sản phẩm chính
+        const sanPham = {
+            ten: $scope.form.ten,
+            gia: $scope.form.gia,
+            moTa: $scope.form.moTa,
+            idDanhMuc: $scope.form.idDanhMuc,
+            idThuongHieu: $scope.form.idThuongHieu,
+            idChatLieu: $scope.form.idChatLieu,
+            xuatXu: $scope.form.xuatXu,
+            ma: Math.random().toString(36).substring(2, 12),
+            trangThai: 1,
+            ngayTao: new Date().toISOString(),
+            ngayCapNhat: new Date().toISOString(),
+            nguoiTao: 1,
+            nguoiCapNhat: 1,
+            anh: $scope.form.anh
+        };
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn sản phẩm này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                $http.post("/san-pham", sanPham).then(() => {
+                    // Sau khi thêm sản phẩm thành công, lấy sản phẩm mới nhất
+                    $scope.upLoadImage();  // Upload ảnh sau khi thêm sản phẩm xong
+                    $http.get("/san-pham").then(resp => {
+                        const dataArray = resp.data.data;
+                        if (Array.isArray(dataArray) && dataArray.length > 0) {
+                            const createdSanPham = dataArray[dataArray.length - 1];
+                            const sanPhamChiTietList = $scope.productDetails.map(detail => ({
+                                idSanPham: createdSanPham.id,
+                                idSize: detail.size.id,
+                                idMauSac: detail.mauSac.id,
+                                soLuong: detail.soLuong,
+                                gia: detail.gia,
+                                ghiChu: detail.ghiChu,
+                                trangThai: 1,
+                                ngayTao: new Date().toISOString(),
+                                ngayCapNhat: new Date().toISOString(),
+                                nguoiTao: 1,
+                                nguoiCapNhat: 1
+                            }));
+
+                            // Gửi từng sản phẩm chi tiết một
+                            const addDetailsPromises = sanPhamChiTietList.map(detail => $http.post("/spct", detail));
+
+                            Promise.all(addDetailsPromises).then(() => {
+                                $scope.initialize();
+                                $scope.reset();
+                                swal("Success!", "Thêm thành công", "success");
+                            }).catch(error => {
+                                console.error("Lỗi khi thêm chi tiết sản phẩm:", error);
+                                swal("Error!", "Lỗi khi thêm chi tiết sản phẩm:", "error");
+                            });
+                        } else {
+                            console("Không thể tìm thấy sản phẩm vừa tạo.");
+                            swal("Error!", "Không thể tìm thấy sản phẩm vừa tạo", "error");
+                        }
+                    }).catch(error => {
+                        console.error("Lỗi khi lấy sản phẩm mới nhất:", error);
+                        swal("Error!", "Lỗi khi lấy sản phẩm mới nhất", "error");
+                    });
+                }).catch(error => {
+                    console.error("Lỗi khi thêm sản phẩm:", error);
+                    swal("Error!", "Lỗi khi thêm sản phẩm", "error");
+                });
             } else {
-                swal("Thất bại!", response.data.message || "Không thể thêm sản phẩm chi tiết.", "error");
+                swal("Hủy cập nhật", "Thêm sản phẩm đã bị hủy", "error");
             }
-        }, function (error) {
-            console.error("Error adding product detail: ", error);
-            swal("Thất bại!", "Đã có lỗi xảy ra. Vui lòng thử lại.", "error");
         });
     };
 
-    // Hàm đặt lại form
-    $scope.resetForm = function () {
-        $scope.form = {}; // Đặt lại form về giá trị mặc định
+
+    $scope.upLoadImage = function () {
+        const input = document.getElementById('profileImage2');
+        if (input.files && input.files[0]) {
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+
+            $http.post("/file/upload", formData, {
+                headers: {'Content-Type': undefined}
+            }).then(resp => {
+                $scope.form.anh = resp.data.filePath;  // lưu đường dẫn vào form
+                document.getElementById("imagePath2").value = resp.data.filePath;  // hiển thị đường dẫn ở input
+            }).catch(error => {
+                console.error("Lỗi khi tải lên ảnh:", error);
+                alert("Có lỗi khi tải lên ảnh. Vui lòng kiểm tra lại.");
+            });
+        }
     };
+
+    document.getElementById('profileImage2').addEventListener('change', function (event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('previewImage2');
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // Hiển thị ảnh xem trước
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    $scope.removeProductDetail = function(detail) {
+        // Xóa sản phẩm chi tiết khỏi danh sách
+        const index = $scope.productDetails.indexOf(detail);
+        if (index > -1) {
+            $scope.productDetails.splice(index, 1); // Xóa sản phẩm chi tiết
+        }
+    };
+
+
+    $scope.initialize();
 });

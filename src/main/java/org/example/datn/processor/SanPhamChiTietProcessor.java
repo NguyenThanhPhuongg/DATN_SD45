@@ -35,11 +35,12 @@ public class SanPhamChiTietProcessor {
         var s = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết sản phẩm"));
         var size = sizeService.findById(s.getIdSize()).orElse(null);
         var mauSac = mauSacService.findById(s.getIdSize()).orElse(null);
+        var sanPham = sanPhamService.findById(s.getIdSanPham()).orElse(null);
         SanPhamChiTietModel model = new SanPhamChiTietModel();
         BeanUtils.copyProperties(s, model);
         model.setSize(size);
         model.setMauSac(mauSac);
-
+        model.setSanPham(sanPham);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 

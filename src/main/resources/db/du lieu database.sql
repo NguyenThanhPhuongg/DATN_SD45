@@ -293,9 +293,12 @@ select * from hoa_don
 select * from phuong_thuc_van_chuyen 
 select * from dia_chi_giao_hang 
 select * from nguoi_dung 
+select * from hinh_anh 
 
 update  danh_muc set ngay_tao = GETDATE() where id =1
 update  nguoi_dung set vaitro = 'CLIENT' where id =1
+
+DELETE FROM san_pham WHERE id = 20;
 
 SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
 

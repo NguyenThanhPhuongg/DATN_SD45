@@ -97,11 +97,11 @@ app.config(function ($routeProvider) {
         /// sản phâm
         .when("/listsanpham", {
             templateUrl: "asset/sanpham/listsanpham.html",
-            controller: "sanpham1-ctrl"
+            controller: "spct-ctrl"
         })
         .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/quanlyspct.html",
-            controller: "spct-ctrl"
+            controller: "quanlyspct-ctrl"
         })
         .when("/sanpham", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/sanpham.html",
@@ -111,7 +111,7 @@ app.config(function ($routeProvider) {
         /// Bán tại quầy
         .when("/bhtq", {
             templateUrl: "asset/banhang/banhang.html",
-            controller: "hoadon-ctrl"
+            controller: "banhang-ctrl"
         })
 
         /// hóa đơn

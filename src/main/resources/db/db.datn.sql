@@ -525,6 +525,7 @@ CREATE TABLE [san_pham]
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
 GO
+--- DROP TABLE [chi_tiet_san_pham];
 
 --- Chi tiet San pham
 SET ANSI_NULLS ON
