@@ -100,6 +100,10 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/sanpham/listsanpham.html",
             controller: "spct-ctrl"
         })
+        .when("/listsanphaman", {
+            templateUrl: "asset/sanpham/listsanphaman.html",
+            controller: "spct-ctrl"
+        })
         .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/quanlyspct.html",
             controller: "quanlyspct-ctrl"

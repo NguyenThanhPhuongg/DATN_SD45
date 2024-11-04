@@ -38,6 +38,7 @@ app.controller("sanpham-ctrl", function ($scope, $http, $rootScope, $location) {
             $scope.mausac = resp.data.data;
             $scope.filterColorsByIdCha();
         });
+        $scope.productDetails = []; // Khởi tạo mảng sản phẩm chi tiết
 
     };
 

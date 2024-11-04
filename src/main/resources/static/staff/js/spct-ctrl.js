@@ -31,8 +31,36 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
             this.updateItems();
         }, updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 1;
                 const matchesSearch = item.ma.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
-                return matchesSearch && $scope.filterByAttributes(item);
+                return matchesSearch && $scope.filterByAttributes(item) && statusMatches;
+            });
+            this.count = Math.ceil(filteredItems.length / this.size);
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+        }
+    };
+    $scope.pager2 = {
+        page: 0, size: 5, items: [], count: 0, first: function () {
+            this.page = 0;
+            this.updateItems();
+        }, prev: function () {
+            if (this.page > 0) {
+                this.page--;
+                this.updateItems();
+            }
+        }, next: function () {
+            if (this.page < this.count - 1) {
+                this.page++;
+                this.updateItems();
+            }
+        }, last: function () {
+            this.page = this.count - 1;
+            this.updateItems();
+        }, updateItems: function () {
+            const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 2;
+                const matchesSearch = item.ma.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                return matchesSearch && $scope.filterByAttributes(item) && statusMatches;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
@@ -49,6 +77,7 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                 ...item, ngayTao: new Date(item.ngayTao), ngayCapNhat: new Date(item.ngayCapNhat)
             }));
             $scope.pager.updateItems();
+            $scope.pager2.updateItems();
         }).catch(error => console.error("Lỗi khi tải danh mục: ", error));
 
         $http.get("/rest/danhmuc").then(resp => {
@@ -140,7 +169,7 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật thương hiệu này không?",
+            text: "Bạn có chắc muốn cập nhật sản phẩm này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -165,9 +194,56 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
+    $scope.update2 = function (item) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn ẩn sản phẩm này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                item.trangThai = 2; // Cập nhật trạng thái
+                $http.put(`/san-pham/${item.id}`, item).then(resp => {
+                    $scope.initialize(); // Tải lại dữ liệu
+                    swal("Success!", "Ẩn sản phẩm thành công", "success");
+                }).catch(error => {
+                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
+                    console.log("Error: ", error);
+                });
+            } else {
+                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
+            }
+        });
+    };
+
+    $scope.update1 = function (item) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn hiện sản phẩm này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                item.trangThai = 1; // Cập nhật trạng thái
+                $http.put(`/san-pham/${item.id}`, item).then(resp => {
+                    $scope.initialize(); // Tải lại dữ liệu
+                    swal("Success!", "Hiện sản phẩm thành công", "success");
+                }).catch(error => {
+                    swal("Error!", "Hiện sản phẩm thất bại", "error");
+                    console.log("Error: ", error);
+                });
+            } else {
+                swal("Hủy cập nhật", "Hiện sản phẩm đã bị hủy", "error");
+            }
+        });
+    };
+
     $scope.selectProduct = function (item) {
         console.log("Selected Product ID: ", item.id); // Log để kiểm tra
         $rootScope.selectedProductId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        $rootScope.selectedProductTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $location.path('/spct'); // Chuyển hướng đến trang sản phẩm chi tiết
     };
 
