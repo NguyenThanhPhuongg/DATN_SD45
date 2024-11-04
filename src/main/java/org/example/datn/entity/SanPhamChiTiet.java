@@ -7,9 +7,6 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * @author hoangKhong
- */
 @Entity
 @Table(name = "chi_tiet_san_pham")
 @Getter

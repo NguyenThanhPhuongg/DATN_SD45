@@ -118,14 +118,31 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/banhang/banhang.html",
             controller: "banhang-ctrl"
         })
-        /// Hóa đơn
-        .when("/hoadon", {
-            templateUrl: "asset/hoadon/hoadon.html",
+
+        /// hóa đơn
+        .when("/hdct", {
+            templateUrl: "asset/hoadon/chitiethoadon.html",
+            controller: "hdct-ctrl"
+        })
+        .when("/hoadoncho", {
+            templateUrl: "asset/hoadon/hoadoncho.html",
             controller: "hoadon-ctrl"
         })
-        // Thêm các route cho hóa đơn khác...
+        .when("/hoadonchovc", {
+            templateUrl: "asset/hoadon/hoadonchovc.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadondone", {
+            templateUrl: "asset/hoadon/hoadondone.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadonfail", {
+            templateUrl: "asset/hoadon/hoadonfail.html",
+            controller: "hoadon-ctrl"
+        })
 
-        /// Khuyến mãi
+
+        /// khuyến mãi
         .when("/listkhuyenmai", {
             templateUrl: "asset/khuyenmai/list.html",
             controller: "khuyenmai-ctrl"
@@ -145,7 +162,7 @@ app.config(function ($routeProvider) {
             controller: "traloihotro-ctrl"
         })
 
-        /// Blog
+        /// BLog
         .when("/blog", {
             templateUrl: "asset/blog/blog.html",
             controller: "blog-ctrl"
