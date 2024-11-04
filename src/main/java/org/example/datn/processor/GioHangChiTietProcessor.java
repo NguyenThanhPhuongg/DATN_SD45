@@ -79,6 +79,7 @@ public class GioHangChiTietProcessor {
             BeanUtils.copyProperties(request, ghct);
             ghct.setIdGioHang(gioHang.getId());
             ghct.setGia(spct.getGia());
+            ghct.setIdSanPhamChiTiet(spct.getId());
             ghct.setTrangThai(StatusGioHang.CHUA_DAT_HANG.getValue());
             service.save(ghct);
             spct.setSoLuong(soLuongConLai - request.getSoLuong());

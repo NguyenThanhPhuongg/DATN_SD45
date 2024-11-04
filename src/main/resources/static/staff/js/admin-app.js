@@ -3,7 +3,7 @@ const app = angular.module("admin-app", ["ngRoute"]);
 app.config(function ($routeProvider) {
     $routeProvider
 
-        /// nhan vien
+        /// Nhân viên
         .when("/taikhoan", {
             templateUrl: "asset/nhanvien/taikhoan.html",
             controller: "taikhoan-ctrl"
@@ -28,7 +28,8 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/nhanvien/chucnang.html",
             controller: "chucnang-ctrl"
         })
-        ////// khach hang
+
+        /// Khách hàng
         .when("/listkhachhang", {
             templateUrl: "asset/khachhang/list.html",
             controller: "listkhachhang-ctrl"
@@ -46,7 +47,7 @@ app.config(function ($routeProvider) {
             controller: "ttcanhan_kh-ctrl"
         })
 
-        /// danh mục
+        /// Danh mục
         .when("/listdanhmuc", {
             templateUrl: "asset/danhmuc/listdanhmuc.html",
             controller: "danhmuc-ctrl"
@@ -56,7 +57,7 @@ app.config(function ($routeProvider) {
             controller: "danhmuc-ctrl"
         })
 
-        /// thuong hiệu
+        /// Thương hiệu
         .when("/listthuonghieu", {
             templateUrl: "asset/thuonghieu/listthuonghieu.html",
             controller: "thuonghieu-ctrl"

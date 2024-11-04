@@ -16,4 +16,6 @@ public interface DiaChiGiaoHangRepository extends JpaRepository<DiaChiGiaoHang, 
     List<DiaChiGiaoHang> findByIdNguoiDung(Long idNguoiDung);
 
     Optional<DiaChiGiaoHang> findByIdNguoiDungAndTrangThai(Long idNguoiDung, Integer trangThai);
+
+    List<DiaChiGiaoHang> findByTrangThai(Integer trangThai);
 }

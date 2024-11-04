@@ -1,5 +1,6 @@
 package org.example.datn.service;
 
+import org.example.datn.entity.HoaDon;
 import org.example.datn.entity.HoaDonChiTiet;
 import org.example.datn.repository.HoaDonChiTietRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,7 @@ public class HoaDonChiTietService {
         repo.delete(hoaDonChiTiet);
     }
 
-//    List<HoaDonChiTiet> findAll();
-//    HoaDonChiTiet findById(Long id);
-//
-//    List<HoaDonChiTiet> findByCateId(Long cid);
-//
-//    HoaDonChiTiet create(HoaDonChiTiet product);
-//
-//    HoaDonChiTiet update(HoaDonChiTiet product);
-//
-//    void delete(Long id);
+    public List<HoaDonChiTiet> findByIdHoaDonInAndTrangThai(List<Long> idHoaDons, Integer trangThai){
+        return repo.findByIdHoaDonInAndTrangThai(idHoaDons, trangThai);
+    }
 }
