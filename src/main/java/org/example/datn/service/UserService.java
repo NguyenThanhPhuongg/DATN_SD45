@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import org.example.datn.entity.User;
 import org.example.datn.exception.NotFoundEntityException;
+import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
 import org.example.datn.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,11 @@ public class UserService {
         return repo.findByIdIn(ids);
     }
 
+    public List<User> findByRole(UserRoles role) {
+        return repo.findByRole(role);
+    }
 
-
+    public void delete(User user) {
+        repo.delete(user);
+    }
 }

@@ -3,7 +3,7 @@ const app = angular.module("admin-app", ["ngRoute"]);
 app.config(function ($routeProvider) {
     $routeProvider
 
-        /// nhan vien
+        /// Nhân viên
         .when("/taikhoan", {
             templateUrl: "asset/nhanvien/taikhoan.html",
             controller: "taikhoan-ctrl"
@@ -28,7 +28,8 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/nhanvien/chucnang.html",
             controller: "chucnang-ctrl"
         })
-        ////// khach hang
+
+        /// Khách hàng
         .when("/listkhachhang", {
             templateUrl: "asset/khachhang/list.html",
             controller: "listkhachhang-ctrl"
@@ -46,7 +47,7 @@ app.config(function ($routeProvider) {
             controller: "ttcanhan_kh-ctrl"
         })
 
-        /// danh mục
+        /// Danh mục
         .when("/listdanhmuc", {
             templateUrl: "asset/danhmuc/listdanhmuc.html",
             controller: "danhmuc-ctrl"
@@ -56,7 +57,7 @@ app.config(function ($routeProvider) {
             controller: "danhmuc-ctrl"
         })
 
-        /// thuong hiệu
+        /// Thương hiệu
         .when("/listthuonghieu", {
             templateUrl: "asset/thuonghieu/listthuonghieu.html",
             controller: "thuonghieu-ctrl"
@@ -66,78 +67,24 @@ app.config(function ($routeProvider) {
             controller: "thuonghieu-ctrl"
         })
 
-        /// thuộc tính
-        .when("/size", {
-            templateUrl: "asset/thuoctinh/size.html",
-            controller: "size-ctrl"
-        })
-        .when("/chatlieu", {
-            templateUrl: "asset/thuoctinh/chatlieu.html",
-            controller: "chatlieu-ctrl"
-        })
-        .when("/mausac", {
-            templateUrl: "asset/thuoctinh/mausac.html",
-            controller: "mausac-ctrl"
-        })
-
-        /// nhân viên
-        .when("/nhom", {
-            templateUrl: "asset/nhanvien/nhom.html",
-            controller: "nhom-ctrl"
-        })
-        .when("/chucnang", {
-            templateUrl: "asset/nhanvien/chucnang.html",
-            controller: "chucnang-ctrl"
-        })
-        .when("/phanquyen", {
-            templateUrl: "asset/nhanvien/phanquyen.html",
-            controller: "phanquyen-ctrl"
-        })
-
-        /// sản phâm
+        /// Sản phẩm
         .when("/sanpham", {
             templateUrl: "asset/sanpham/listsanpham.html",
             controller: "sanpham-ctrl"
         })
-        // .when("/spct",{
-        //     templateUrl:"asset/sanpham/quanlyspct.html",
-        //     controller: "spct-ctrl"
-        // })
-        .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
+        .when("/spct/:id", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/quanlyspct.html",
             controller: "spct-ctrl"
         })
 
-        /// Bán tại quầy
-        .when("/bhtq", {
-            templateUrl: "asset/banhang/banhang.html",
+        /// Hóa đơn
+        .when("/hoadon", {
+            templateUrl: "asset/hoadon/hoadon.html",
             controller: "hoadon-ctrl"
         })
+        // Thêm các route cho hóa đơn khác...
 
-        /// hóa đơn
-        .when("/hdct", {
-            templateUrl: "asset/hoadon/chitiethoadon.html",
-            controller: "hdct-ctrl"
-        })
-        .when("/hoadoncho", {
-            templateUrl: "asset/hoadon/hoadoncho.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoadonchovc", {
-            templateUrl: "asset/hoadon/hoadonchovc.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoadondone", {
-            templateUrl: "asset/hoadon/hoadondone.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoadonfail", {
-            templateUrl: "asset/hoadon/hoadonfail.html",
-            controller: "hoadon-ctrl"
-        })
-
-
-        /// khuyến mãi
+        /// Khuyến mãi
         .when("/listkhuyenmai", {
             templateUrl: "asset/khuyenmai/list.html",
             controller: "khuyenmai-ctrl"
@@ -157,12 +104,13 @@ app.config(function ($routeProvider) {
             controller: "traloihotro-ctrl"
         })
 
-        /// BLog
+        /// Blog
         .when("/blog", {
             templateUrl: "asset/blog/blog.html",
             controller: "blog-ctrl"
         })
 
-
-
-})
+        .otherwise({
+            redirectTo: "/taikhoan" // Redirect to default route
+        });
+});
