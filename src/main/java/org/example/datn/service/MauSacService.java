@@ -33,4 +33,7 @@ public class MauSacService {
     }
 
 
+    public List<MauSac> findByIdIn(List<Long> ids) {
+        return repo.findByIdIn(ids);
+    }
 }

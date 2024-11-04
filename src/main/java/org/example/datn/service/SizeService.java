@@ -29,4 +29,8 @@ public class SizeService {
     public void deleteById(Long id) {
         repo.deleteById(id);
     }
+
+    public List<Size> findByIdIn(List<Long> ids) {
+        return repo.findByIdIn(ids);
+    }
 }

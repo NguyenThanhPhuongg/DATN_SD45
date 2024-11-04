@@ -13,4 +13,6 @@ import java.util.List;
 public interface MauSacRepository extends JpaRepository<MauSac, Long> {
     @Query("SELECT p FROM MauSac p WHERE p.id = ?1")
     List<MauSac> findByCateId(Long cid);
+
+    List<MauSac> findByIdIn(List<Long> ids);
 }

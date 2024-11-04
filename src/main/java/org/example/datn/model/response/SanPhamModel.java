@@ -4,12 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.example.datn.entity.ChatLieu;
-import org.example.datn.entity.DanhMuc;
-import org.example.datn.entity.Thuonghieu;
+import org.example.datn.entity.*;
 import org.example.datn.model.CommonModel;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,5 +40,8 @@ public class SanPhamModel extends CommonModel {
     private DanhMuc danhMuc;
     private Thuonghieu thuonghieu;
     private ChatLieu chatLieu;
+
+    private List<Size> listSize ;
+    private List<MauSac> listMauSac ;
 
 }
