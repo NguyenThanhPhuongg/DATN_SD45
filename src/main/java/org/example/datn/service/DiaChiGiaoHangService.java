@@ -1,5 +1,6 @@
 package org.example.datn.service;
 
+import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.DiaChiGiaoHang;
 import org.example.datn.repository.DiaChiGiaoHangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,10 @@ public class DiaChiGiaoHangService {
 
     public Optional<DiaChiGiaoHang> findByIdNguoiDungAndTrangThai(Long idNguoiDung, Integer trangThai) {
         return repo.findByIdNguoiDungAndTrangThai(idNguoiDung, trangThai);
+    }
+
+    public List<DiaChiGiaoHang> findByTrangThaiDefault(Integer trangThai){
+        return repo.findByTrangThai(trangThai);
     }
 
 }

@@ -16,6 +16,9 @@ public final class SystemConstant {
     public static final String CODE_404 = "404";
     public static final String CODE_401 = "401";
     public static final String CODE_204 = "204";
+    public static final Integer DEFAULT = 1;
+    public static final Integer UNDEFAULT = 0;
+
 
 
 }

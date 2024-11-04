@@ -49,7 +49,7 @@ public class HoaDonProcessor {
     HoaDonService service;
 
     @Autowired
-    HoaDonTransformer transformer;
+    HoaDonTransformer hoaDonTransformer;
 
     @Autowired
     DiaChiGiaoHangProcessor diaChiGiaoHangProcessor;
@@ -112,7 +112,7 @@ public class HoaDonProcessor {
 
     public ServiceResult getById(Long id) {
         var hoaDon = service.findById(id).orElseThrow(() -> new EntityNotFoundException("hoaDon.not.found"));
-        var model = transformer.toModel(hoaDon);
+        var model = hoaDonTransformer.toModel(hoaDon);
         var diaChiGiaoHang = diaChiGiaoHangProcessor.findById(hoaDon.getIdDiaChiGiaoHang());
         var phuongThucVanChuyen = phuongThucVanChuyenProcessor.findById(hoaDon.getIdPhuongThucVanChuyen());
         var user = userProcessor.findById(hoaDon.getIdDiaChiGiaoHang());
@@ -192,6 +192,5 @@ public class HoaDonProcessor {
         int nextNumber = (lastInvoice == null) ? 1 : Integer.parseInt(lastInvoice.getMa().substring(4)) + 1;
         return String.format("CODE%04d", nextNumber);
     }
-
 
 }

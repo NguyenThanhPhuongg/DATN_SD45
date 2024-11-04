@@ -1,254 +1,121 @@
-app.controller("taikhoan-ctrl", function ($scope, $http) {
-    $scope.items = [];
-    $scope.form = {};
-    $scope.formAdd = {};
-    $scope.searchText = ''; // Biến tìm kiếm
+app.controller('taikhoan-ctrl', function ($scope, $http) {
+    // Biến để lưu danh sách nhân viên
+    $scope.employees = [];
+
+    // Biến cho phân trang
     $scope.pager = {
         page: 0,
-        size: 5, // Giá trị mặc định
-        items: [],
         count: 0,
+        itemsPerPage: 10, // Số lượng nhân viên trên mỗi trang
         first: function () {
             this.page = 0;
-            this.updateItems();
+            fetchEmployees();
         },
         prev: function () {
             if (this.page > 0) {
                 this.page--;
-                this.updateItems();
+                fetchEmployees();
             }
         },
         next: function () {
             if (this.page < this.count - 1) {
                 this.page++;
-                this.updateItems();
+                fetchEmployees();
             }
         },
         last: function () {
             this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            // Lọc các mục theo tìm kiếm
-            const filteredItems = $scope.items.filter(item => {
-                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
-                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
-                const matchesIdCha = !$scope.selectedIdCha || item.idCha === Number($scope.selectedIdCha);
-                return matchesSearch && matchesIdCha;
+            fetchEmployees();
+        }
+    };
+
+    // Hàm gọi API để lấy danh sách nhân viên theo vai trò
+    function fetchEmployees() {
+        const role = 'CLIENT'; // Hoặc vai trò bạn muốn
+        $http.get(`user/get-list-by-role?role=${role}`).then(function (response) {
+            if (response.data && response.data.data) { // Kiểm tra thuộc tính 'data'
+                $scope.employees = response.data.data; // Lưu danh sách nhân viên
+                $scope.pager.count = Math.ceil($scope.employees.length / $scope.pager.itemsPerPage); // Tính tổng số trang
+                updateEmployeesForCurrentPage(); // Cập nhật nhân viên cho trang hiện tại
+            }
+        }).catch(function (error) {
+            console.error('Lỗi khi gọi API:', error);
+        });
+    }
+
+
+    // Hàm thêm tài khoản
+    $scope.addAccount = function () {
+        // Đảm bảo rằng mật khẩu và mật khẩu nhập lại giống nhau
+        if ($scope.newAccount.password !== $scope.newAccount.retypePassword) {
+            alert('Mật khẩu không khớp!');
+            return;
+        }
+
+        // Gọi API để đăng ký
+        $http.post('/register', $scope.newAccount)
+            .then(function (response) {
+                console.log('API response:', response.data); // Log phản hồi từ API
+
+                // Kiểm tra mã phản hồi và thông điệp từ server
+                if (response.data && response.data.code === "200" && response.data.message === "Thành công") {
+                    alert('Đăng ký thành công!');
+                    fetchEmployees(); // Cập nhật danh sách nhân viên
+                    $('#addModal').modal('hide'); // Ẩn modal
+                    $scope.newAccount = {}; // Reset lại form
+                } else {
+                    alert('Có lỗi xảy ra: ' + (response.data.message || 'Vui lòng kiểm tra thông tin nhập vào.'));
+                }
+            })
+            .catch(function (error) {
+                console.error('Lỗi khi gọi API:', error);
+                alert('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.');
             });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
     };
 
-// Khởi tạo và tải dữ liệu
-    $scope.initialize = function () {
-        // Gọi API và kiểm tra dữ liệu
-        $http.get("/rest/danhmuc").then(resp => {
-            console.log("Dữ liệu từ API: ", resp.data); // Kiểm tra dữ liệu từ API
-            // Kiểm tra xem resp.data.data có phải là mảng không
-            if (Array.isArray(resp.data.data)) {
-                $scope.items = resp.data.data.map(item => ({
-                    ...item,
-                    ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
-                    ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
-                }));
-                $scope.pager.updateItems(); // Cập nhật các mục cho pager
-            } else {
-                console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
-            }
-        }).catch(error => {
-            console.error("Lỗi khi tải danh mục: ", error);
-        });
+    // Hàm gọi API để lấy chi tiết người dùng
+    $scope.detailUser = function (userId) {
+        $http.get(`/user/${userId}`)
+            .then(function (response) {
+                if (response.data && response.data.code === "200") {
+                    $scope.selectedUser = response.data.data; // Lưu dữ liệu người dùng
+                    $('#detailModal').modal('show'); // Hiện modal
+                } else {
+                    alert('Có lỗi xảy ra: ' + response.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.error('Lỗi khi gọi API:', error);
+                alert('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.');
+            });
     };
 
-// Theo dõi thay đổi trong ô tìm kiếm
-    $scope.$watch('searchText', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pager.updateItems();
-        }
-    });
-
-    $scope.$watch('selectedIdCha', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pager.updateItems();
-        }
-    });
-
-// Khởi tạo dữ liệu khi controller được tải
-    $scope.initialize();
-
-    $scope.reset = function () {
-        // Giữ nguyên giá trị của id nếu có
-        const currentId = $scope.form.id; // Lưu trữ giá trị ID hiện tại
-        const ngayTao = $scope.form.ngayTao; // Lưu trữ giá trị ID hiện tại
-
-        // Thiết lập lại các trường khác
-        $scope.form = {
-            nguoiTao: 1, // Mặc định người tạo là 'Admin'
-            nguoiCapNhat: 1, // Mặc định người cập nhật là 'Admin'
-            ngayTao: ngayTao, // Ngày tạo sẽ là thời gian hiện tại
-            ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
-            ten: '', // Đặt mặc định cho tên
-            moTa: '', // Đặt mặc định cho mô tả
-            trangThai: 1, // Đặt mặc định cho trạng thái là true
-            id: currentId, // Giữ nguyên giá trị ID
-            idCha: 1, // Giữ nguyên giá trị ID
-        };
-    };
-
-    $scope.resetAdd = function () {
-        $scope.formAdd = {};
-    };
-
-    $scope.edit = function (item) {
-        // Chuyển timestamp thành Date object
-        item.ngayCapNhat = new Date(item.ngayCapNhat);
-        item.ngayTao = new Date(item.ngayTao);
-        $scope.form = angular.copy(item);
-    };
-
-    $scope.update = function () {
-        $scope.error = {
-            ten: false,
-            moTa: false,
-            idCha: false,
-            trangThai: false
-        };
-
-        let isValid = true;
-
-        if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 100) {
-            $scope.error.ten = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.moTa || $scope.form.moTa.length < 1 || $scope.form.moTa.length > 100) {
-            $scope.error.moTa = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.idCha) {
-            $scope.error.idCha = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.trangThai) {
-            $scope.error.trangThai = true;
-            isValid = false;
-        }
-
-
-        if (!isValid) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
-            return; // Ngừng thực hiện nếu không hợp lệ
-        }
-
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật danh mục này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                var item = angular.copy($scope.form);
-                item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
-                item.nguoiCapNhat = 2;
-
-                $http.put(`/rest/danhmuc/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
+    // Hàm xóa người dùng
+    $scope.deleteUser = function(userId) {
+        if (confirm('Bạn có chắc chắn muốn xóa người dùng này không?')) {
+            $http.delete(`/user/${userId}`)
+                .then(function(response) {
+                    if (response.data && response.data.code === "200") {
+                        alert('Xóa người dùng thành công!');
+                        fetchEmployees(); // Cập nhật lại danh sách người dùng
+                    } else {
+                        alert('Có lỗi xảy ra: ' + response.data.message);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Lỗi khi gọi API:', error);
+                    alert('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.');
                 });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật danh mục đã bị hủy", "error");
-            }
-        });
+        }
     };
 
-// Xóa thương hiệu
-    $scope.delete = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn xóa danh mục này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                $http.delete(`/rest/danhmuc/${item.id}`).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    $scope.reset();
-                    swal("Success!", "Xóa thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Xóa thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy xóa", "Xóa danh mục đã bị hủy", "error");
-            }
-        });
-    };
-// Thêm thương hiệu
-    $scope.create = function () {
-        $scope.error1 = {
-            ten: false,
-            moTa: false,
-            idCha: false,
-            trangThai: false
-        };
+    // Cập nhật danh sách nhân viên cho trang hiện tại
+    function updateEmployeesForCurrentPage() {
+        const startIndex = $scope.pager.page * $scope.pager.itemsPerPage;
+        const endIndex = startIndex + $scope.pager.itemsPerPage;
+        $scope.currentEmployees = $scope.employees.slice(startIndex, endIndex); // Cắt mảng để hiển thị theo trang
+    }
 
-        let isValid = true;
-
-        if (!$scope.formAdd.ten || $scope.formAdd.ten.length < 1 || $scope.formAdd.ten.length > 100) {
-            $scope.error1.ten = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.moTa || $scope.formAdd.moTa.length < 1 || $scope.formAdd.moTa.length > 100) {
-            $scope.error1.moTa = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.idCha) {
-            $scope.error1.idCha = true;
-            isValid = false;
-        }
-
-
-        if (!isValid) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
-            return; // Ngừng thực hiện nếu không hợp lệ
-        }
-
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn thêm danh mục này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willAdd) => {
-            if (willAdd) {
-                var item = angular.copy($scope.formAdd);
-                item.nguoiTao = 1;
-                item.trangThai = 1;
-                item.ngayTao = new Date(); // Ngày tạo là thời gian hiện tại
-                item.ngayCapNhat = new Date(); // Ngày cập nhật là thời gian hiện tại
-                $http.post(`/rest/danhmuc`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    $scope.resetAdd();
-                    swal("Success!", "Thêm mới thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Thêm mới thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy thêm danh mục", "Thêm danh mục đã bị hủy", "error");
-            }
-        });
-    };
-})
-;
+    // Gọi hàm fetchEmployees khi controller khởi tạo
+    fetchEmployees();
+});

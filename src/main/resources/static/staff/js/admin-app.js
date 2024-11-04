@@ -3,7 +3,7 @@ const app = angular.module("admin-app", ["ngRoute"]);
 app.config(function ($routeProvider) {
     $routeProvider
 
-        /// nhan vien
+        /// Nhân viên
         .when("/taikhoan", {
             templateUrl: "asset/nhanvien/taikhoan.html",
             controller: "taikhoan-ctrl"
@@ -28,7 +28,8 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/nhanvien/chucnang.html",
             controller: "chucnang-ctrl"
         })
-        ////// khach hang
+
+        /// Khách hàng
         .when("/listkhachhang", {
             templateUrl: "asset/khachhang/list.html",
             controller: "listkhachhang-ctrl"
@@ -46,7 +47,7 @@ app.config(function ($routeProvider) {
             controller: "ttcanhan_kh-ctrl"
         })
 
-        /// danh mục
+        /// Danh mục
         .when("/listdanhmuc", {
             templateUrl: "asset/danhmuc/listdanhmuc.html",
             controller: "danhmuc-ctrl"
@@ -56,7 +57,7 @@ app.config(function ($routeProvider) {
             controller: "danhmuc-ctrl"
         })
 
-        /// thuong hiệu
+        /// Thương hiệu
         .when("/listthuonghieu", {
             templateUrl: "asset/thuonghieu/listthuonghieu.html",
             controller: "thuonghieu-ctrl"
@@ -113,31 +114,14 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/banhang/banhang.html",
             controller: "banhang-ctrl"
         })
+        /// Hóa đơn
+        .when("/hoadon", {
+            templateUrl: "asset/hoadon/hoadon.html",
+            controller: "hoadon-ctrl"
+        })
+        // Thêm các route cho hóa đơn khác...
 
-        /// hóa đơn
-        .when("/hdct", {
-            templateUrl: "asset/hoadon/chitiethoadon.html",
-            controller: "hdct-ctrl"
-        })
-        .when("/hoadoncho", {
-            templateUrl: "asset/hoadon/hoadoncho.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoadonchovc", {
-            templateUrl: "asset/hoadon/hoadonchovc.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoadondone", {
-            templateUrl: "asset/hoadon/hoadondone.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoadonfail", {
-            templateUrl: "asset/hoadon/hoadonfail.html",
-            controller: "hoadon-ctrl"
-        })
-
-
-        /// khuyến mãi
+        /// Khuyến mãi
         .when("/listkhuyenmai", {
             templateUrl: "asset/khuyenmai/list.html",
             controller: "khuyenmai-ctrl"
@@ -157,7 +141,7 @@ app.config(function ($routeProvider) {
             controller: "traloihotro-ctrl"
         })
 
-        /// BLog
+        /// Blog
         .when("/blog", {
             templateUrl: "asset/blog/blog.html",
             controller: "blog-ctrl"
