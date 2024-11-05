@@ -15,31 +15,31 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SanPhamModel extends CommonModel {
 
-    private Long id;
+     Long id;
 
-    private Long idDanhMuc;
+     Long idDanhMuc;
 
-    private Long idThuongHieu;
+     Long idThuongHieu;
 
-    private Long idChatLieu;
+     Long idChatLieu;
 
-    private String ten;
+     String ten;
 
-    private String ma;
+     String ma;
 
-    private String xuatXu;
+     String xuatXu;
 
-    private String moTa;
+     String moTa;
 
-    private BigDecimal gia;
+     BigDecimal gia;
 
-    private String anh;
+     String anh;
 
-    private Integer trangThai;
+     Integer trangThai;
 
-    private DanhMuc danhMuc;
-    private Thuonghieu thuonghieu;
-    private ChatLieu chatLieu;
+     DanhMuc danhMuc;
+     Thuonghieu thuonghieu;
+     ChatLieu chatLieu;
 
     private List<Size> listSize ;
     private List<MauSac> listMauSac ;

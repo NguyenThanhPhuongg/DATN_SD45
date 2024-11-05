@@ -107,6 +107,11 @@ public class UserProcessor {
         return userModel;
     }
 
+    public ServiceResult getAll() {
+        var models = userService.findAll().stream().map(mapper()).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
     public List<UserModel> getAcctive() {
         var userModel = userService.findAllByStatus(UserStatus.ACTIVE).stream().map(mapper()).collect(Collectors.toList());
         return userModel;
@@ -341,7 +346,7 @@ public class UserProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult deleteById(Long id){
+    public ServiceResult deleteById(Long id) {
         var user = userService.findById(id).orElseThrow(() -> new EntityNotFoundException("not.fond"));
         userService.delete(user);
         return new ServiceResult();

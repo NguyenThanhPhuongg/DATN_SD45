@@ -1,20 +1,11 @@
 <div class="container-fluid px-4">
-    <h2 class="mt-4">Quản lý sản phẩm chi tiết</h2><br>
-
-    <!-- Select để chọn ID sản phẩm -->
-    <div class="mb-3">
-        <label for="productSelect" class="form-label">Sản phẩm</label>
-        <select id="productSelect" class="form-control" ng-model="form.idSanPham.id" ng-change="updateProductDetails()">
-            <option value="" disabled selected>Chọn sản phẩm</option>
-            <option ng-repeat="c in sanpham" ng-value="c.id">{{c.ten}}</option>
-        </select>
-    </div>
+    <h2 class="mt-4">Sản phẩm chi tiết: {{selectedProductTen}}</h2><br>
 
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-table me-1"></i>
-                Danh sách sản phẩm chi tiết
+                Danh sách các sản phẩm chi tiết
             </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal"
                  data-bs-target="#addModal">
@@ -27,12 +18,9 @@
                 <thead>
                 <tr>
                     <th>STT</th>
-                    <th>ID</th>
-                    <th>ID Sản phẩm</th>
                     <th>Size</th>
                     <th>Màu sắc</th>
-                    <th>Chất liệu</th>
-                    <th>Số lương</th>
+                    <th>Số lượng</th>
                     <th>Giá</th>
                     <th>Ghi chú</th>
                     <th>Trạng thái</th>
@@ -42,58 +30,79 @@
                 <tbody>
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
-                    <td>{{item.id}}</td>
-                    <td>{{item.idSanPham.id}}</td>
-                    <td>{{item.idSize.ten}}</td>
-                    <td>{{item.idMauSac.ten}}</td>
-                    <td>{{item.idChatLieu.ten}}</td>
+                    <td>{{item.size.ten}}</td>
+                    <td>{{item.mauSac.ten}}</td>
                     <td>{{item.soLuong}}</td>
                     <td>{{item.gia}}</td>
                     <td>{{item.ghiChu}}</td>
-                    <td>{{item.trangThai}}</td>
+                    <td>
+                        <div class="badge"
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 2, 'bg-secondary': item.trangThai === 3}">
+                            <span ng-if="item.trangThai === 1">Active</span>
+                            <span ng-if="item.trangThai === 2">Locked</span>
+                            <span ng-if="item.trangThai === 3">Khác</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
                                     data-bs-target="#exampleModal" ng-click="edit(item)">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-link" type="button" ng-click="delete(item)">
+                            <button class="btn btn-link" type="button" ng-click="update2(item)">
                                 <i class="fas fa-times icon-close"></i>
+                            </button>
+                            <button class="btn btn-link" type="button" ng-click="update1(item)">
+                                <i class="fas fa-check"></i>
                             </button>
                         </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <div class="panel-footer text-center">
-                <button ng-click="pager.first()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
-                </button>
-                <button ng-click="pager.prev()" class="btn btn-primary">
-                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
-                </button>
-                <button class="btn btn-success">{{pager.page+1}} of {{pager.count}}</button>
-                <button ng-click="pager.next()" class="btn btn-primary">
-                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
-                </button>
-                <button ng-click="pager.last()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
-                </button>
+            <div class="panel-footer d-flex justify-content-between align-items-center">
+                <div class="me-auto">
+                    <label for="pageSizeSelect" class="me-2">Hiển thị:</label>
+                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()"
+                            class="form-select d-inline-block w-auto">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="text-center">
+                    <button ng-click="pager.first()" class="btn btn-danger">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button ng-click="pager.prev()" class="btn btn-primary">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
+                    <button ng-click="pager.next()" class="btn btn-primary">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button ng-click="pager.last()" class="btn btn-danger">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!--    /// edit-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Thông tin sản phẩm chi tiết</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Thông tin sản phẩm chi tiết: <h5
+                            style="color: #b02a37"> Màu {{form.mauSac.ten}}, Size {{form.size.ten}}</h5></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid px-4">
                         <div class="row">
-                            <div class="col-md-6 mt-2">
+                            <div class="col-md-4 mt-2">
                                 <div class="col-md-12 mt-2">
                                     <label for="inputNgayTao" class="form-label">Ngày tạo</label>
                                     <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
@@ -115,77 +124,42 @@
                                     <input type="text" class="form-control" id="inputNguoiCapNhat"
                                            ng-model="form.nguoiCapNhat" readonly>
                                 </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Ghi chú</label>
-                                    <input type="text" class="form-control" id="inputTen" ng-model="form.ghiChu">
-                                    <span class="text-danger"
-                                          ng-show="error1.ghiChu">Ghi chú phải từ 1 đến 300 ký tự</span>
-                                </div>
-                                <div class="form-group col-md-12 mt-2">
-                                    <label>Trạng thái</label>
-                                    <div class="mt-2">
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="trangThai"
-                                                   ng-model="form.trangThai" ng-value="1">
-                                            <label class="form-check-label">Active</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="trangThai"
-                                                   ng-model="form.trangThai" ng-value="0">
-                                            <label class="form-check-label">Locked</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="trangThai"
-                                                   ng-model="form.trangThai" ng-value="2">
-                                            <label class="form-check-label">Khác</label>
-                                        </div>
-                                    </div>
-                                    <span class="text-danger"
-                                          ng-show="error1.trangThai">Vui lòng chọn trạng thái.</span>
-                                </div>
                             </div>
-                            <div class="col-md-6 mt-2">
+                            <div class="col-md-8 mt-2">
                                 <div class="col-md-12 mt-2">
                                     <label for="inputID" class="form-label">ID</label>
                                     <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
                                 </div>
                                 <div class="col-md-12 mt-2">
-                                    <label for="inputID" class="form-label">ID Sản phẩm</label>
-                                    <input type="text" class="form-control" id="inputID" ng-model="form.idSanPham.id"
-                                           readonly>
+                                    <label for="inputID" class="form-label">Giá sản phẩm</label>
+                                    <input type="number" class="form-control" ng-model="form.gia">
                                 </div>
                                 <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Size</label>
-                                    <select ng-model="form.idSize.id" class="form-control">
+                                    <label for="inputID" class="form-label">Số lượng sản phẩm</label>
+                                    <input type="number" class="form-control" ng-model="form.soLuong">
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" placeholder="Leave a comment here"
+                                              ng-model="form.ghiChu"></textarea>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">Sản phẩm</label>
+                                    <select ng-model="form.idSanPham" class="form-control" disabled>
+                                        <option ng-repeat="c in sanpham" ng-value="c.id">{{c.ten}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="inputID" class="form-label">Size sản phẩm</label>
+                                    <select ng-model="form.idSize" class="form-control" disabled>
                                         <option ng-repeat="c in size" ng-value="c.id">{{c.ten}}</option>
                                     </select>
-                                    <span class="text-danger" ng-show="error1.idSize">Vui lòng chọn danh mục.</span>
                                 </div>
                                 <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Màu sắc</label>
-                                    <select ng-model="form.idMauSac.id" class="form-control">
+                                    <label for="inputID" class="form-label">Màu sắc sản phẩm</label>
+                                    <select ng-model="form.idMauSac" class="form-control" disabled>
                                         <option ng-repeat="c in mausac" ng-value="c.id">{{c.ten}}</option>
                                     </select>
-                                    <span class="text-danger" ng-show="error1.idMauSac">Vui lòng chọn danh mục.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Chất liệu</label>
-                                    <select ng-model="form.idChatLieu.id" class="form-control">
-                                        <option ng-repeat="c in chatlieu" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error1.idChatLieu">Vui lòng chọn danh mục.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Số lượng</label>
-                                    <input type="number" class="form-control" id="inputTen" ng-model="form.soLuong">
-                                    <span class="text-danger"
-                                          ng-show="error1.soLuong">Số lượng < 1 và ko >= 10000.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Giá</label>
-                                    <input type="number" class="form-control" id="inputTen" ng-model="form.gia">
-                                    <span class="text-danger"
-                                          ng-show="error1.gia">Giâ < 100000 và ko >= 100000000.</span>
                                 </div>
                             </div>
                         </div>
@@ -206,77 +180,83 @@
         </div>
     </div>
 
-    <!--    //// thêm -->
+    <!--    /// add-->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel1">Thêm sản phẩm</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Thêm sản phẩm chi tiết: {{selectedProductTen}}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid px-4">
                         <div class="row">
-                            <div class="col-md-6 mt-2">
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputID" class="form-label">ID Sản phẩm</label>
-                                    <input type="text" class="form-control" id="inputID" ng-model="formAdd.idSanPham.id" readonly>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Ghi chú</label>
-                                    <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ghiChu">
-                                    <span class="text-danger"
-                                          ng-show="error.ghiChu">Ghi chú phải từ 1 đến 300 ký tự</span>
-                                </div>
-                                <div class="form-group col-md-12 mt-2">
-                                    <label>Trạng thái</label>
-                                    <div class="mt-2">
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="trangThai"
-                                                   ng-model="formAdd.trangThai" ng-value="1">
-                                            <label class="form-check-label">Active</label>
+                            <div class="col-md-12 mt-2">
+
+                                <div class="col-md-12 mt-3 d-flex align-items-center">
+                                    <label class="form-label me-2">Chọn size cho</label>
+                                    <select ng-model="selectedSizeIdCha" ng-change="filterSizesByIdCha()" class="form-control me-3"
+                                            style="width: 150px;">
+                                        <option value="">Tất cả</option>
+                                        <option value="1">Áo</option>
+                                        <option value="2">Quần</option>
+                                        <option value="3">Khác</option>
+                                    </select>
+                                    <div class="form-check d-flex flex-wrap">
+                                        <div class="form-check d-flex me-3 mb-2" ng-repeat="size in filteredSizes">
+                                            <input type="checkbox" class="form-check-input" ng-model="size.selected"
+                                                   ng-change="filterColorsAndSizes()">
+                                            <label class="form-check-label ms-2">{{size.ten}}</label>
                                         </div>
                                     </div>
-                                    <span class="text-danger"
-                                          ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
                                 </div>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Size</label>
-                                    <select ng-model="formAdd.idSize.id" class="form-control">
-                                        <option value="" disabled selected>Chọn size</option>
-                                        <option ng-repeat="c in size" ng-value="c.id">{{c.ten}}</option>
+
+                                <div class="col-md-12 mt-3 d-flex align-items-center">
+                                    <label class="form-label me-2">Chọn màu sắc cho</label>
+                                    <select ng-model="selectedColorIdCha" ng-change="filterColorsByIdCha()" class="form-control me-3"
+                                            style="width: 150px;">
+                                        <option value="">Tất cả</option>
+                                        <option value="1">Áo</option>
+                                        <option value="2">Quần</option>
+                                        <option value="3">Khác</option>
                                     </select>
-                                    <span class="text-danger" ng-show="error.idSize">Vui lòng chọn danh mục.</span>
+                                    <div class="form-check d-flex flex-wrap">
+                                        <div class="form-check d-flex me-3 mb-2" ng-repeat="color in filteredColors">
+                                            <input type="checkbox" class="form-check-input" ng-model="color.selected"
+                                                   ng-change="filterColorsAndSizes()">
+                                            <label class="form-check-label ms-2">{{color.ten}}</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Màu sắc</label>
-                                    <select ng-model="formAdd.idMauSac.id" class="form-control">
-                                        <option value="" disabled selected>Chọn màu sắc</option>
-                                        <option ng-repeat="c in mausac" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error.idMauSac">Vui lòng chọn danh mục.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="" class="form-label">Chất liệu</label>
-                                    <select ng-model="formAdd.idChatLieu.id" class="form-control">
-                                        <option value="" disabled selected>Chọn chất liệu</option>
-                                        <option ng-repeat="c in chatlieu" ng-value="c.id">{{c.ten}}</option>
-                                    </select>
-                                    <span class="text-danger" ng-show="error.idChatLieu">Vui lòng chọn danh mục.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Số lượng</label>
-                                    <input type="number" class="form-control" id="inputTen" ng-model="formAdd.soLuong">
-                                    <span class="text-danger"
-                                          ng-show="error.soLuong">Số lượng < 1 và ko >= 10000.</span>
-                                </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputTen" class="form-label">Giá</label>
-                                    <input type="number" class="form-control" id="inputTen" ng-model="formAdd.gia">
-                                    <span class="text-danger"
-                                          ng-show="error.gia">Giâ < 100000 và ko >= 100000000.</span>
+
+                                <!-- Bảng hiển thị các tổ hợp sản phẩm chi tiết -->
+                                <div class="mb-3 mt-3">
+                                    <label>Danh sách sản phẩm chi tiết</label>
+                                    <table class="table table-bordered" id="productDetailsTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Size</th>
+                                            <th>Màu Sắc</th>
+                                            <th>Số Lượng</th>
+                                            <th>Giá</th>
+                                            <th>Ghi Chú</th>
+                                            <th>Thao Tác</th> <!-- Thêm cột thao tác -->
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="detail in productDetails">
+                                            <td>{{ detail.size.ten }}</td>
+                                            <td>{{ detail.mauSac.ten }}</td>
+                                            <td><input type="number" ng-model="detail.soLuong" class="form-control"></td>
+                                            <td><input type="number" ng-model="detail.gia" class="form-control"></td>
+                                            <td><input type="text" ng-model="detail.ghiChu" class="form-control"></td>
+                                            <td>
+                                                <button class="btn btn-danger" ng-click="removeProductDetail(detail)">Xóa</button>
+                                                <!-- Nút xóa -->
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -284,7 +264,7 @@
                 </div>
                 <div class="modal-footer">
                     <div class="card-footer text-center mt-4">
-                        <button type="button" class="btn btn-warning me-2" ng-click="create()">
+                        <button type="button" class="btn btn-warning me-2" ng-click="add()">
                             <i class="fas fa-edit"></i> Thêm
                         </button>
                         <button type="button" class="btn btn-secondary" ng-click="resetAdd()">

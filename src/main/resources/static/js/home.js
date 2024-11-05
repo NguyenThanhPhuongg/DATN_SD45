@@ -6,13 +6,13 @@ $(document).ready(function () {
             method: 'GET',
             success: function (response) {
                 const productContainer = $('#product-info');
-                productContainer.empty(); // Xóa nội dung cũ
+                // productContainer.empty(); // Xóa nội dung cũ
 
                 response.forEach(product => {
                     const productHtml = `
                         <div class="product">
                             <div class="image-wrapper">
-                                <a href="/productDetail">
+                                <a href="/productDetail/${product.id}">
                                     <img src="/images/${product.anh}" alt="${product.ten}">
                                 </a>
                                 <div class="icon-heart">
