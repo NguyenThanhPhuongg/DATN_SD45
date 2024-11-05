@@ -17,4 +17,7 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     List<SanPhamChiTiet> findByIdIn(List<Long> ids);
 
     Optional<SanPhamChiTiet> findByIdSanPhamAndIdSizeAndIdMauSac(Long idSanPham, Long idSize, Long idMauSac);
+
+
+
 }

@@ -67,24 +67,78 @@ app.config(function ($routeProvider) {
             controller: "thuonghieu-ctrl"
         })
 
-        /// Sản phẩm
+        /// thuộc tính
+        .when("/size", {
+            templateUrl: "asset/thuoctinh/size.html",
+            controller: "size-ctrl"
+        })
+        .when("/chatlieu", {
+            templateUrl: "asset/thuoctinh/chatlieu.html",
+            controller: "chatlieu-ctrl"
+        })
+        .when("/mausac", {
+            templateUrl: "asset/thuoctinh/mausac.html",
+            controller: "mausac-ctrl"
+        })
+
+        /// nhân viên
+        .when("/nhom", {
+            templateUrl: "asset/nhanvien/nhom.html",
+            controller: "nhom-ctrl"
+        })
+        .when("/chucnang", {
+            templateUrl: "asset/nhanvien/chucnang.html",
+            controller: "chucnang-ctrl"
+        })
+        .when("/phanquyen", {
+            templateUrl: "asset/nhanvien/phanquyen.html",
+            controller: "phanquyen-ctrl"
+        })
+
+        /// sản phâm
         .when("/sanpham", {
             templateUrl: "asset/sanpham/listsanpham.html",
             controller: "sanpham-ctrl"
         })
-        .when("/spct/:id", { // Thêm :id để nhận ID sản phẩm từ URL
+        // .when("/spct",{
+        //     templateUrl:"asset/sanpham/quanlyspct.html",
+        //     controller: "spct-ctrl"
+        // })
+        .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/quanlyspct.html",
             controller: "spct-ctrl"
         })
 
-        /// Hóa đơn
-        .when("/hoadon", {
-            templateUrl: "asset/hoadon/hoadon.html",
+        /// Bán tại quầy
+        .when("/bhtq", {
+            templateUrl: "asset/banhang/banhang.html",
+            controller: "banhang-ctrl"
+        })
+
+        /// hóa đơn
+        .when("/hdct", {
+            templateUrl: "asset/hoadon/chitiethoadon.html",
+            controller: "hdct-ctrl"
+        })
+        .when("/hoadoncho", {
+            templateUrl: "asset/hoadon/hoadoncho.html",
             controller: "hoadon-ctrl"
         })
-        // Thêm các route cho hóa đơn khác...
+        .when("/hoadonchovc", {
+            templateUrl: "asset/hoadon/hoadonchovc.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadondone", {
+            templateUrl: "asset/hoadon/hoadondone.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoadonfail", {
+            templateUrl: "asset/hoadon/hoadonfail.html",
+            controller: "hoadon-ctrl"
+        })
 
-        /// Khuyến mãi
+
+        /// khuyến mãi
         .when("/listkhuyenmai", {
             templateUrl: "asset/khuyenmai/list.html",
             controller: "khuyenmai-ctrl"
@@ -104,13 +158,12 @@ app.config(function ($routeProvider) {
             controller: "traloihotro-ctrl"
         })
 
-        /// Blog
+        /// BLog
         .when("/blog", {
             templateUrl: "asset/blog/blog.html",
             controller: "blog-ctrl"
         })
 
-        .otherwise({
-            redirectTo: "/taikhoan" // Redirect to default route
-        });
-});
+
+
+})
