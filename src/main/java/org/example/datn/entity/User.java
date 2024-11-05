@@ -31,8 +31,6 @@ public class User extends CommonEntity {
     @Column(name = "mat_khau")
     private String password;
 
-    @Column(name = "id_nhom")
-    private Long idNhom;
 
     @Column(name = "loai")
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,8 @@
 package org.example.datn.service;
 
 import javax.persistence.EntityManager;
+
+import org.example.datn.entity.ChucNang;
 import org.example.datn.repository.ChucNangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,5 +25,10 @@ public class ChucNangService {
 
     public List<String> findChucNangByNhomIds(List<Long> nhomIds) {
         return repo.findChucNangByNhomIds(nhomIds);
+    }
+
+    public List<ChucNang> findAllByIdNhom(Long idNhom) {
+        var list = repo.findByIdNhom(idNhom);
+        return list;
     }
 }
