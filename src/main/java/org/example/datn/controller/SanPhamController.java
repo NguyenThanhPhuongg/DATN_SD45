@@ -26,6 +26,7 @@ public class SanPhamController {
         return ResponseEntity.ok(processor.getById(id));
     }
 
+
     @GetMapping
     public ResponseEntity<ServiceResult> getAll() {
         return ResponseEntity.ok(processor.getAll());
