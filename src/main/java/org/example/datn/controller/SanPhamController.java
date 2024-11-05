@@ -26,12 +26,11 @@ public class SanPhamController {
         return ResponseEntity.ok(processor.getById(id));
     }
 
-
     @GetMapping
     public ResponseEntity<ServiceResult> getAll() {
         return ResponseEntity.ok(processor.getAll());
     }
-
+ 
     @PostMapping
     public ResponseEntity<ServiceResult> add(@RequestBody SanPhamModel model) {
         return ResponseEntity.ok(processor.save(model));

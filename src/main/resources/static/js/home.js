@@ -2,34 +2,44 @@ $(document).ready(function () {
     // Hàm để lấy danh sách sản phẩm
     function fetchProducts() {
         $.ajax({
-            url: '/san-pham/get-list',
+            url: '/san-pham',
             method: 'GET',
+            dataType: 'json',  // Đảm bảo dữ liệu được xử lý như JSON
             success: function (response) {
-                const productContainer = $('#product-info');
-                // productContainer.empty(); // Xóa nội dung cũ
+                console.log(response);  // Kiểm tra dữ liệu trả về
 
-                response.forEach(product => {
-                    const productHtml = `
-                        <div class="product">
-                            <div class="image-wrapper">
-                                <a href="/productDetail/${product.id}">
-                                    <img src="/images/${product.anh}" alt="${product.ten}">
-                                </a>
-                                <div class="icon-heart">
-                                    <a href="#"><i class="bi bi-heart heart"></i></a>
+                // Truy cập vào mảng `data` trong `response`
+                const products = response.data;
+
+                if (Array.isArray(products)) {
+                    const productContainer = $('#product-info');
+                    productContainer.empty(); // Xóa nội dung cũ
+
+                    products.forEach(product => {
+                        const productHtml = `
+                            <div class="product">
+                                <div class="image-wrapper">
+                                    <a href="/productDetail/${product.id}">
+                                        <img src="/images/${product.anh}" alt="${product.ten}">
+                                    </a>
+                                    <div class="icon-heart">
+                                        <a href="#"><i class="bi bi-heart heart"></i></a>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="price"><b>${new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(product.gia)}</b></p>
+                                    <p class="name">${product.ten}</p>
                                 </div>
                             </div>
-                            <div class="mt-2">
-                                <p class="price"><b>${new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND'
-                    }).format(product.gia)}</b></p>
-                                <p class="name">${product.ten}</p>
-                            </div>
-                        </div>
-                    `;
-                    productContainer.append(productHtml);
-                });
+                        `;
+                        productContainer.append(productHtml);
+                    });
+                } else {
+                    console.error('Expected array but got:', products);
+                }
             },
             error: function (error) {
                 console.error('Error fetching products:', error);
@@ -37,8 +47,8 @@ $(document).ready(function () {
         });
     }
 
-    function detailProduct() {
 
+    function detailProduct() {
         document.addEventListener("DOMContentLoaded", function () {
             const urlPath = window.location.pathname;
             const productId = urlPath.split('/').pop();
@@ -95,10 +105,7 @@ $(document).ready(function () {
         });
     }
 
-
+    // Gọi hàm fetchProducts để hiển thị danh sách sản phẩm
     fetchProducts();
     detailProduct();
 });
-
-
-
