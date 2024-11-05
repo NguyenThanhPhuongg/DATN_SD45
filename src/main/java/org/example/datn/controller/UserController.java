@@ -40,4 +40,9 @@ public class UserController {
         return ResponseEntity.ok(processor.deleteById(id));
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<ServiceResult> getAll() {
+        return ResponseEntity.ok(processor.getAll());
+    }
+
 }

@@ -11,15 +11,12 @@ import org.example.datn.model.response.RegisterUpdateGroupModel;
 import org.example.datn.processor.NhomProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController("NhomApi")
-@RequestMapping("/nhom")
+@RequestMapping("/groups")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NhomController {
@@ -37,5 +34,10 @@ public class NhomController {
 //    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ServiceResult add(@Valid @RequestBody RegisterUpdateGroupModel model) throws DuplicatedException {
         return processor.add(model);
+    }
+
+    @PutMapping("/change-status/{id}")
+    public ServiceResult update(@PathVariable Long id) {
+        return processor.changeStatus(id);
     }
 }

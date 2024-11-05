@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hoangKhong
@@ -48,6 +49,10 @@ public class NhomService {
     public Page<Nhom> getList(String ten, Integer page, Integer size) {
         int pageIndex = (page > 0) ? page - 1 : 0;
         return repo.getList(ten, PageRequest.of(pageIndex, size));
+    }
+
+    public Optional<Nhom> findById(Long id) {
+        return repo.findById(id);
     }
 
 

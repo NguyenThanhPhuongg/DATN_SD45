@@ -19,4 +19,6 @@ public interface ChucNangRepository extends JpaRepository<ChucNang, Long> {
 
     @Query("SELECT c FROM ChucNang c JOIN NhomChucNang nc ON c.id = nc.idChucNang WHERE nc.idNhom = :idNhom")
     List<ChucNang> findByIdNhom(@Param("idNhom") Long idNhom);
+
+    List<ChucNang> findAllByOrderByNgayTaoDesc();
 }

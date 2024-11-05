@@ -1,6 +1,7 @@
 package org.example.datn.entity;
 
 import javax.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChucNang {
+public class ChucNang extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -30,7 +31,7 @@ public class ChucNang {
     private String ma;
 
     @Column(name = "loai")
-    private String loai;
+    private Integer loai;
 
     @Column(name = "trang_thai")
     private Integer trangThai;

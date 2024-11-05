@@ -31,4 +31,8 @@ public class ChucNangService {
         var list = repo.findByIdNhom(idNhom);
         return list;
     }
+
+    public List<ChucNang> findAllByOrderByNgayTaoDesc(){
+        return repo.findAllByOrderByNgayTaoDesc();
+    }
 }

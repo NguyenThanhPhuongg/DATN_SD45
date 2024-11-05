@@ -164,6 +164,13 @@ app.config(function ($routeProvider) {
             controller: "blog-ctrl"
         })
 
+        .when("/group", {
+            templateUrl: "asset/group/group.html",
+            controller: "group-ctrl"
+        })
+
+
+
 
 
 })
