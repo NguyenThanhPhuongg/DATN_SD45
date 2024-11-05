@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Nhom {
+public class Nhom extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -30,12 +30,4 @@ public class Nhom {
 
     @Column(name = "trang_thai")
     private Integer trangThai;
-    @Column(name = "nguoi_tao")
-    private String nguoiTao;
-    @Column(name = "nguoi_cap_nhat")
-    private String nguoiCapNhat;
-    @Column(name = "ngay_tao")
-    private Date ngayTao;
-    @Column(name = "ngay_cap_nhat")
-    private Date ngayCapNhat;
 }

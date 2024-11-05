@@ -1,37 +1,30 @@
 package org.example.datn.entity;
 
-import javax.persistence.*;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import javax.persistence.*;
 
 /**
  * @author hoangKhong
  */
 @Entity
-@Table(name = "chuc_nang")
+@Table(name = "nhom_nguoi_dung")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChucNang extends CommonEntity{
+public class NhomNguoiDung extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "id_cha")
-    private Long idCha;
+    @Column(name = "id_nhom")
+    private Long idNhom;
 
-    @Column(name = "ten")
-    private String ten;
-
-    @Column(name = "ma")
-    private String ma;
-
-    @Column(name = "loai")
-    private Integer loai;
+    @Column(name = "id_nguoi_dung")
+    private Long userId;
 
     @Column(name = "trang_thai")
     private Integer trangThai;
