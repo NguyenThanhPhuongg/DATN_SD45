@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NhomNguoiDung extends CommonEntity{
+public class NhomNguoiDung extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,5 +27,5 @@ public class NhomNguoiDung extends CommonEntity{
     private Long userId;
 
     @Column(name = "trang_thai")
-    private String trangThai;
+    private Integer trangThai;
 }
