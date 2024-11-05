@@ -14,4 +14,6 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     List<HoaDon> findByCateId(Long cid);
 
     HoaDon findTopByOrderByNgayTaoDesc();
+
+    List<HoaDon> findByIdNguoiDung(Long idNguoiDung);
 }

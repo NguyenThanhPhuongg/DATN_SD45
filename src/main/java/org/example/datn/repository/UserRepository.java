@@ -1,6 +1,7 @@
 package org.example.datn.repository;
 
 import org.example.datn.entity.User;
+import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUserName(String username);
 
+    List<User> findByRole(UserRoles role);
 }

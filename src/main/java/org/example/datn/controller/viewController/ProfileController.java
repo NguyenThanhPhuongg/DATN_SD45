@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ProfileController {
     @GetMapping("/profile")
     public String register() {
-        return "customer/auth/profile";
+        return "customer/profile/profile";
     }
 }

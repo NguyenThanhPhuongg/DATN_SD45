@@ -29,4 +29,6 @@ public class SanPhamChiTietModel extends CommonModel {
     MauSac mauSac;
     ChatLieu chatLieu;
 
+    SanPhamModel sanPhamModel;
+
 }

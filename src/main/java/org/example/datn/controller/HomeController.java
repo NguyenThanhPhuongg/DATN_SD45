@@ -27,7 +27,11 @@ public class HomeController {
         return "customer/category/category";
     }
     @GetMapping("/staff")
-    public String home(){
+    public String staff(){
         return "/staff/index";
+    }
+    @GetMapping("/qr")
+    public String staffQr(){
+        return "/staff/qr";
     }
 }

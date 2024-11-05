@@ -225,11 +225,14 @@ document.addEventListener('DOMContentLoaded', fetchDeliveryAddress);
 
 // Đóng modal khi nhấp bên ngoài
 window.onclick = function (event) {
-    const modal = document.getElementById("address-modal");
-    if (event.target === modal) {
+    const addressModal = document.getElementById("address-modal");
+    const shippingModal = document.getElementById("shipping-modal");
+
+    if (event.target === addressModal || event.target === shippingModal) {
         closeModal();
     }
 };
+
 let data; // Biến lưu trữ dữ liệu giỏ hàng
 
 async function fetchCartData() {

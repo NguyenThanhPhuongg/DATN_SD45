@@ -15,6 +15,7 @@ import org.example.datn.model.enums.*;
 import org.example.datn.model.request.AuthModel;
 import org.example.datn.model.request.ChangePasswordModel;
 import org.example.datn.model.request.RegisterModel;
+import org.example.datn.model.request.UserQuery;
 import org.example.datn.model.response.AuthInfoModel;
 import org.example.datn.model.response.ProfileModel;
 import org.example.datn.model.response.SessionModel;
@@ -57,7 +58,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserProcessor {
 
-   final UserTransformer userTransformer;
+    final UserTransformer userTransformer;
     UserService userService;
     ProfileTransformer profileTransformer;
     ProfileService profileService;
@@ -85,6 +86,20 @@ public class UserProcessor {
     public List<UserModel> findByIdIn(List<Long> ids) {
         var userModel = userService.findByIdIn(ids).stream().map(mapper()).collect(Collectors.toList());
         return userModel;
+    }
+
+    public ServiceResult get(UserAuthentication ua) {
+        var model = userService.findById(ua.getPrincipal())
+                .map(mapper())
+                .orElseThrow(() -> new EntityNotFoundException("not.fond"));
+        return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult getById(Long id) {
+        var model = userService.findById(id)
+                .map(mapper())
+                .orElseThrow(() -> new EntityNotFoundException("not.fond"));
+        return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public List<UserModel> findAll(String username) {
@@ -311,6 +326,24 @@ public class UserProcessor {
         var hashedPass = userService.encodePassword(model.getPassword());
         user.setPassword(hashedPass);
         userService.save(user);
+        return new ServiceResult();
+    }
+
+    public ServiceResult getListByRole(UserRoles role) {
+        var users = userService.findByRole(role);
+        var models = users.stream().map(user -> {
+            var model = userTransformer.toModel(user);
+            var profile = profileService.findByUserId(user.getId()).orElse(null);
+            var profileModel = profileTransformer.toModel(profile);
+            model.setProfile(profileModel);
+            return model;
+        }).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult deleteById(Long id){
+        var user = userService.findById(id).orElseThrow(() -> new EntityNotFoundException("not.fond"));
+        userService.delete(user);
         return new ServiceResult();
     }
 

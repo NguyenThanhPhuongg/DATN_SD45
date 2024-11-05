@@ -57,16 +57,16 @@ GO
 
 INSERT INTO thong_tin_ca_nhan (id_nguoi_dung, ho_va_ten, sdt, avatar, dia_chi, gioi_tinh, ngay_sinh, cccd, email, nguoi_tao, nguoi_cap_nhat)
 VALUES 
-(1, 'Nguyen Van A', '0912345678', 'avatar1.png', 'Hanoi', 1, '1990-01-01', '0123456789', 'a@example.com', 1, 1),
-(2, 'Nguyen Van B', '0912345679', 'avatar2.png', 'Hanoi', 1, '1991-02-01', '0123456790', 'b@example.com', 1, 1),
-(3, 'Nguyen Van C', '0912345680', 'avatar3.png', 'Hanoi', 1, '1992-03-01', '0123456801', 'c@example.com', 1, 1),
-(4, 'Nguyen Van D', '0912345681', 'avatar4.png', 'Hanoi', 1, '1993-04-01', '0123456812', 'd@example.com', 1, 1),
-(5, 'Nguyen Van E', '0912345682', 'avatar5.png', 'Hanoi', 1, '1994-05-01', '0123456823', 'e@example.com', 1, 1),
-(6, 'Nguyen Van F', '0912345683', 'avatar6.png', 'Hanoi', 1, '1995-06-01', '0123456834', 'f@example.com', 1, 1),
-(7, 'Nguyen Van G', '0912345684', 'avatar7.png', 'Hanoi', 1, '1996-07-01', '0123456845', 'g@example.com', 1, 1),
-(8, 'Nguyen Van H', '0912345685', 'avatar8.png', 'Hanoi', 1, '1997-08-01', '0123456856', 'h@example.com', 1, 1),
-(9, 'Nguyen Van I', '0912345686', 'avatar9.png', 'Hanoi', 1, '1998-09-01', '0123456867', 'i@example.com', 1, 1),
-(10, 'Nguyen Van J', '0912345687', 'avatar10.png', 'Hanoi', 1, '1999-10-01', '0123456878', 'j@example.com', 1, 1);
+(1, 'Nguyen Van A', '0912345678', 'avatar1.png', 'Hanoi', 'NAM', '1990-01-01', '0123456789', 'a@example.com', 1, 1),
+(2, 'Nguyen Van B', '0912345679', 'avatar2.png', 'Hanoi', 'NAM', '1991-02-01', '0123456790', 'b@example.com', 1, 1),
+(3, 'Nguyen Van C', '0912345680', 'avatar3.png', 'Hanoi', 'NU', '1992-03-01', '0123456801', 'c@example.com', 1, 1),
+(4, 'Nguyen Van D', '0912345681', 'avatar4.png', 'Hanoi', 'NAM', '1993-04-01', '0123456812', 'd@example.com', 1, 1),
+(5, 'Nguyen Van E', '0912345682', 'avatar5.png', 'Hanoi', 'NU', '1994-05-01', '0123456823', 'e@example.com', 1, 1),
+(6, 'Nguyen Van F', '0912345683', 'avatar6.png', 'Hanoi', 'NAM', '1995-06-01', '0123456834', 'f@example.com', 1, 1),
+(7, 'Nguyen Van G', '0912345684', 'avatar7.png', 'Hanoi', 'NAM', '1996-07-01', '0123456845', 'g@example.com', 1, 1),
+(8, 'Nguyen Van H', '0912345685', 'avatar8.png', 'Hanoi', 'NAM', '1997-08-01', '0123456856', 'h@example.com', 1, 1),
+(9, 'Nguyen Van I', '0912345686', 'avatar9.png', 'Hanoi', 'NAM' '1998-09-01', '0123456867', 'i@example.com', 1, 1),
+(10, 'Nguyen Van J', '0912345687', 'avatar10.png', 'Hanoi', 'NU', '1999-10-01', '0123456878', 'j@example.com', 1, 1);
 GO
 
 INSERT INTO danh_muc (id_danh_muc_cha, ten, mo_ta, trang_thai, nguoi_tao, nguoi_cap_nhat)

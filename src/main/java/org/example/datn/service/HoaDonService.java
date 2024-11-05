@@ -32,4 +32,8 @@ public class HoaDonService {
     public HoaDon findTopByOrderByNgayTaoDesc(){
         return repo.findTopByOrderByNgayTaoDesc();
     }
+
+    public List<HoaDon> findByIdNguoiDung(Long idNguoiDung){
+        return repo.findByIdNguoiDung(idNguoiDung);
+    }
 }
