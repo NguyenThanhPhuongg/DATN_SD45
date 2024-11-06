@@ -352,5 +352,19 @@ public class UserProcessor {
         return new ServiceResult();
     }
 
+    public ServiceResult getList(UserQuery request) {
+        var users = userService.getUsersByHoVaTenAndRole(request.getKeyword(), request.getRole(), request.getPage(), request.getSize());
+        var models = users.stream().map(mapper()).collect(Collectors.toList());
+        var totalPages = (int) Math.ceil((double) users.getTotalElements() / request.getSize());
+        return new ServiceResult(models, totalPages, request.getPage(), users.getTotalElements(), SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult changeStatus(Long id, UserStatus status) {
+        var user = userService.findById(id).orElseThrow(() -> new EntityNotFoundException("not.fond"));
+        user.setStatus(status);
+        userService.save(user);
+        return new ServiceResult();
+    }
+
 
 }

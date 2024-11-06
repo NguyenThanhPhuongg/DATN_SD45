@@ -155,9 +155,9 @@ public class NhomProcessor {
     }
 
 
-    public ServiceResult changeStatus(Long id) {
+    public ServiceResult changeStatus(Long id, Integer trangThai) {
         var group = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nhóm"));
-        group.setTrangThai(SystemConstant.LOCKED);
+        group.setTrangThai(trangThai);
         service.save(group);
         return new ServiceResult();
     }

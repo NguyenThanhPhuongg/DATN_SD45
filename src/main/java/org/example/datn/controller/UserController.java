@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.UserRoles;
+import org.example.datn.model.enums.UserStatus;
+import org.example.datn.model.request.UserQuery;
 import org.example.datn.processor.UserProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,16 @@ public class UserController {
     @GetMapping("/list")
     public ResponseEntity<ServiceResult> getAll() {
         return ResponseEntity.ok(processor.getAll());
+    }
+
+    @PostMapping("/get-list")
+    public ResponseEntity<ServiceResult> getList(@RequestBody UserQuery request) {
+        return ResponseEntity.ok(processor.getList(request));
+    }
+
+    @PutMapping("/change-status/{id}")
+    public ResponseEntity<ServiceResult> changeStatus(@PathVariable Long id, @RequestParam UserStatus status) {
+        return ResponseEntity.ok(processor.changeStatus(id, status));
     }
 
 }

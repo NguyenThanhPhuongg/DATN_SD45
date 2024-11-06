@@ -236,27 +236,60 @@ app.controller('group-ctrl', function ($scope, $http) {
 
 
 
-    // Xác nhận trước khi khóa nhóm quyền
-    $scope.confirmLock = function(itemId) {
-        var confirmAction = confirm('Bạn có chắc chắn muốn khóa nhóm này?');
-        if (confirmAction) {
-            $scope.lockItem(itemId);
-        }
+    $scope.confirmLock = function(group) {
+        // Đảm bảo rằng group được gán đúng vào selectedGroupForStatusChange
+        $scope.selectedGroupForStatusChange = group;
+
+        var modalTitle = group.trangThai == 1 ? 'Xác nhận khóa nhóm quyền' : 'Xác nhận mở khóa nhóm quyền';
+        var modalMessage = group.trangThai == 1 ? 'Bạn có chắc chắn muốn khóa nhóm quyền này?' : 'Bạn có chắc chắn muốn mở khóa nhóm quyền này?';
+
+        // Cập nhật modal thông tin
+        $scope.modalTitle = modalTitle;
+        $scope.modalMessage = modalMessage;
+
+        // Hiển thị modal
+        $('#confirmModal').modal('show');
     };
 
-    // Khóa nhóm quyền
-    $scope.lockItem = function(itemId) {
-        $http.put('/groups/change-status/' + itemId).then(function(response) {
-            if (response.data.code === '200') {
-                alert('Nhóm đã được khóa thành công!');
-                $scope.loadData();
-            } else {
+
+// Biến lưu trữ thông tin nhóm cần thay đổi trạng thái
+    $scope.selectedGroupForStatusChange = null;
+    $scope.modalTitle = '';
+    $scope.modalMessage = '';
+
+    // Cập nhật trạng thái cho nhóm quyền
+    $scope.confirmStatusChange = function(group, status) {
+        $scope.selectedGroupForStatusChange = group;
+        $scope.modalTitle = status === 1 ? 'Xác nhận khóa nhóm quyền' : 'Xác nhận mở khóa nhóm quyền';
+        $scope.modalMessage = status === 1 ? 'Bạn có chắc chắn muốn khóa nhóm này không?' : 'Bạn có chắc chắn muốn mở khóa nhóm này không?';
+        $('#confirmModal').modal('show'); // Mở modal xác nhận
+    };
+
+    // Thực hiện thay đổi trạng thái nhóm quyền sau khi xác nhận
+    $scope.confirmChangeStatus = function() {
+        const status = $scope.selectedGroupForStatusChange.trangThai === 1 ? 0 : 1; // Đảo ngược trạng thái
+        const groupId = $scope.selectedGroupForStatusChange.id;
+
+        // Gửi yêu cầu PUT với tham số trangThai trong query string
+        $http.put('/groups/change-status/' + groupId + '?trangThai=' + status)
+            .then(function(response) {
+                if (response.data.code === '200') {
+                    $('#confirmModal').modal('hide');
+                    alert('Trạng thái nhóm quyền đã được cập nhật!');
+                    $scope.loadData(); // Tải lại dữ liệu sau khi cập nhật
+                } else {
+                    alert('Có lỗi xảy ra, vui lòng thử lại!');
+                }
+            }, function(error) {
+                console.error('Lỗi khi thay đổi trạng thái nhóm:', error);
                 alert('Có lỗi xảy ra, vui lòng thử lại!');
-            }
-        }, function(error) {
-            console.error('Lỗi khi khóa nhóm:', error);
-            alert('Có lỗi xảy ra, vui lòng thử lại!');
-        });
+            });
+    };
+
+    // Hàm thay đổi trạng thái nhóm quyền (Khóa/Mở khóa) khi gọi từ modal
+    $scope.changeStatus = function(group) {
+        const status = group.trangThai === 1 ? 0 : 1; // Xác định trạng thái mới
+        $scope.confirmStatusChange(group, status); // Hiển thị modal xác nhận
     };
 
     // Tải danh sách chức năng và người dùng khi controller được khởi tạo
