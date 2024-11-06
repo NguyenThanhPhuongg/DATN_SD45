@@ -1,8 +1,11 @@
 app.controller('group-ctrl', function ($scope, $http) {
+
+    // Khai báo pager cho phân trang
     $scope.pager = {
         page: 1,
         size: 20,
-        count: 1,  // Sử dụng giá trị trả về từ API để xác định tổng số trang
+        count: 1,  // Tổng số trang
+        totalRecord: 0,  // Tổng số bản ghi
         first: function() {
             $scope.pager.page = 1;
             $scope.loadData();
@@ -25,70 +28,77 @@ app.controller('group-ctrl', function ($scope, $http) {
         }
     };
 
-    $scope.searchText = ''; // Biến để lưu giá trị tìm kiếm
+    // Biến lưu trữ giá trị tìm kiếm
+    $scope.searchText = '';
 
-    // Hàm gọi API để tải dữ liệu theo điều kiện tìm kiếm và phân trang
+    // Hàm tải dữ liệu nhóm quyền và phân trang
     $scope.loadData = function() {
         const model = {
             page: $scope.pager.page,
             size: $scope.pager.size,
-            keyword: $scope.searchText // Thêm tham số tìm kiếm vào request
+            keyword: $scope.searchText  // Tìm kiếm theo từ khóa
         };
 
+        // Gọi API tải dữ liệu nhóm quyền
         $http.post('/groups/list_page', model).then(function(response) {
-            // Giả sử response chứa dữ liệu nhóm quyền và số trang
-            $scope.groups = response.data.data;  // Danh sách nhóm quyền
-            $scope.pager.count = response.data.totalPage;  // Tổng số trang
-            $scope.pager.totalRecord = response.data.totalRecord;  // Tổng số bản ghi
+            if (response.data.code === '200') {
+                $scope.groups = response.data.data;  // Danh sách nhóm quyền
+                $scope.pager.count = response.data.totalPage;  // Tổng số trang
+                $scope.pager.totalRecord = response.data.totalRecord;  // Tổng số bản ghi
+            } else {
+                console.error("Lỗi khi tải dữ liệu nhóm quyền");
+            }
         }, function(error) {
-            console.error("Error fetching data:", error);
+            console.error("Lỗi khi gọi API:", error);
         });
     };
 
-    // Gọi hàm loadData khi người dùng nhập tìm kiếm
+    // Hàm tìm kiếm và tải lại dữ liệu
     $scope.search = function() {
         $scope.pager.page = 1;  // Reset về trang đầu khi tìm kiếm
         $scope.loadData();
     };
 
-    // Load dữ liệu ban đầu
+    // Gọi loadData khi trang được tải
     $scope.loadData();
 
+    // Biến để lưu trữ thông tin nhóm quyền
     $scope.newGroupName = '';  // Tên nhóm quyền mới
     $scope.newGroupDesc = '';  // Mô tả nhóm quyền
     $scope.functions = [];  // Danh sách chức năng
     $scope.allUsers = [];  // Danh sách tất cả người dùng
-    $scope.selectedUsers = [];  // Danh sách người dùng trong nhóm
+    $scope.selectedUsers = [];  // Danh sách người dùng đã chọn trong nhóm
 
     // Lấy danh sách chức năng từ API
     $scope.loadFunctions = function() {
         $http.get('/function/list').then(function(response) {
             if (response.data.code === '200') {
                 $scope.functions = response.data.data;  // Lưu vào biến functions
+            } else {
+                console.error("Lỗi khi tải danh sách chức năng");
             }
         }, function(error) {
-            console.error('Error fetching functions:', error);
+            console.error("Lỗi khi gọi API chức năng:", error);
         });
     };
 
     // Lấy danh sách người dùng từ API
     $scope.loadUsers = function() {
-        // Giả sử có một API để lấy tất cả người dùng
         $http.get('/user/list').then(function(response) {
             if (response.data.code === '200') {
                 $scope.allUsers = response.data.data;  // Lưu vào biến allUsers
+            } else {
+                console.error("Lỗi khi tải danh sách người dùng");
             }
         }, function(error) {
-            console.error('Error fetching users:', error);
+            console.error("Lỗi khi gọi API người dùng:", error);
         });
     };
 
-    // Hàm di chuyển người dùng từ "Danh sách người dùng" sang "Người dùng trong nhóm"
+    // Di chuyển người dùng từ "Danh sách người dùng" sang "Người dùng trong nhóm"
     $scope.moveUserToGroup = function(user) {
         if (user.selected) {
-            // Di chuyển người dùng vào danh sách "Người dùng trong nhóm"
             $scope.selectedUsers.push(user);
-            // Xóa khỏi danh sách "Danh sách người dùng"
             const index = $scope.allUsers.indexOf(user);
             if (index > -1) {
                 $scope.allUsers.splice(index, 1);
@@ -96,12 +106,10 @@ app.controller('group-ctrl', function ($scope, $http) {
         }
     };
 
-    // Hàm di chuyển người dùng từ "Người dùng trong nhóm" về lại "Danh sách người dùng"
+    // Di chuyển người dùng từ "Người dùng trong nhóm" về lại "Danh sách người dùng"
     $scope.moveUserBackToList = function(user) {
         if (!user.selected) {
-            // Di chuyển người dùng về lại danh sách "Danh sách người dùng"
             $scope.allUsers.push(user);
-            // Xóa khỏi danh sách "Người dùng trong nhóm"
             const index = $scope.selectedUsers.indexOf(user);
             if (index > -1) {
                 $scope.selectedUsers.splice(index, 1);
@@ -109,89 +117,149 @@ app.controller('group-ctrl', function ($scope, $http) {
         }
     };
 
+    // Di chuyển tất cả người dùng vào nhóm
     $scope.moveAllUsersToGroup = function() {
-        console.log("Di chuyển tất cả người dùng sang nhóm");  // Log để kiểm tra
         angular.forEach($scope.allUsers, function(user) {
-            $scope.selectedUsers.push(user);  // Thêm người dùng vào "Người dùng trong nhóm"
+            $scope.selectedUsers.push(user);
         });
-        $scope.allUsers = [];  // Xóa tất cả người dùng khỏi "Danh sách người dùng"
+        $scope.allUsers = [];
     };
 
+    // Di chuyển tất cả người dùng ra khỏi nhóm
     $scope.moveAllUsersBackToList = function() {
-        console.log("Di chuyển tất cả người dùng về lại danh sách người dùng");  // Log để kiểm tra
         angular.forEach($scope.selectedUsers, function(user) {
-            $scope.allUsers.push(user);  // Thêm người dùng vào "Danh sách người dùng"
+            $scope.allUsers.push(user);
         });
-        $scope.selectedUsers = [];  // Xóa tất cả người dùng khỏi "Người dùng trong nhóm"
+        $scope.selectedUsers = [];
     };
 
-
-    // Hàm lưu nhóm quyền mới
+    // Lưu nhóm quyền mới (thêm hoặc chỉnh sửa)
     $scope.saveGroup = function() {
-        // Tạo đối tượng dữ liệu để gửi tới backend
         const groupData = {
             ten: $scope.newGroupName,  // Tên nhóm quyền
             moTa: $scope.newGroupDesc,  // Mô tả nhóm quyền
-            chucNangId: $scope.functions.filter(function(f) { return f.selected; }).map(function(f) { return f.id; }),  // Lọc các chức năng đã chọn và lấy ID
-            userId: $scope.selectedUsers.map(function(user) { return user.id; })  // Lấy ID người dùng trong nhóm
+            chucNangId: $scope.functions.filter(function(f) { return f.selected; }).map(function(f) { return f.id; }),  // Lọc các chức năng đã chọn
+            userId: $scope.selectedUsers.map(function(user) { return user.id; })  // Lấy ID của người dùng trong nhóm
         };
 
-        // Gọi API POST để lưu nhóm quyền mới
-        $http.post('/groups', groupData).then(function(response) {
-            if (response.data.code === '200') {
-                alert('Nhóm quyền đã được tạo thành công!');
-                // Đóng modal
-                $('#addModal').modal('hide');
-                //Load lại danh sach nhóm
-                $scope.loadData();
+        // Kiểm tra xem đây là hành động thêm mới hay chỉnh sửa
+        let apiUrl = '/groups'; // API thêm mới nhóm quyền
+        let method = 'POST'; // Mặc định là POST (thêm mới)
 
+        // Nếu đang chỉnh sửa, thay đổi API URL và phương thức
+        if ($scope.isEdit) {
+            apiUrl = '/groups/' + $scope.selectedGroup.id;
+            method = 'PUT'; // Phương thức PUT để cập nhật
+        }
+
+        // Gửi yêu cầu API
+        $http({
+            method: method,
+            url: apiUrl,
+            data: groupData
+        }).then(function(response) {
+            if (response.data.code === '200') {
+                alert($scope.isEdit ? 'Nhóm quyền đã được cập nhật thành công!' : 'Nhóm quyền đã được tạo thành công!');
+                $('#addModal').modal('hide');
+                $scope.loadData();
                 // Reset form
-                $scope.newGroupName = '';
-                $scope.newGroupDesc = '';
-                $scope.selectedUsers = [];
-                angular.forEach($scope.functions, function(func) {
-                    func.selected = false;  // Reset các checkbox chức năng
-                });
+                $scope.resetForm();
             } else {
                 alert('Có lỗi xảy ra, vui lòng thử lại!');
             }
         }, function(error) {
-            console.error('Error saving group:', error);
+            console.error('Lỗi khi lưu nhóm quyền:', error);
             alert('Có lỗi xảy ra, vui lòng thử lại!');
         });
     };
-    // Gọi ngay khi controller được khởi tạo
-    $scope.loadFunctions();
-    $scope.loadUsers();
 
-    // Hàm xác nhận trước khi khóa
+    // Hàm reset form
+    $scope.resetForm = function() {
+        $scope.newGroupName = '';
+        $scope.newGroupDesc = '';
+        $scope.selectedUsers = [];
+        angular.forEach($scope.functions, function(func) {
+            func.selected = false;
+        });
+        $scope.isEdit = false;  // Đặt trạng thái không phải chỉnh sửa
+        $scope.groupId = null;   // Reset ID nhóm
+    };
+
+    $scope.editGroup = function(group) {
+        console.log("group: ", group);  // Kiểm tra đối tượng nhóm quyền
+
+        // Đánh dấu là chế độ chỉnh sửa
+        $scope.isEdit = true;
+        $scope.selectedGroup = angular.copy(group);  // Sao chép dữ liệu nhóm quyền cần chỉnh sửa vào scope
+        console.log("selectedGroup after copy: ", $scope.selectedGroup);
+
+        // Cập nhật tên nhóm và mô tả vào các trường trong modal
+        $scope.newGroupName = $scope.selectedGroup.ten;
+        $scope.newGroupDesc = $scope.selectedGroup.moTa;
+
+        // Reset danh sách người dùng đã chọn và người dùng chưa có trong nhóm
+        $scope.selectedUsers = [];
+        $scope.allUsers.forEach(function(user) {
+            user.selected = false;  // Đánh dấu lại tất cả người dùng chưa chọn
+        });
+
+        // Cập nhật danh sách người dùng đã chọn
+        $scope.selectedGroup.listNguoiDungModel.forEach(function(user) {
+            // Thêm người dùng vào danh sách selectedUsers
+            $scope.selectedUsers.push(user);
+
+            // Tìm người dùng trong danh sách allUsers
+            const index = $scope.allUsers.findIndex(function(u) {
+                return u.id === user.id;
+            });
+
+            if (index > -1) {
+                // Loại bỏ người dùng khỏi allUsers
+                $scope.allUsers.splice(index, 1);
+            }
+        });
+
+        console.log("selectedUsers after update: ", $scope.selectedUsers);
+        console.log("allUsers after update: ", $scope.allUsers);
+
+        // Cập nhật lại các chức năng đã chọn (checkbox)
+        $scope.functions.forEach(function(func) {
+            // Kiểm tra xem chức năng có trong selectedGroup.idChucNang không
+            func.selected = $scope.selectedGroup.idChucNang.includes(func.id); // Kiểm tra xem chức năng có trong nhóm không
+        });
+
+        console.log("functions after update (checkbox state): ", $scope.functions);
+
+        // Mở modal
+        $('#addModal').modal('show');
+    };
+
+
+
+    // Xác nhận trước khi khóa nhóm quyền
     $scope.confirmLock = function(itemId) {
-        // Hiển thị hộp thoại xác nhận
         var confirmAction = confirm('Bạn có chắc chắn muốn khóa nhóm này?');
-
         if (confirmAction) {
-            // Nếu người dùng xác nhận, gọi API để khóa
             $scope.lockItem(itemId);
         }
     };
 
-    // Hàm gọi API để khóa
+    // Khóa nhóm quyền
     $scope.lockItem = function(itemId) {
         $http.put('/groups/change-status/' + itemId).then(function(response) {
             if (response.data.code === '200') {
                 alert('Nhóm đã được khóa thành công!');
-                // Cập nhật lại danh sách sau khi khóa
                 $scope.loadData();
             } else {
                 alert('Có lỗi xảy ra, vui lòng thử lại!');
             }
         }, function(error) {
-            console.error('Lỗi khi gọi API khóa:', error);
+            console.error('Lỗi khi khóa nhóm:', error);
             alert('Có lỗi xảy ra, vui lòng thử lại!');
         });
     };
 
-
+    // Tải danh sách chức năng và người dùng khi controller được khởi tạo
+    $scope.loadFunctions();
+    $scope.loadUsers();
 });
-
-
