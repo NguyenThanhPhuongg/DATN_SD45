@@ -208,6 +208,7 @@ app.controller("sanpham-ctrl", function ($scope, $http, $rootScope, $location) {
 
                             // Gửi từng sản phẩm chi tiết một
                             const addDetailsPromises = sanPhamChiTietList.map(detail => $http.post("/spct", detail));
+                            addDetailsPromises.push($scope.uploadImages(createdSanPham.id));
 
                             Promise.all(addDetailsPromises).then(() => {
                                 $scope.initialize();
@@ -235,6 +236,30 @@ app.controller("sanpham-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
+    $scope.uploadImages = function (idSanPham) {
+        const input = document.getElementById('profileImage3');
+        const files = input.files;
+        if (files.length > 0) {
+            const formData = new FormData();
+            Array.from(files).forEach(file => {
+                formData.append("images", file);
+            });
+            formData.append("idSanPham", idSanPham);
+
+            return $http.post("/hinh-anh", formData, {
+                headers: { 'Content-Type': undefined }
+            }).then(resp => {
+                console.log("Ảnh đã được tải lên thành công");
+                // Cập nhật thông tin đường dẫn hình ảnh cho sản phẩm
+                document.getElementById("imagePath3").value = resp.data.filePath;  // hiển thị đường dẫn ở input
+            }).catch(error => {
+                console.error("Lỗi khi tải lên ảnh:", error);
+                alert("Có lỗi khi tải lên ảnh. Vui lòng kiểm tra lại.");
+            });
+        } else {
+            swal("Lỗi!", "Vui lòng chọn ảnh sản phẩm.", "error");
+        }
+    };
 
     $scope.upLoadImage = function () {
         const input = document.getElementById('profileImage2');
@@ -276,6 +301,49 @@ app.controller("sanpham-ctrl", function ($scope, $http, $rootScope, $location) {
         }
     };
 
+    $scope.updateImagePreview3 = function(event) {
+        // Xóa tất cả ảnh đã hiển thị trước đó
+        var previewContainer = document.getElementById('previewContainer');
+        previewContainer.innerHTML = '';
+
+        // Lấy danh sách file được chọn
+        var files = event.target.files;
+
+        // Kiểm tra nếu có file nào được chọn
+        if (files.length > 0) {
+            // Duyệt qua danh sách file và tạo preview cho từng file
+            $scope.image.anh = []; // Đảm bảo danh sách ảnh được reset
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var reader = new FileReader();
+
+                // Khi đọc file xong, tạo preview và cập nhật vào model
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        // Tạo phần tử img để hiển thị ảnh
+                        var img = document.createElement('img');
+                        img.classList.add('preview-image');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '100px'; // Đặt kích thước hiển thị
+                        img.style.margin = '5px';
+
+                        // Thêm ảnh vào container
+                        previewContainer.appendChild(img);
+
+                        // Cập nhật danh sách ảnh vào mô hình Angular
+                        $scope.$apply(function() {
+                            $scope.image.anh.push({
+                                file: theFile,
+                                url: e.target.result
+                            });
+                        });
+                    };
+                })(file);
+
+                reader.readAsDataURL(file); // Đọc file ảnh
+            }
+        }
+    };
 
     $scope.initialize();
 });

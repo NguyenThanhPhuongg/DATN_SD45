@@ -5,8 +5,6 @@
             <div class="col-12">
                 <label class="" for="inlineFormInputGroupUsername">Tên sản phẩm</label>
                 <div class="input-group mt-1">
-                    <div class="input-group-text" style="background-color: gainsboro;"><i class="fas fa-tag"></i>
-                    </div>
                     <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Áo sơ mi"
                            ng-model="form.ten">
                 </div>
@@ -15,9 +13,6 @@
             <div class="col-12 mt-2">
                 <label class="" for="inlineFormInputGroupUsername1">Giá sản phẩm</label>
                 <div class="input-group mt-1">
-                    <div class="input-group-text" style="background-color: gainsboro;"><i
-                            class="fas fa-dollar-sign"></i>
-                    </div>
                     <input type="number" class="form-control" id="inlineFormInputGroupUsername1" step="100000"
                            placeholder="100.000" ng-model="form.gia">
                 </div>
@@ -26,9 +21,6 @@
             <div class="col-12 mt-2">
                 <label class="" for="inlineFormInputGroupUsername2">Mô tả sản phẩm</label>
                 <div class="input-group mt-1">
-                    <div class="input-group-text" style="background-color: gainsboro;"><i
-                            class="fas fa-info-circle"></i>
-                    </div>
                     <textarea type="text" class="form-control" id="inlineFormInputGroupUsername2"
                               placeholder="Chất chơi người dơi người sắt người nhện" ng-model="form.moTa"></textarea>
                 </div>
@@ -103,6 +95,12 @@
                 </div>
                 <input type="text" class="form-control" id="imagePath2" ng-model="form.anh" readonly
                        style="display: none;">
+                <span class="text-danger" ng-show="error.anh">Vui lòng chọn ảnh sản phẩm.</span>
+            </div>
+            <div class="col-md-12 mt-2">
+                <input type="file" class="form-control" id="profileImage3" accept="image/*" multiple onchange="updateImagePreview3()">
+                <div id="previewContainer" class="mt-2"></div>
+                <input type="text" class="form-control" id="imagePath3" ng-model="image.anh" readonly style="display: none;">
                 <span class="text-danger" ng-show="error.anh">Vui lòng chọn ảnh sản phẩm.</span>
             </div>
         </div>
