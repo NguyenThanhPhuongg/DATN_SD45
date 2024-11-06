@@ -38,8 +38,8 @@ public class NhomController {
     }
 
     @PutMapping("/change-status/{id}")
-    public ServiceResult update(@PathVariable Long id) {
-        return processor.changeStatus(id);
+    public ServiceResult update(@PathVariable Long id, @RequestParam Integer trangThai) {
+        return processor.changeStatus(id, trangThai);
     }
 
     @PutMapping("/{id}")

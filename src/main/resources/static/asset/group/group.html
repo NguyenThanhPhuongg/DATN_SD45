@@ -30,11 +30,15 @@
                     <td>{{ group.count }}</td>
                     <td>
                         <span ng-if="group.trangThai == 1" class="badge bg-success">Đang hoạt động</span>
-                        <span ng-if="group.trangThai == 0" class="badge bg-danger">Không hoạt động</span>
+                        <span ng-if="group.trangThai == 0" class="badge bg-danger">Đã khóa</span>
                     </td>
                     <td>
                         <button class="btn btn-warning" ng-click="editGroup(group)">Chỉnh sửa</button>
-                        <button class="btn btn-danger btn-sm" ng-click="confirmLock(group.id)">Khoá</button>
+                        <button class="btn"
+                                ng-class="group.trangThai == 1 ? 'btn-danger' : 'btn-success'"
+                                ng-click="confirmLock(group)">
+                            {{ group.trangThai == 1 ? 'Khoá' : 'Mở khóa' }}
+                        </button>
                     </td>
                 </tr>
                 </tbody>
@@ -121,6 +125,27 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="button" class="btn btn-primary" ng-click="saveGroup()">Đồng ý</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Confirm -->
+        <div class="modal" id="confirmModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{modalMessage}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" ng-click="confirmChangeStatus()">Xác nhận</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                     </div>
                 </div>
             </div>

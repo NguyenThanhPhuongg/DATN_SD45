@@ -2,12 +2,17 @@ package org.example.datn.service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+
 import org.example.datn.entity.User;
 import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
 import org.example.datn.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,7 +45,7 @@ public class UserService {
     }
 
     public User saveEntity(User user) {
-       return repo.save(user);
+        return repo.save(user);
     }
 
     public String encodePassword(String raw) {
@@ -55,6 +60,7 @@ public class UserService {
     public boolean passwordMatched(String password, User user) {
         return passwordEncoder.matches(password, user.getPassword());
     }
+
     public List<User> findAll() {
         return repo.findAll();
     }
@@ -108,5 +114,13 @@ public class UserService {
 
     public void delete(User user) {
         repo.delete(user);
+    }
+
+    public Page<User> getUsersByHoVaTenAndRole(String hoVaTen, UserRoles role, Integer page, Integer size) {
+        int pageIndex = (page > 0) ? page - 1 : 0;
+        Pageable pageable = PageRequest.of(pageIndex, size, Sort.by(Sort.Order.desc("ngayTao")));
+
+        // Truy vấn và trả về trang dữ liệu
+        return repo.findByHoVaTenAndRole(hoVaTen, role, pageable);
     }
 }
