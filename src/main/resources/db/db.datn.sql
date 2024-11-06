@@ -3,7 +3,7 @@ GO
 USE [DB.DATN]
 GO
 
--- DROP DATABASE DB.DATN
+--- DROP DATABASE [DB.DATN]
 --- Chuc nang
 SET ANSI_NULLS ON
 GO
@@ -69,16 +69,26 @@ CREATE TABLE [nhom]
 ) ON [PRIMARY];
 GO
 
-CREATE TABLE nhom_nguoi_dung (
-                                 id BIGINT IDENTITY(1,1) PRIMARY KEY,
-                                 id_nhom BIGINT,
-                                 id_nguoi_dung BIGINT,
-                                 trang_thai INT,
-                                 ngay_tao DATETIME,
-                                 ngay_cap_nhat DATETIME,
-                                 nguoi_tao BIGINT,
-                                 nguoi_cap_nhat BIGINT
-);
+--- Nhom nguoi dung
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE nhom_nguoi_dung
+(
+    [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED
+    (
+        [id] ASC
+    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+    [id_nhom] BIGINT,
+    [id_nguoi_dung] BIGINT,
+    [trang_thai] INT,
+    [ngay_tao] DATETIME,
+    [ngay_cap_nhat] DATETIME,
+    [nguoi_tao] BIGINT,
+    [nguoi_cap_nhat] BIGINT
+)ON [PRIMARY];
+GO
 
 --- Nguoi dung
 SET ANSI_NULLS ON
@@ -534,7 +544,6 @@ CREATE TABLE [san_pham]
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
 GO
---- DROP TABLE [chi_tiet_san_pham];
 
 --- Chi tiet San pham
 SET ANSI_NULLS ON
