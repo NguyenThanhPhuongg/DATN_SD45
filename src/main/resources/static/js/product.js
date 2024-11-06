@@ -1,19 +1,57 @@
 $(document).ready(function () {
-    const productId = 1;
+    // Trích xuất productId từ URL
+    const urlParts = window.location.pathname.split('/');
+    const productId = urlParts[urlParts.length - 1];
 
+    // // Lấy dữ liệu sản phẩm
+    // $.ajax({
+    //     url: `/san-pham/${productId}`,
+    //     method: 'GET',
+    //     success: function (response) {
+    //         const product = response.data;
+    //         $('#productName').text(product.ten);
+    //         $('#productBrand').text(product.thuonghieu.ten);
+    //         $('#productCode').text(product.ma);
+    //         $('#productPrice').text(product.gia.toLocaleString() + 'đ');
+    //         $('#productOldPrice').text(product.gia.toLocaleString() + 'đ');
+    //         $('#priceProduct').val(product.gia);
+    //         $('#productDescription').text(product.moTa);
+    //     },
+    //     error: function (error) {
+    //         console.error("Lỗi khi lấy dữ liệu sản phẩm", error);
+    //     }
+    // });
     // Lấy dữ liệu sản phẩm
     $.ajax({
         url: `/san-pham/${productId}`,
         method: 'GET',
         success: function (response) {
-            const product = response.data;
-            $('#productName').text(product.ten);
-            $('#productBrand').text(product.thuonghieu.ten);
-            $('#productCode').text(product.ma);
-            $('#productPrice').text(product.gia.toLocaleString() + 'đ');
-            $('#productOldPrice').text(product.gia.toLocaleString() + 'đ');
-            $('#priceProduct').val(product.gia);
-            $('#productDescription').text(product.moTa);
+            if (response && response.data) {
+                const product = response.data;
+                $('#productName').text(product.ten);
+                $('#productBrand').text(product.thuonghieu.ten);
+                $('#productCode').text(product.ma);
+                $('#productPrice').text(product.gia.toLocaleString() + ' đ');  // Thêm khoảng trắng trước 'đ'
+                $('#productOldPrice').text(product.gia.toLocaleString() + ' đ'); // Thêm khoảng trắng trước 'đ'
+                $('#priceProduct').val(product.gia);
+                $('#productDescription').text(product.moTa);
+
+                // Cập nhật tùy chọn màu sắc
+                let colorOptionsHtml = '';
+                product.listMauSac.forEach(color => {
+                    colorOptionsHtml += `<span class="badge bg-secondary me-1">${color.ten}</span>`;
+                });
+                $('#colorOptions').append(colorOptionsHtml);
+
+                // Cập nhật tùy chọn kích thước
+                let sizeOptionsHtml = '';
+                product.listSize.forEach(size => {
+                    sizeOptionsHtml += `<span class="badge bg-secondary me-1">${size.ten}</span>`;
+                });
+                $('#sizeOptions').append(sizeOptionsHtml);
+            } else {
+                alert("Không tìm thấy dữ liệu sản phẩm!");
+            }
         },
         error: function (error) {
             console.error("Lỗi khi lấy dữ liệu sản phẩm", error);
@@ -105,12 +143,12 @@ $(document).ready(function () {
 });
 
 
-document.querySelector('.quantity_plus').addEventListener('click', function() {
+document.querySelector('.quantity_plus').addEventListener('click', function () {
     const input = document.querySelector('input[name="quantity_product"]');
     input.value = parseInt(input.value) + 1;
 });
 
-document.querySelector('.quantity_minius').addEventListener('click', function() {
+document.querySelector('.quantity_minius').addEventListener('click', function () {
     const input = document.querySelector('input[name="quantity_product"]');
     if (input.value > 1) {
         input.value = parseInt(input.value) - 1;

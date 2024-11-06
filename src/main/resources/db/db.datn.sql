@@ -362,6 +362,7 @@ CREATE TABLE [hoa_don]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_nguoi_dung] BIGINT,
+    [ma] NVARCHAR(50),
     [id_dia_chi_giao_hang] BIGINT,
     [id_phuong_thuc_van_chuyen] BIGINT,
     [ngay_dat_hang] DATETIME DEFAULT GETDATE(),
@@ -377,6 +378,7 @@ CREATE TABLE [hoa_don]
 GO
 
 --- chi tiet hoa don
+
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -532,6 +534,7 @@ CREATE TABLE [san_pham]
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
 GO
+--- DROP TABLE [chi_tiet_san_pham];
 
 --- Chi tiet San pham
 SET ANSI_NULLS ON

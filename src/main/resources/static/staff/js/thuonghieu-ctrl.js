@@ -31,8 +31,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
         updateItems: function () {
             // Lọc các mục theo tìm kiếm
             const filteredItems = $scope.items.filter(item => {
-                return item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || // Lọc theo ID
-                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase()); // Lọc theo tên
+                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
+                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                return matchesSearch;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);

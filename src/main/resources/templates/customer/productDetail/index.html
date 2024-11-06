@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="vi-VN" dir="LTR">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml" lang="vi-VN" dir="LTR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -22,6 +22,7 @@
     <script src="/js/main.js"></script>
     <script src="/js/loadmore.js"></script>
     <script src="/js/product.js"></script>
+    <script src="/js/home.js"></script>
 
     <style>
 
@@ -188,36 +189,50 @@
 
             <div class="col-md-5">
                 <form id="productForm" action="">
+                    <!-- Product Name -->
                     <h1 class="mt-2" id="productName"></h1>
+
+                    <!-- Product Brand and Code -->
                     <div class="mb-2">Thương hiệu: <b id="productBrand"></b></div>
                     <div class="mb-2">Mã sản phẩm: <b id="productCode"></b></div>
-                    <p>Giá: <span class="text-danger me-3" id="productPrice"></span>
+
+                    <!-- Product Price -->
+                    <p>
+                        Giá: <span class="text-danger me-3" id="productPrice"></span>
                         <del class="text-muted" id="productOldPrice"></del>
                     </p>
                     <input type="hidden" name="price_product" id="priceProduct">
+
+                    <!-- Color Options -->
                     <div class="mt-2" id="colorOptions">
                         <label>Màu sắc:</label><br>
                     </div>
 
+                    <!-- Size Options -->
                     <div class="mt-2" id="sizeOptions">
                         <label>Size:</label><br>
                     </div>
 
-
+                    <!-- Quantity Selection -->
                     <span>Số lượng</span>
                     <div class="quantity_group">
-                        <button class="quantity_minius">-</button>
-                        <input type="number" name="quantity_product" value="1" min="1" class="quantity_input"/>
-                        <button class="quantity_plus">+</button>
+                        <button type="button" class="quantity_minus">-</button>
+                        <input type="number" name="quantity_product" value="1" min="1" class="quantity_input" id="quantityInput"/>
+                        <button type="button" class="quantity_plus">+</button>
                     </div>
 
+                    <!-- Total Price Display -->
                     <div id="total_price" class="mb-2" style="display:none;">
-                        Tổng tiền: <span></span>
+                        Tổng tiền: <span id="totalPriceValue"></span> VND
                     </div>
                     <hr>
+
+                    <!-- Action Buttons -->
                     <button type="button" class="btn btn-dark btn-buy" style="margin-right: 10px">Mua hàng</button>
                     <button type="button" class="btn btn-outline-dark btn-addcart">Thêm vào giỏ hàng</button>
                     <hr>
+
+                    <!-- Product Description -->
                     <div>
                         <b>Mô tả ngắn:</b>
                         <p id="productDescription"></p>
@@ -225,6 +240,7 @@
                 </form>
                 <hr>
             </div>
+
 
             <div class="mt-5 col-md-10 text-detail">
                 <h1 style="text-align: center">CHI TIẾT SẢN PHẨM</h1>

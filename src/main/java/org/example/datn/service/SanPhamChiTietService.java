@@ -44,4 +44,8 @@ public class SanPhamChiTietService {
     }
     //
 
+
+    public List<SanPhamChiTiet> findByIdSanPham(Long idSanPham) {
+        return repo.findByIdSanPham(idSanPham);
+    }
 }

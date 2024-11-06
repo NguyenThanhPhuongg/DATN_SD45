@@ -5,7 +5,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
     $scope.searchText = ''; // Biến tìm kiếm
     $scope.pager = {
         page: 0,
-        size: 5,
+        size: 5, // Giá trị mặc định
         items: [],
         count: 0,
         first: function () {
@@ -31,15 +31,17 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         updateItems: function () {
             // Lọc các mục theo tìm kiếm
             const filteredItems = $scope.items.filter(item => {
-                return item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || // Lọc theo ID
-                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase()); // Lọc theo tên
+                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
+                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                const matchesIdCha = !$scope.selectedIdCha || item.idCha === Number($scope.selectedIdCha);
+                return matchesSearch && matchesIdCha;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
 
-    // Khởi tạo và tải dữ liệu
+// Khởi tạo và tải dữ liệu
     $scope.initialize = function () {
         // Gọi API và kiểm tra dữ liệu
         $http.get("/rest/danhmuc").then(resp => {
@@ -60,14 +62,20 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         });
     };
 
-    // Theo dõi thay đổi trong ô tìm kiếm
+// Theo dõi thay đổi trong ô tìm kiếm
     $scope.$watch('searchText', function (newValue, oldValue) {
         if (newValue !== oldValue) {
             $scope.pager.updateItems();
         }
     });
 
-    // Khởi tạo dữ liệu khi controller được tải
+    $scope.$watch('selectedIdCha', function (newValue, oldValue) {
+        if (newValue !== oldValue) {
+            $scope.pager.updateItems();
+        }
+    });
+
+// Khởi tạo dữ liệu khi controller được tải
     $scope.initialize();
 
     $scope.reset = function () {
@@ -184,7 +192,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
             }
         });
     };
-    // Thêm thương hiệu
+// Thêm thương hiệu
     $scope.create = function () {
         $scope.error1 = {
             ten: false,
@@ -242,4 +250,5 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
             }
         });
     };
-});
+})
+;

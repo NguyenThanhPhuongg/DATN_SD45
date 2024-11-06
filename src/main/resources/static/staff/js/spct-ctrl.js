@@ -1,205 +1,163 @@
-app.controller("spct-ctrl", function ($scope, $http,$rootScope) {
+app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
+    $scope.item = [];
     $scope.items = [];
-    $scope.sanpham = [];
+    $scope.form = {};
+    $scope.filters = {};  // Đối tượng lưu giá trị bộ lọc riêng
+    $scope.error = {};
     $scope.size = [];
     $scope.mausac = [];
+    $scope.danhmuc = [];
+    $scope.thuonghieu = [];
     $scope.chatlieu = [];
-    $scope.form = {};
-    $scope.formAdd = {};
-    $scope.searchText = ''; // Thêm biến tìm kiếm
+    $scope.searchText = ''; // Biến tìm kiếm
+    $scope.selectedProductId = null;
+
     $scope.pager = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
+        page: 0, size: 5, items: [], count: 0, first: function () {
             this.page = 0;
             this.updateItems();
-        },
-        prev: function () {
+        }, prev: function () {
             if (this.page > 0) {
                 this.page--;
                 this.updateItems();
             }
-        },
-        next: function () {
+        }, next: function () {
             if (this.page < this.count - 1) {
                 this.page++;
                 this.updateItems();
             }
-        },
-        last: function () {
+        }, last: function () {
             this.page = this.count - 1;
             this.updateItems();
-        }
-
-
-    };
-
-    $scope.selectedProductId = null; // Biến để lưu ID sản phẩm được chọn
-
-    // Hàm cập nhật sản phẩm chi tiết
-    $scope.updateProductDetails = function () {
-        const selectedProductId = $scope.form.idSanPham.id;
-        $scope.selectedProductId = selectedProductId;
-
-        // Cập nhật formAdd.idSanPham.id khi chọn sản phẩm
-        $scope.formAdd.idSanPham = {id: selectedProductId};
-
-        // Cập nhật các mục cho pager
-        $scope.pager.updateItems(); // Cập nhật lại items để phân trang
-    };
-
-
-    // Cập nhật lại hàm updateItems trong pager để chỉ tìm theo ID sản phẩm
-    $scope.pager.updateItems = function () {
-        const filteredItems = $scope.items.filter(item => {
-            // Chỉ lọc sản phẩm chi tiết có idSanPham trùng với selectedProductId
-            return item.idSanPham.id === $scope.selectedProductId;
-        });
-
-        this.count = Math.ceil(filteredItems.length / this.size);
-        this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-    };
-
-    // Theo dõi sự thay đổi trong select sản phẩm
-    $scope.$watch('form.idSanPham.id', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.updateProductDetails(); // Gọi hàm cập nhật khi ID sản phẩm thay đổi
-        }
-    });
-
-    // Hàm khởi tạo
-    $scope.initialize = function () {
-        // Tải danh sách thương hiệu
-        $http.get("/rest/spct").then(resp => {
-            console.log("Data from API: ", resp.data); // Kiểm tra dữ liệu từ API
-            $scope.items = resp.data;
-            $scope.items.forEach(item => {
-                item.ngayTao = new Date(item.ngayTao); // Đổi tên trường nếu cần
-                item.ngayCapNhat = new Date(item.ngayCapNhat); // Đổi tên trường nếu cần
+        }, updateItems: function () {
+            const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 1;
+                const matchesSearch = item.ma.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                return matchesSearch && $scope.filterByAttributes(item) && statusMatches;
             });
-            $scope.pager.updateItems(); // Cập nhật các mục cho pager
-        }).catch(error => {
-            console.log("Error loading thuong hieu: ", error);
-        });
-        $http.get("/rest/size").then(resp => {
-            $scope.size = resp.data;
-        });
-        $http.get("/rest/mausac").then(resp => {
-            $scope.mausac = resp.data;
-        });
-        $http.get("/rest/chatlieu").then(resp => {
-            $scope.chatlieu = resp.data;
-        });
-        $http.get("/rest/sanpham").then(resp => {
-            $scope.sanpham = resp.data;
-        });
-
-    };
-
-    // Theo dõi sự thay đổi trong ô tìm kiếm
-    $scope.$watch('searchText', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pager.updateItems();
+            this.count = Math.ceil(filteredItems.length / this.size);
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
+    };
+    $scope.pager2 = {
+        page: 0, size: 5, items: [], count: 0, first: function () {
+            this.page = 0;
+            this.updateItems();
+        }, prev: function () {
+            if (this.page > 0) {
+                this.page--;
+                this.updateItems();
+            }
+        }, next: function () {
+            if (this.page < this.count - 1) {
+                this.page++;
+                this.updateItems();
+            }
+        }, last: function () {
+            this.page = this.count - 1;
+            this.updateItems();
+        }, updateItems: function () {
+            const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 2;
+                const matchesSearch = item.ma.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                return matchesSearch && $scope.filterByAttributes(item) && statusMatches;
+            });
+            this.count = Math.ceil(filteredItems.length / this.size);
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+        }
+    };
+
+    $scope.filterByAttributes = function (item) {
+        return ((!$scope.filters.idChatLieu || item.idChatLieu === $scope.filters.idChatLieu) && (!$scope.filters.idDanhMuc || item.idDanhMuc === $scope.filters.idDanhMuc) && (!$scope.filters.idThuongHieu || item.idThuongHieu === $scope.filters.idThuongHieu) && (!$scope.filters.xuatXu || item.xuatXu === $scope.filters.xuatXu));
+    };
+
+    $scope.initialize = function () {
+        $http.get("/san-pham").then(resp => {
+            $scope.items = resp.data.data.map(item => ({
+                ...item, ngayTao: new Date(item.ngayTao), ngayCapNhat: new Date(item.ngayCapNhat)
+            }));
+            $scope.pager.updateItems();
+            $scope.pager2.updateItems();
+        }).catch(error => console.error("Lỗi khi tải danh mục: ", error));
+
+        $http.get("/rest/danhmuc").then(resp => {
+            $scope.danhmuc = resp.data.data;
+        });
+        $http.get("/rest/thuonghieu").then(resp => {
+            $scope.thuonghieu = resp.data.data;
+        });
+        $http.get("/chat-lieu/get-list").then(resp => {
+            $scope.chatlieu = resp.data.data;
+        });
+        $http.get("/size/get-list").then(resp => {
+            $scope.size = resp.data.data;
+        });
+        $http.get("/mau-sac/get-list").then(resp => {
+            $scope.mausac = resp.data.data;
+        });
+    };
+
+    $scope.$watchGroup(['filters.idChatLieu', 'filters.idDanhMuc', 'filters.idThuongHieu', 'filters.xuatXu', 'searchText'], function () {
+        $scope.pager.updateItems();
     });
-    // Khởi tạo
-    $scope.initialize();
-
-    // Reset
-    $scope.reset = function () {
-        // Giữ nguyên giá trị của id nếu có
-        const currentId = $scope.form.id; // Lưu trữ giá trị ID hiện tại
-        const currentIdSP = $scope.form.idSanPham; // Lưu trữ giá trị ID hiện tại
-        const ngayTao = $scope.form.ngayTao; // Lưu trữ giá trị ID hiện tại
-        // Thiết lập lại các trường khác
-        $scope.form = {
-            nguoiTao: 'Admin', // Mặc định người tạo là 'Admin'
-            nguoiCapNhat: 'Admin', // Mặc định người cập nhật là 'Admin'
-            ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
-            ngayTao: ngayTao,
-            trangThai: 1, // Đặt mặc định cho trạng thái là true
-            id: currentId, // Giữ nguyên giá trị ID
-            idSanPham: currentIdSP, // Giữ nguyên giá trị ID
-            soLuong: 0,
-            gia: 0,
-            ghiChu: ''
-        };
-    };
-
-    $scope.resetAdd = function () {
-        const currentIdSP = $scope.formAdd.idSanPham; // Lưu trữ giá trị ID sản phẩm hiện tại
-
-        // Thiết lập lại các trường khác nhưng giữ nguyên idSanPham
-        $scope.formAdd = {
-            idSanPham: currentIdSP, // Giữ nguyên giá trị ID sản phẩm
-            soLuong: 0,
-            gia: 0,
-            ghiChu: '',
-            trangThai: 1, // Đặt mặc định trạng thái
-            nguoiTao: 'Admin', // Đặt mặc định người tạo là 'Admin'
-            nguoiCapNhat: 'Admin', // Đặt mặc định người cập nhật là 'Admin'
-            ngayCapNhat: new Date() // Ngày cập nhật là thời gian hiện tại
-        };
-    };
-
 
     $scope.edit = function (item) {
-        // Chuyển timestamp thành Date object
         item.ngayCapNhat = new Date(item.ngayCapNhat);
         $scope.form = angular.copy(item);
     };
 
     $scope.update = function () {
-        $scope.error1 = {
-            soLuong: false,
-            ghiChu: false,
+        $scope.error = {
+            ten: false,
+            moTa: false,
+            xuatXu: false,
             gia: false,
-            trangThai: false,
-            idSize: false,
             idChatLieu: false,
-            idMauSac: false
+            idThuongHieu: false,
+            idDanhMuc: false,
+            anh: false // Thêm trường lỗi cho ảnh
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
-        // Kiểm tra trường 'gia' phải từ 100,000 đến 100,000,000
+        if (!$scope.form.ten || $scope.form.ten.length < 1 || $scope.form.ten.length > 250) {
+            $scope.error.ten = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.moTa || $scope.form.moTa.length < 1 || $scope.form.moTa.length > 250) {
+            $scope.error.moTa = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.xuatXu) {
+            $scope.error.xuatXu = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.idThuongHieu || !$scope.form.idThuongHieu) {
+            $scope.error.idThuongHieu = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.idDanhMuc || !$scope.form.idDanhMuc) {
+            $scope.error.idDanhMuc = true;
+            isValid = false;
+        }
+
+        if (!$scope.form.idChatLieu || !$scope.form.idChatLieu) {
+            $scope.error.idChatLieu = true;
+            isValid = false;
+        }
+
         if (!$scope.form.gia || $scope.form.gia < 100000 || $scope.form.gia > 100000000) {
-            $scope.error1.gia = true;
+            $scope.error.gia = true;
             isValid = false;
         }
 
-        // Kiểm tra trường 'soLuong' phải từ 100 đến 10,000
-        if (!$scope.form.soLuong || $scope.form.soLuong < 100 || $scope.form.soLuong > 10000) {
-            $scope.error1.soLuong = true;
-            isValid = false;
-        }
-
-        // Kiểm tra trường 'ghiChu' phải từ 1 đến 300 ký tự
-        if (!$scope.form.ghiChu || $scope.form.ghiChu.length < 1 || $scope.form.ghiChu.length > 300) {
-            $scope.error1.ghiChu = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.idSize || !$scope.form.idSize.id) {
-            $scope.error1.idSize = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.idChatLieu || !$scope.form.idChatLieu.id) {
-            $scope.error1.idChatLieu = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.idMauSac || !$scope.form.idMauSac.id) {
-            $scope.error1.idMauSac = true;
-            isValid = false;
-        }
-
-        if (!$scope.form.trangThai) {
-            $scope.error1.trangThai = true;
+        if (!$scope.form.anh) {
+            $scope.error.anh = true;
             isValid = false;
         }
 
@@ -211,7 +169,7 @@ app.controller("spct-ctrl", function ($scope, $http,$rootScope) {
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật thương hiệu này không?",
+            text: "Bạn có chắc muốn cập nhật sản phẩm này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -219,11 +177,13 @@ app.controller("spct-ctrl", function ($scope, $http,$rootScope) {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
                 item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
-                item.nguoiCapNhat = 'Admin'; // Đặt người tạo mặc định là 'Admin'
+                item.nguoiCapNhat = 2;
 
-                $http.put(`/rest/spct/${item.id}`, item).then(resp => {
+                $http.put(`/san-pham/${item.id}`, item).then(resp => {
+                    $scope.upLoadImage();
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
+                    $('#exampleModal').modal('hide');
                 }).catch(error => {
                     swal("Error!", "Cập nhật thất bại", "error");
                     console.log("Error: ", error);
@@ -234,116 +194,95 @@ app.controller("spct-ctrl", function ($scope, $http,$rootScope) {
         });
     };
 
-    // Thêm thương hiệu
-    $scope.create = function () {
-        $scope.error = {
-            soLuong: false,
-            ghiChu: false,
-            gia: false,
-            trangThai: false,
-            idSize: false,
-            idChatLieu: false,
-            idMauSac: false
-        };
-
-        // Kiểm tra các trường dữ liệu
-        let isValid = true;
-
-        // Kiểm tra trường 'gia' phải từ 100,000 đến 100,000,000
-        if (!$scope.formAdd.gia || $scope.formAdd.gia < 100000 || $scope.formAdd.gia > 100000000) {
-            $scope.error.gia = true;
-            isValid = false;
-        }
-
-        // Kiểm tra trường 'soLuong' phải từ 100 đến 10,000
-        if (!$scope.formAdd.soLuong || $scope.formAdd.soLuong < 100 || $scope.formAdd.soLuong > 10000) {
-            $scope.error.soLuong = true;
-            isValid = false;
-        }
-
-        // Kiểm tra trường 'ghiChu' phải từ 1 đến 300 ký tự
-        if (!$scope.formAdd.ghiChu || $scope.formAdd.ghiChu.length < 1 || $scope.formAdd.ghiChu.length > 300) {
-            $scope.error.ghiChu = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.idSize || !$scope.formAdd.idSize.id) {
-            $scope.error.idSize = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.idChatLieu || !$scope.formAdd.idChatLieu.id) {
-            $scope.error.idChatLieu = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.idMauSac || !$scope.formAdd.idMauSac.id) {
-            $scope.error.idMauSac = true;
-            isValid = false;
-        }
-
-        if (!$scope.formAdd.trangThai) {
-            $scope.error.trangThai = true;
-            isValid = false;
-        }
-
-        // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
-        if (!isValid) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
-            return; // Ngừng thực hiện nếu không hợp lệ
-        }
-
+    $scope.update2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn thêm thương hiệu này không?",
+            text: "Bạn có chắc muốn ẩn sản phẩm này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
-        }).then((willAdd) => {
-            if (willAdd) {
-                var item = angular.copy($scope.formAdd);
-                item.nguoiTao = 'Admin'; // Đặt người tạo mặc định là 'Admin'
-                item.ngayTao = new Date(); // Ngày tạo là thời gian hiện tại
-                item.ngayCapNhat = new Date(); // Ngày cập nhật là thời gian hiện tại
-
-                $http.post(`/rest/spct`, item).then(resp => {
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                item.trangThai = 2; // Cập nhật trạng thái
+                $http.put(`/san-pham/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
-                    $scope.resetAdd();
-                    swal("Success!", "Thêm mới thành công", "success");
+                    swal("Success!", "Ẩn sản phẩm thành công", "success");
                 }).catch(error => {
-                    swal("Error!", "Thêm mới thất bại", "error");
+                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
                     console.log("Error: ", error);
                 });
             } else {
-                swal("Hủy thêm thương hiệu", "Thêm thương hiệu đã bị hủy", "error");
+                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
             }
         });
     };
 
-    // Xóa thương hiệu
-    $scope.delete = function (item) {
+    $scope.update1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn xóa thương hiệu này không?",
+            text: "Bạn có chắc muốn hiện sản phẩm này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                $http.delete(`/rest/spct/${item.id}`).then(resp => {
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                item.trangThai = 1; // Cập nhật trạng thái
+                $http.put(`/san-pham/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
-                    $scope.reset();
-                    swal("Success!", "Xóa thành công", "success");
+                    swal("Success!", "Hiện sản phẩm thành công", "success");
                 }).catch(error => {
-                    swal("Error!", "Xóa thất bại", "error");
+                    swal("Error!", "Hiện sản phẩm thất bại", "error");
                     console.log("Error: ", error);
                 });
             } else {
-                swal("Hủy xóa", "Xóa thương hiệu đã bị hủy", "error");
+                swal("Hủy cập nhật", "Hiện sản phẩm đã bị hủy", "error");
             }
         });
     };
 
-    $scope.selectedProductId = $rootScope.selectedProductId; // Lấy ID sản phẩm từ rootScope
+    $scope.selectProduct = function (item) {
+        console.log("Selected Product ID: ", item.id); // Log để kiểm tra
+        $rootScope.selectedProductId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        $rootScope.selectedProductTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        $location.path('/spct'); // Chuyển hướng đến trang sản phẩm chi tiết
+    };
 
+
+    $scope.upLoadImage = function () {
+        const input = document.getElementById('profileImage');
+        if (input.files && input.files[0]) {
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+
+            $http.post("/file/upload", formData, {
+                headers: {'Content-Type': undefined}
+            }).then(resp => {
+                $scope.form.anh = resp.data.filePath;  // lưu đường dẫn vào form
+                document.getElementById("imagePath").value = resp.data.filePath;  // hiển thị đường dẫn ở input
+                // Gọi lại API để lấy dữ liệu mới
+                $scope.initialize(); // Tải lại dữ liệu hình ảnh
+            }).catch(error => {
+                console.error("Lỗi khi tải lên ảnh:", error);
+                alert("Có lỗi khi tải lên ảnh. Vui lòng kiểm tra lại.");
+            });
+        }
+    };
+
+
+    document.getElementById('profileImage').addEventListener('change', function (event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('previewImage');
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // Hiển thị ảnh xem trước
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    $scope.initialize();
 });
