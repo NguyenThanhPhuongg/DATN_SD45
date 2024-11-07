@@ -111,3 +111,30 @@ function updateImagePreview3() {
     selectedFiles.forEach(file => dataTransfer.items.add(file));
     fileInput.files = dataTransfer.files;
 }
+
+///// đổi màu menu
+document.addEventListener("DOMContentLoaded", function () {
+    const nav = document.getElementById("sidenavAccordion");
+    const themeToggle = document.getElementById("themeToggle");
+
+    // Kiểm tra trạng thái checkbox khi trang được tải
+    if (themeToggle.checked) {
+
+        nav.classList.remove("sb-sidenav-dark");
+        nav.classList.add("sb-sidenav-light");
+    } else {
+        nav.classList.remove("sb-sidenav-light");
+        nav.classList.add("sb-sidenav-dark");
+    }
+
+    // Xử lý sự kiện thay đổi trạng thái checkbox
+    themeToggle.addEventListener("change", function () {
+        if (themeToggle.checked) {
+            nav.classList.remove("sb-sidenav-dark");
+            nav.classList.add("sb-sidenav-light");
+        } else {
+            nav.classList.remove("sb-sidenav-light");
+            nav.classList.add("sb-sidenav-dark");
+        }
+    });
+});

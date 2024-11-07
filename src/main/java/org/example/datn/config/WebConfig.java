@@ -66,7 +66,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/");
 
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:D:/FPT Polytechnic/DUANTOTNGHIEP/DATN_SD45/src/main/resources/static/images/")
+                .addResourceLocations("file:./images/")  // ánh xạ đến thư mục images ngoài src
                 .setCacheControl(CacheControl.noCache());
     }
 

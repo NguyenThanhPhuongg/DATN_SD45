@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 public class HinhAnhImpl implements HinhAnhService {
     private final HinhAnhRepository repository;
-    private static final String UPLOAD_DIR = "src/main/resources/static/images";  // Đường dẫn thư mục lưu ảnh trong dự án
+    private static final String UPLOAD_DIR = "images";  // Đường dẫn thư mục lưu ảnh trong dự án
 
     public HinhAnhImpl(HinhAnhRepository repository) {
         this.repository = repository;
