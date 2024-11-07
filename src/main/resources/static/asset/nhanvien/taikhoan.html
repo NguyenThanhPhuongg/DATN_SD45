@@ -1,24 +1,32 @@
 <div class="container-fluid px-4">
-    <h2 class="mt-4">Quản lý nhân viên</h2><br>
+    <h2 class="mt-4">Quản lý người dùng</h2><br>
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-table me-1"></i>
-                Danh sách nhân viên
+                Danh sách tài khoản người dùng
             </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal" data-bs-target="#addModal">
                 <!-- Nút thêm mới -->
-                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addModal">Thêm</button>
+                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addModal">Thêm mới</button>
             </div>
         </div>
         <div class="card-body">
-            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3"/>
+            <!-- Radio Buttons để chọn vai trò -->
+            <div class="mb-3">
+                <label>Vai trò:</label><br>
+                <input type="radio" id="employeeRole" ng-model="selectedRole" value="USER"> Nhân viên
+                <input type="radio" id="customerRole" ng-model="selectedRole" value="CLIENT"> Khách hàng
+            </div>
+
+            <!-- Ô tìm kiếm theo hoVaTen -->
+            <input type="text" ng-model="searchText" placeholder="Tìm kiếm theo họ và tên..." class="form-control mb-3" ng-change="fetchUsers()"/>
+
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>STT</th>
                     <th>Tên đăng nhập</th>
-<!--                    <th>Nhóm</th>-->
                     <th>Vai trò</th>
                     <th>Xác thực</th>
                     <th>Trạng thái</th>
@@ -29,31 +37,39 @@
                 <tr ng-repeat="user in currentEmployees track by user.id">
                     <td>{{$index + 1 + pager.page * pager.itemsPerPage}}</td>
                     <td>{{user.userName}}</td>
-<!--                    <td>{{user.profile.hoVaTen}}</td>-->
                     <td>{{user.role}}</td>
                     <td>{{user.verified ? 'Đã xác thực' : 'Chưa xác thực'}}</td>
-                    <td>{{user.status}}</td>
                     <td>
-                        <button class="btn btn-warning" ng-click="detailUser(user.id)">Xem chi tết </button>
-                        <button class="btn btn-danger" ng-click="deleteUser(user.id)">Xóa</button>
+                        <span ng-if="user.status === 'ACTIVE'" class="badge bg-success">Đang hoạt động</span>
+                        <span ng-if="user.status === 'LOCKED'" class="badge bg-danger">Đã khóa</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning" ng-click="detailUser(user.id)">Xem chi tiết</button>
+                        <!-- Nút Khóa khi người dùng có trạng thái ACTIVE -->
+                        <button class="btn btn-danger" ng-if="user.status === 'ACTIVE'" ng-click="prepareLockUser(user)">Khóa</button>
+
+                        <!-- Nút Mở khóa khi người dùng có trạng thái LOCKED -->
+                        <button class="btn btn-success" ng-if="user.status === 'LOCKED'" ng-click="prepareUnlockUser(user)">Mở khóa</button>
+                    </td>
                     </td>
                 </tr>
                 </tbody>
-
             </table>
+
+            <!-- Phân trang -->
             <div class="panel-footer text-center">
                 <button ng-click="pager.first()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
+                    <i class="fas fa-angle-double-left"></i>
                 </button>
                 <button ng-click="pager.prev()" class="btn btn-primary">
-                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
+                    <i class="fas fa-angle-left"></i>
                 </button>
-                <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
+                <button class="btn btn-success"> {{employees.currentPage}} / {{employees.totalPage}}</button>
                 <button ng-click="pager.next()" class="btn btn-primary">
-                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
+                    <i class="fas fa-angle-right"></i>
                 </button>
                 <button ng-click="pager.last()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
+                    <i class="fas fa-angle-double-right"></i>
                 </button>
             </div>
         </div>
@@ -148,6 +164,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Confirm -->
+        <div class="modal" id="confirmModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{modalMessage}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Nút xác nhận với ng-class để thay đổi màu khi action là "ACTIVE" -->
+                        <button
+                                type="button"
+                                class="btn"
+                                ng-class="{'btn-success': modalAction === 'ACTIVE', 'btn-danger': modalAction === 'LOCKED'}"
+                                ng-click="confirmAction()">
+                            {{modalConfirmButton}}
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
     </div>

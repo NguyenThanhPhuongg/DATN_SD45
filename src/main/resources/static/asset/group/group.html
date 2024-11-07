@@ -8,7 +8,7 @@
             </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal" data-bs-target="#addModal">
                 <!-- Nút thêm mới -->
-                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addModal">Thêm mới</button>
+                <button class="btn btn-primary" ng-click="resetForm(); $('#addModal').modal('show')">Thêm mới</button>
             </div>
         </div>
         <div class="card-body">
@@ -17,6 +17,7 @@
                 <thead>
                 <tr>
                     <th>Tên nhóm</th>
+                    <th>Mô tả</th>
                     <th>Số người</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
@@ -25,14 +26,19 @@
                 <tbody>
                 <tr ng-repeat="group in groups">
                     <td>{{ group.ten }}</td>
+                    <td>{{ group.moTa }}</td>
                     <td>{{ group.count }}</td>
                     <td>
                         <span ng-if="group.trangThai == 1" class="badge bg-success">Đang hoạt động</span>
-                        <span ng-if="group.trangThai == 0" class="badge bg-danger">Không hoạt động</span>
+                        <span ng-if="group.trangThai == 0" class="badge bg-danger">Đã khóa</span>
                     </td>
                     <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm" ng-click="confirmLock(group.id)">Khoá</button>
+                        <button class="btn btn-warning" ng-click="editGroup(group)">Chỉnh sửa</button>
+                        <button class="btn"
+                                ng-class="group.trangThai == 1 ? 'btn-danger' : 'btn-success'"
+                                ng-click="confirmLock(group)">
+                            {{ group.trangThai == 1 ? 'Khoá' : 'Mở khóa' }}
+                        </button>
                     </td>
                 </tr>
                 </tbody>
@@ -55,11 +61,12 @@
             </div>
         </div>
         <!-- Modal Thêm Mới Nhóm Quyền -->
+        <!-- Modal Thêm Mới Nhóm Quyền -->
         <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true" ng-controller="group-ctrl">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addModalLabel">Thêm mới nhóm quyền</h5>
+                        <h5 class="modal-title" id="addModalLabel">{{ isEdit ? 'Chỉnh sửa nhóm quyền' : 'Thêm mới nhóm quyền' }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -67,6 +74,12 @@
                         <div class="mb-3">
                             <label for="groupName" class="form-label">Tên nhóm quyền</label>
                             <input type="text" class="form-control" id="groupName" ng-model="newGroupName" placeholder="Nhập tên nhóm quyền">
+                        </div>
+
+                        <!-- Mô Tả Nhóm -->
+                        <div class="form-group mb-3">
+                            <label for="groupDesc">Mô Tả:</label>
+                            <textarea class="form-control" id="groupDesc" ng-model="newGroupDesc"></textarea>
                         </div>
 
                         <!-- Danh sách quyền -->
@@ -82,6 +95,7 @@
 
                         <!-- Danh sách người dùng -->
                         <div class="row">
+                            <!-- Danh sách người dùng chưa có trong nhóm -->
                             <div class="col-4">
                                 <h5>Danh sách người dùng</h5>
                                 <ul class="list-group list-group-flush">
@@ -93,7 +107,6 @@
 
                             <!-- Mũi tên trái phải -->
                             <div class="col-4 text-center">
-                                <!-- Sử dụng button thay vì mũi tên -->
                                 <button class="btn btn-primary" ng-click="moveAllUsersToGroup()"> >> </button><br><br>
                                 <button class="btn btn-secondary" ng-click="moveAllUsersBackToList()"> << </button>
                             </div>
@@ -116,6 +129,28 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Confirm -->
+        <div class="modal" id="confirmModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{modalMessage}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" ng-click="confirmChangeStatus()">Xác nhận</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
 

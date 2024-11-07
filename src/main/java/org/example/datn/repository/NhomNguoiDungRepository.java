@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface NhomNguoiDungRepository extends JpaRepository<NhomNguoiDung, Long> {
     List<NhomNguoiDung> findByIdNhom(Long idNhom);
+
+    void deleteAllByIdNhom(Long idNhom);
+
 }

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -124,15 +125,14 @@ public class NhomProcessor {
         validateDuplicate(model, null);
         var nhom = service.save(nhomTransformer.toEntity(model));
         nhom.setTrangThai(SystemConstant.ACTIVE);
+        nhom.setNgayTao(LocalDateTime.now());
+        nhom.setNgayCapNhat(LocalDateTime.now());
         addGroupFunction(model.getChucNangId(), nhom.getId(), model.getUserId());
         return new ServiceResult(SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public void addGroupFunction(List<Long> functionId, Long groupId, List<Long> userId) {
         nhomChucNangService.deleteAllByNhomId(groupId);
-        if (!functionId.isEmpty()) {
-            functionId.forEach(item -> nhomChucNangService.save(groupId, item));
-        }
         if (!functionId.isEmpty()) {
             functionId.forEach(item -> nhomChucNangService.save(groupId, item));
         }
@@ -155,11 +155,35 @@ public class NhomProcessor {
     }
 
 
-    public ServiceResult changeStatus(Long id){
+    public ServiceResult changeStatus(Long id, Integer trangThai) {
         var group = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nhóm"));
-        group.setTrangThai(SystemConstant.LOCKED);
+        group.setTrangThai(trangThai);
         service.save(group);
         return new ServiceResult();
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult edit(RegisterUpdateGroupModel model, Long id) throws NotFoundEntityException, DuplicatedException {
+        var group = service.findById(id)
+                .orElseThrow(NotFoundEntityException.ofSupplier("not.found"));
+        group.setTen(model.getTen());
+        group.setMoTa(model.getMoTa());
+        group.setNgayCapNhat(LocalDateTime.now());
+        validateDuplicate(model, id);
+        service.save(group);
+        editGroupFunction(model.getChucNangId(), id, model.getUserId());
+        return new ServiceResult(SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public void editGroupFunction(List<Long> functionId, Long groupId, List<Long> userId) {
+        nhomChucNangService.deleteAllByNhomId(groupId);
+        if (!functionId.isEmpty()) {
+            functionId.forEach(item -> nhomChucNangService.save(groupId, item));
+        }
+        nhomNguoiDungService.deleteAllByIdNhom(groupId);
+        if (!userId.isEmpty()) {
+            userId.forEach(item -> nhomNguoiDungService.save(groupId, item));
+        }
     }
 
 }

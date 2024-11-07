@@ -5,6 +5,7 @@ import org.example.datn.repository.NhomNguoiDungRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ public class NhomNguoiDungService {
         var nhomNguoiDung = new NhomNguoiDung();
         nhomNguoiDung.setIdNhom(idNhom);
         nhomNguoiDung.setUserId(userId);
+        nhomNguoiDung.setNgayTao(LocalDateTime.now());
+        nhomNguoiDung.setNgayCapNhat(LocalDateTime.now());
         repo.save(nhomNguoiDung);
     }
 
@@ -33,5 +36,9 @@ public class NhomNguoiDungService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    public void deleteAllByIdNhom(Long userId){
+        repo.deleteAllByIdNhom(userId);
     }
 }
