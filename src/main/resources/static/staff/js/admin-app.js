@@ -96,17 +96,21 @@ app.config(function ($routeProvider) {
         })
 
         /// sản phâm
-        .when("/sanpham", {
+        .when("/listsanpham", {
             templateUrl: "asset/sanpham/listsanpham.html",
-            controller: "sanpham-ctrl"
+            controller: "spct-ctrl"
         })
-        // .when("/spct",{
-        //     templateUrl:"asset/sanpham/quanlyspct.html",
-        //     controller: "spct-ctrl"
-        // })
+        .when("/listsanphaman", {
+            templateUrl: "asset/sanpham/listsanphaman.html",
+            controller: "spct-ctrl"
+        })
         .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/quanlyspct.html",
-            controller: "spct-ctrl"
+            controller: "quanlyspct-ctrl"
+        })
+        .when("/sanpham", { // Thêm :id để nhận ID sản phẩm từ URL
+            templateUrl: "asset/sanpham/sanpham.html",
+            controller: "sanpham-ctrl"
         })
 
         /// Bán tại quầy
@@ -168,7 +172,6 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/group/group.html",
             controller: "group-ctrl"
         })
-
 
 
 

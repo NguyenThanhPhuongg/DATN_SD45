@@ -1,9 +1,13 @@
 package org.example.datn.repository;
 
+import feign.Param;
 import org.example.datn.entity.User;
 import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,4 +32,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUserName(String username);
 
     List<User> findByRole(UserRoles role);
+
+    @Query("SELECT u FROM User u JOIN Profile p ON u.id = p.userId " +
+            "WHERE p.hoVaTen LIKE %:hoVaTen% " +
+            "AND (:role IS NULL OR u.role = :role)")
+    Page<User> findByHoVaTenAndRole(@Param("hoVaTen") String hoVaTen,
+                                    @Param("role") UserRoles role,
+                                    Pageable pageable);
+
 }

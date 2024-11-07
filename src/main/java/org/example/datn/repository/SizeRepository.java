@@ -12,4 +12,6 @@ import java.util.List;
 public interface SizeRepository extends JpaRepository<Size, Long> {
     @Query("SELECT p FROM Size p WHERE p.id = ?1")
     List<Size> findByCateId(Long cid);
+
+    List<Size> findByIdIn(List<Long> ids);
 }

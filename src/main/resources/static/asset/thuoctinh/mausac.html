@@ -64,20 +64,34 @@
                 </tr>
                 </tbody>
             </table>
-            <div class="panel-footer text-center">
-                <button ng-click="pager.first()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-left"></i> <!-- Tiến đến đầu -->
-                </button>
-                <button ng-click="pager.prev()" class="btn btn-primary">
-                    <i class="fas fa-angle-left"></i> <!-- Lùi 1 -->
-                </button>
-                <button class="btn btn-success">{{pager.page+1}} of {{pager.count}}</button>
-                <button ng-click="pager.next()" class="btn btn-primary">
-                    <i class="fas fa-angle-right"></i> <!-- Tiến 1 -->
-                </button>
-                <button ng-click="pager.last()" class="btn btn-danger">
-                    <i class="fas fa-angle-double-right"></i> <!-- Lùi đến cuối -->
-                </button>
+            <div class="panel-footer d-flex justify-content-between align-items-center">
+                <!-- Bộ chọn số lượng dữ liệu hiển thị -->
+                <div class="me-auto">
+                    <label for="pageSizeSelect" class="me-2">Hiển thị:</label>
+                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()" class="form-select d-inline-block w-auto">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+
+                <!-- Điều hướng trang -->
+                <div class="text-center">
+                    <button ng-click="pager.first()" class="btn btn-danger">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button ng-click="pager.prev()" class="btn btn-primary">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
+                    <button ng-click="pager.next()" class="btn btn-primary">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button ng-click="pager.last()" class="btn btn-danger">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
