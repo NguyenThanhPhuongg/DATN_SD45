@@ -2,6 +2,11 @@ const app = angular.module("admin-app", ["ngRoute"]);
 
 app.config(function ($routeProvider) {
     $routeProvider
+        // tổng quan
+        .when("/tongquan", {
+            templateUrl: "asset/tongquan.html",
+            controller: "tongquan-ctrl"
+        })
 
         /// Nhân viên
         .when("/taikhoan", {
@@ -175,5 +180,7 @@ app.config(function ($routeProvider) {
 
 
 
-
+        .otherwise({
+            redirectTo: "/tongquan" // Chuyển hướng đến đường dẫn mặc định
+        });
 })
