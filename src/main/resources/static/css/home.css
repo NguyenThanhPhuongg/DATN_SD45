@@ -164,6 +164,7 @@
     text-align: center; /* Căn giữa chữ */
 }
 
-.dropdown-menu a:hover {
-    background-color: #b2ebf2;
+.user-dropdown .dropdown-menu {
+    left: -50px;
 }
+
