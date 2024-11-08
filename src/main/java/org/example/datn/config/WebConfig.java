@@ -65,8 +65,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/")
                 .addResourceLocations("classpath:/static/");
 
-//        registry.addResourceHandler("/images/")
-//                .addResourceLocations("file:./images/")  // ánh xạ đến thư mục images ngoài src
-//                .setCacheControl(CacheControl.noCache());
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:./images/")  // ánh xạ đến thư mục images ngoài src
+                .setCacheControl(CacheControl.noCache());
     }
 }
