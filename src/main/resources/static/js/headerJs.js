@@ -81,3 +81,49 @@ document.addEventListener('click', function(event) {
         window.location.href = '/cart'; // Chuyển hướng đến trang /cart
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token');
+
+    // Kiểm tra nếu có token thì fetch API, nếu không có thì hiển thị số lượng giỏ hàng là 0
+    if (token) {
+        fetchCartItemCount(token); // Gọi hàm lấy số lượng giỏ hàng nếu có token
+    } else {
+        updateCartBadge(0); // Nếu không có token, hiển thị 0
+    }
+});
+
+// Hàm lấy số lượng sản phẩm trong giỏ hàng và cập nhật badge
+function fetchCartItemCount(token) {
+    fetch('/gio-hang-chi-tiet/get-list', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.result) {
+                const cartItemCount = data.result.length;
+                updateCartBadge(cartItemCount); // Cập nhật số lượng giỏ hàng
+            } else {
+                console.error('Không có dữ liệu giỏ hàng');
+                updateCartBadge(0); // Nếu không có dữ liệu giỏ hàng, hiển thị 0
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi gọi API:', error);
+            updateCartBadge(0); // Hiển thị 0 nếu có lỗi trong việc gọi API
+        });
+}
+
+// Hàm cập nhật số lượng giỏ hàng trong badge
+function updateCartBadge(count) {
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = count; // Cập nhật số lượng giỏ hàng
+    }
+}
+
+
