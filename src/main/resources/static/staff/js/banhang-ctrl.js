@@ -10,9 +10,17 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
             price: null,
             name_cutomsmer: null,
             phone: null,
+            qrCodeUrl: null,
         }
-        $scope.bills.push(bill);
-        $scope.activeIndex = $scope.bills.length - 1; // Cập nhật activeIndex
 
+        const qr = new QRious({
+            value: `https://aquamarine-sustaining-harp.glitch.me/scan.html?idhd=${$scope.bills.length + 1}`,
+            size: 200
+        });
+
+        // Store the QR code as a data URL in the bill object
+        bill.qrCodeUrl = qr.toDataURL();
+        $scope.bills.push(bill);
+        $scope.activeIndex = $scope.bills.length - 1;
     };
 });
