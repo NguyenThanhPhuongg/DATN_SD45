@@ -199,6 +199,7 @@
             color: #fff;
             font-size: 14px;
         }
+
         .sub-menu a {
             display: block;
             padding-left: 40px; /* Dịch chữ bên trong sang phải 20px */
@@ -264,6 +265,7 @@
             padding: 10px;
             border-bottom: 1px solid #ddd;
         }
+
         .address-item .default {
             display: inline-block;
             padding: 2px 6px;
@@ -325,25 +327,29 @@
             box-sizing: border-box; /* Bao gồm cả padding và border */
         }
 
-        .order-item h3{
+        .order-item h3 {
             margin: 0; /* Loại bỏ khoảng cách mặc định của h4 và p */
             padding-bottom: 10px; /* Khoảng cách dưới mỗi đoạn */
             font-size: 18px; /* Tăng cỡ chữ */
             font-weight: normal; /* Không đậm chữ */
         }
+
         .order-item p {
             margin: 0; /* Loại bỏ khoảng cách mặc định của h4 và p */
             padding-bottom: 10px; /* Khoảng cách dưới mỗi đoạn */
         }
+
         .order-item .status {
             float: right; /* Dịch sang góc phải */
             color: red; /* Màu đỏ */
         }
+
         .order-item .classification {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .order-item .total {
             text-align: right; /* Dịch sang góc phải */
             color: red; /* Màu đỏ */
@@ -373,6 +379,7 @@
             background-color: #cccccc;
             color: #333; /* Màu chữ đen đậm */
         }
+
         .tab-link {
             text-decoration: none;
             color: #333; /* Default color */
@@ -385,6 +392,7 @@
             color: #fff; /* Màu chữ trắng */
             border-radius: 4px; /* Bo góc */
         }
+
         .confirm-dialog {
             position: fixed;
             top: 50%;
@@ -403,6 +411,7 @@
             justify-content: center;
             align-items: center;
         }
+
         .confirm-dialog button {
             margin: 5px;
             padding: 10px 20px;
@@ -420,6 +429,7 @@
             background-color: #f0f0f0;
             color: #333;
         }
+
         /* CSS cho form thêm mới địa chỉ */
         #add-address-form {
             background-color: #f9f9f9;
@@ -490,6 +500,7 @@
             color: red;
             font-size: 20px;
         }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -508,12 +519,14 @@
         }
 
 
-
         #orders-link {
             display: flex;
-            align-items: center; #account-link, #orders-link {
-            font-size: 16px; /* Đặt cỡ chữ */
-        }
+            align-items: center;
+
+            #account-link, #orders-link {
+                font-size: 16px; /* Đặt cỡ chữ */
+            }
+
             font-size: 16px; /* Đặt cỡ chữ */
             text-decoration: none;
             color: inherit;
@@ -524,6 +537,7 @@
             height: 18px;
             margin-right: 8px; /* Khoảng cách giữa hình ảnh và văn bản */
         }
+
         #account-link {
             display: flex;
             align-items: center;
@@ -539,164 +553,180 @@
         }
 
 
-
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="../css/headerAll.css">
+    <script src="/js/headerJs.js"></script>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<div th:include="homeHeader :: body"></div>
-<div class="container">
-    <div class="sidebar">
-        <div class="user-info">
-            <img src="../images/user-icon.png" alt="User Icon" class="user-icon"/>
-            <div class="user-name" id="user-name">Tên người dùng</div>
-        </div>
+<div th:include="header-all::body"></div>
+<main>
+    <div class="container">
+        <div class="sidebar">
+            <div class="user-info">
+                <img src="../images/user-icon.png" alt="User Icon" class="user-icon"/>
+                <div class="user-name" id="user-name">Tên người dùng</div>
+            </div>
 
-        <a href="#" id="account-link">
-            <img src="https://down-vn.img.susercontent.com/file/ba61750a46794d8847c3f463c5e71cc4" alt="Icon" class="link-icon">
-            Tài khoản của tôi
-        </a>
-        <div class="sub-menu" id="account-submenu" style="display:none;">
-            <a href="#" id="profile-link">Hồ sơ</a>
-            <a href="#" id="change-password-link">Đổi mật khẩu</a>
-            <a href="#" id="address-link">Địa chỉ</a>
-            <a href="#">Tích điểm</a>
-        </div>
-        <a href="#" id="orders-link">
-            <img src="https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078" alt="Icon" class="link-icon">
-            Đơn mua
-        </a>
+            <a href="#" id="account-link">
+                <img src="https://down-vn.img.susercontent.com/file/ba61750a46794d8847c3f463c5e71cc4" alt="Icon"
+                     class="link-icon">
+                Tài khoản của tôi
+            </a>
+            <div class="sub-menu" id="account-submenu" style="display:none;">
+                <a href="#" id="profile-link">Hồ sơ</a>
+                <a href="#" id="change-password-link">Đổi mật khẩu</a>
+                <a href="#" id="address-link">Địa chỉ</a>
+                <a href="#">Tích điểm</a>
+            </div>
+            <a href="#" id="orders-link">
+                <img src="https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078" alt="Icon"
+                     class="link-icon">
+                Đơn mua
+            </a>
 
-    </div>
-    <div class="content">
-        <div id="profile-form" class="tabs active">
-            <h2>Hồ sơ của tôi</h2>
-            <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
-            <div class="separator"></div>
-            <div class="profile-form-container">
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="username">Tên đăng nhập</label>
-                        <input type="text" id="username" name="username" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="name">Tên</label>
-                        <input type="text" id="name" name="name">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Số điện thoại</label>
-                        <input type="text" id="phone" name="phone">
-                    </div>
-                    <div class="form-group">
-                        <label for="cccd">CCCD</label>
-                        <input type="text" id="cccd" name="cccd">
-                    </div>
-                    <div class="form-group">
-                        <label>Giới tính</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="gender" value="NAM"> Nam</label>
-                            <label><input type="radio" name="gender" value="NU"> Nữ</label>
+        </div>
+        <div class="content">
+            <div id="profile-form" class="tabs active">
+                <h2>Hồ sơ của tôi</h2>
+                <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+                <div class="separator"></div>
+                <div class="profile-form-container">
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="username">Tên đăng nhập</label>
+                            <input type="text" id="username" name="username" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Tên</label>
+                            <input type="text" id="name" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input type="text" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="cccd">CCCD</label>
+                            <input type="text" id="cccd" name="cccd">
+                        </div>
+                        <div class="form-group">
+                            <label>Giới tính</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="gender" value="NAM"> Nam</label>
+                                <label><input type="radio" name="gender" value="NU"> Nữ</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="dob">Ngày sinh</label>
+                            <input type="date" id="dob" name="dob">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="dob">Ngày sinh</label>
-                        <input type="date" id="dob" name="dob">
-                    </div>
-                </div>
-                <div class="profile-pic-section">
-                    <img src="profile-placeholder.png" alt="Profile Picture">
-                    <div class="form-group">
-                        <label for="profile-pic">Ảnh đại diện</label>
-                        <input type="file" id="profile-pic" name="profile-pic">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <button type="submit" id="update-button">Cập Nhật</button>
-            </div>
-        </div>
-        <div id="password-form" class="tabs">
-            <h2>Đổi Mật Khẩu</h2>
-            <p>Đổi mật khẩu tài khoản của bạn</p>
-            <div class="separator"></div>
-            <form class="profile-form-container">
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="old-password">Mật khẩu cũ</label>
-                        <input type="password" id="old-password" name="old-password">
-                    </div>
-                    <div class="form-group">
-                        <label for="new-password">Mật khẩu mới</label>
-                        <input type="password" id="new-password" name="new-password">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm-password">Xác nhận mật khẩu</label>
-                        <input type="password" id="confirm-password" name="confirm-password">
+                    <div class="profile-pic-section">
+                        <img src="profile-placeholder.png" alt="Profile Picture">
+                        <div class="form-group">
+                            <label for="profile-pic">Ảnh đại diện</label>
+                            <input type="file" id="profile-pic" name="profile-pic">
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="change-password-button">Đổi Mật Khẩu</button>
+                    <button type="submit" id="update-button">Cập Nhật</button>
                 </div>
-            </form>
-        </div>
-        <div id="address-form" class="tabs">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>Địa chỉ của tôi</h2>
-                <button type="button" id="add-address-button"
-                        style="background-color: #ff5722; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
-                    Thêm địa chỉ mới
-                </button>
             </div>
-            <div class="separator"></div>
-            <div id="address-list" class="address-list">
-                <!-- Danh sách địa chỉ sẽ được hiển thị tại đây -->
+            <div id="password-form" class="tabs">
+                <h2>Đổi Mật Khẩu</h2>
+                <p>Đổi mật khẩu tài khoản của bạn</p>
+                <div class="separator"></div>
+                <form class="profile-form-container">
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="old-password">Mật khẩu cũ</label>
+                            <input type="password" id="old-password" name="old-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">Mật khẩu mới</label>
+                            <input type="password" id="new-password" name="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Xác nhận mật khẩu</label>
+                            <input type="password" id="confirm-password" name="confirm-password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="change-password-button">Đổi Mật Khẩu</button>
+                    </div>
+                </form>
             </div>
-            <div id="add-address-form" style="display: none;">
-                <h3 id="form-title">Thêm mới địa chỉ</h3>
-                <label for="hoTen">Họ và tên:</label>
-                <input type="text" id="hoTen" name="hoTen"><br><br>
-                <label for="diaChi">Địa chỉ:</label>
-                <input type="text" id="diaChi" name="diaChi"><br><br>
-                <label for="sdt">Số điện thoại:</label>
-                <input type="text" id="sdt" name="sdt"><br><br>
-                <label for="thanhPho">Thành phố:</label>
-                <input type="text" id="thanhPho" name="thanhPho"><br><br>
-                <label for="quocGia">Quốc gia:</label>
-                <input type="text" id="quocGia" name="quocGia"><br><br>
-                <button id="save-button" onclick="submitNewAddress()">Lưu</button>
-                <button onclick="cancelNewAddress()">Hủy</button>
+            <div id="address-form" class="tabs">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Địa chỉ của tôi</h2>
+                    <button type="button" id="add-address-button"
+                            style="background-color: #ff5722; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                        Thêm địa chỉ mới
+                    </button>
+                </div>
+                <div class="separator"></div>
+                <div id="address-list" class="address-list">
+                    <!-- Danh sách địa chỉ sẽ được hiển thị tại đây -->
+                </div>
+                <div id="add-address-form" style="display: none;">
+                    <h3 id="form-title">Thêm mới địa chỉ</h3>
+                    <label for="hoTen">Họ và tên:</label>
+                    <input type="text" id="hoTen" name="hoTen"><br><br>
+                    <label for="diaChi">Địa chỉ:</label>
+                    <input type="text" id="diaChi" name="diaChi"><br><br>
+                    <label for="sdt">Số điện thoại:</label>
+                    <input type="text" id="sdt" name="sdt"><br><br>
+                    <label for="thanhPho">Thành phố:</label>
+                    <input type="text" id="thanhPho" name="thanhPho"><br><br>
+                    <label for="quocGia">Quốc gia:</label>
+                    <input type="text" id="quocGia" name="quocGia"><br><br>
+                    <button id="save-button" onclick="submitNewAddress()">Lưu</button>
+                    <button onclick="cancelNewAddress()">Hủy</button>
+                </div>
+                <div id="confirm-dialog" class="confirm-dialog" style="display: none;">
+                    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+                    <button id="confirm-yes">Có</button>
+                    <button id="confirm-no">Không</button>
+                </div>
             </div>
-            <div id="confirm-dialog" class="confirm-dialog" style="display: none;">
-                <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
-                <button id="confirm-yes">Có</button>
-                <button id="confirm-no">Không</button>
-            </div>
-        </div>
 
-        <div id="orders-tabs" class="tabs">
-            <div class="tab-links">
-                <ul>
-                    <li><a href="#" class="tab-link" data-status="null">Tất cả</a></li>
-                    <li><a href="#" class="tab-link" data-status="1">Chờ thanh toán</a></li>
-                    <li><a href="#" class="tab-link" data-status="2">Chờ giao hàng</a></li>
-                    <li><a href="#" class="tab-link" data-status="3">Vận chuyển</a></li>
-                    <li><a href="#" class="tab-link" data-status="4">Hoàn thành</a></li>
-                    <li><a href="#" class="tab-link" data-status="5">Đã hủy</a></li>
-                    <li><a href="#" class="tab-link" data-status="6">Trả hàng/Hoàn tiền</a></li>
-                </ul>
+            <div id="orders-tabs" class="tabs">
+                <div class="tab-links">
+                    <ul>
+                        <li><a href="#" class="tab-link" data-status="null">Tất cả</a></li>
+                        <li><a href="#" class="tab-link" data-status="1">Chờ thanh toán</a></li>
+                        <li><a href="#" class="tab-link" data-status="2">Chờ giao hàng</a></li>
+                        <li><a href="#" class="tab-link" data-status="3">Vận chuyển</a></li>
+                        <li><a href="#" class="tab-link" data-status="4">Hoàn thành</a></li>
+                        <li><a href="#" class="tab-link" data-status="5">Đã hủy</a></li>
+                        <li><a href="#" class="tab-link" data-status="6">Trả hàng/Hoàn tiền</a></li>
+                    </ul>
+                </div>
+                <div id="order-contents" class="order-contents">
+                    <!-- Thông tin đơn hàng sẽ được hiển thị tại đây -->
+                </div>
             </div>
-            <div id="order-contents" class="order-contents">
-                <!-- Thông tin đơn hàng sẽ được hiển thị tại đây -->
-            </div>
-        </div>
 
+        </div>
     </div>
-</div>
-
+</main>
 <div id="notification" class="notification"></div>
 <!--<div id="confirm-dialog" class="confirm-dialog" style="display: none;">-->
 <!--    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>-->
@@ -705,8 +735,8 @@
 <!--</div>-->
 
 
-
 <div th:include="footer::body"></div>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
 <script>
     let diaChiIdToHandle = null; // Biến lưu trữ ID địa chỉ cho hành động cần thực hiện
     let confirmAction = null; // Biến lưu trữ loại hành động cần xác nhận
@@ -718,7 +748,7 @@
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
 
@@ -770,7 +800,7 @@
 
     // Gán sự kiện click cho tất cả các tab
     document.querySelectorAll('.tab-link').forEach(tab => {
-        tab.addEventListener('click', function(event) {
+        tab.addEventListener('click', function (event) {
             event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
             let status = this.dataset.status; // Lấy giá trị trạng thái từ thuộc tính data-status
             status = status === "null" ? null : parseInt(status, 10); // Chuyển đổi giá trị về kiểu số nguyên hoặc null
@@ -791,7 +821,7 @@
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
             },
-            body: JSON.stringify({ status }) // Gửi đối tượng JSON với thuộc tính status
+            body: JSON.stringify({status}) // Gửi đối tượng JSON với thuộc tính status
         });
 
         if (response.ok) {
@@ -1069,14 +1099,14 @@
     });
 
     // Gán sự kiện click cho nút "Thêm địa chỉ mới"
-    document.getElementById('add-address-button').addEventListener('click', function() {
+    document.getElementById('add-address-button').addEventListener('click', function () {
         document.getElementById('address-list').style.display = 'none'; // Ẩn danh sách địa chỉ
         document.getElementById('add-address-form').style.display = 'block'; // Hiển thị form thêm mới
     });
 
     // Đảm bảo rằng DOM đã tải xong trước khi gán sự kiện
     document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('add-address-button').addEventListener('click', function() {
+        document.getElementById('add-address-button').addEventListener('click', function () {
             document.getElementById('address-list').style.display = 'none'; // Ẩn danh sách địa chỉ
             document.getElementById('add-address-form').style.display = 'block'; // Hiển thị form thêm mới
             document.getElementById('form-title').innerText = 'Thêm mới địa chỉ';
@@ -1085,7 +1115,7 @@
         });
 
         document.getElementById('confirm-yes').addEventListener('click', xacNhanHanhDong);
-        document.getElementById('confirm-no').addEventListener('click', function() {
+        document.getElementById('confirm-no').addEventListener('click', function () {
             document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
             confirmAction = null; // Reset biến lưu trữ hành động
@@ -1093,7 +1123,7 @@
     });
 
 
-        // Hàm để xóa địa chỉ
+    // Hàm để xóa địa chỉ
     async function xoaDiaChi() {
         if (diaChiIdToHandle !== null) {
             const response = await fetch(`/dia-chi/${diaChiIdToHandle}`, {
@@ -1150,21 +1180,19 @@
             xoaDiaChi();
         }
     }
+
     // Gán sự kiện cho các nút xác nhận
     document.getElementById('confirm-yes').addEventListener('click', xacNhanHanhDong);
-    document.getElementById('confirm-no').addEventListener('click', function() {
+    document.getElementById('confirm-no').addEventListener('click', function () {
         document.getElementById('confirm-dialog').style.display = 'none';
         diaChiIdToHandle = null; // Reset biến lưu trữ ID
         confirmAction = null; // Reset biến lưu trữ hành động
     });
 
-    document.getElementById('add-new-address-btn').addEventListener('click', function() {
+    document.getElementById('add-new-address-btn').addEventListener('click', function () {
         document.getElementById('address-list').style.display = 'none'; // Ẩn danh sách địa chỉ
         document.getElementById('add-address-form').style.display = 'block'; // Hiển thị form thêm mới
     });
-
-
-
 
 
     // Hàm để hủy thêm mới địa chỉ
@@ -1178,6 +1206,7 @@
         document.getElementById('thanhPho').value = '';
         document.getElementById('quocGia').value = '';
     }
+
     // Hàm để xóa tất cả lỗi khi hủy
     function clearFormErrors() {
         const errorElements = document.querySelectorAll('.error-message');
