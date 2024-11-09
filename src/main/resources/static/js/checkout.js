@@ -3,6 +3,7 @@ let addressDataId;
 let phuongThucVanChuyenId;
 let phuongThucThanhToanId;
 let isAddingNewAddress = false;
+
 async function fetchDeliveryAddress() {
     try {
         const token = localStorage.getItem('token');
@@ -179,6 +180,7 @@ async function addNewAddress() {
         document.getElementById('error-message').innerText = 'Lỗi khi thêm địa chỉ mới.';
     }
 }
+
 function handleConfirmButton() {
     if (isAddingNewAddress) {
         addNewAddress();
@@ -186,6 +188,7 @@ function handleConfirmButton() {
         selectAddress();
     }
 }
+
 function cancelNewAddress() {
     // Ẩn form và hiển thị lại danh sách địa chỉ
     document.getElementById('new-address-form').style.display = 'none';
@@ -203,7 +206,7 @@ function showModal() {
     fetchAddressList(); // Gọi hàm lấy danh sách địa chỉ khi hiển thị modal
 }
 
-function clearFormModal(){
+function clearFormModal() {
     document.getElementById('add-address-button').style.display = 'block';
     document.getElementById('new-hoTen').value = '';
     document.getElementById('new-sdt').value = '';
@@ -553,6 +556,10 @@ document.addEventListener('DOMContentLoaded', fetchShippingMethods);
 
 // dat hang
 async function placeOrder() {
+    const isConfirmed = window.confirm('Bạn chắc chắn muốn đặt hàng?');
+    if (!isConfirmed) {
+        return; // Nếu người dùng không đồng ý, dừng lại
+    }
     const idDiaChiGiaoHang = addressDataId;
 
     // Lấy thông tin phương thức vận chuyển đã chọn

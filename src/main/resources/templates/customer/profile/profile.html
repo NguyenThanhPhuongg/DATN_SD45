@@ -576,7 +576,7 @@
     <div class="container">
         <div class="sidebar">
             <div class="user-info">
-                <img src="../images/user-icon.png" alt="User Icon" class="user-icon"/>
+                <img src="" alt="User Icon" class="user-icon" id="user-avatar"/>
                 <div class="user-name" id="user-name">Tên người dùng</div>
             </div>
 
@@ -638,7 +638,7 @@
                         </div>
                     </div>
                     <div class="profile-pic-section">
-                        <img src="profile-placeholder.png" alt="Profile Picture">
+                        <img id="profile-pic-img" src="" alt="Avatar user">
                         <div class="form-group">
                             <label for="profile-pic">Ảnh đại diện</label>
                             <input type="file" id="profile-pic" name="profile-pic">
@@ -920,13 +920,19 @@
                 document.getElementById('phone').value = profile.phone || '';
                 document.getElementById('cccd').value = profile.cccd || '';
                 document.getElementById('dob').value = profile.ngaySinh || '';
+                const avatarImg = document.getElementById('profile-pic-img');
+                if (profile.avatar) {
+                    avatarImg.src = `${profile.avatar}`;
+                    document.getElementById('user-avatar').src = profile.avatar;
 
+                }
                 // Xử lý giới tính
                 if (profile.gioiTinh === 'NAM') {
                     document.querySelector('input[name="gender"][value="NAM"]').checked = true;
                 } else if (profile.gioiTinh === 'NU') {
                     document.querySelector('input[name="gender"][value="NU"]').checked = true;
                 }
+
             }
         }
     }
@@ -958,26 +964,36 @@
         };
     }
 
-    // Hàm để gọi API cập nhật thông tin người dùng
     async function updateProfile(request) {
         const token = localStorage.getItem('token');
+
+        const formData = new FormData();
+
+        formData.append('request', JSON.stringify(request));
+
+        const fileInput = document.getElementById('profile-pic');
+        const file = fileInput.files[0];
+        if (file) {
+            formData.append('file', file);
+        }
+
         const response = await fetch('profile/update', {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(request)
+            body: formData
         });
+
         if (response.ok) {
             const data = await response.json();
-            console.log('Cập nhật thành công:', data);
             hienThiThongBao('Cập nhật thành công!', true);
+            window.location.reload();
         } else {
-            console.error('Lỗi khi cập nhật thông tin');
             hienThiThongBao('Có lỗi xảy ra khi cập nhật thông tin.', false);
         }
     }
+
 
     // Gán sự kiện click cho nút Cập Nhật
     document.getElementById('update-button').addEventListener('click', function (event) {

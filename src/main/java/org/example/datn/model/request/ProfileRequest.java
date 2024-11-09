@@ -25,5 +25,5 @@ public class ProfileRequest {
     private String phone;
     private String cccd;
     private GioiTinh gioiTinh;
-    private LocalDate ngaySinh;
+    private String ngaySinh;
 }
