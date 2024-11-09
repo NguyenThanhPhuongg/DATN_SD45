@@ -1,4 +1,6 @@
-﻿--- data sql db.datn -----
+﻿
+
+--- data sql db.datn -----
 INSERT INTO [chuc_nang] ([ten], [ma], [id_cha], [loai], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
 (N'Chức năng 1', N'MA001', 0, 1, 1, 1, 1),
@@ -284,62 +286,46 @@ VALUES
 GO
 
 
-select * from thong_tin_ca_nhan
+--select * from thong_tin_ca_nhan
 
-select * from thuong_hieu
-select * from danh_muc 
-select * from size 
+--select * from thuong_hieu
+--select * from danh_muc 
+select * from size where id =1 
 select * from mau_sac 
-select * from chat_lieu 
-select * from chuc_nang 
-select * from nhom 
-select * from nhom_chuc_nang 
-select * from san_pham 
-select * from chi_tiet_san_pham 
-select * from hinh_anh 
-select * from khuyen_mai 
-select * from ap_dung_khuyen_mai 
-select * from blog
-select * from ap_dung_khuyen_mai 
+--select * from chat_lieu 
+--select * from chuc_nang 
+--select * from nhom 
+--select * from nhom_chuc_nang 
+--select * from san_pham 
+--select * from chi_tiet_san_pham 
+--select * from hinh_anh 
+--select * from khuyen_mai 
+--select * from ap_dung_khuyen_mai 
+--select * from blog
+--select * from ap_dung_khuyen_mai 
 
-select * from thanh_toan
-select * from phuong_thuc_thanh_toan
-select * from chi_tiet_hoa_don 
-select * from gio_hang 
-select * from chi_tiet_gio_hang 
-select * from hoa_don 
-select * from phuong_thuc_van_chuyen 
-select * from dia_chi_giao_hang 
-select * from nguoi_dung 
+--select * from thanh_toan
+--select * from phuong_thuc_thanh_toan
+--select * from chi_tiet_hoa_don 
+--select * from gio_hang 
+--select * from chi_tiet_gio_hang 
+--select * from hoa_don 
+--select * from phuong_thuc_van_chuyen 
+--select * from dia_chi_giao_hang 
+--select * from nguoi_dung 
 
 SELECT * FROM [san_pham];
 SELECT * FROM [chi_tiet_san_pham];
-SELECT * FROM [thuong_hieu];
-SELECT * FROM [danh_muc];
-SELECT * FROM [san_pham_yeu_thich];
-SELECT * FROM [danh_gia];
-SELECT * FROM [khuyen_mai];
-SELECT * FROM [ap_dung_khuyen_mai];
-SELECT * FROM [hinh_anh];
-SELECT * FROM [yeu_cau_doi_tra];
-SELECT * FROM [yeu_cau_doi_tra_chi_tiet];
-SELECT * FROM [blog];
-SELECT * FROM [binh_luan];
-SELECT * FROM [rep_binh_luan];
-select * from nhom
-
-update  danh_muc set ngay_tao = GETDATE() where id =1
-update  nguoi_dung set mat_khau = 'Chuchu11@' where id =1
-
-DELETE FROM san_pham WHERE id = 20;
-
-SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
-
-drop database [DB.DATN]
-SELECT * FROM danh_muc WHERE id = 1; -- hoặc điều kiện khác
-SELECT * FROM hinh_anh
-INSERT INTO hinh_anh (id_san_pham, anh, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
-VALUES 
-(3,'meme.png',1, '2024-10-20', '2024-10-20', 1, 1),
-(3,'mangto.png',1, '2024-10-20', '2024-10-20', 1, 1),
-(3,'avatar.png',1, '2024-10-20', '2024-10-20', 1, 1)
+--SELECT * FROM [thuong_hieu];
+--SELECT * FROM [danh_muc];
+--SELECT * FROM [san_pham_yeu_thich];
+--SELECT * FROM [danh_gia];
+--SELECT * FROM [khuyen_mai];
+--SELECT * FROM [ap_dung_khuyen_mai];
+--SELECT * FROM [hinh_anh];
+--SELECT * FROM [yeu_cau_doi_tra];
+--SELECT * FROM [yeu_cau_doi_tra_chi_tiet];
+--SELECT * FROM [blog];
+--SELECT * FROM [binh_luan];
+--SELECT * FROM [rep_binh_luan];
+--select * from nhom
