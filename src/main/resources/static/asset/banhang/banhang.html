@@ -6,7 +6,7 @@
 
     <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
         <li ng-repeat="(index, item) in bills" class="nav-item" role="presentation">
-            <button class="nav-link" ng-class="{'active': index === activeIndex}" data-bs-toggle="tab" data-bs-target="#bill{{ index }}" type="button">Hóa đơn {{ index + 1 }}</button>
+            <button class="nav-link" ng-class="{'active': index === activeIndex }" ng-click="setActiveTab(index)" data-bs-toggle="tab" data-bs-target="#bill{{ index }}" type="button">Hóa đơn {{ index + 1 }}</button>
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
@@ -14,7 +14,6 @@
             <div class="card-body">
                 <div class="d-grid gap-2 d-md-flex justify-content-between mb-2">
                     <h5 class="me-auto">Hóa đơn {{ index + 1 }}</h5>
-                    <a href="/qr?id={{ index + 1 }}" target="_blank" class="btn btn-primary me-md-2" >Quét QR</a>
                     <button class="btn btn-primary me-md-2" >Thêm sản phẩm</button>
                 </div>
                 <div>
@@ -25,6 +24,7 @@
                             <th scope="col">Hình ảnh</th>
                             <th scope="col">Sản phẩm</th>
                             <th scope="col">Số lượng</th>
+                            <th scope="col" class="text-end">Đơn giá (vnđ)</th>
                             <th scope="col" class="text-end">Tổng tiền (vnđ)</th>
                             <th scope="col">Thao tác</th>
                         </tr>
@@ -56,31 +56,25 @@
                                         <tr>
                                             <th scope="row">Mã giảm giá</th>
                                             <td>
-                                                <div class="d-flex">
-                                                    <select class="form-select form-select-sm" name="" id="">
-                                                        <option value="">fdfds</option>
-                                                        <option value="">fdfds</option>
-                                                        <option value="">fdfds</option>
+                                                <div>
+                                                    <select  ng-model="selectedVoucher" ng-change="onVoucherChange(selectedVoucher, index + 1)" class="form-select form-select-sm" >
+                                                        <option ng-repeat="voucher in vouchers" value="{{ voucher.giaTri }}">{{ voucher.ten }}</option>
                                                     </select>
-                                                    <span class="text-nowrap ms-2">- 10.000 vnđ</span>
+                                                    <span class="text-nowrap d-block ms-2">- {{ selectedVoucher }} vnđ</span>
                                                 </div>
-
-
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row">Khách cần trả</th>
-                                            <td class="text-end">10.000 vnđ</td>
+                                            <th scope="row">Tổng thanh toán</th>
+                                            <td class="text-end price-bill-{{ index + 1 }}"></td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Tiền khách đưa</th>
-                                            <td><input type="text" class="form-control form-control-sm"></td>
+                                            <td>
+                                                <input type="text" ng-model="moneyCustomer" id="moneyCustomerInput-{{ index + 1 }}" class="form-control" ng-change="onMoneyCustomerChange(index + 1)" placeholder="Nhập tiền khách hàng" />
+                                                <span>Trả lại: <b class="return-money-{{ index + 1 }}"></b></span>
+                                            </td>
                                         </tr>
-                                        <tr>
-                                            <th scope="row">Thành tiền</th>
-                                            <td class="text-end">10.000 vnđ</td>
-                                        </tr>
-
                                         </tbody>
                                     </table>
                                     <div class="form-check form-check-inline">
