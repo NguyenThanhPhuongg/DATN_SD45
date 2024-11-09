@@ -116,11 +116,10 @@ public class UserService {
         repo.delete(user);
     }
 
-    public Page<User> getUsersByHoVaTenAndRole(String hoVaTen, UserRoles role, Integer page, Integer size) {
+    public Page<User> getList(String hoVaTen, UserRoles role, String phone, Integer page, Integer size) {
         int pageIndex = (page > 0) ? page - 1 : 0;
         Pageable pageable = PageRequest.of(pageIndex, size, Sort.by(Sort.Order.desc("ngayTao")));
 
-        // Truy vấn và trả về trang dữ liệu
-        return repo.findByHoVaTenAndRole(hoVaTen, role, pageable);
+        return repo.getList(hoVaTen, role, phone, pageable);
     }
 }

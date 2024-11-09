@@ -1,4 +1,6 @@
-﻿--- data sql db.datn -----
+﻿
+
+--- data sql db.datn -----
 INSERT INTO [chuc_nang] ([ten], [ma], [id_cha], [loai], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
 (N'Chức năng 1', N'MA001', 0, 1, 1, 1, 1),
@@ -284,33 +286,33 @@ VALUES
 GO
 
 
-select * from thong_tin_ca_nhan
+--select * from thong_tin_ca_nhan
 
-select * from thuong_hieu
-select * from danh_muc 
-select * from size 
+--select * from thuong_hieu
+--select * from danh_muc 
+select * from size where id =1 
 select * from mau_sac 
-select * from chat_lieu 
-select * from chuc_nang 
-select * from nhom 
-select * from nhom_chuc_nang 
-select * from san_pham 
-select * from chi_tiet_san_pham 
-select * from hinh_anh 
-select * from khuyen_mai 
-select * from ap_dung_khuyen_mai 
-select * from blog
-select * from ap_dung_khuyen_mai 
+--select * from chat_lieu 
+--select * from chuc_nang 
+--select * from nhom 
+--select * from nhom_chuc_nang 
+--select * from san_pham 
+--select * from chi_tiet_san_pham 
+--select * from hinh_anh 
+--select * from khuyen_mai 
+--select * from ap_dung_khuyen_mai 
+--select * from blog
+--select * from ap_dung_khuyen_mai 
 
-select * from thanh_toan
-select * from phuong_thuc_thanh_toan
-select * from chi_tiet_hoa_don 
-select * from gio_hang 
-select * from chi_tiet_gio_hang 
-select * from hoa_don 
-select * from phuong_thuc_van_chuyen 
-select * from dia_chi_giao_hang 
-select * from nguoi_dung 
+--select * from thanh_toan
+--select * from phuong_thuc_thanh_toan
+--select * from chi_tiet_hoa_don 
+--select * from gio_hang 
+--select * from chi_tiet_gio_hang 
+--select * from hoa_don 
+--select * from phuong_thuc_van_chuyen 
+--select * from dia_chi_giao_hang 
+--select * from nguoi_dung 
 
 SELECT * FROM [san_pham];
 SELECT * FROM [chi_tiet_san_pham];

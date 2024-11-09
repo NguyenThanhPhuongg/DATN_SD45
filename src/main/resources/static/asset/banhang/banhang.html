@@ -6,7 +6,7 @@
 
     <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
         <li ng-repeat="(index, item) in bills" class="nav-item" role="presentation">
-            <button class="nav-link" ng-class="{'active': index === activeIndex}" data-bs-toggle="tab" data-bs-target="#bill{{ index }}" type="button">Hóa đơn {{ index + 1 }}</button>
+            <button class="nav-link" ng-class="{'active': index === activeIndex }" ng-click="setActiveTab(index)" data-bs-toggle="tab" data-bs-target="#bill{{ index }}" type="button">Hóa đơn {{ index + 1 }}</button>
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
@@ -14,7 +14,6 @@
             <div class="card-body">
                 <div class="d-grid gap-2 d-md-flex justify-content-between mb-2">
                     <h5 class="me-auto">Hóa đơn {{ index + 1 }}</h5>
-                    <a href="/qr?id={{ index + 1 }}" target="_blank" class="btn btn-primary me-md-2" >Quét QR</a>
                     <button class="btn btn-primary me-md-2" >Thêm sản phẩm</button>
                 </div>
                 <div>
@@ -25,63 +24,18 @@
                             <th scope="col">Hình ảnh</th>
                             <th scope="col">Sản phẩm</th>
                             <th scope="col">Số lượng</th>
+                            <th scope="col" class="text-end">Đơn giá (vnđ)</th>
                             <th scope="col" class="text-end">Tổng tiền (vnđ)</th>
                             <th scope="col">Thao tác</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td><img width="50" src="../images/monnica.png" alt=""></td>
-                            <td>
-                                <div class="">Đồ ngủ</div>
-                                <div class="text-muted">
-                                    <span>Size: S</span>
-                                </div>
-                            </td>
-                            <td>
-                                <input class="form-control" type="number">
-                            </td>
-                            <td class="text-end">
-                                <span>100.000</span>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-danger">
-                                    <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                                        <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td><img width="50" src="../images/monnica.png" alt=""></td>
-                            <td>
-                                <div class="">Đồ ngủ</div>
-                                <div class="text-muted">
-                                    <span>Size: S</span>
-                                </div>
-                            </td>
-                            <td>
-                                <input class="form-control" type="number">
-                            </td>
-                            <td class="text-end">
-                                <span>100.000</span>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-danger">
-                                    <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                                        <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                        <tbody class="display-result-{{ index + 1 }}">
+
                         </tbody>
                     </table>
-                    <div class="row justify-content-md-end">
-                        <div class="col-8">
-                            <h3>Kết quả quét mã QR</h3>
-                            <p id="display-result-{{ index + 1 }}">Kết quả sẽ hiển thị ở đây...</p>
+                    <div class="row justify-content-between">
+                        <div class="col-4">
+                            <img ng-src="{{ item.qrCodeUrl }}" width="150" alt="QR Code for Bill">
                         </div>
                         <div class="col-4">
                             <div class="card">
@@ -102,52 +56,45 @@
                                         <tr>
                                             <th scope="row">Mã giảm giá</th>
                                             <td>
-                                                <div class="d-flex">
-                                                    <select class="form-select form-select-sm" name="" id="">
-                                                        <option value="">fdfds</option>
-                                                        <option value="">fdfds</option>
-                                                        <option value="">fdfds</option>
+                                                <div>
+                                                    <select  ng-model="selectedVoucher" ng-change="onVoucherChange(selectedVoucher, index + 1)" class="form-select form-select-sm" >
+                                                        <option ng-repeat="voucher in vouchers" value="{{ voucher.giaTri }}">{{ voucher.ten }}</option>
                                                     </select>
-                                                    <span class="text-nowrap ms-2">- 10.000 vnđ</span>
+                                                    <span class="text-nowrap d-block ms-2">- {{ selectedVoucher }} vnđ</span>
                                                 </div>
-
-
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row">Khách cần trả</th>
-                                            <td class="text-end">10.000 vnđ</td>
+                                            <th scope="row">Tổng thanh toán</th>
+                                            <td class="text-end price-bill-{{ index + 1 }}"></td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Tiền khách đưa</th>
-                                            <td><input type="text" class="form-control form-control-sm"></td>
+                                            <td>
+                                                <input type="text" ng-model="moneyCustomer" id="moneyCustomerInput-{{ index + 1 }}" class="form-control" ng-change="onMoneyCustomerChange(index + 1)" placeholder="Nhập tiền khách hàng" />
+                                                <span>Trả lại: <b class="return-money-{{ index + 1 }}"></b></span>
+                                            </td>
                                         </tr>
-                                        <tr>
-                                            <th scope="row">Thành tiền</th>
-                                            <td class="text-end">10.000 vnđ</td>
-                                        </tr>
-
                                         </tbody>
                                     </table>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                                        <label class="form-check-label" for="inlineRadio1">Chuyển khoản</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                        <input ng-model="paymentCustomer" ng-change="onChangePayment(index + 1)" checked class="form-check-input" type="radio" name="payment-{{ index + 1 }}" id="inlineRadio2" value="money">
                                         <label class="form-check-label" for="inlineRadio2">Tiền mặt</label>
                                     </div>
-
+                                    <div class="form-check form-check-inline">
+                                        <input ng-model="paymentCustomer" ng-change="onChangePayment(index + 1)" class="form-check-input" type="radio" name="payment-{{ index + 1 }}" id="inlineRadio1" value="bank">
+                                        <label class="form-check-label" for="inlineRadio1">Chuyển khoản</label>
+                                    </div>
+                                    <div id="card-qr-{{ index + 1 }}" class="qr-block">
+                                        <img class="qr-payment-{{ index + 1 }}" width="150" src="" alt="QR Code for Bank Transfer">
+                                    </div>
                                     <div class="text-start mt-2">
                                         <a href="#" class="btn btn-primary btn-block w-100">Thanh toán</a>
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
