@@ -7,6 +7,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.selectedVoucher = 0;
     $scope.moneyCustomer = null;
     $scope.paymentCustomer = 'money';
+    $scope.phoneCustomer = null;
     // Hàm thêm hóa đơn
     $scope.addBill = function () {
         const bill = {
@@ -34,6 +35,22 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         $http.get("/rest/khuyenmai").then(resp => {
             $scope.vouchers = resp.data.data;
         });
+    };
+    $scope.onPhoneChange = function(idBill) {
+        const inputElementPhone = document.getElementById(`phoneInput-${idBill}`);
+        const inputElementName = document.getElementById(`nameInput-${idBill}`);
+        const phone = inputElementPhone.value;
+        let formData = {
+            role: "CLIENT",
+            phone: phone,
+        }
+        $http.post("user/get-list", formData).then(resp => {
+            if (resp.data.data.length === 1) {
+                let name = resp.data.data[0].profile.hoVaTen;
+                inputElementName.value = name;
+            }
+        });
+
     };
     $scope.onVoucherChange = function (selectedVoucher, idBill) {
         const elePriceTotal = document.querySelector(`.price-bill-${idBill}`);

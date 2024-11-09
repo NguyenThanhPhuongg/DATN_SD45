@@ -47,11 +47,11 @@
                                         <tbody>
                                         <tr>
                                             <th scope="row">Số điện thoại</th>
-                                            <td><input type="text" class="form-control form-control-sm" id="phoneInput"></td>
+                                            <td><input type="text" ng-model="phoneCustomer" class="form-control form-control-sm" ng-change="onPhoneChange(index + 1)" id="phoneInput-{{ index + 1 }}"></td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Tên khách hàng</th>
-                                            <td><input type="text" class="form-control form-control-sm" id="nameInput"></td>
+                                            <td><input type="text" class="form-control form-control-sm" id="nameInput-{{ index + 1 }}"></td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Mã giảm giá</th>
