@@ -6,6 +6,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.vouchers = [];
     $scope.selectedVoucher = 0;
     $scope.moneyCustomer = null;
+    $scope.paymentCustomer = 'money';
     // Hàm thêm hóa đơn
     $scope.addBill = function () {
         const bill = {
@@ -41,13 +42,6 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         elePriceTotal.textContent = parseFloat(priceOriginal) - parseFloat(selectedVoucher) + ' vnđ'
         // You can perform further actions based on the selected voucher here
     };
-    $scope.onKeyDown = function(event) {
-        // Kiểm tra nếu phím Enter (keyCode 13) được nhấn
-        if (event.keyCode === 13) {
-            console.log("Enter key pressed, Money Customer:", $scope.moneyCustomer);
-            // Thực hiện các thao tác cần thiết khi nhấn Enter
-        }
-    };
     $scope.onMoneyCustomerChange = function(idBill) {
         const inputElementMn = document.getElementById(`moneyCustomerInput-${idBill}`);
         const moneyCustomer = inputElementMn.value;
@@ -61,6 +55,35 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         if (moneyCustomer == null || moneyCustomer === ''){
             eleReturn.textContent = '0 vnđ'
         }
+    };
+    $scope.onChangePayment = function(idBill) {
+        const paymentOptions = document.getElementsByName(`payment-${idBill}`);
+        let paymentCustomer;
+        const elePriceTotal = document.querySelector(`.price-bill-${idBill}`);
+        const qrImg = document.querySelector(`.qr-payment-${idBill}`);
+        const AMOUNT = elePriceTotal.textContent.replace(/[^0-9,]/g, ''); // Loại bỏ ký tự không phải số và dấu phẩy
+        const DESCRIPTION = encodeURIComponent('ck'); // Mã hóa mô tả
+        const ACCOUNT_NAME = encodeURIComponent('NGUYEN THI THANH PHUONG'); // Mã hóa tên tài khoản
+        let QR_URL = `https://img.vietqr.io/image/970422-3006200466-compact.png?amount=${AMOUNT}&addInfo=${DESCRIPTION}&accountName=${ACCOUNT_NAME}`;
+        console.log(AMOUNT)
+        console.log(QR_URL)
+        // Lặp qua các radio button để kiểm tra cái nào được chọn
+        for (const option of paymentOptions) {
+            if (option.checked) {
+                paymentCustomer = option.value;
+                break;
+            }
+        }
+        const qrCode = document.getElementById(`card-qr-${idBill}`);
+
+        if (paymentCustomer === 'bank') {
+            qrCode.classList.add('show')
+            qrImg.src = QR_URL;
+        } else {
+            qrCode.classList.remove('show') // Ẩn QR code
+        }
+
+        console.log("Phương thức thanh toán:", paymentCustomer);
     };
     $scope.initialize()
 });
