@@ -20,7 +20,7 @@ $(document).ready(function () {
                             <div class="product">
                                 <div class="image-wrapper">
                                     <a href="/productDetail/${product.id}">
-                                        <img src="/images/${product.anh}" alt="${product.ten}">
+                                        <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
                                     </a>
                                     <div class="icon-heart">
                                         <a href="#"><i class="bi bi-heart heart"></i></a>
@@ -47,7 +47,7 @@ $(document).ready(function () {
         });
     }
 
-
+    //hiển thị sản phẩm chi tiết
     function detailProduct() {
         document.addEventListener("DOMContentLoaded", function () {
             const urlPath = window.location.pathname;
@@ -107,5 +107,5 @@ $(document).ready(function () {
 
     // Gọi hàm fetchProducts để hiển thị danh sách sản phẩm
     fetchProducts();
-    detailProduct();
+    // detailProduct();
 });

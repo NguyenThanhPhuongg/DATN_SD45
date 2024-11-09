@@ -3,24 +3,24 @@ $(document).ready(function () {
     const urlParts = window.location.pathname.split('/');
     const productId = urlParts[urlParts.length - 1];
 
-    // // Lấy dữ liệu sản phẩm
-    // $.ajax({
-    //     url: `/san-pham/${productId}`,
-    //     method: 'GET',
-    //     success: function (response) {
-    //         const product = response.data;
-    //         $('#productName').text(product.ten);
-    //         $('#productBrand').text(product.thuonghieu.ten);
-    //         $('#productCode').text(product.ma);
-    //         $('#productPrice').text(product.gia.toLocaleString() + 'đ');
-    //         $('#productOldPrice').text(product.gia.toLocaleString() + 'đ');
-    //         $('#priceProduct').val(product.gia);
-    //         $('#productDescription').text(product.moTa);
-    //     },
-    //     error: function (error) {
-    //         console.error("Lỗi khi lấy dữ liệu sản phẩm", error);
-    //     }
-    // });
+    // Lấy dữ liệu sản phẩm
+    $.ajax({
+        url: `/san-pham/${productId}`,
+        method: 'GET',
+        success: function (response) {
+            const product = response.data;
+            $('#productName').text(product.ten);
+            $('#productBrand').text(product.thuonghieu.ten);
+            $('#productCode').text(product.ma);
+            $('#productPrice').text(product.gia.toLocaleString() + 'đ');
+            $('#productOldPrice').text(product.gia.toLocaleString() + 'đ');
+            $('#priceProduct').val(product.gia);
+            $('#productDescription').text(product.moTa);
+        },
+        error: function (error) {
+            console.error("Lỗi khi lấy dữ liệu sản phẩm", error);
+        }
+    });
     // Lấy dữ liệu sản phẩm
     $.ajax({
         url: `/san-pham/${productId}`,
@@ -36,19 +36,30 @@ $(document).ready(function () {
                 $('#priceProduct').val(product.gia);
                 $('#productDescription').text(product.moTa);
 
-                // Cập nhật tùy chọn màu sắc
-                let colorOptionsHtml = '';
-                product.listMauSac.forEach(color => {
-                    colorOptionsHtml += `<span class="badge bg-secondary me-1">${color.ten}</span>`;
+                // Cập nhật tùy chọn màu sắc dưới dạng radio buttons
+                let colorOptionsHtml = '<label><p>Màu sắc</p></label>: ';  // Add label for color
+                product.listMauSac.forEach((color, index) => {
+                    colorOptionsHtml += `
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="color" id="colorOption${index}" value="${color.ten}">
+            <label class="form-check-label" for="colorOption${index}">${color.ten}</label>
+        </div>
+    `;
                 });
-                $('#colorOptions').append(colorOptionsHtml);
+                $('#colorOptions').html(colorOptionsHtml); // Use .html() to replace content
 
-                // Cập nhật tùy chọn kích thước
-                let sizeOptionsHtml = '';
-                product.listSize.forEach(size => {
-                    sizeOptionsHtml += `<span class="badge bg-secondary me-1">${size.ten}</span>`;
+            // Cập nhật tùy chọn kích thước dưới dạng radio buttons
+                let sizeOptionsHtml = '<label><p>Kích thước</p></label>: ';  // Add label for size
+                product.listSize.forEach((size, index) => {
+                    sizeOptionsHtml += `
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="size" id="sizeOption${index}" value="${size.ten}">
+            <label class="form-check-label" for="sizeOption${index}">${size.ten}</label>
+        </div>
+    `;
                 });
-                $('#sizeOptions').append(sizeOptionsHtml);
+                $('#sizeOptions').html(sizeOptionsHtml); // Use .html() to replace content
+
             } else {
                 alert("Không tìm thấy dữ liệu sản phẩm!");
             }

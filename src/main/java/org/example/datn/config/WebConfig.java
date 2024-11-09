@@ -62,13 +62,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**")
+        registry.addResourceHandler("/")
                 .addResourceLocations("classpath:/static/");
 
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:./images/")  // ánh xạ đến thư mục images ngoài src
                 .setCacheControl(CacheControl.noCache());
     }
-
-
 }
