@@ -331,7 +331,7 @@ select * from nhom
 update  danh_muc set ngay_tao = GETDATE() where id =1
 update  nguoi_dung set mat_khau = 'Chuchu11@' where id =1
 
-DELETE FROM san_pham WHERE id = 20;
+DELETE FROM san_pham WHERE id = 19;
 
 SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
 

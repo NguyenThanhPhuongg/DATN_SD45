@@ -113,7 +113,7 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/sanpham/quanlyspct.html",
             controller: "quanlyspct-ctrl"
         })
-        .when("/sanpham", { // Thêm :id để nhận ID sản phẩm từ URL
+        .when("/sanpham", {
             templateUrl: "asset/sanpham/sanpham.html",
             controller: "sanpham-ctrl"
         })
@@ -178,9 +178,13 @@ app.config(function ($routeProvider) {
             controller: "group-ctrl"
         })
 
-
+        .when("/test", {
+            templateUrl: "asset/test/test.html",
+            controller: "test-ctrl"
+        })
 
         .otherwise({
             redirectTo: "/tongquan" // Chuyển hướng đến đường dẫn mặc định
         });
+
 })

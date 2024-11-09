@@ -1,4 +1,4 @@
-app.controller("sanpham-ctrl", function ($scope, $http) {
+app.controller("test-ctrl", function ($scope, $http) {
     $scope.items = [];
     $scope.form = {};
     $scope.danhmuc = [];

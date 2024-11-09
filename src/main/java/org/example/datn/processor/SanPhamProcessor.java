@@ -10,14 +10,17 @@ import org.example.datn.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class SanPhamProcessor {
-
     @Autowired
     private SanPhamService service;
 
@@ -69,16 +72,70 @@ public class SanPhamProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult save(SanPhamModel model) {
+    // Lưu ảnh vào thư mục và trả về tên file
+    public String saveImage(MultipartFile image) throws IOException {
+        // Lấy thư mục gốc của dự án
+        String projectDir = System.getProperty("user.dir");
+
+        // Đường dẫn thư mục lưu ảnh
+        String uploadDir = projectDir + "/images";  // Thư mục images nằm trong thư mục gốc của dự án
+
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();  // Tạo thư mục nếu không tồn tại
+        }
+
+        // Tạo tên file duy nhất bằng UUID
+        String fileName = UUID.randomUUID().toString() + "-" + image.getOriginalFilename();
+        String filePath = uploadDir + "/" + fileName;
+
+        try {
+            // Lưu file vào thư mục
+            image.transferTo(new File(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();  // In chi tiết lỗi ra console
+            throw new IOException("Lỗi khi lưu ảnh: " + e.getMessage());
+        }
+
+        // Trả về tên file để lưu vào database
+        return fileName;
+    }
+
+
+    // Thêm mới sản phẩm
+    public ServiceResult save(SanPhamModel model, MultipartFile file) {
         SanPham sanPham = new SanPham();
         BeanUtils.copyProperties(model, sanPham);
+
+        // Nếu có ảnh, gọi phương thức saveImage và lưu tên file
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = saveImage(file);
+                sanPham.setAnh(fileName);  // Lưu tên file vào thuộc tính `anh`
+            } catch (IOException e) {
+                return new ServiceResult("Lỗi khi lưu ảnh", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_400);
+            }
+        }
+
         service.save(sanPham);
         return new ServiceResult("Sản phẩm đã được thêm thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult update(Long id, SanPhamModel model) {
+    // Cập nhật thông tin sản phẩm
+    public ServiceResult update(Long id, SanPhamModel model, MultipartFile file) {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
         BeanUtils.copyProperties(model, sanPham);
+
+        // Nếu có ảnh mới, gọi phương thức saveImage để lưu ảnh và cập nhật tên file
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = saveImage(file);
+                sanPham.setAnh(fileName);  // Cập nhật tên file mới
+            } catch (IOException e) {
+                return new ServiceResult("Lỗi khi lưu ảnh", SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
+            }
+        }
+
         service.update(sanPham);
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }

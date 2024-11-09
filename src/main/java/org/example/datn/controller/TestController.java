@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController("SanPhamApi")
-@RequestMapping("/san-pham")
-public class SanPhamController {
+@RestController
+@RequestMapping("/san-pham1")
+public class TestController {
 
     @Autowired
     SanPhamProcessor processor;
