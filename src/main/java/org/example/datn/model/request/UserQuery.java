@@ -9,6 +9,7 @@ import org.example.datn.model.enums.UserRoles;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserQuery extends CommonQuery{
+public class UserQuery extends CommonQuery {
     UserRoles role;
+    String phone;
 }

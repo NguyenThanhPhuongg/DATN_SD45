@@ -34,10 +34,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRole(UserRoles role);
 
     @Query("SELECT u FROM User u JOIN Profile p ON u.id = p.userId " +
-            "WHERE p.hoVaTen LIKE %:hoVaTen% " +
+            "WHERE (p.hoVaTen LIKE %:hoVaTen% OR p.phone LIKE %:phone%) " +
             "AND (:role IS NULL OR u.role = :role)")
-    Page<User> findByHoVaTenAndRole(@Param("hoVaTen") String hoVaTen,
-                                    @Param("role") UserRoles role,
-                                    Pageable pageable);
+    Page<User> getList(@Param("hoVaTen") String hoVaTen,
+                                         @Param("role") UserRoles role,
+                                         @Param("phone") String phone,
+                                         Pageable pageable);
+
 
 }
