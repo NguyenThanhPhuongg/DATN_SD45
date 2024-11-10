@@ -269,19 +269,23 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
     };
 
 
-    document.getElementById('profileImage').addEventListener('change', function (event) {
-        const input = event.target;
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const preview = document.getElementById('previewImage');
-                preview.src = e.target.result;
-                preview.style.display = 'block'; // Hiển thị ảnh xem trước
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+    const profileImageInput = document.getElementById('profileImage');
+
+    if (profileImageInput) {
+        profileImageInput.addEventListener('change', function (event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('previewImage');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block'; // Show the preview image
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 
 
     $scope.initialize();
