@@ -14,7 +14,7 @@
             <div class="card-body">
                 <div class="d-grid gap-2 d-md-flex justify-content-between mb-2">
                     <h5 class="me-auto">Hóa đơn {{ index + 1 }}</h5>
-                    <button class="btn btn-primary me-md-2" >Thêm sản phẩm</button>
+                    <button class="btn btn-primary me-md-2"  ng-click="showProductModal(index + 1)">Thêm sản phẩm</button>
                 </div>
                 <div>
                     <table class="table table-bordered">
@@ -47,20 +47,20 @@
                                         <tbody>
                                         <tr>
                                             <th scope="row">Số điện thoại</th>
-                                            <td><input type="text" class="form-control form-control-sm" id="phoneInput"></td>
+                                            <td><input type="text" ng-model="phoneCustomer" class="form-control form-control-sm" maxlength="10" ng-change="onPhoneChange(index + 1)" id="phoneInput-{{ index + 1 }}"></td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Tên khách hàng</th>
-                                            <td><input type="text" class="form-control form-control-sm" id="nameInput"></td>
+                                            <td><input type="text" class="form-control form-control-sm" ng-keydown="onKeyDownName($event)" id="nameInput-{{ index + 1 }}"></td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Mã giảm giá</th>
                                             <td>
                                                 <div>
-                                                    <select  ng-model="selectedVoucher" ng-change="onVoucherChange(selectedVoucher, index + 1)" class="form-select form-select-sm" >
+                                                    <select id="selectedVoucher-{{ index + 1 }}"  ng-model="selectedVoucher" ng-change="onVoucherChange(index + 1)" class="form-select form-select-sm" >
                                                         <option ng-repeat="voucher in vouchers" value="{{ voucher.giaTri }}">{{ voucher.ten }}</option>
                                                     </select>
-                                                    <span class="text-nowrap d-block ms-2">- {{ selectedVoucher }} vnđ</span>
+                                                    <span class="text-nowrap d-block ms-2 " id="voucher-{{ index + 1 }}"></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -89,7 +89,7 @@
                                         <img class="qr-payment-{{ index + 1 }}" width="150" src="" alt="QR Code for Bank Transfer">
                                     </div>
                                     <div class="text-start mt-2">
-                                        <a href="#" class="btn btn-primary btn-block w-100">Thanh toán</a>
+                                        <button ng-click="createBill(index + 1, $event)" data-iduser="" data-nameuser="" class="btn btn-primary btn-block w-100 btn-create-bill-{{ index + 1 }}">Thanh toán</button>
                                     </div>
                                 </div>
                             </div>
@@ -100,4 +100,177 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thanh toán thành công</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="mb-2">Thông tin hóa đơn</h6>
+                    <div class="bill-info-head" ></div>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end">Đơn giá (vnđ)</th>
+                            <th class="text-end">Thành tiền (vnđ)</th>
+                        </tr>
+                        </thead>
+                        <tbody class="prod-in-bill">
+
+                        </tbody>
+                    </table>
+                    <div class="d-flex fw-bold justify-content-between">
+                        <div class="total-quantity"></div>
+                        <div class="total-voucher"></div>
+                        <div class="total-payment"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!--                    <button type="button" class="btn btn-primary">In hóa đơn</button>-->
+                    <button type="button"  data-bs-dismiss="modal" ng-click="clearBill($event)" data-bilid="" class="btn btn-primary btn-done-bill">Hoàn thành</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thêm Sản Phẩm -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h2 class="mt-4">Danh sách sản phẩm</h2><br>
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-table me-1"></i>
+                                Danh sách sản phẩm
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
+                            </div>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã SP</th>
+                                    <th>Tên</th>
+                                    <th>Mô tả</th>
+                                    <th>Giá</th>
+                                    <th>Ảnh</th>
+                                    <th>Trạng thái</th>
+                                    <th>Chức năng</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="item in products">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{item.ma}}</td>
+                                    <td>{{item.ten}}</td>
+                                    <td>{{item.moTa}}</td>
+                                    <td>{{item.gia}}</td>
+                                    <td>
+                                        <img ng-src="/images/{{item.anh}}" alt="Ảnh sản phẩm"
+                                             style="width: 50px; height: 50px; object-fit: cover;"/>
+                                    </td>
+                                    <td>
+                                        <div class="badge"
+                                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                                            <span ng-if="item.trangThai === 1">Active</span>
+                                            <span ng-if="item.trangThai === 3">Locked</span>
+                                            <span ng-if="item.trangThai === 2">Khác</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-xs">
+                                            <button data-bill="" class="btn btn-link btn-select" ng-click="selectProduct(item, $event)">
+                                                Chọn
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addProductModalDetail" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h2 class="mt-4">Danh sách sản phẩm</h2><br>
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-table me-1"></i>
+                                Danh sách sản phẩm
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Size</th>
+                                    <th>Màu sắc</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá</th>
+                                    <th>Ghi chú</th>
+                                    <th>Chức năng</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="item in productDetails">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{item.size.ten}}</td>
+                                    <td>{{item.mauSac.ten}}</td>
+                                    <td>{{item.soLuong}}</td>
+                                    <td>{{item.gia}}</td>
+                                    <td>{{item.ghiChu}}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-xs">
+                                            <button data-bill="" class="btn btn-link btn-addtobill" type="button" ng-click="addProdBill($event)">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast border-0 bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="toast-body">
+                    Đã lưu thông tin khách hàng!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
 </div>
