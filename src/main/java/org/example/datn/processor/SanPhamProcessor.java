@@ -6,6 +6,7 @@ import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.SanPhamModel;
+import org.example.datn.repository.SanPhamRepository;
 import org.example.datn.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,8 @@ import java.util.stream.Collectors;
 public class SanPhamProcessor {
     @Autowired
     private SanPhamService service;
-
+    @Autowired
+    private SanPhamRepository repository;
     @Autowired
     private DanhMucService danhMucService;
 
@@ -126,11 +129,11 @@ public class SanPhamProcessor {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
         BeanUtils.copyProperties(model, sanPham);
 
-        // Nếu có ảnh mới, gọi phương thức saveImage để lưu ảnh và cập nhật tên file
+        // Chỉ cập nhật ảnh nếu có ảnh mới (file != null và file không rỗng)
         if (file != null && !file.isEmpty()) {
             try {
-                String fileName = saveImage(file);
-                sanPham.setAnh(fileName);  // Cập nhật tên file mới
+                String fileName = saveImage(file);  // Gọi phương thức lưu ảnh và lấy tên file
+                sanPham.setAnh(fileName);  // Cập nhật tên file ảnh mới
             } catch (IOException e) {
                 return new ServiceResult("Lỗi khi lưu ảnh", SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
             }
@@ -140,28 +143,22 @@ public class SanPhamProcessor {
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+
+    // Cập nhật nếu không có ảnh mới
+    public ServiceResult update(Long id, SanPhamModel model) {
+        SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
+        BeanUtils.copyProperties(model, sanPham);
+
+        // Không thay đổi ảnh nếu không có ảnh mới
+        service.update(sanPham);
+        return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+
     public ServiceResult delete(Long id) {
         service.delete(id);
         return new ServiceResult("Sản phẩm đã được xóa thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

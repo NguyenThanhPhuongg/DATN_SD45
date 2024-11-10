@@ -129,23 +129,30 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/hoadon/chitiethoadon.html",
             controller: "hdct-ctrl"
         })
-        .when("/hoadoncho", {
-            templateUrl: "asset/hoadon/hoadoncho.html",
+        .when("/choxacnhan", {
+            templateUrl: "asset/hoadon/choxacnhan.html",
             controller: "hoadon-ctrl"
         })
-        .when("/hoadonchovc", {
-            templateUrl: "asset/hoadon/hoadonchovc.html",
+        .when("/chogiaohang", {
+            templateUrl: "asset/hoadon/chogiaohang.html",
             controller: "hoadon-ctrl"
         })
-        .when("/hoadondone", {
-            templateUrl: "asset/hoadon/hoadondone.html",
+        .when("/dangvanchuyen", {
+            templateUrl: "asset/hoadon/dangvanchuyen.html",
             controller: "hoadon-ctrl"
         })
-        .when("/hoadonfail", {
-            templateUrl: "asset/hoadon/hoadonfail.html",
+        .when("/hoanthanh", {
+            templateUrl: "asset/hoadon/hoanthanh.html",
             controller: "hoadon-ctrl"
         })
-
+        .when("/dahuy", {
+            templateUrl: "asset/hoadon/dahuy.html",
+            controller: "hoadon-ctrl"
+        })
+        .when("/hoantra", {
+            templateUrl: "asset/hoadon/hoantra.html",
+            controller: "hoadon-ctrl"
+        })
 
         /// khuyến mãi
         .when("/listkhuyenmai", {

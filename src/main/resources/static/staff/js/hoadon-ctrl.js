@@ -5,6 +5,12 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.hdcts = [];
     $scope.ptvc = [];
     $scope.form = {};
+    $scope.form2 = {};
+    $scope.form3 = {};
+    $scope.form4 = {};
+    $scope.form5 = {};
+    $scope.form6 = {};
+
     $scope.selectedInvoiceId = null;
     $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
     $scope.searchText2 = '';
@@ -62,10 +68,12 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
                     ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
                     ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
                 }));
-                $scope.pager1.updateItems();
+                $scope.pager0.updateItems();
                 $scope.pager2.updateItems();
                 $scope.pager3.updateItems();
                 $scope.pager4.updateItems();
+                $scope.pager5.updateItems();
+                $scope.pager6.updateItems();
             } else {
                 console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
             }
@@ -74,7 +82,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
-    $scope.pager1 = {
+    $scope.pager0 = {
         page: 0,
         size: 5,
         items: [],
@@ -101,7 +109,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 1;
+                const statusMatches = item.trangThai === 0;
                 const idMatches = item.id.toString().includes($scope.searchText1);
                 return statusMatches && idMatches;
             });
@@ -214,11 +222,81 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
+    $scope.pager5 = {
+        page: 0,
+        size: 5,
+        items: [],
+        count: 0,
+        first: function () {
+            this.page = 0;
+            this.updateItems();
+        },
+        prev: function () {
+            if (this.page > 0) {
+                this.page--;
+                this.updateItems();
+            }
+        },
+        next: function () {
+            if (this.page < this.count - 1) {
+                this.page++;
+                this.updateItems();
+            }
+        },
+        last: function () {
+            this.page = this.count - 1;
+            this.updateItems();
+        },
+        updateItems: function () {
+            const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 5;
+                const idMatches = item.id.toString().includes($scope.searchText4);
+                return statusMatches && idMatches;
+            });
+            this.count = Math.ceil(filteredItems.length / this.size);
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+        }
+    };
+    $scope.pager6 = {
+        page: 0,
+        size: 5,
+        items: [],
+        count: 0,
+        first: function () {
+            this.page = 0;
+            this.updateItems();
+        },
+        prev: function () {
+            if (this.page > 0) {
+                this.page--;
+                this.updateItems();
+            }
+        },
+        next: function () {
+            if (this.page < this.count - 1) {
+                this.page++;
+                this.updateItems();
+            }
+        },
+        last: function () {
+            this.page = this.count - 1;
+            this.updateItems();
+        },
+        updateItems: function () {
+            const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 6;
+                const idMatches = item.id.toString().includes($scope.searchText4);
+                return statusMatches && idMatches;
+            });
+            this.count = Math.ceil(filteredItems.length / this.size);
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+        }
+    };
 
     // Theo dõi sự thay đổi trong ô tìm kiếm cho từng trạng thái
     $scope.$watch('searchText1', function (newValue, oldValue) {
         if (newValue !== oldValue) {
-            $scope.pager1.updateItems();
+            $scope.pager0.updateItems();
         }
     });
     $scope.$watch('searchText2', function (newValue, oldValue) {
@@ -232,6 +310,16 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         }
     });
     $scope.$watch('searchText4', function (newValue, oldValue) {
+        if (newValue !== oldValue) {
+            $scope.pager4.updateItems();
+        }
+    });
+    $scope.$watch('searchText5', function (newValue, oldValue) {
+        if (newValue !== oldValue) {
+            $scope.pager4.updateItems();
+        }
+    });
+    $scope.$watch('searchText6', function (newValue, oldValue) {
         if (newValue !== oldValue) {
             $scope.pager4.updateItems();
         }
@@ -304,7 +392,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             }
         });
     };
-    $scope.update1 = function (item) {
+    $scope.update5 = function (item) {
         swal({
             title: "Xác nhận",
             text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
@@ -313,7 +401,29 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                item.trangThai = 1; // Cập nhật trạng thái
+                item.trangThai = 5; // Cập nhật trạng thái
+                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                    $scope.initialize(); // Tải lại dữ liệu
+                    swal("Success!", "Cập nhật thành công", "success");
+                }).catch(error => {
+                    swal("Error!", "Cập nhật thất bại", "error");
+                    console.log("Error: ", error);
+                });
+            } else {
+                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
+            }
+        });
+    };
+    $scope.update6 = function (item) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                item.trangThai = 6; // Cập nhật trạng thái
                 $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
@@ -327,6 +437,42 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
+    $scope.edit0 = function (item) {
+        // Chuyển timestamp thành Date object
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        item.ngayTao = new Date(item.ngayTao);
+        $scope.form = angular.copy(item);
+    };
+    $scope.edit2 = function (item) {
+        // Chuyển timestamp thành Date object
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        item.ngayTao = new Date(item.ngayTao);
+        $scope.form2 = angular.copy(item);
+    };
+    $scope.edit3 = function (item) {
+        // Chuyển timestamp thành Date object
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        item.ngayTao = new Date(item.ngayTao);
+        $scope.form3 = angular.copy(item);
+    };
+    $scope.edit4 = function (item) {
+        // Chuyển timestamp thành Date object
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        item.ngayTao = new Date(item.ngayTao);
+        $scope.form4 = angular.copy(item);
+    };
+    $scope.edit5 = function (item) {
+        // Chuyển timestamp thành Date object
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        item.ngayTao = new Date(item.ngayTao);
+        $scope.form5 = angular.copy(item);
+    };
+    $scope.edit6 = function (item) {
+        // Chuyển timestamp thành Date object
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        item.ngayTao = new Date(item.ngayTao);
+        $scope.form6 = angular.copy(item);
+    };
     $scope.selectInvoice = function (item) {
         console.log("Selected Invoice ID: ", item.id); // Thêm log này
         $rootScope.selectedInvoiceId = item.id; // Lưu ID hóa đơn vào rootScope
