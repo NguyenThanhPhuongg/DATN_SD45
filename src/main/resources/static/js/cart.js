@@ -134,10 +134,14 @@ function renderCart(items) {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
     const productSection = document.querySelector('.product-section');
     productSection.innerHTML = '';
+    if (items.length === 0) {
+        productSection.innerHTML = '<p>Không có sản phẩm nào.</p>';
+        return;
+    }
     let totalAmount = 0;
     items.forEach(item => {
-        const sanPham = item.sanPham;
-        const sanPhamChiTiet = item.sanPhamChiTiet;
+        const sanPham = item.sanPham || {}; // Xử lý trường hợp sanPham là null
+        const sanPhamChiTiet = item.sanPhamChiTiet || {};
         const total = item.gia * item.soLuong;
         totalAmount += total;
         const productItem = document.createElement('div');
@@ -145,8 +149,8 @@ function renderCart(items) {
         const itemHtml = `
             <div>
                 <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} data-id="${item.id}">
-                <img src="${sanPham.anh}">
-                <span>${sanPham.ten}<br>Phân loại: ${sanPhamChiTiet.mauSac.ten}, Size: ${sanPhamChiTiet.size.ten}</span>
+                <img src="${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}"> 
+                <span>${sanPham.ten || 'Sản phẩm không xác định'}<br>Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}</span>
             </div>
             <div class="price">₫${item.gia}</div>
             <div class="quantity">
@@ -162,7 +166,7 @@ function renderCart(items) {
     });
     updateTotalSection();
 
-    // Thêm sự kiện cho các nút tăng giảm
+    // Thêm sự kiện cho các nút tăng giảm số lượng
     document.querySelectorAll('.product-item .quantity button').forEach(button => {
         button.addEventListener('click', (e) => {
             const itemId = e.target.closest('.product-item').querySelector('input[data-id]').dataset.id;
@@ -171,14 +175,14 @@ function renderCart(items) {
         });
     });
 
-    // Thêm sự kiện cho các checkbox
+    // Thêm sự kiện cho các ô checkbox
     document.querySelectorAll('.product-item input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('click', (e) => {
             handleCheckboxClick(e.target.dataset.id, e.target.checked);
         });
     });
 
-    // Thêm sự kiện cho nút Xóa
+    // Thêm sự kiện cho các nút Xóa
     document.querySelectorAll('.product-item .delete-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const itemId = e.target.closest('.product-item').querySelector('input[data-id]').dataset.id;
@@ -189,6 +193,7 @@ function renderCart(items) {
     // Thêm sự kiện cho nút Mua Hàng
     document.querySelector('.checkout-btn').addEventListener('click', handleCheckout);
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Xóa selectedItems khỏi local storage khi trang được tải lại

@@ -26,4 +26,9 @@ public class PhuongThucThanhToanController {
     public ResponseEntity<ServiceResult> getActive() {
         return ResponseEntity.ok(processor.getActive());
     }
+
+    @GetMapping("/get-list")
+    public ResponseEntity<ServiceResult> getList() {
+        return ResponseEntity.ok(processor.getList());
+    }
 }

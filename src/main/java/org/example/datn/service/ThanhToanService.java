@@ -5,6 +5,8 @@ import org.example.datn.repository.ThanhToanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ThanhToanService {
 
@@ -13,6 +15,9 @@ public class ThanhToanService {
 
     public void save(ThanhToan thanhToan){
         repository.save(thanhToan);
+    }
+    public Optional<ThanhToan> findByIdHoaDon(Long idHoaDon){
+        return repository.findByIdHoaDon(idHoaDon);
     }
 
 }

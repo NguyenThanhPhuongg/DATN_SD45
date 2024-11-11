@@ -1,7 +1,7 @@
 let fetchedAddresses = []; // Biến toàn cục để lưu địa chỉ đã fetch
 let addressDataId;
 let phuongThucVanChuyenId;
-let phuongThucThanhToanId;
+let phuongThucThanhToanId = null;
 let isAddingNewAddress = false;
 
 async function fetchDeliveryAddress() {
@@ -471,7 +471,7 @@ function closeShippingModal() {
 
 async function fetchPaymentMethods() {
     try {
-        const response = await fetch('/phuong-thuc-thanh-toan/get-active', {
+        const response = await fetch('/phuong-thuc-thanh-toan/get-list', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -479,19 +479,20 @@ async function fetchPaymentMethods() {
         });
 
         if (!response.ok) {
-            throw new Error('Phản hồi mạng không hợp lệ');
+            throw new Error('Không thể kết nối với server');
         }
 
         const result = await response.json();
         const paymentOptionsElement = document.getElementById('payment-options');
-        phuongThucThanhToanId = result.data.id;
-        console.log('phuong thuc thanh toan: ', phuongThucThanhToanId);
-        // Kiểm tra xem có dữ liệu hay không
-        if (result.data) {
-            paymentOptionsElement.innerHTML = `
-                <span>${result.data.ten}</span>
-                <button class="change-button" onclick="changePaymentMethod()">Thay đổi</button>
-            `;
+
+        // Kiểm tra xem result.data có phải là mảng và có phần tử hay không
+        if (Array.isArray(result.data) && result.data.length > 0) {
+            const optionsHtml = result.data.map(option => `
+                <div class="payment-option" id="payment-option-${option.id}" onclick="selectPaymentOption(${option.id})">
+                    <span>${option.ten}</span>
+                </div>
+            `).join('');
+            paymentOptionsElement.innerHTML = optionsHtml;
         } else {
             paymentOptionsElement.innerHTML = '<p>Không có phương thức thanh toán nào</p>';
         }
@@ -499,6 +500,19 @@ async function fetchPaymentMethods() {
         console.error('Lỗi khi lấy phương thức thanh toán:', error);
         document.getElementById('payment-options').innerHTML = '<p>Lỗi khi tải phương thức thanh toán</p>';
     }
+}
+
+function selectPaymentOption(id) {
+    phuongThucThanhToanId = id; // Cập nhật id của phương thức thanh toán được chọn
+    console.log('Phương thức thanh toán đã chọn:', phuongThucThanhToanId);
+
+    // Loại bỏ lớp 'selected' khỏi tất cả các payment option
+    const allOptions = document.querySelectorAll('.payment-option');
+    allOptions.forEach(option => option.classList.remove('selected'));
+
+    // Thêm lớp 'selected' vào option đã được chọn
+    const selectedOption = document.getElementById(`payment-option-${id}`);
+    selectedOption.classList.add('selected');
 }
 
 // Hàm để xử lý khi nút "Thay đổi" được nhấn
@@ -565,6 +579,11 @@ async function placeOrder() {
     // Lấy thông tin phương thức vận chuyển đã chọn
     const idPhuongThucVanChuyen = phuongThucVanChuyenId;
 
+    if (!phuongThucThanhToanId) {
+        alert('Vui lòng chọn phương thức thanh toán.');
+        return; // Dừng lại nếu phương thức thanh toán không được chọn
+    }
+
     // Lấy thông tin phương thức thanh toán đã chọn
     const idPhuongThucThanhToan = phuongThucThanhToanId;
 
@@ -603,25 +622,28 @@ async function placeOrder() {
         }
 
         const result = await response.json();
+
+        // Kiểm tra nếu kết quả trả về có code = 200 và data = null
         if (result.code === "200") {
-            alert('Đặt hàng thành công!');
-            window.location.href = '/bill';
+            if (result.data === null) {
+                // Nếu data là null, thông báo đặt hàng thành công và chuyển hướng đến /bill
+                alert('Đặt hàng thành công!');
+                window.location.href = '/bill';
+            } else if (typeof result.data === 'string') {
+                // Nếu data là một link (VNPay link), chuyển hướng tới link đó
+                window.location.href = result.data;
+            }
         } else {
+            // Nếu không phải mã thành công, thông báo lỗi
             alert(`Có lỗi xảy ra: ${result.message}`);
         }
+
     } catch (error) {
         console.error('Error placing order:', error);
         alert('Có lỗi xảy ra khi đặt hàng.');
     }
-
-    function hideMessageAfterDelay() {
-        setTimeout(function () {
-            $('#message').fadeOut('slow', function () {
-                $(this).empty().show();
-            });
-        }, 2000);
-    }
 }
+
 
 
 

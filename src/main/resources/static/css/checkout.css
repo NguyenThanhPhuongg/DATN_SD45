@@ -47,3 +47,36 @@ table {
 .product-price, .product-quantity, .product-total {
     margin-top: 5px;
 }
+/* Cấu trúc Flexbox để hiển thị các payment options theo hàng ngang */
+#payment-options {
+    display: flex;
+    gap: 10px; /* Khoảng cách giữa các option */
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+}
+
+/* Đóng khung từng payment option */
+.payment-option {
+    padding: 10px 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Màu nền khi hover */
+.payment-option:hover {
+    background-color: #EE4D2D;
+    border-color: #EE4D2D;
+}
+
+/* Màu nền khi chọn (hover và chọn được thêm lớp 'selected') */
+.payment-option.selected {
+    background-color: #EE4D2D;
+    border-color: #EE4D2D;
+}
+
+/* Tùy chỉnh font và text */
+.payment-option span {
+    font-size: 16px;
+    font-weight: bold;
+}

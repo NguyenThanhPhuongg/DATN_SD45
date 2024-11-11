@@ -14,9 +14,10 @@ public class HoaDonService {
     @Autowired
     private HoaDonRepository repo;
 
-    public List<HoaDon> getAll(){
+    public List<HoaDon> getAll() {
         return repo.findAll();
     }
+
     public void save(HoaDon hoaDon) {
         repo.save(hoaDon);
     }
@@ -29,11 +30,15 @@ public class HoaDonService {
         repo.delete(hoaDon);
     }
 
-    public HoaDon findTopByOrderByNgayTaoDesc(){
+    public HoaDon findTopByOrderByNgayTaoDesc() {
         return repo.findTopByOrderByNgayTaoDesc();
     }
 
-    public List<HoaDon> findByIdNguoiDung(Long idNguoiDung){
+    public List<HoaDon> findByIdNguoiDung(Long idNguoiDung) {
         return repo.findByIdNguoiDung(idNguoiDung);
+    }
+
+    public Optional<HoaDon> findByMa(String ma) {
+        return repo.findByMa(ma);
     }
 }
