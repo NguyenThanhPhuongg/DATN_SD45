@@ -245,11 +245,11 @@
                            aria-controls="pagesCollapseAttributeManagement">
                             Đã hủy
                         </a>
-                        <a class="nav-link collapsed" href="#!/hoantra"
-                           data-bs-target="#pagesCollapseAttributeManagement" aria-expanded="false"
-                           aria-controls="pagesCollapseAttributeManagement">
-                            Hoàn / Trả hàng
-                        </a>
+<!--                        <a class="nav-link collapsed" href="#!/hoantra"-->
+<!--                           data-bs-target="#pagesCollapseAttributeManagement" aria-expanded="false"-->
+<!--                           aria-controls="pagesCollapseAttributeManagement">-->
+<!--                            Hoàn / Trả hàng-->
+<!--                        </a>-->
                     </nav>
                 </div>
                 <!-- Quản lý khuyến mãi -->
@@ -286,19 +286,36 @@
                     Hỗ trợ
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapsePages9" aria-labelledby="headingTwo"
-                     data-bs-parent="#sidenavAccordion">
+                <div class="collapse" id="collapsePages9" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages1">
-                        <a class="nav-link collapsed" href="#"
-                           data-bs-target="#pagesCollapseProductManagement" aria-expanded="false"
-                           aria-controls="pagesCollapseProductManagement">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                           data-bs-target="#pagesCollapseAccount2" aria-expanded="false"
+                           aria-controls="pagesCollapseAccount2">
                             Đổi hàng
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <a class="nav-link collapsed" href="#"
-                           data-bs-target="#pagesCollapseAttributeManagement" aria-expanded="false"
-                           aria-controls="pagesCollapseAttributeManagement">
+                        <div class="collapse" id="pagesCollapseAccount2" aria-labelledby="headingTwo"
+                             data-bs-parent="#sidenavAccordionPages1">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="#!/doihangcho">Yêu cầu chờ</a>
+                                <a class="nav-link" href="#!/doihangthanhcong">Yêu cầu thành công</a>
+                                <a class="nav-link" href="#!/doihanghuy">Yêu cầu hủy</a>
+                            </nav>
+                        </div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                           data-bs-target="#pagesCollapseAccount3" aria-expanded="false"
+                           aria-controls="pagesCollapseAccount3">
                             Trả hàng
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
+                        <div class="collapse" id="pagesCollapseAccount3" aria-labelledby="headingTwo"
+                             data-bs-parent="#sidenavAccordionPages1">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="#!/trahangcho">Yêu cầu chờ</a>
+                                <a class="nav-link" href="#!/trahangthanhcong">Yêu cầu thành công</a>
+                                <a class="nav-link" href="#!/trahanghuy">Yêu cầu hủy</a>
+                            </nav>
+                        </div>
                         <a class="nav-link collapsed" href="#!/traloihotro"
                            data-bs-target="#pagesCollapseAttributeManagement" aria-expanded="false"
                            aria-controls="pagesCollapseAttributeManagement">

@@ -187,21 +187,21 @@ GO
 INSERT INTO [san_pham] 
 ([id_danh_muc], [id_thuong_hieu], [id_chat_lieu], [ten], [ma], [xuat_xu], [mo_ta], [gia], [anh], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES
-(1, 1, 1, N'Áo thun nam', N'ATN001', N'Trung Quốc', N'Áo thun nam chất lượng cao', 199.99, N'path_to_image1.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(1, 1, 2, N'Quần jean nam', N'QJN001', N'Việt Nam', N'Quần jean nam, bền và thời trang', 250.00, N'path_to_image2.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(2, 2, 1, N'Áo sơ mi nữ', N'ASN001', N'Việt Nam', N'Áo sơ mi nữ thanh lịch, phù hợp với công sở', 350.00, N'path_to_image3.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(2, 3, 2, N'Áo khoác nam', N'AKN001', N'Hàn Quốc', N'Áo khoác nam dày, ấm áp cho mùa đông', 450.00, N'path_to_image4.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(3, 1, 3, N'Váy đầm nữ', N'VDN001', N'Thái Lan', N'Váy đầm nữ đẹp, nhẹ nhàng cho mùa hè', 399.99, N'path_to_image5.jpg', 1, GETDATE(), GETDATE(), 1, 1);
+(1, 1, 1, N'Áo thun nam', N'ATN001', N'Trung Quốc', N'Áo thun nam chất lượng cao', 199999, N'path_to_image1.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(1, 1, 2, N'Quần jean nam', N'QJN001', N'Việt Nam', N'Quần jean nam, bền và thời trang', 250900, N'path_to_image2.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(2, 2, 1, N'Áo sơ mi nữ', N'ASN001', N'Việt Nam', N'Áo sơ mi nữ thanh lịch, phù hợp với công sở', 350900, N'path_to_image3.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(2, 3, 2, N'Áo khoác nam', N'AKN001', N'Hàn Quốc', N'Áo khoác nam dày, ấm áp cho mùa đông', 450900, N'path_to_image4.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(3, 1, 3, N'Váy đầm nữ', N'VDN001', N'Thái Lan', N'Váy đầm nữ đẹp, nhẹ nhàng cho mùa hè', 399999, N'path_to_image5.jpg', 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
 INSERT INTO [chi_tiet_san_pham] 
 ([id_san_pham], [id_size], [id_mau_sac], [so_luong], [gia], [ghi_chu], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES
-(1, 1, 1, 50, 199.99, N'Áo thun màu đỏ, kích thước S', 1, GETDATE(), GETDATE(), 1, 1),
-(1, 2, 2, 30, 199.99, N'Áo thun màu xanh, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
-(2, 3, 3, 40, 250.00, N'Quần jean màu đen, kích thước L', 1, GETDATE(), GETDATE(), 1, 1),
-(3, 2, 4, 20, 350.00, N'Áo sơ mi nữ màu trắng, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
-(4, 3, 5, 10, 450.00, N'Áo khoác nam màu xanh, kích thước XL', 1, GETDATE(), GETDATE(), 1, 1);
+(1, 1, 1, 500, 199999, N'Áo thun màu đỏ, kích thước S', 1, GETDATE(), GETDATE(), 1, 1),
+(1, 2, 2, 300, 199999, N'Áo thun màu xanh, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
+(2, 3, 3, 400, 250900, N'Quần jean màu đen, kích thước L', 1, GETDATE(), GETDATE(), 1, 1),
+(3, 2, 4, 200, 350900, N'Áo sơ mi nữ màu trắng, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
+(4, 3, 5, 100, 450900, N'Áo khoác nam màu xanh, kích thước XL', 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
 INSERT INTO [thuong_hieu] ([ten], [mo_ta], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
@@ -285,10 +285,24 @@ VALUES
 (5, 2, N'Phản hồi Bình luận 5.1', 1, 1, 1);
 GO
 
+INSERT INTO yeu_cau_doi_tra (id_hoa_don, id_nguoi_dung, loai_yeu_cau, ly_do, trang_thai, ngay_yeu_cau, ngay_hoan_tat, ghi_chu, nguoi_tao, nguoi_cap_nhat, ngay_tao, ngay_cap_nhat)
+VALUES
+(1, 1, 'EXCHANGE', N'Sản phẩm lỗi, cần đổi mới', 0, GETDATE(), NULL, N'Đang chờ xử lý', 1, 1, GETDATE(), GETDATE()),
+(2, 2, 'EXCHANGE', N'Sản phẩm không đúng màu sắc', 0, GETDATE(), NULL, N'Đang xử lý', 2, 2, GETDATE(), GETDATE()),
+(3, 1, 'RETURN', N'Sản phẩm không vừa size', 0, GETDATE(), NULL, N'Đã hoàn tất', 3, 3, GETDATE(), GETDATE()),
+(4, 3, 'RETURN', N'Sản phẩm bị hỏng trong quá trình giao hàng', 0, GETDATE(), NULL, N'Đang xử lý', 4, 4, GETDATE(), GETDATE()),
+(5, 2, 'EXCHANGE', N'Sản phẩm có lỗi nhỏ, muốn đổi sản phẩm khác', 0, GETDATE(), NULL, N'Chờ phê duyệt', 5, 5, GETDATE(), GETDATE());
 
---select * from thong_tin_ca_nhan
+INSERT INTO yeu_cau_doi_tra_chi_tiet (id_yeu_cau_doi_tra, id_san_pham_chi_tiet, so_luong, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
+VALUES
+(1, 1, 1, 1, GETDATE(), GETDATE(), 1, 1),
+(2, 2, 1, 1, GETDATE(), GETDATE(), 1, 1),
+(3, 3, 1, 1, GETDATE(), GETDATE(), 1, 1),
+(4, 4, 1, 1, GETDATE(), GETDATE(), 1, 1),
+(5, 5, 1, 1, GETDATE(), GETDATE(), 1, 1);
 
---select * from thuong_hieu
+select * from thong_tin_ca_nhan
+select * from gio_hang
 --select * from danh_muc 
 select * from size where id =1 
 select * from mau_sac 
@@ -306,13 +320,13 @@ select * from mau_sac
 
 --select * from thanh_toan
 --select * from phuong_thuc_thanh_toan
---select * from chi_tiet_hoa_don 
+select * from chi_tiet_hoa_don 
 --select * from gio_hang 
 --select * from chi_tiet_gio_hang 
---select * from hoa_don 
+select * from hoa_don 
 --select * from phuong_thuc_van_chuyen 
 --select * from dia_chi_giao_hang 
---select * from nguoi_dung 
+select * from nguoi_dung 
 
 SELECT * FROM [san_pham];
 SELECT * FROM [chi_tiet_san_pham];
@@ -333,7 +347,7 @@ select * from nhom
 update  danh_muc set ngay_tao = GETDATE() where id =1
 update  nguoi_dung set mat_khau = 'Chuchu11@' where id =1
 
-DELETE FROM san_pham WHERE id = 19;
+DELETE FROM hoa_don WHERE id = 6;
 
 SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
 
