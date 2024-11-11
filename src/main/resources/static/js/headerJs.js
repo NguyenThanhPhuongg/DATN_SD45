@@ -104,8 +104,8 @@ function fetchCartItemCount(token) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data && data.result) {
-                const cartItemCount = data.result.length;
+            if (data && data.data) {
+                const cartItemCount = data.data.length;
                 updateCartBadge(cartItemCount); // Cập nhật số lượng giỏ hàng
             } else {
                 console.error('Không có dữ liệu giỏ hàng');

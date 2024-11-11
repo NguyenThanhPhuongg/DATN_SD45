@@ -21,12 +21,16 @@ import org.example.datn.service.*;
 import org.example.datn.transformer.HoaDonTransformer;
 import org.example.datn.transformer.ProfileTransformer;
 import org.example.datn.transformer.UserTransformer;
+import org.example.datn.utils.VNPayUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -74,6 +78,10 @@ public class HoaDonProcessor {
 
     @Autowired
     ThanhToanService thanhToanService;
+
+    @Autowired
+    private PaymentService paymentService;
+
     public ServiceResult getAll() {
         var list = service.getAll();
         var models = list.stream().map(hoaDon -> {
@@ -129,15 +137,17 @@ public class HoaDonProcessor {
         hoaDon.setIdNguoiDung(ua.getPrincipal());
         hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
         hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
-        hoaDon.setMa(generateNextInvoiceNumber());
+        hoaDon.setMa(getRandomNumber(8));
         hoaDon.setDiemSuDung(0);
-        hoaDon.setTrangThai(StatusHoaDon.CHO_XAC_NHAN.getValue());
         hoaDon.setNgayTao(LocalDateTime.now());
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiTao(ua.getPrincipal());
         hoaDon.setNguoiCapNhat(ua.getPrincipal());
         hoaDon.setNgayDatHang(LocalDateTime.now());
         service.save(hoaDon);
+
+        var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
+                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
 
         var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
         BigDecimal tongTien = BigDecimal.ZERO;
@@ -149,7 +159,7 @@ public class HoaDonProcessor {
             hdct.setGia(ghct.getGia());
             BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
             tongTien = tongTien.add(giaTien);
-            hdct.setTrangThai(StatusHoaDon.CHO_XAC_NHAN.getValue());
+            hdct.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
             hdct.setNgayTao(LocalDateTime.now());
             hdct.setNgayCapNhat(LocalDateTime.now());
             hdct.setNguoiTao(ua.getPrincipal());
@@ -158,39 +168,33 @@ public class HoaDonProcessor {
             ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
             gioHangChiTietService.save(ghct);
         }
-        hoaDon.setTongTien(tongTien);
-        service.save(hoaDon);
-        var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
-                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
-        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH)) {
-            ThanhToan thanhToan = new ThanhToan();
-            thanhToan.setIdHoaDon(hoaDon.getId());
-            thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
-            thanhToan.setSoTien(hoaDon.getTongTien());
-            thanhToan.setTrangThai(StatusThanhToan.CHUA_THANH_TOAN.getValue());
-            thanhToanService.save(thanhToan);
-        }
-//        else if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
-//            // Tạo bản ghi thanh toán trước khi chuyển hướng
-//            ThanhToan thanhToan = new ThanhToan();
-//            thanhToan.setIdHoaDon(hoaDon.getId());
-//            thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
-//            thanhToan.setSoTien(hoaDon.getTongTien());
-//            thanhToan.setTrangThai(StatusThanhToan.CHUA_THANH_TOAN.getValue());
-//            thanhToanService.save(thanhToan);
-//
-//            // Xử lý thanh toán qua VNPAY
-//            String vnpayUrl = createVnpayRequest(hoaDon, tongTien, ua);
-//            return new ServiceResult(vnpayUrl, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
-//        }
-        return new ServiceResult();
 
+        hoaDon.setTongTien(tongTien);
+        hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
+        service.save(hoaDon);
+        ThanhToan thanhToan = new ThanhToan();
+        thanhToan.setIdHoaDon(hoaDon.getId());
+        thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
+        thanhToan.setSoTien(hoaDon.getTongTien());
+        thanhToan.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusThanhToan.CHUA_THANH_TOAN.getValue() : StatusThanhToan.DANG_XU_LY.getValue());
+        thanhToanService.save(thanhToan);
+        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
+            HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String ipAddress = VNPayUtil.getIpAddress(httpRequest);
+            String vnPayResponse = paymentService.createVnPayPayment(hoaDon, "NCB", ipAddress);
+            return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+        }
+        return new ServiceResult();
     }
 
-    public String generateNextInvoiceNumber() {
-        HoaDon lastInvoice = service.findTopByOrderByNgayTaoDesc();
-        int nextNumber = (lastInvoice == null) ? 1 : Integer.parseInt(lastInvoice.getMa().substring(4)) + 1;
-        return String.format("CODE%04d", nextNumber);
+    public static String getRandomNumber(int len) {
+        Random rnd = new Random();
+        String chars = "0123456789";
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 
     public ServiceResult update(Long id, HoaDonModel request) {

@@ -33,4 +33,12 @@ public class HoaDonChiTietService {
     public List<HoaDonChiTiet> findByIdHoaDonInAndTrangThai(List<Long> idHoaDons, Integer trangThai){
         return repo.findByIdHoaDonInAndTrangThai(idHoaDons, trangThai);
     }
+
+    public List<HoaDonChiTiet> findByIdHoaDon(Long idHoaDon){
+        return repo.findByIdHoaDon(idHoaDon);
+    }
+
+    public void saveAll(List<HoaDonChiTiet> hoaDonChiTietList) {
+        repo.saveAll(hoaDonChiTietList);
+    }
 }

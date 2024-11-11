@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "thanh_toan")
@@ -33,7 +34,7 @@ public class ThanhToan extends CommonEntity{
     private BigDecimal soTien;
 
     @Column(name = "ngay_thanh_toan")
-    private LocalDate ngayThanhToan;
+    private LocalDateTime ngayThanhToan;
 
     @Column(name = "ghi_chu")
     private String ghiChu;
