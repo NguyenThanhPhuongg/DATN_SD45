@@ -5,6 +5,7 @@ import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.model.request.HoaDonRequest;
+import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.processor.DanhMucProcessor;
 import org.example.datn.processor.HoaDonProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,4 +52,10 @@ public class HoaDonController {
     public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.save(request, ua));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody HoaDonModel request) {
+        ServiceResult result = processor.update(id, request);
+        return ResponseEntity.ok(result);
+    }
+
 }

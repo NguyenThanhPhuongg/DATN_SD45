@@ -2,9 +2,12 @@ package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.HoaDon;
+import org.example.datn.entity.HoaDonChiTiet;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.HoaDonChiTietRequest;
+import org.example.datn.model.response.HoaDonChiTietModel;
+import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.service.*;
 import org.example.datn.transformer.HoaDonChiTietTransformer;
 import org.example.datn.transformer.HoaDonTransformer;
@@ -44,6 +47,9 @@ public class HoaDonChiTietProcessor {
     @Autowired
     private MauSacService mauSacService;
 
+    @Autowired
+    SanPhamChiTietProcessor sanPhamChiTietprocessor;
+
     public ServiceResult getListByStatus(HoaDonChiTietRequest request, UserAuthentication ua) {
         var idHoaDons = hoaDonService.findByIdNguoiDung(ua.getPrincipal()).stream()
                 .map(HoaDon::getId)
@@ -70,6 +76,31 @@ public class HoaDonChiTietProcessor {
                     return model;
                 })
                 .collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    private HoaDonChiTietModel toModel(HoaDonChiTiet hoaDon) {
+        if (hoaDon == null) {
+            return null;
+        }
+
+        HoaDonChiTietModel model = new HoaDonChiTietModel();
+        model.setId(hoaDon.getId());
+        model.setIdHoaDon(hoaDon.getIdHoaDon());
+        model.setGia(hoaDon.getGia());
+        model.setSoLuong(hoaDon.getSoLuong());
+        model.setIdSanPhamChiTiet(hoaDon.getIdSanPhamChiTiet());
+        model.setTrangThai(hoaDon.getTrangThai());
+        return model;
+    }
+    public ServiceResult getAll() {
+        var list = service.findAll();
+        var models = list.stream().map(hoaDonChiTiet -> {
+            var model = toModel(hoaDonChiTiet);
+            var sanPhamChiTiet = sanPhamChiTietprocessor.findById(hoaDonChiTiet.getIdSanPhamChiTiet());
+            model.setSanPhamChiTietModel(sanPhamChiTiet);
+            return model;
+        }).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 

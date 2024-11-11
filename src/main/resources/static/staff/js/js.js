@@ -22,58 +22,6 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 });
 
-function updateImagePreview() {
-    var fileInput = document.getElementById('profileImage2');
-    var file = fileInput.files[0];
-
-    if (file) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var imagePreview = document.getElementById('previewImage2');
-            imagePreview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-
-        // Sử dụng $scope.$apply() để AngularJS nhận diện sự thay đổi
-        $scope.$apply(function() {
-            $scope.form.anh = file.name; // Cập nhật giá trị ảnh
-        });
-    }
-}
-
-
-
-function updateImagePreview2() {
-    var profileImage = document.getElementById("profileImage");
-    var scope = angular.element(document.getElementById("imagePath")).scope(); // Lấy scope của Angular
-
-    // Kiểm tra nếu file đã được chọn
-    if (profileImage.files.length > 0) {
-        var fileName = profileImage.files[0].name; // Lấy tên file
-        scope.$apply(function() {
-            scope.form.anh = fileName; // Cập nhật ng-model trong Angular
-        });
-    } else {
-        scope.$apply(function() {
-            scope.form.anh = ""; // Nếu không có file, thì xóa giá trị
-        });
-    }
-}
-// function updateImagePreview() {
-//     var input = document.getElementById('profileImage2');
-//     var preview = document.getElementById('previewImage2');
-//     var file = input.files[0];
-//
-//     if (file) {
-//         var reader = new FileReader();
-//
-//         reader.onload = function(e) {
-//             preview.src = e.target.result;  // Cập nhật ảnh xem trước
-//         };
-//
-//         reader.readAsDataURL(file);  // Đọc ảnh và chuyển thành base64 để hiển thị
-//     }
-// }
 
 // hình ảnh sản phẩm
 let selectedFiles = []; // Danh sách các file đã chọn

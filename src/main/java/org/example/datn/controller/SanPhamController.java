@@ -31,11 +31,18 @@ public class SanPhamController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestParam("file") MultipartFile file, @ModelAttribute SanPhamModel model) {
-        return ResponseEntity.ok(processor.update(id, model, file));
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id,
+                                                @RequestParam(value = "file", required = false) MultipartFile file,
+                                                @ModelAttribute SanPhamModel model) {
+        // Kiểm tra nếu có file ảnh mới
+        if (file != null && !file.isEmpty()) {
+            // Nếu có ảnh mới, xử lý ảnh và cập nhật thông tin sản phẩm
+            return ResponseEntity.ok(processor.update(id, model, file));
+        } else {
+            // Nếu không có ảnh mới, chỉ cập nhật thông tin sản phẩm mà không thay đổi ảnh
+            return ResponseEntity.ok(processor.update(id, model));
+        }
     }
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
         return ResponseEntity.ok(processor.delete(id));

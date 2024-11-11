@@ -577,7 +577,7 @@
         <div class="sidebar">
             <div class="user-info">
                 <img src="" alt="User Icon" class="user-icon" id="user-avatar"/>
-                <div class="user-name" id="user-name">Tên người dùng</div>
+                <div class="user-name" id="user-name">Username</div>
             </div>
 
             <a href="#" id="account-link">
@@ -760,19 +760,19 @@
     }
 
     // Hàm để cập nhật thông tin người dùng
-    function updateUserInfo() {
-        const token = localStorage.getItem('token');
-        const userInfo = parseJwt(token);
-
-        if (userInfo) {
-            const userName = userInfo.fullName;
-
-            document.getElementById('user-name').innerText = userName;
-        }
-    }
+    // function updateUserInfo() {
+    //     const token = localStorage.getItem('token');
+    //     const userInfo = parseJwt(token);
+    //
+    //     if (userInfo) {
+    //         const userName = userInfo.fullName;
+    //
+    //         document.getElementById('user-name').innerText = userName;
+    //     }
+    // }
 
     // Gọi hàm updateUserInfo để cập nhật thông tin người dùng khi trang tải
-    document.addEventListener('DOMContentLoaded', updateUserInfo);
+    // document.addEventListener('DOMContentLoaded', updateUserInfo);
 
     document.getElementById('account-link').addEventListener('click', function () {
         var submenu = document.getElementById('account-submenu');
@@ -924,8 +924,8 @@
                 if (profile.avatar) {
                     avatarImg.src = `${profile.avatar}`;
                     document.getElementById('user-avatar').src = profile.avatar;
-
                 }
+                document.getElementById('user-name').innerText = profile.hoVaTen;
                 // Xử lý giới tính
                 if (profile.gioiTinh === 'NAM') {
                     document.querySelector('input[name="gender"][value="NAM"]').checked = true;
