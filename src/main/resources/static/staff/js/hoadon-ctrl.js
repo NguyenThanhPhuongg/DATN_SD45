@@ -12,6 +12,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.form6 = {};
 
     $scope.selectedInvoiceId = null;
+    $scope.selectedInvoiceMa = null;
     $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
     $scope.searchText2 = '';
     $scope.searchText3 = '';
@@ -473,9 +474,11 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         item.ngayTao = new Date(item.ngayTao);
         $scope.form6 = angular.copy(item);
     };
+
     $scope.selectInvoice = function (item) {
         console.log("Selected Invoice ID: ", item.id); // Thêm log này
         $rootScope.selectedInvoiceId = item.id; // Lưu ID hóa đơn vào rootScope
+        $rootScope.selectedInvoiceMa = item.ma; // Lưu ID hóa đơn vào rootScope
         $location.path('/hdct'); // Chuyển hướng đến trang hdct
     };
 

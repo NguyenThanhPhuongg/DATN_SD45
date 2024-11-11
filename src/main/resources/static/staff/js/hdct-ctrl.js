@@ -3,6 +3,9 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
     $scope.hoadon = [];
     $scope.spct = [];
     $scope.form = {};
+    $scope.selectedHoaDonId = $rootScope.selectedInvoiceId; // Lấy ID từ rootScope
+    $scope.selectedHoaDonMa = $rootScope.selectedInvoiceMa; // Lấy ID từ rootScope
+
     $scope.pager = {
         page: 0,
         size: 5,
@@ -30,7 +33,7 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                return item.idHoaDon.id === $scope.selectedHoaDonId;
+                return item.idHoaDon === $scope.selectedHoaDonId;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
@@ -38,14 +41,17 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
     };
 
     $scope.initialize = function () {
-        $http.get("/rest/hdct").then(resp => {
-            console.log("Data from API: ", resp.data);
-            $scope.items = resp.data;
-            $scope.items.forEach(item => {
-                item.ngayTao = new Date(item.ngayTao);
-                item.ngayCapNhat = new Date(item.ngayCapNhat);
-            });
-            $scope.pager.updateItems();
+        $http.get("/hoa-don-chi-tiet").then(resp => {
+            if (Array.isArray(resp.data.data)) {
+                $scope.items = resp.data.data.map(item => ({
+                    ...item,
+                    ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
+                    ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
+                }));
+                $scope.pager.updateItems(); // Cập nhật các mục cho pager
+            } else {
+                console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
+            }
         }).catch(error => {
             console.log("Error loading data: ", error);
         });
@@ -54,28 +60,17 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
             $scope.hoadon = resp.data;
         });
 
-        $http.get("/rest/spct").then(resp => {
+        $http.get("/spct").then(resp => {
             $scope.spct = resp.data;
         });
     };
 
-    $scope.selectedHoaDonId = $rootScope.selectedInvoiceId; // Lấy ID từ rootScope
-
+    $scope.edit = function (item) {
+        item.ngayCapNhat = new Date(item.ngayCapNhat);
+        $scope.form = angular.copy(item);
+    };
     // Khởi tạo
     $scope.initialize();
 
 
-    // $scope.form.idHoaDon = {id: $scope.selectedHoaDonId}; // Khởi tạo form với ID đã chọn
-    //
-    // $scope.updateProductDetails = function () {
-    //     const selectedProductId = $scope.form.idHoaDon.id;
-    //     $scope.selectedHoaDonId = selectedProductId;
-    //     $scope.pager.updateItems();
-    // };
-    //
-    // $scope.$watch('form.idHoaDon.id', function (newValue, oldValue) {
-    //     if (newValue !== oldValue) {
-    //         $scope.updateProductDetails();
-    //     }
-    // });
 });

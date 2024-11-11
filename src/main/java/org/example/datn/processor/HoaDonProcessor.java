@@ -74,7 +74,6 @@ public class HoaDonProcessor {
 
     @Autowired
     ThanhToanService thanhToanService;
-
     public ServiceResult getAll() {
         var list = service.getAll();
         var models = list.stream().map(hoaDon -> {
@@ -89,6 +88,7 @@ public class HoaDonProcessor {
         }).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
+
 
     private HoaDonModel toModel(HoaDon hoaDon) {
         if (hoaDon == null) {
@@ -192,5 +192,15 @@ public class HoaDonProcessor {
         int nextNumber = (lastInvoice == null) ? 1 : Integer.parseInt(lastInvoice.getMa().substring(4)) + 1;
         return String.format("CODE%04d", nextNumber);
     }
+
+    public ServiceResult update(Long id, HoaDonModel request) {
+        HoaDon hoaDon = service.findById(id).orElseThrow(() -> new EntityNotFoundException("hoaDon.not.found"));
+        BeanUtils.copyProperties(request, hoaDon);
+        // Lưu hóa đơn cập nhật
+        service.save(hoaDon);
+
+        return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
 
 }
