@@ -1,19 +1,15 @@
 <div class="container-fluid px-4">
-    <h2 class="mt-4">Danh sách sản phẩm ẩn</h2><br>
-
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">Sản phẩm</li>
-            <li class="breadcrumb-item active" aria-current="page">Khác</li>
-            <li class="breadcrumb-item"><a href="#!/listsanphaman">Sản phẩm ẩn</a></li>
-        </ol>
-    </nav>
-
+    <h2 class="mt-4">Danh sách sản phẩm</h2><br>
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-table me-1"></i>
-                Danh sách sản phẩm ẩn
+                Danh sách sản phẩm
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="#!/sanpham">
+                    <button class="btn btn-primary" type="button">Thêm</button>
+                </a>
             </div>
         </div>
         <div class="card-body">
@@ -52,8 +48,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="item in pager2.items | filter: searchText | filter: filterByAttributes">
-                    <td>{{$index + 1 + (pager2.page * pager2.size)}}</td>
+                <tr ng-repeat="item in pager.items | filter: searchText | filter: filterByAttributes">
+                    <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>{{item.ma}}</td>
                     <td>{{item.ten}}</td>
                     <td>{{item.moTa}}</td>
@@ -64,7 +60,7 @@
                     </td>
                     <td>
                         <div class="badge"
-                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 2, 'bg-secondary': item.trangThai === 3}">
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
                             <span ng-if="item.trangThai === 1">Active</span>
                             <span ng-if="item.trangThai === 3">Locked</span>
                             <span ng-if="item.trangThai === 2">Khác</span>
@@ -76,8 +72,11 @@
                                     data-bs-target="#exampleModal" ng-click="edit(item)">
                                 <i class="fas fa-info-circle"></i>
                             </button>
-                            <button class="btn btn-link" type="button" ng-click="updateProduct()">
-                                <i class="fas fa-check"></i>
+                            <button class="btn btn-link" type="button" ng-click="updateStatus2()">
+                                <i class="fas fa-times icon-close"></i>
+                            </button>
+                            <button class="btn btn-link" type="button" ng-click="selectProduct(item)">
+                                <i class="fas fa-list-alt"></i>
                             </button>
                         </div>
                     </td>
@@ -87,7 +86,7 @@
             <div class="panel-footer d-flex justify-content-between align-items-center">
                 <div class="me-auto">
                     <label for="pageSizeSelect" class="me-2">Hiển thị:</label>
-                    <select id="pageSizeSelect" ng-model="pager2.size" ng-change="pager2.updateItems()"
+                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()"
                             class="form-select d-inline-block w-auto">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>
@@ -96,17 +95,17 @@
                     </select>
                 </div>
                 <div class="text-center">
-                    <button ng-click="pager2.first()" class="btn btn-danger">
+                    <button ng-click="pager.first()" class="btn btn-danger">
                         <i class="fas fa-angle-double-left"></i>
                     </button>
-                    <button ng-click="pager2.prev()" class="btn btn-primary">
+                    <button ng-click="pager.prev()" class="btn btn-primary">
                         <i class="fas fa-angle-left"></i>
                     </button>
-                    <button class="btn btn-success">{{pager2.page + 1}} of {{pager2.count}}</button>
-                    <button ng-click="pager2.next()" class="btn btn-primary">
+                    <button class="btn btn-success">{{pager.page + 1}} of {{pager.count}}</button>
+                    <button ng-click="pager.next()" class="btn btn-primary">
                         <i class="fas fa-angle-right"></i>
                     </button>
-                    <button ng-click="pager2.last()" class="btn btn-danger">
+                    <button ng-click="pager.last()" class="btn btn-danger">
                         <i class="fas fa-angle-double-right"></i>
                     </button>
                 </div>
@@ -127,8 +126,7 @@
                             <div class="col-md-4 mt-2">
                                 <div class="mb-3">
                                     <input type="file" id="anh" class="form-control" accept="image/*"
-                                           onchange="angular.element(this).scope().onFileChange(event)"
-                                    style="display: none">
+                                           onchange="angular.element(this).scope().onFileChange(event)">
                                 </div>
                                 <div class="image-preview d-flex justify-content-center align-items-center p-2"
                                      style="border: 1px dashed #ddd; height: 200px;">
@@ -171,6 +169,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" ng-click="updateProduct()">
+                        <i class="fas fa-edit"></i> Sửa
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> Đóng
                     </button>

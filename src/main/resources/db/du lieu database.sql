@@ -316,16 +316,32 @@ select * from mau_sac
 
 SELECT * FROM [san_pham];
 SELECT * FROM [chi_tiet_san_pham];
---SELECT * FROM [thuong_hieu];
---SELECT * FROM [danh_muc];
---SELECT * FROM [san_pham_yeu_thich];
---SELECT * FROM [danh_gia];
---SELECT * FROM [khuyen_mai];
---SELECT * FROM [ap_dung_khuyen_mai];
---SELECT * FROM [hinh_anh];
---SELECT * FROM [yeu_cau_doi_tra];
---SELECT * FROM [yeu_cau_doi_tra_chi_tiet];
---SELECT * FROM [blog];
---SELECT * FROM [binh_luan];
---SELECT * FROM [rep_binh_luan];
---select * from nhom
+SELECT * FROM [thuong_hieu];
+SELECT * FROM [danh_muc];
+SELECT * FROM [san_pham_yeu_thich];
+SELECT * FROM [danh_gia];
+SELECT * FROM [khuyen_mai];
+SELECT * FROM [ap_dung_khuyen_mai];
+SELECT * FROM [hinh_anh];
+SELECT * FROM [yeu_cau_doi_tra];
+SELECT * FROM [yeu_cau_doi_tra_chi_tiet];
+SELECT * FROM [blog];
+SELECT * FROM [binh_luan];
+SELECT * FROM [rep_binh_luan];
+select * from nhom
+
+update  danh_muc set ngay_tao = GETDATE() where id =1
+update  nguoi_dung set mat_khau = 'Chuchu11@' where id =1
+
+DELETE FROM san_pham WHERE id = 19;
+
+SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
+
+drop database [DB.DATN]
+SELECT * FROM danh_muc WHERE id = 1; -- hoặc điều kiện khác
+SELECT * FROM hinh_anh
+INSERT INTO hinh_anh (id_san_pham, anh, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
+VALUES 
+(3,'meme.png',1, '2024-10-20', '2024-10-20', 1, 1),
+(3,'mangto.png',1, '2024-10-20', '2024-10-20', 1, 1),
+(3,'avatar.png',1, '2024-10-20', '2024-10-20', 1, 1)

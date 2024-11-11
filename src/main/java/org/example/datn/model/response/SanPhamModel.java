@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.entity.*;
 import org.example.datn.model.CommonModel;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,7 +41,7 @@ public class SanPhamModel extends CommonModel {
      DanhMuc danhMuc;
      Thuonghieu thuonghieu;
      ChatLieu chatLieu;
-
+     private List<MultipartFile> images;
     private List<Size> listSize ;
     private List<MauSac> listMauSac ;
 

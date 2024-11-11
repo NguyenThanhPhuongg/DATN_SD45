@@ -1,4 +1,4 @@
-app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
+app.controller("test-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.items = [];
     $scope.form = {};
     $scope.filters = {};  // Đối tượng lưu giá trị bộ lọc riêng
@@ -129,60 +129,6 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 2);
-                formData.append("ngayCapNhat", now);
-                formData.append("nguoiCapNhat", 1);
-
-                formData.append("ma", $scope.form.ma);
-                formData.append("ngayTao", now);
-                formData.append("nguoiTao", $scope.form.nguoiTao);
-
-                $http.put(`/san-pham/${$scope.form.id}`, formData, {
-                    headers: {
-                        "Content-Type": undefined
-                    }
-                }).then(function (response) {
-                    $scope.initialize();
-                    swal("Success!", "Ẩn sản phẩm thành công", "success");
-                    $('#exampleModal').modal('hide');
-                }).catch(function (error) {
-                    console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
-                });
-            } else {
-                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
-            }
-        });
-    };
-
-    $scope.updateStatus1 = function () {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn Ẩn sản phẩm này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                const now = new Date().toISOString().split('.')[0];
-                const formData = new FormData();
-                // Kiểm tra nếu có ảnh mới từ input file
-                const fileInput = document.getElementById('anh');
-                if (fileInput.files.length > 0) {
-                    // Nếu có ảnh mới, gửi file ảnh lên server
-                    formData.append("file", fileInput.files[0]);
-                } else if ($scope.form.anh) {
-                    // Nếu không có ảnh mới, gửi lại ảnh cũ
-                    formData.append("anh", $scope.form.anh.replace("/images/", ""));
-                }
-
-                formData.append("ten", $scope.form.ten);
-                formData.append("xuatXu", $scope.form.xuatXu);
-                formData.append("moTa", $scope.form.moTa);
-                formData.append("gia", $scope.form.gia);
-                formData.append("idDanhMuc", $scope.form.idDanhMuc);
-                formData.append("idThuongHieu", $scope.form.idThuongHieu);
-                formData.append("idChatLieu", $scope.form.idChatLieu);
-                formData.append("trangThai", 1);
                 formData.append("ngayCapNhat", now);
                 formData.append("nguoiCapNhat", 1);
 

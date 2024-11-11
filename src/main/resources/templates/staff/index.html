@@ -22,7 +22,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow:ellipsis;
-            max-width: 200px;
+            max-width: 150px;
         }
         /*////// anh sản phẩm*/
         #previewContainer {
@@ -65,6 +65,31 @@
             align-items: center;
             justify-content: center;
         }
+        .qr-block{
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+        .qr-block.show{
+            width: auto;
+            height: auto;
+            overflow: inherit;
+        }
+        .modal-payment{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+        }
+        .modal-payment.show{
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
     <link rel="stylesheet" href="../staff/css/group.css">
 </head>
@@ -106,6 +131,7 @@
 <script src="../staff/js/quanlyspct-ctrl.js"></script>
 <script src="../staff/js/taikhoan-ctrl.js"></script>
 <script src="../staff/js/group-ctrl.js"></script>
+<script src="../staff/js/test-ctrl.js"></script>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -120,7 +146,7 @@
 <script type="module">
     // Import các hàm cần thiết từ SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
     // Cấu hình Firebase
     const firebaseConfig = {
@@ -134,7 +160,7 @@
         measurementId: "G-D9XQ6JY5L1"
     };
 
-
+    let isUpdatingDatabase = false;
     // Khởi tạo Firebase
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
@@ -145,9 +171,13 @@
     //     const date = new Date(timestamp);
     //     return date.toLocaleString(); // Định dạng theo múi giờ hệ thống của người dùng
     // }
-
+    function formatCurrency(amount) {
+        const formatter = new Intl.NumberFormat('vi-VN');
+        return formatter.format(amount);
+    }
 
      let results = {}
+
     // Lắng nghe dữ liệu từ `qrResults`
     document.addEventListener("DOMContentLoaded", () => {
         onValue(qrResultsRef, (snapshot) => {
@@ -177,16 +207,22 @@
                         return response.json();
                     })
                     .then(data => {
-                        const resultWithData = {
-                            ...result,
-                            apiData: data // Thêm dữ liệu từ API vào kết quả
-                        };
+                        const isDuplicate = results[id_hd].some(item => item.result === result.result);
+                        if (!isDuplicate ) {
+                            const resultWithData = {
+                                ...result,
+                                apiData: data // Thêm dữ liệu từ API vào kết quả
+                            };
 
-                        // Thêm `resultWithData` vào `results[id_hd]`
-                        results[id_hd].push(resultWithData);
+                            // Thêm `resultWithData` vào `results[id_hd]`
+                            results[id_hd].push(resultWithData);
 
-                        // Cập nhật giao diện với kết quả mới
-                        displayResults();
+                            if (!isUpdatingDatabase) {
+                                // Cập nhật giao diện với kết quả mới
+                                displayResults();
+                            }
+
+                        }
                     })
                     .catch(error => {
                         console.error("Lỗi khi gửi yêu cầu tới API:", error);
@@ -206,13 +242,15 @@
             // Duyệt qua từng nhóm `id_hd`
             Object.keys(results).forEach((id_hd) => {
                 const groupContainer = document.querySelector(`.display-result-${id_hd}`);
+                const eleBill = document.querySelector(`.price-bill-${id_hd}`);
 
+                let invoiceTotal = 0;
                 // Kiểm tra nếu có container tương ứng với id_hd
                 if (groupContainer) {
                     results[id_hd].forEach((item, index) => {
                         // console.log(result)
 
-
+                        invoiceTotal += item.apiData.data.gia;
                         // const resultText = `ID hóa đơn: ${result.id_hd} - Kết quả: ${result.apiData.data.sanPham.ten} - Thời gian: ${formatTimestamp(result.timestamp)}`;
                         let resultElement = document.createElement("tr")
                         resultElement.className=`sp-${index}-${id_hd}`
@@ -220,27 +258,74 @@
                         <th class="" scope="row">${index + 1}</th>
                         <td><img width="50" src="../images/monnica.png" alt=""></td>
                         <td>
-                            <div class="">${item.apiData.data.sanPham.ten || 'Tên sản phẩm'}</div>
+                            <div class="name-prod">${item.apiData.data.sanPham.ten || 'Tên sản phẩm'}</div>
                             <div class="text-muted">
-                                <span>Size: ${item.apiData.data.ten || 'Không có size'}</span>
+                                <span class="size-prod">Size: ${item.apiData.data.size.ten || 'Không có size'}</span>
                             </div>
                         </td>
                         <td>
-                            <input class="form-control" type="number" min="1" value="1">
+                          <input class="form-control quantity-input" type="number" min="1" value="1" max="${item.apiData.data.soLuong}" data-idsp="${item.result}" data-bill="${id_hd}" data-price="${item.apiData.data.gia}" data-id="${id_hd}" data-index="${index}">
                         </td>
                         <td class="text-end">
-                            <span>${item.apiData.data.gia || 'Giá không có'}</span>
+                            <span>${formatCurrency(item.apiData.data.gia) || 'Giá không có'}</span>
+                        </td>
+                        <td class="text-end">
+                            <span class="price-display">${formatCurrency(item.apiData.data.gia) || 'Giá không có'}</span>
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-danger" onclick="removeItemQR(${index}, '${id_hd}')">
+                            <button class="btn btn-sm btn-danger del-item-${id_hd}-${item.result}" data-quantity="1" data-price="${item.apiData.data.gia}" onclick="removeItemQR(${index}, '${id_hd}', ${item.result})">
                                 <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                                     <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </td>
                     `;
-                        groupContainer.appendChild(resultElement); // Thêm kết quả vào container tương ứng
+
+                        groupContainer.appendChild(resultElement); // Thêm kết quả vào co
+                        eleBill.textContent = `${formatCurrency(invoiceTotal)} vnđ`;
+                        eleBill.setAttribute('data-origin', formatCurrency(invoiceTotal));
+                        const quantityInput = resultElement.querySelector('.quantity-input');
+                        quantityInput.addEventListener('input', updatePrice);
                     });
+                }
+
+                function updatePrice(event) {
+                    const inputElement = event.target;
+                    const quantity = parseInt(inputElement.value);
+                    const price = parseFloat(inputElement.getAttribute('data-price'));
+                    const productId = parseFloat(inputElement.getAttribute('data-idsp'));
+                    const billID = parseFloat(inputElement.getAttribute('data-bill'));
+                    const totalPrice = price * quantity;
+                    const eleDelete = document.querySelector(`.del-item-${billID}-${productId}`);
+
+                    const priceDisplay = inputElement.closest('tr').querySelector('.price-display');
+                    priceDisplay.textContent = formatCurrency(totalPrice);
+                    eleDelete.setAttribute('data-quantity', quantity);
+                    let newInvoiceTotal = 0;
+                    document.querySelectorAll(`.display-result-${id_hd} .quantity-input`).forEach(input => {
+                        const itemPrice = parseFloat(input.getAttribute('data-price'));
+                        const itemQuantity = parseInt(input.value);
+                        newInvoiceTotal += itemPrice * itemQuantity;
+                    });
+                    eleBill.textContent = `${formatCurrency(newInvoiceTotal)} vnđ`;
+                    eleBill.setAttribute('data-origin', formatCurrency(invoiceTotal));
+                    // Optionally, you can update a total cart price here if needed
+                    updateQuantityInDatabase(productId, billID ,quantity);
+                };
+
+                function updateQuantityInDatabase(resultId, bill, quantity) {
+                    const resultRef = ref(database, `qrResults/${resultId}-${bill}`);
+                    isUpdatingDatabase = true;
+                    update(resultRef, { quantity: quantity })
+                        .then(() => {
+                            console.log(`Số lượng cho ${resultId} đã được cập nhật trong Firebase.`);
+                            // Sau khi cập nhật Firebase, đặt lại biến cờ
+                            isUpdatingDatabase = false;
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi cập nhật số lượng trong Firebase:', error);
+                            isUpdatingDatabase = false;
+                        });
                 }
             });
 
@@ -249,15 +334,24 @@
 
     document.addEventListener('DOMContentLoaded', () => {
 
-        window.removeItemQR = function(index, id_hd) {
+        window.removeItemQR = function(index, id_hd, idsp) {
             // Xóa phần tử trong results
             if (confirm('Bạn có chắc chắn muốn xóa?')) {
                 results[id_hd].splice(index, 1);
-
-                // Lấy phần tử cần xóa trong DOM
+                const eleBill = document.querySelector(`.price-bill-${id_hd}`);
+                const eleReturn = document.querySelector(`.return-money-${id_hd}`);
+                const eleDelete = document.querySelector(`.del-item-${id_hd}-${idsp}`);
                 const elementClass = `sp-${index}-${id_hd}`;
                 const element = document.querySelector(`.${elementClass}`);
+                const quantityProd = parseFloat(eleDelete.getAttribute('data-quantity'));
+                const priceProd = parseFloat(eleDelete.getAttribute('data-price'));
+                const billPrice = parseFloat(eleBill.textContent.replace(/[^0-9,]/g, ''));
+                const inputElementMn = document.getElementById(`moneyCustomerInput-${id_hd}`);
+                const moneyCustomer = inputElementMn.value;
+                const billPriceNew = billPrice - quantityProd * priceProd;
 
+                eleBill.textContent = formatCurrency(billPriceNew) + ' vnđ'
+                eleReturn.textContent = formatCurrency(parseFloat(moneyCustomer) - billPriceNew) + ' vnđ'
                 // Nếu phần tử tồn tại, xóa nó khỏi DOM
                 if (element) {
                     element.remove();
