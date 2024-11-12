@@ -2,6 +2,7 @@ package org.example.datn.service;
 
 import org.example.datn.entity.HoaDon;
 import org.example.datn.entity.HoaDonChiTiet;
+import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.repository.HoaDonChiTietRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ import java.util.Optional;
 public class HoaDonChiTietService {
     @Autowired
     HoaDonChiTietRepository repo;
+    public List<HoaDonChiTiet> findAll() {
+        return repo.findAll();
+    }
 
     public void save(HoaDonChiTiet hoaDonChiTiet){
         repo.save(hoaDonChiTiet);

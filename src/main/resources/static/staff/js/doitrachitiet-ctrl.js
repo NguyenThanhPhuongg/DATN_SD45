@@ -1,10 +1,8 @@
-app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
+app.controller("chitietdoitra-ctrl", function ($scope, $http, $rootScope) {
     $scope.items = [];
-    $scope.hoadon = [];
-    $scope.spct = [];
     $scope.form = {};
-    $scope.selectedHoaDonId = $rootScope.selectedInvoiceId; // Lấy ID từ rootScope
-    $scope.selectedHoaDonMa = $rootScope.selectedInvoiceMa; // Lấy ID từ rootScope
+    $scope.selectedId = $rootScope.selectedID; // Lấy ID từ rootScope
+    $scope.selectedMaHD = $rootScope.selectedMAHD; // Lấy ID từ rootScope
 
     $scope.pager = {
         page: 0,
@@ -33,7 +31,7 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                return item.idHoaDon === $scope.selectedHoaDonId;
+                return item.idYeuCauDoiTra === $scope.selectedId;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
@@ -41,7 +39,7 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
     };
 
     $scope.initialize = function () {
-        $http.get("/hoa-don-chi-tiet").then(resp => {
+        $http.get("/yeu-cau-chi-tiet").then(resp => {
             if (Array.isArray(resp.data.data)) {
                 $scope.items = resp.data.data.map(item => ({
                     ...item,
@@ -55,20 +53,8 @@ app.controller("hdct-ctrl", function ($scope, $http, $rootScope) {
         }).catch(error => {
             console.log("Error loading data: ", error);
         });
-
-        $http.get("/rest/hoadon").then(resp => {
-            $scope.hoadon = resp.data;
-        });
-
-        $http.get("/spct").then(resp => {
-            $scope.spct = resp.data;
-        });
     };
 
-    $scope.edit = function (item) {
-        item.ngayCapNhat = new Date(item.ngayCapNhat);
-        $scope.form = angular.copy(item);
-    };
     // Khởi tạo
     $scope.initialize();
 

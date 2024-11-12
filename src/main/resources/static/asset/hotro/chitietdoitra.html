@@ -1,5 +1,5 @@
 <div class="container-fluid px-4">
-    <h2 class="mt-4">Chi tiết hóa đơn: {{selectedInvoiceMa}}</h2><br>
+    <h2 class="mt-4">Sản phẩm chi tiết đổi / trả hóa đơn: {{selectedInvoiceMa}}</h2><br>
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
@@ -17,18 +17,16 @@
                     <th>Màu</th>
                     <th>Size</th>
                     <th>Số lượng</th>
-                    <th>Tổng giá</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="item in pager.items">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
-                    <td>{{item.sanPhamChiTietModel.sanPham.ma}}</td>
-                    <td>{{item.sanPhamChiTietModel.sanPham.ten}}</td>
-                    <td>{{item.sanPhamChiTietModel.mauSac.ten}}</td>
-                    <td>{{item.sanPhamChiTietModel.size.ten}}</td>
+                    <td>{{item.sanPhamChiTiet.sanPham.ma}}</td>
+                    <td>{{item.sanPhamChiTiet.sanPham.ten}}</td>
+                    <td>{{item.sanPhamChiTiet.mauSac.ten}}</td>
+                    <td>{{item.sanPhamChiTiet.size.ten}}</td>
                     <td>{{item.soLuong}}</td>
-                    <td>{{item.gia}}</td>
                 </tr>
                 </tbody>
             </table>

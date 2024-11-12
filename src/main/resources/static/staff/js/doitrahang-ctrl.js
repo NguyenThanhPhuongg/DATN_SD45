@@ -1,28 +1,21 @@
-app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
+app.controller("doitrahang-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.items = [];
-    $scope.dcgh = [];
-    $scope.hdct = [];
-    $scope.hdcts = [];
-    $scope.ptvc = [];
     $scope.form = {};
-    $scope.form2 = {};
-    $scope.form3 = {};
-    $scope.form4 = {};
-    $scope.form5 = {};
-    $scope.form6 = {};
 
-    $scope.selectedInvoiceId = null;
-    $scope.selectedInvoiceMa = null;
+
+    $scope.selectedID = null;
+    $scope.selectedMAHD = null;
     $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
     $scope.searchText2 = '';
     $scope.searchText3 = '';
     $scope.searchText4 = '';
     $scope.searchText5 = '';
+    $scope.searchText6 = '';
     // Thêm searchText cho các trạng thái khác nếu cần
 
     $scope.initialize = function () {
         // Gọi API và kiểm tra dữ liệu
-        $http.get("/rest/hoadon").then(resp => {
+        $http.get("/yeu-cau").then(resp => {
             console.log("Dữ liệu từ API: ", resp.data); // Kiểm tra dữ liệu từ API
             // Kiểm tra xem resp.data.data có phải là mảng không
             if (Array.isArray(resp.data.data)) {
@@ -31,11 +24,12 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
                     ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
                     ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
                 }));
-                $scope.pager0.updateItems();
-                $scope.pager2.updateItems();
-                $scope.pager3.updateItems();
-                $scope.pager4.updateItems();
-                $scope.pager5.updateItems();
+                $scope.pagerDH0.updateItems();
+                $scope.pagerDH1.updateItems();
+                $scope.pagerDH2.updateItems();
+                $scope.pagerTH0.updateItems();
+                $scope.pagerTH1.updateItems();
+                $scope.pagerTH2.updateItems();
             } else {
                 console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
             }
@@ -44,7 +38,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
-    $scope.pager0 = {
+    $scope.pagerDH0 = {
         page: 0,
         size: 5,
         items: [],
@@ -72,14 +66,53 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
                 const statusMatches = item.trangThai === 0;
+                const loaiYeuCau = item.loai === 'EXCHANGE';
                 const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches;
+                return statusMatches && idMatches && loaiYeuCau;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
-    $scope.pager2 = {
+
+    $scope.pagerDH1 = {
+        page: 0,
+        size: 5,
+        items: [],
+        count: 0,
+        first: function () {
+            this.page = 0;
+            this.updateItems();
+        },
+        prev: function () {
+            if (this.page > 0) {
+                this.page--;
+                this.updateItems();
+            }
+        },
+        next: function () {
+            if (this.page < this.count - 1) {
+                this.page++;
+                this.updateItems();
+            }
+        },
+        last: function () {
+            this.page = this.count - 1;
+            this.updateItems();
+        },
+        updateItems: function () {
+            const filteredItems = $scope.items.filter(item => {
+                const statusMatches = item.trangThai === 1;
+                const loaiYeuCau = item.loai === 'EXCHANGE';
+                const idMatches = item.id.toString().includes($scope.searchText1);
+                return statusMatches && idMatches && loaiYeuCau;
+            });
+            this.count = Math.ceil(filteredItems.length / this.size);
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+        }
+    };
+
+    $scope.pagerDH2 = {
         page: 0,
         size: 5,
         items: [],
@@ -107,14 +140,17 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
                 const statusMatches = item.trangThai === 2;
-                const idMatches = item.id.toString().includes($scope.searchText2);
-                return statusMatches && idMatches;
+                const loaiYeuCau = item.loai === 'EXCHANGE';
+                const idMatches = item.id.toString().includes($scope.searchText1);
+                return statusMatches && idMatches && loaiYeuCau;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
-    $scope.pager3 = {
+
+
+    $scope.pagerTH0 = {
         page: 0,
         size: 5,
         items: [],
@@ -141,15 +177,17 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 3;
-                const idMatches = item.id.toString().includes($scope.searchText3);
-                return statusMatches && idMatches;
+                const statusMatches = item.trangThai === 0;
+                const loaiYeuCau = item.loai === 'RETURN';
+                const idMatches = item.id.toString().includes($scope.searchText1);
+                return statusMatches && idMatches && loaiYeuCau;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
-    $scope.pager4 = {
+
+    $scope.pagerTH1 = {
         page: 0,
         size: 5,
         items: [],
@@ -176,15 +214,17 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 4;
-                const idMatches = item.id.toString().includes($scope.searchText4);
-                return statusMatches && idMatches;
+                const statusMatches = item.trangThai === 1;
+                const loaiYeuCau = item.loai === 'RETURN';
+                const idMatches = item.id.toString().includes($scope.searchText1);
+                return statusMatches && idMatches && loaiYeuCau;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
-    $scope.pager5 = {
+
+    $scope.pagerTH2 = {
         page: 0,
         size: 5,
         items: [],
@@ -211,9 +251,10 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         },
         updateItems: function () {
             const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 5;
-                const idMatches = item.id.toString().includes($scope.searchText4);
-                return statusMatches && idMatches;
+                const statusMatches = item.trangThai === 2;
+                const loaiYeuCau = item.loai === 'RETURN';
+                const idMatches = item.id.toString().includes($scope.searchText1);
+                return statusMatches && idMatches && loaiYeuCau;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
@@ -223,27 +264,27 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
     // Theo dõi sự thay đổi trong ô tìm kiếm cho từng trạng thái
     $scope.$watch('searchText1', function (newValue, oldValue) {
         if (newValue !== oldValue) {
-            $scope.pager0.updateItems();
+            $scope.pagerDH0.updateItems();
         }
     });
     $scope.$watch('searchText2', function (newValue, oldValue) {
         if (newValue !== oldValue) {
-            $scope.pager2.updateItems();
+            $scope.pagerDH1.updateItems();
         }
     });
     $scope.$watch('searchText3', function (newValue, oldValue) {
         if (newValue !== oldValue) {
-            $scope.pager3.updateItems();
+            $scope.pagerTH0.updateItems();
         }
     });
     $scope.$watch('searchText4', function (newValue, oldValue) {
         if (newValue !== oldValue) {
-            $scope.pager4.updateItems();
+            $scope.pagerTH1.updateItems();
         }
     });
     $scope.$watch('searchText5', function (newValue, oldValue) {
         if (newValue !== oldValue) {
-            $scope.pager5.updateItems();
+            $scope.pagerTH2.updateItems();
         }
     });
 
@@ -259,95 +300,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         }).then((willUpdate) => {
             if (willUpdate) {
                 item.trangThai = 2; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-            }
-        });
-    };
-    $scope.update3 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 3; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-            }
-        });
-    };
-    $scope.update4 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 4; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-            }
-        });
-    };
-    $scope.update5 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 5; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-            }
-        });
-    };
-    $scope.update6 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 6; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -360,42 +313,42 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
-    $scope.edit0 = function (item) {
+    $scope.update1 = function (item) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                item.trangThai = 1; // Cập nhật trạng thái
+                $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
+                    $scope.initialize(); // Tải lại dữ liệu
+                    swal("Success!", "Cập nhật thành công", "success");
+                }).catch(error => {
+                    swal("Error!", "Cập nhật thất bại", "error");
+                    console.log("Error: ", error);
+                });
+            } else {
+                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
+            }
+        });
+    };
+    //////////
+    $scope.edit = function (item) {
         // Chuyển timestamp thành Date object
         item.ngayCapNhat = new Date(item.ngayCapNhat);
         item.ngayTao = new Date(item.ngayTao);
         $scope.form = angular.copy(item);
     };
-    $scope.edit2 = function (item) {
-        // Chuyển timestamp thành Date object
-        item.ngayCapNhat = new Date(item.ngayCapNhat);
-        item.ngayTao = new Date(item.ngayTao);
-        $scope.form2 = angular.copy(item);
-    };
-    $scope.edit3 = function (item) {
-        // Chuyển timestamp thành Date object
-        item.ngayCapNhat = new Date(item.ngayCapNhat);
-        item.ngayTao = new Date(item.ngayTao);
-        $scope.form3 = angular.copy(item);
-    };
-    $scope.edit4 = function (item) {
-        // Chuyển timestamp thành Date object
-        item.ngayCapNhat = new Date(item.ngayCapNhat);
-        item.ngayTao = new Date(item.ngayTao);
-        $scope.form4 = angular.copy(item);
-    };
-    $scope.edit5 = function (item) {
-        // Chuyển timestamp thành Date object
-        item.ngayCapNhat = new Date(item.ngayCapNhat);
-        item.ngayTao = new Date(item.ngayTao);
-        $scope.form5 = angular.copy(item);
-    };
+
 
     $scope.selectInvoice = function (item) {
         console.log("Selected Invoice ID: ", item.id); // Thêm log này
-        $rootScope.selectedInvoiceId = item.id; // Lưu ID hóa đơn vào rootScope
-        $rootScope.selectedInvoiceMa = item.ma; // Lưu ID hóa đơn vào rootScope
-        $location.path('/hdct'); // Chuyển hướng đến trang hdct
+        $rootScope.selectedID = item.id; // Lưu ID hóa đơn vào rootScope
+        $rootScope.selectedMAHD = item.hoaDon.ma; // Lưu ID hóa đơn vào rootScope
+        $location.path('/chitietdoitra'); // Chuyển hướng đến trang hdct
     };
 
     // Khởi tạo

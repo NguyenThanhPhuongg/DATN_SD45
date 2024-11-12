@@ -24,6 +24,9 @@ public class HoaDonChiTietController {
     public ResponseEntity<ServiceResult> getListByStatus(@RequestBody HoaDonChiTietRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.getListByStatus(request, ua));
     }
-
+    @GetMapping
+    public ResponseEntity<ServiceResult> getAll() {
+        return ResponseEntity.ok(processor.getAll());
+    }
 
 }

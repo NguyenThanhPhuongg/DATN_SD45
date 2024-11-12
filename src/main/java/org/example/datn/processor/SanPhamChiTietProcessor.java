@@ -4,6 +4,7 @@ import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.response.DiaChiGiaoHangModel;
 import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.service.MauSacService;
@@ -76,4 +77,16 @@ public class SanPhamChiTietProcessor {
         return new ServiceResult("Sản phẩm đã được xóa thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    public SanPhamChiTietModel findById(Long id) {
+        return service.findById(id)
+                .map(entity -> {
+                    SanPhamChiTietModel model = new SanPhamChiTietModel();
+                    BeanUtils.copyProperties(entity, model);
+                    model.setSanPham(sanPhamService.findById(entity.getIdSanPham()).orElse(null));
+                    model.setMauSac(mauSacService.findById(entity.getIdMauSac()).orElse(null));
+                    model.setSize(sizeService.findById(entity.getIdSize()).orElse(null));
+                    return model;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("sanPhamChiTiet.not.found với ID: " + id));
+    }
 }
