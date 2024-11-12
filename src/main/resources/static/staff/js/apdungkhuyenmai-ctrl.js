@@ -1,4 +1,4 @@
-app.controller("khuyenmai-ctrl", function ($scope, $http) {
+app.controller("apdungkhuyenmai-ctrl", function ($scope, $http) {
     $scope.items = [];
     $scope.form = {};
     $scope.formAdd = {};
@@ -169,7 +169,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             .then(function (response) {
                 // Hiển thị thông báo thành công
                 alert('Khuyến mãi đã được lưu thành công!');
-                $('#addNewModal').modal('hide'); // Đóng modal sau khi lưu thành công
+                $('#addNewModal').modal('hide');  // Đóng modal sau khi lưu thành công
                 $scope.resetForm();
                 $scope.getKhuyenMaiList();// Reset form sau khi lưu thành công
             }, function (error) {

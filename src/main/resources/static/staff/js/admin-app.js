@@ -165,7 +165,7 @@ app.config(function ($routeProvider) {
         })
         .when("/apdungkhuyenmai", {
             templateUrl: "asset/khuyenmai/apdung.html",
-            controller: "apdungkhuyenmai-ctrl"
+            controller: "apdungkhuyenmai-ctrl.js"
         })
 
         /// Hỗ trợ

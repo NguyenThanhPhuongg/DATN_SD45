@@ -19,6 +19,10 @@ public final class SystemConstant {
     public static final Integer DEFAULT = 1;
     public static final Integer UNDEFAULT = 0;
 
+    public static final Integer CHUA_AP_DUNG = 0;
+    public static final Integer DA_AP_DUNG = 1;
 
+    public static final Integer KHUYEN_MAI_SAN_PHAM = 1;
+    public static final Integer KHUYEN_MAI_NGUOI_DUNG = 2;
 
 }

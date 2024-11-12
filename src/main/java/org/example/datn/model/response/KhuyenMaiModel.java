@@ -6,6 +6,7 @@ import org.example.datn.model.CommonModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class KhuyenMaiModel extends CommonModel {
 
     private Long id;
+    private String ma;
     private String ten;
     private String moTa;
     private Integer loai;
@@ -22,4 +24,7 @@ public class KhuyenMaiModel extends CommonModel {
     private LocalDateTime ngayBatDau;
     private LocalDateTime ngayKetThuc;
     private Integer trangThai;
+
+    private List<SanPhamModel> sanPhamModels;
+    private List<UserModel> userModels;
 }
