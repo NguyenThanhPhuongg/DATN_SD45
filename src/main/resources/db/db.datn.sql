@@ -670,6 +670,7 @@ CREATE TABLE [khuyen_mai]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [ten] NVARCHAR(200),
+    [ma] VARCHAR(100),
     [mo_ta] NVARCHAR(1000),
     [loai] INT,
     [gia_tri] DECIMAL(10,2),
@@ -695,11 +696,12 @@ CREATE TABLE [ap_dung_khuyen_mai]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_khuyen_mai] BIGINT,
-    [id_gio_hang] BIGINT,
-    [id_hoa_don] BIGINT,
+    [id_san_pham] BIGINT,
+    [id_nguoi_dung] BIGINT,
     [gia_tri_giam] DECIMAL(10,2),
     [ngay_ap_dung] DATETIME,
     [trang_thai] INT DEFAULT 1,
+    [da_su_dung] BIT,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
     [nguoi_tao] BIGINT,
