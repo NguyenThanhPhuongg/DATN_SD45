@@ -41,24 +41,33 @@ public class SanPhamProcessor {
     private MauSacService mauSacService;
     @Autowired
     private SizeService sizeService;
+    @Autowired
+    private HinhAnhServices hinhAnhServices;
 
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var danhMuc = danhMucService.findById(sp.getIdDanhMuc()).orElse(null);
         var thuongHieu = thuongHieuService.findById(sp.getIdThuongHieu()).orElse(null);
         var chatLieu = chatLieuService.findById(sp.getIdChatLieu()).orElse(null);
+
         SanPhamModel model = new SanPhamModel();
         BeanUtils.copyProperties(sp, model);
         model.setDanhMuc(danhMuc);
         model.setThuonghieu(thuongHieu);
         model.setChatLieu(chatLieu);
-        var spct = sanPhamChiTietService.findByIdSanPham(id);
-        var idSizes = spct.stream().map(SanPhamChiTiet::getIdSize).collect(Collectors.toList());
-        var idMauSacs = spct.stream().map(SanPhamChiTiet::getIdMauSac).collect(Collectors.toList());
+
+        var spctList = sanPhamChiTietService.findByIdSanPham(id);
+        var idSizes = spctList.stream().map(SanPhamChiTiet::getIdSize).collect(Collectors.toList());
+        var idMauSacs = spctList.stream().map(SanPhamChiTiet::getIdMauSac).collect(Collectors.toList());
         var sizes = sizeService.findByIdIn(idSizes);
         var mauSac = mauSacService.findByIdIn(idMauSacs);
+
+        model.setListSanPhamChiTiet(spctList);
         model.setListSize(sizes);
         model.setListMauSac(mauSac);
+
+        var hinhAnhs = hinhAnhServices.getImagesByProductId(id); // Lấy hình ảnh từ bảng hinh_anh
+        model.setHinhAnhList(hinhAnhs);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 

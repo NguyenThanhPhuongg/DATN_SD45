@@ -1375,6 +1375,17 @@ footer .footer_inner .footer_col ul li a:hover:before {
     margin-left: 10px; /* Khoảng cách giữa biểu tượng giỏ hàng và tên người dùng */
     cursor: pointer; /* Con trỏ khi di chuột qua */
 }
+/* Ẩn nút tăng giảm của input number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Ẩn nút tăng giảm trên Firefox */
+}
+
 
 
 

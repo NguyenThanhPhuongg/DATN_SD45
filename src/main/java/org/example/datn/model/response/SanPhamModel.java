@@ -16,33 +16,43 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SanPhamModel extends CommonModel {
 
-     Long id;
+    Long id;
 
-     Long idDanhMuc;
+    Long idDanhMuc;
 
-     Long idThuongHieu;
+    Long idThuongHieu;
 
-     Long idChatLieu;
+    Long idChatLieu;
 
-     String ten;
+    String ten;
 
-     String ma;
+    String ma;
 
-     String xuatXu;
+    String xuatXu;
 
-     String moTa;
+    String moTa;
 
-     BigDecimal gia;
+    BigDecimal gia;
 
-     String anh;
+    String anh;
 
-     Integer trangThai;
+    Integer trangThai;
 
-     DanhMuc danhMuc;
-     Thuonghieu thuonghieu;
-     ChatLieu chatLieu;
-     private List<MultipartFile> images;
-    private List<Size> listSize ;
-    private List<MauSac> listMauSac ;
 
+
+    DanhMuc danhMuc;
+    Thuonghieu thuonghieu;
+    ChatLieu chatLieu;
+
+
+    private List<MultipartFile> images;
+    private List<Size> listSize;
+    private List<MauSac> listMauSac;
+    private List<SanPhamChiTiet> listSanPhamChiTiet;
+
+    public void setListSanPhamChiTiet(List<SanPhamChiTiet> spctList) {
+        this.listSanPhamChiTiet = spctList;
+    }
+
+    private List<HinhAnh> hinhAnhList;
 }

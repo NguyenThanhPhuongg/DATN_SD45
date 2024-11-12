@@ -670,6 +670,7 @@ CREATE TABLE [khuyen_mai]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [ten] NVARCHAR(200),
+    [ma] VARCHAR(100),
     [mo_ta] NVARCHAR(1000),
     [loai] INT,
     [gia_tri] DECIMAL(10,2),
@@ -695,11 +696,12 @@ CREATE TABLE [ap_dung_khuyen_mai]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_khuyen_mai] BIGINT,
-    [id_gio_hang] BIGINT,
-    [id_hoa_don] BIGINT,
+    [id_san_pham] BIGINT,
+    [id_nguoi_dung] BIGINT,
     [gia_tri_giam] DECIMAL(10,2),
     [ngay_ap_dung] DATETIME,
     [trang_thai] INT DEFAULT 1,
+    [da_su_dung] BIT,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
     [nguoi_tao] BIGINT,
@@ -741,14 +743,16 @@ CREATE TABLE [yeu_cau_doi_tra]
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_hoa_don] BIGINT,
     [id_nguoi_dung] BIGINT,
-    [id_san_pham_chi_tiet] BIGINT,
     [loai_yeu_cau] NVARCHAR(50),
     [ly_do] NVARCHAR(1000),
     [trang_thai] INT DEFAULT 1,
+    [ngay_yeu_cau] DATETIME DEFAULT GETDATE(),
+    [ngay_hoan_tat] DATETIME DEFAULT GETDATE(),
+    [ghi_chu] NVARCHAR(1000),
+    [nguoi_tao] BIGINT,
+    [nguoi_cap_nhat] BIGINT,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
-    [nguoi_tao] BIGINT,
-    [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
 GO
 
@@ -765,6 +769,7 @@ CREATE TABLE [yeu_cau_doi_tra_chi_tiet]
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_yeu_cau_doi_tra] BIGINT,
     [id_san_pham_chi_tiet] BIGINT,
+    [so_luong] INT,
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),

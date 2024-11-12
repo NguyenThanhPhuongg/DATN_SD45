@@ -165,13 +165,42 @@ app.config(function ($routeProvider) {
         })
         .when("/apdungkhuyenmai", {
             templateUrl: "asset/khuyenmai/apdung.html",
-            controller: "apdungkhuyenmai-ctrl"
+            controller: "apdungkhuyenmai-ctrl.js"
         })
 
         /// Hỗ trợ
         .when("/traloihotro", {
             templateUrl: "asset/hotro/traloihotro.html",
             controller: "traloihotro-ctrl"
+        })
+        .when("/doihangcho", {
+            templateUrl: "asset/hotro/doihangcho.html",
+            controller: "doitrahang-ctrl"
+        })
+        .when("/doihangthanhcong", {
+            templateUrl: "asset/hotro/doihangthanhcong.html",
+            controller: "doitrahang-ctrl"
+        })
+        .when("/doihanghuy", {
+            templateUrl: "asset/hotro/doihanghuy.html",
+            controller: "doitrahang-ctrl"
+        })
+
+        .when("/trahangcho", {
+            templateUrl: "asset/hotro/trahangcho.html",
+            controller: "doitrahang-ctrl"
+        })
+        .when("/trahangthanhcong", {
+            templateUrl: "asset/hotro/trahangthanhcong.html",
+            controller: "doitrahang-ctrl"
+        })
+        .when("/trahanghuy", {
+            templateUrl: "asset/hotro/trahanghuy.html",
+            controller: "doitrahang-ctrl"
+        })
+        .when("/chitietdoitra", {
+            templateUrl: "asset/hotro/chitietdoitra.html",
+            controller: "chitietdoitra-ctrl"
         })
 
         /// BLog

@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.example.datn.entity.HinhAnh;
 import org.example.datn.model.response.HinhAnhModel;
 import org.example.datn.service.HinhAnhService;
+import org.example.datn.service.HinhAnhServices;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ import java.util.List;
 public class HinhAnhController {
 
     private final HinhAnhService hinhAnhService;
+    @Autowired
+    private final HinhAnhServices hinhAnhServices;
 
     // Lấy danh sách tất cả hình ảnh
     @GetMapping
@@ -68,5 +72,16 @@ public class HinhAnhController {
     public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
         hinhAnhService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //    hieu
+     //Lấy hình ảnh theo idSanPham
+    @GetMapping("/san-pham/{id}")
+    public ResponseEntity<List<HinhAnh>> getImagesByProductId(@PathVariable Long id) {
+        List<HinhAnh> hinhAnhs = hinhAnhServices.getImagesByProductId(id); // Lấy hình ảnh theo idSanPham
+        if (hinhAnhs.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Trả về 404 nếu không có hình ảnh
+        }
+        return ResponseEntity.ok(hinhAnhs); // Trả về hình ảnh nếu có
     }
 }
