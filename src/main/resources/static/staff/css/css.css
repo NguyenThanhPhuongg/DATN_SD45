@@ -11296,3 +11296,96 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
 }
+
+/*////////////////////// hinh ảnh san phẩm ////*/
+
+
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+.image-item {
+    position: relative;
+    text-align: center;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.image-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.image-container {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.image-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-status {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+}
+
+.bg-success {
+    background-color: #28a745;
+}
+
+.bg-danger {
+    background-color: #dc3545;
+}
+
+.image-caption {
+    padding: 8px;
+    font-weight: 600;
+}
+
+.image-actions {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Modal hiển thị ảnh lớn */
+.image-modal {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.image-modal-content {
+    max-width: 500px;  /* Đặt chiều dài tối đa của ảnh là 500px */
+    height: auto;      /* Chiều cao tự động điều chỉnh theo tỷ lệ của ảnh */
+    max-height: 90vh;  /* Giới hạn chiều cao tối đa là 90% chiều cao màn hình */
+    object-fit: contain; /* Đảm bảo ảnh không bị biến dạng */
+    border-radius: 10px;
+}
+

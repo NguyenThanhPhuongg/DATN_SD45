@@ -84,4 +84,12 @@ public class HinhAnhController {
         }
         return ResponseEntity.ok(hinhAnhs); // Trả về hình ảnh nếu có
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateTrangThai(@PathVariable Long id, @RequestParam("status") int status) {
+        hinhAnhService.updateTrangThai(id, status);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
