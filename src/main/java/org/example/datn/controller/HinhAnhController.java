@@ -69,4 +69,12 @@ public class HinhAnhController {
         hinhAnhService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateTrangThai(@PathVariable Long id, @RequestParam("status") int status) {
+        hinhAnhService.updateTrangThai(id, status);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

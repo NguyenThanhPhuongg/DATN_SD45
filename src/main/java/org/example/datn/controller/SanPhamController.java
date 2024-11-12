@@ -47,4 +47,10 @@ public class SanPhamController {
     public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
         return ResponseEntity.ok(processor.delete(id));
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ServiceResult> updateStatus(@PathVariable Long id, @RequestParam("status") int status) {
+        return ResponseEntity.ok(processor.updateStatus(id, status));
+    }
+
 }
