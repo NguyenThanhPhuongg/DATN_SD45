@@ -1,42 +1,35 @@
 $(document).ready(function () {
     // Hàm để lấy danh sách sản phẩm
+    let currentPage = 0; // Chỉ số trang hiện tại
+    const totalProducts = 11; // Tổng số sản phẩm
+    const productsPerPage = 5; // Số sản phẩm mỗi trang
+    const totalPages = Math.ceil(totalProducts / productsPerPage); // Số trang cần hiển thị
+
+    let allProducts = []; // Mảng lưu tất cả các sản phẩm
+
     function fetchProducts() {
         $.ajax({
             url: '/san-pham',
             method: 'GET',
-            dataType: 'json',  // Đảm bảo dữ liệu được xử lý như JSON
+            dataType: 'json',
             success: function (response) {
                 console.log(response);  // Kiểm tra dữ liệu trả về
 
-                // Truy cập vào mảng `data` trong `response`
                 const products = response.data;
 
                 if (Array.isArray(products)) {
-                    const productContainer = $('#product-info');
-                    productContainer.empty(); // Xóa nội dung cũ
+                    // Lưu toàn bộ sản phẩm vào mảng `allProducts`
+                    allProducts = products;
 
-                    products.forEach(product => {
-                        const productHtml = `
-                            <div class="product">
-                                <div class="image-wrapper">
-                                    <a href="/productDetail/${product.id}">
-                                        <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
-                                    </a>
-                                    <div class="icon-heart">
-                                        <a href="#"><i class="bi bi-heart heart"></i></a>
-                                    </div>
-                                </div>
-                                <div class="mt-2">
-                                    <p class="price" style="font-size: 20px"><b>${new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND'
-                        }).format(product.gia)}</b></p>
-                                    <p class="name" style="font-size: 18px;" >${product.ten}</p>
-                                </div>
-                            </div>
-                        `;
-                        productContainer.append(productHtml);
-                    });
+                    // Hiển thị sản phẩm của trang hiện tại
+                    displayProducts(currentPage);
+
+                    // Cập nhật nút "Xem thêm" hoặc "Ẩn bớt"
+                    if (currentPage < totalPages - 1) {
+                        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');  // Nếu không phải trang cuối
+                    } else {
+                        $('#load-more').hide();  // Nếu là trang cuối, ẩn nút "Xem thêm"
+                    }
                 } else {
                     console.error('Expected array but got:', products);
                 }
@@ -46,6 +39,116 @@ $(document).ready(function () {
             }
         });
     }
+
+// Hàm hiển thị sản phẩm dựa trên chỉ số trang, có hiệu ứng fade
+    function displayProducts(page) {
+        const productContainer = $('#product-info');
+
+        // Thêm lớp "fade-out" để bắt đầu hiệu ứng mờ dần
+        productContainer.addClass('fade-out');
+
+        // Đợi 500ms để hiệu ứng mờ dần kết thúc trước khi thay đổi nội dung
+        setTimeout(() => {
+            productContainer.empty();  // Xóa các sản phẩm cũ trước khi thêm sản phẩm mới
+
+            const startIndex = page * productsPerPage; // Tính chỉ số sản phẩm bắt đầu
+            const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage); // Lấy sản phẩm cho trang hiện tại
+
+            // Thêm sản phẩm vào container
+            productsToShow.forEach(product => {
+                const productHtml = `
+                <div class="product">
+                    <div class="image-wrapper">
+                        <a href="/productDetail/${product.id}">
+                            <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
+                        </a>
+                        <div class="icon-heart">
+                            <a href="#"><i class="bi bi-heart heart"></i></a>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="price" style="font-size: 20px">
+                            <b>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia)}</b>
+                        </p>
+                        <p class="name" style="font-size: 18px;">${product.ten}</p>
+                    </div>
+                </div>
+            `;
+                productContainer.append(productHtml);
+            });
+
+            // Chuyển sang lớp "fade-in" sau khi thêm sản phẩm mới
+            productContainer.removeClass('fade-out').addClass('fade-in');
+        }, 500); // Độ trễ phù hợp với thời gian của CSS fade-out
+    }
+
+// Gọi hàm để hiển thị sản phẩm ngay khi trang tải
+    $(document).ready(function() {
+        fetchProducts(); // Hiển thị sản phẩm của trang đầu tiên
+    });
+
+// Sự kiện bấm vào nút "Xem thêm" hoặc "Ẩn bớt"
+    $('#load-more').on('click', function() {
+        // Nếu đang ở trang hiện tại và chưa đến trang cuối
+        if (currentPage < totalPages - 1) {
+            currentPage++;  // Chuyển sang trang kế tiếp
+            displayProducts(currentPage);
+        }
+
+        // Nếu là trang cuối, ẩn nút "Xem thêm"
+        if (currentPage === totalPages - 1) {
+            $('#load-more').hide();
+        }
+    });
+
+// Sự kiện bấm vào nút mũi tên trái để quay lại trang đầu tiên
+    $('#prev-page').on('click', function() {
+        currentPage = 0; // Quay về trang đầu tiên
+        displayProducts(currentPage); // Hiển thị sản phẩm của trang đầu tiên
+
+        // Cập nhật lại trạng thái của nút "Xem thêm" (nếu cần)
+        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
+        $('#load-more').show();
+    });
+
+    //hiueej ứng
+    function displayProducts(page) {
+        const productContainer = $('#product-info');
+
+        // Ẩn container trước khi thay đổi nội dung để áp dụng hiệu ứng
+        productContainer.fadeOut(100, function() {
+            productContainer.empty();  // Xóa sản phẩm cũ
+
+            const startIndex = page * productsPerPage;
+            const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage);
+
+            productsToShow.forEach(product => {
+                const productHtml = `
+                <div class="product">
+                    <div class="image-wrapper">
+                        <a href="/productDetail/${product.id}">
+                            <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
+                        </a>
+                        <div class="icon-heart">
+                            <a href="#"><i class="bi bi-heart heart"></i></a>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="price" style="font-size: 20px">
+                            <b>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia)}</b>
+                        </p>
+                        <p class="name" style="font-size: 18px;">${product.ten}</p>
+                    </div>
+                </div>
+            `;
+                productContainer.append(productHtml);
+            });
+
+            // Hiển thị lại container với hiệu ứng mờ dần
+            productContainer.fadeIn(100);
+        });
+    }
+
 
     // Gọi hàm fetchProducts để hiển thị danh sách sản phẩm
 
