@@ -170,4 +170,11 @@ public class SanPhamProcessor {
     }
 
 
+    public ServiceResult updateStatus(Long id, Integer trangThai) {
+        SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật trạng thái"));
+        sanPham.setTrangThai(trangThai); // Cập nhật trạng thái
+        service.update(sanPham); // Lưu thay đổi vào database
+        return new ServiceResult("Trạng thái sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
 }

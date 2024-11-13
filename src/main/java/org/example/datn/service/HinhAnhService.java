@@ -26,5 +26,7 @@ public interface HinhAnhService {
     void deleteProduct(Long productId);
 
     List<HinhAnh> searchProductByName(String productName);
+    void updateTrangThai(Long id, Integer trangThai);
+
 
 }

@@ -290,6 +290,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
     };
 
     $scope.clearImagePreview = function () {
+        selectedFiles = [];  // Xóa danh sách các file đã chọn
         // Reset file input by setting its value to null
         const input = document.getElementById('profileImage3');
         if (input) {

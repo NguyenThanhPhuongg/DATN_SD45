@@ -144,4 +144,15 @@ public class HinhAnhImpl implements HinhAnhService {
     public List<HinhAnh> searchProductByName(String productName) {
         return null;  // Tìm kiếm sản phẩm theo tên nếu cần
     }
+
+    @Override
+    public void updateTrangThai(Long id, Integer trangThai) {
+        HinhAnh hinhAnh = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hình ảnh không tồn tại"));
+
+        hinhAnh.setTrangThai(trangThai);  // Cập nhật trạng thái theo giá trị được truyền vào
+        repository.save(hinhAnh);  // Lưu lại vào cơ sở dữ liệu
+    }
+
+
 }

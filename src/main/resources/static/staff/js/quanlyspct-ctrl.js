@@ -17,7 +17,6 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.selectedProductTen = null;
     $scope.selectedProductId = $rootScope.selectedProductId; // Lấy ID sản phẩm từ rootScope
     $scope.selectedProductTen = $rootScope.selectedProductTen; // Lấy ID sản phẩm từ rootScope
-
     $scope.pager = {
         page: 0, size: 5, items: [], count: 0, first: function () {
             this.page = 0;
