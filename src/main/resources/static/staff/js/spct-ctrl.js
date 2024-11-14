@@ -10,6 +10,7 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.chatlieu = [];
     $scope.searchText = ''; // Biến tìm kiếm
     $scope.selectedProductId = null;
+    $scope.selectedImagesId = null;
 
     $scope.pager = {
         page: 0, size: 5, items: [], count: 0, first: function () {
@@ -100,7 +101,15 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         $scope.pager.updateItems();
     });
 
-    $scope.updateStatus2 = function () {
+    // $scope.updateStatus2 = function (item) {
+    //     $http.put('/san-pham/' + item.id + '/status?status=2').then(function (response) {
+    //         alert("Trạng thái sản phẩm đã được cập nhật thành công!");
+    //     }, function (error) {
+    //         alert("Đã xảy ra lỗi khi cập nhật trạng thái sản phẩm!");
+    //     });
+    // };
+
+    $scope.updateStatus2 = function (item) {
         swal({
             title: "Xác nhận",
             text: "Bạn có chắc muốn Ẩn sản phẩm này không?",
@@ -109,42 +118,11 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                const now = new Date().toISOString().split('.')[0];
-                const formData = new FormData();
-                // Kiểm tra nếu có ảnh mới từ input file
-                const fileInput = document.getElementById('anh');
-                if (fileInput.files.length > 0) {
-                    // Nếu có ảnh mới, gửi file ảnh lên server
-                    formData.append("file", fileInput.files[0]);
-                } else if ($scope.form.anh) {
-                    // Nếu không có ảnh mới, gửi lại ảnh cũ
-                    formData.append("anh", $scope.form.anh.replace("/images/", ""));
-                }
-
-                formData.append("ten", $scope.form.ten);
-                formData.append("xuatXu", $scope.form.xuatXu);
-                formData.append("moTa", $scope.form.moTa);
-                formData.append("gia", $scope.form.gia);
-                formData.append("idDanhMuc", $scope.form.idDanhMuc);
-                formData.append("idThuongHieu", $scope.form.idThuongHieu);
-                formData.append("idChatLieu", $scope.form.idChatLieu);
-                formData.append("trangThai", 2);
-                formData.append("ngayCapNhat", now);
-                formData.append("nguoiCapNhat", 1);
-
-                formData.append("ma", $scope.form.ma);
-                formData.append("ngayTao", now);
-                formData.append("nguoiTao", $scope.form.nguoiTao);
-
-                $http.put(`/san-pham/${$scope.form.id}`, formData, {
-                    headers: {
-                        "Content-Type": undefined
-                    }
-                }).then(function (response) {
-                    $scope.initialize();
-                    swal("Success!", "Ẩn sản phẩm thành công", "success");
-                    $('#exampleModal').modal('hide');
-                }).catch(function (error) {
+                $http.put('/san-pham/' + item.id + '/status?status=2')
+                    .then(function (response) {
+                        $scope.initialize();
+                        swal("Success!", "Ẩn sản phẩm thành công", "success");
+                    }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
                     swal("Error!", "Ẩn sản phẩm thất bại", "error");
                 });
@@ -154,56 +132,25 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
-    $scope.updateStatus1 = function () {
+    $scope.updateStatus1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn Ẩn sản phẩm này không?",
+            text: "Bạn có chắc muốn Hiện sản phẩm này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                const now = new Date().toISOString().split('.')[0];
-                const formData = new FormData();
-                // Kiểm tra nếu có ảnh mới từ input file
-                const fileInput = document.getElementById('anh');
-                if (fileInput.files.length > 0) {
-                    // Nếu có ảnh mới, gửi file ảnh lên server
-                    formData.append("file", fileInput.files[0]);
-                } else if ($scope.form.anh) {
-                    // Nếu không có ảnh mới, gửi lại ảnh cũ
-                    formData.append("anh", $scope.form.anh.replace("/images/", ""));
-                }
-
-                formData.append("ten", $scope.form.ten);
-                formData.append("xuatXu", $scope.form.xuatXu);
-                formData.append("moTa", $scope.form.moTa);
-                formData.append("gia", $scope.form.gia);
-                formData.append("idDanhMuc", $scope.form.idDanhMuc);
-                formData.append("idThuongHieu", $scope.form.idThuongHieu);
-                formData.append("idChatLieu", $scope.form.idChatLieu);
-                formData.append("trangThai", 1);
-                formData.append("ngayCapNhat", now);
-                formData.append("nguoiCapNhat", 1);
-
-                formData.append("ma", $scope.form.ma);
-                formData.append("ngayTao", now);
-                formData.append("nguoiTao", $scope.form.nguoiTao);
-
-                $http.put(`/san-pham/${$scope.form.id}`, formData, {
-                    headers: {
-                        "Content-Type": undefined
-                    }
-                }).then(function (response) {
-                    $scope.initialize();
-                    swal("Success!", "Ẩn sản phẩm thành công", "success");
-                    $('#exampleModal').modal('hide');
-                }).catch(function (error) {
+                $http.put('/san-pham/' + item.id + '/status?status=1')
+                    .then(function (response) {
+                        $scope.initialize();
+                        swal("Success!", "Hiện sản phẩm thành công", "success");
+                    }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
+                    swal("Error!", "Hiện sản phẩm thất bại", "error");
                 });
             } else {
-                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
+                swal("Hủy cập nhật", "Hiện sản phẩm đã bị hủy", "error");
             }
         });
     };
@@ -334,5 +281,14 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         $rootScope.selectedProductTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $location.path('/spct'); // Chuyển hướng đến trang sản phẩm chi tiết
     };
+
+    $scope.selectImages = function (item) {
+        console.log("Selected Images ID: ", item.id); // Log để kiểm tra
+        $rootScope.selectedImagesId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        $rootScope.selectedImagesTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        $location.path('/hinhanh'); // Chuyển hướng đến trang sản phẩm chi tiết
+    };
     $scope.initialize();
+
+
 });

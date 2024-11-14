@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface HinhAnhRepository extends JpaRepository<HinhAnh, Long> {
     @Query("SELECT p FROM HinhAnh p WHERE p.id = ?1")
     List<HinhAnh> findByCateId(Long cid);
+
     Optional<HinhAnh> findByAnh(String anh);
 
+    // Truy vấn lấy tất cả hình ảnh của sản phẩm dựa trên id_san_pham
+    List<HinhAnh> findByIdSanPham(Long idSanPham);
 }

@@ -1,42 +1,35 @@
 $(document).ready(function () {
     // Hàm để lấy danh sách sản phẩm
+    let currentPage = 0; // Chỉ số trang hiện tại
+    const totalProducts = 11; // Tổng số sản phẩm
+    const productsPerPage = 5; // Số sản phẩm mỗi trang
+    const totalPages = Math.ceil(totalProducts / productsPerPage); // Số trang cần hiển thị
+
+    let allProducts = []; // Mảng lưu tất cả các sản phẩm
+
     function fetchProducts() {
         $.ajax({
             url: '/san-pham',
             method: 'GET',
-            dataType: 'json',  // Đảm bảo dữ liệu được xử lý như JSON
+            dataType: 'json',
             success: function (response) {
                 console.log(response);  // Kiểm tra dữ liệu trả về
 
-                // Truy cập vào mảng `data` trong `response`
                 const products = response.data;
 
                 if (Array.isArray(products)) {
-                    const productContainer = $('#product-info');
-                    productContainer.empty(); // Xóa nội dung cũ
+                    // Lưu toàn bộ sản phẩm vào mảng `allProducts`
+                    allProducts = products;
 
-                    products.forEach(product => {
-                        const productHtml = `
-                            <div class="product">
-                                <div class="image-wrapper">
-                                    <a href="/productDetail/${product.id}">
-                                        <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
-                                    </a>
-                                    <div class="icon-heart">
-                                        <a href="#"><i class="bi bi-heart heart"></i></a>
-                                    </div>
-                                </div>
-                                <div class="mt-2">
-                                    <p class="price"><b>${new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND'
-                        }).format(product.gia)}</b></p>
-                                    <p class="name">${product.ten}</p>
-                                </div>
-                            </div>
-                        `;
-                        productContainer.append(productHtml);
-                    });
+                    // Hiển thị sản phẩm của trang hiện tại
+                    displayProducts(currentPage);
+
+                    // Cập nhật nút "Xem thêm" hoặc "Ẩn bớt"
+                    if (currentPage < totalPages - 1) {
+                        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');  // Nếu không phải trang cuối
+                    } else {
+                        $('#load-more').hide();  // Nếu là trang cuối, ẩn nút "Xem thêm"
+                    }
                 } else {
                     console.error('Expected array but got:', products);
                 }
@@ -47,65 +40,321 @@ $(document).ready(function () {
         });
     }
 
-    //hiển thị sản phẩm chi tiết
-    function detailProduct() {
-        document.addEventListener("DOMContentLoaded", function () {
-            const urlPath = window.location.pathname;
-            const productId = urlPath.split('/').pop();
-            const apiUrl = `/san-pham/${productId}`;
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const product = data.data;
+// Hàm hiển thị sản phẩm dựa trên chỉ số trang, có hiệu ứng fade
+    function displayProducts(page) {
+        const productContainer = $('#product-info');
 
-                    // Populate product details
-                    document.getElementById('productName').innerText = product.ten;
-                    document.getElementById('productBrand').innerText = product.thuonghieu.ten;
-                    document.getElementById('productCode').innerText = product.ma;
-                    document.getElementById('productPrice').innerText = product.gia.toLocaleString() + ' VND';
-                    document.getElementById('productOldPrice').innerText = ''; // Add old price if available
-                    document.getElementById('productDescription').innerText = product.moTa;
+        // Thêm lớp "fade-out" để bắt đầu hiệu ứng mờ dần
+        productContainer.addClass('fade-out');
 
-                    // Populate color options
-                    const colorOptions = document.getElementById('colorOptions');
-                    product.listMauSac.forEach(color => {
-                        const colorLabel = document.createElement('label');
-                        colorLabel.innerHTML = `<input type="radio" name="color" value="${color.ten}"> ${color.ten}`;
-                        colorOptions.appendChild(colorLabel);
-                    });
+        // Đợi 500ms để hiệu ứng mờ dần kết thúc trước khi thay đổi nội dung
+        setTimeout(() => {
+            productContainer.empty();  // Xóa các sản phẩm cũ trước khi thêm sản phẩm mới
 
-                    // Populate size options
-                    const sizeOptions = document.getElementById('sizeOptions');
-                    product.listSize.forEach(size => {
-                        const sizeLabel = document.createElement('label');
-                        sizeLabel.innerHTML = `<input type="radio" name="size" value="${size.ten}"> ${size.ten}`;
-                        sizeOptions.appendChild(sizeLabel);
-                    });
+            const startIndex = page * productsPerPage; // Tính chỉ số sản phẩm bắt đầu
+            const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage); // Lấy sản phẩm cho trang hiện tại
 
-                    // Set the price in a hidden input
-                    document.getElementById('priceProduct').value = product.gia;
+            // Thêm sản phẩm vào container
+            productsToShow.forEach(product => {
+                const productHtml = `
+                <div class="product">
+                    <div class="image-wrapper">
+                        <a href="/productDetail/${product.id}">
+                            <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
+                        </a>
+                        <div class="icon-heart">
+                            <a href="#"><i class="bi bi-heart heart"></i></a>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="price" style="font-size: 20px">
+                            <b>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia)}</b>
+                        </p>
+                        <p class="name" style="font-size: 18px;">${product.ten}</p>
+                    </div>
+                </div>
+            `;
+                productContainer.append(productHtml);
+            });
 
-                    // Total price calculation based on quantity
-                    const quantityInput = document.getElementById('quantityInput');
-                    const totalPriceValue = document.getElementById('totalPriceValue');
-                    quantityInput.addEventListener('input', function () {
-                        const quantity = parseInt(quantityInput.value);
-                        totalPriceValue.innerText = (product.gia * quantity).toLocaleString() + ' VND';
-                        document.getElementById('total_price').style.display = quantity > 0 ? 'block' : 'none';
-                    });
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
+            // Chuyển sang lớp "fade-in" sau khi thêm sản phẩm mới
+            productContainer.removeClass('fade-out').addClass('fade-in');
+        }, 500); // Độ trễ phù hợp với thời gian của CSS fade-out
+    }
+
+// Gọi hàm để hiển thị sản phẩm ngay khi trang tải
+    $(document).ready(function() {
+        fetchProducts(); // Hiển thị sản phẩm của trang đầu tiên
+    });
+
+// Sự kiện bấm vào nút "Xem thêm" hoặc "Ẩn bớt"
+    $('#load-more').on('click', function() {
+        // Nếu đang ở trang hiện tại và chưa đến trang cuối
+        if (currentPage < totalPages - 1) {
+            currentPage++;  // Chuyển sang trang kế tiếp
+            displayProducts(currentPage);
+        }
+
+        // Nếu là trang cuối, ẩn nút "Xem thêm"
+        if (currentPage === totalPages - 1) {
+            $('#load-more').hide();
+        }
+    });
+
+// Sự kiện bấm vào nút mũi tên trái để quay lại trang đầu tiên
+    $('#prev-page').on('click', function() {
+        currentPage = 0; // Quay về trang đầu tiên
+        displayProducts(currentPage); // Hiển thị sản phẩm của trang đầu tiên
+
+        // Cập nhật lại trạng thái của nút "Xem thêm" (nếu cần)
+        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
+        $('#load-more').show();
+    });
+
+    //hiueej ứng
+    function displayProducts(page) {
+        const productContainer = $('#product-info');
+
+        // Ẩn container trước khi thay đổi nội dung để áp dụng hiệu ứng
+        productContainer.fadeOut(100, function() {
+            productContainer.empty();  // Xóa sản phẩm cũ
+
+            const startIndex = page * productsPerPage;
+            const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage);
+
+            productsToShow.forEach(product => {
+                const productHtml = `
+                <div class="product">
+                    <div class="image-wrapper">
+                        <a href="/productDetail/${product.id}">
+                            <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
+                        </a>
+                        <div class="icon-heart">
+                            <a href="#"><i class="bi bi-heart heart"></i></a>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="price" style="font-size: 20px">
+                            <b>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia)}</b>
+                        </p>
+                        <p class="name" style="font-size: 18px;">${product.ten}</p>
+                    </div>
+                </div>
+            `;
+                productContainer.append(productHtml);
+            });
+
+            // Hiển thị lại container với hiệu ứng mờ dần
+            productContainer.fadeIn(100);
         });
     }
 
+
     // Gọi hàm fetchProducts để hiển thị danh sách sản phẩm
+
+    $(document).ready(function () {
+        // Hàm lấy productId từ URL
+        function getProductIdFromUrl() {
+            const url = window.location.href; // Lấy URL hiện tại
+            const match = url.match(/\/productDetail\/(\d+)/); // Dùng regex để lấy id sản phẩm từ URL
+            return match ? match[1] : null; // Trả về productId hoặc null nếu không tìm thấy
+        }
+
+        // Hàm tải chi tiết sản phẩm từ API
+        function loadProductDetails(productId) {
+            $.ajax({
+                url: `/san-pham/${productId}`, // Địa chỉ API mới
+                method: 'GET',
+                success: function (data) {
+                    if (data.data) {
+                        const product = data.data;
+
+                        // Cập nhật thông tin sản phẩm vào form
+                        $('#productName').text(product.ten);
+                        $('#productBrand').text(product.thuonghieu.ten); // Thương hiệu
+                        $('#productCode').text(product.ma); // Mã sản phẩm
+                        $('#productPrice').text(product.gia.toLocaleString() + ' VND'); // Giá sản phẩm
+                        $('#productDescription').text(product.moTa); // Mô tả ngắn
+
+                        // Cập nhật danh sách màu sắc (Sử dụng input radio buttons)
+                        $('#colorOptions').empty();
+                        product.listMauSac.forEach(function (mauSac, index) {
+                            $('#colorOptions').append(`
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="color" id="color${mauSac.id}" value="${mauSac.id}">
+                                <label class="form-check-label" for="color${mauSac.id}">${mauSac.ten}</label>
+                            </div>
+                        `);
+                        });
+                        //image
+                        if (product.hinhAnhList && product.hinhAnhList.length > 0) {
+                            // Nếu có ảnh, thêm vào carousel
+                            product.hinhAnhList.forEach(function (image, index) {
+                                const activeClass = index === 0 ? 'active' : '';  // Chỉ đánh dấu active cho ảnh đầu tiên
+                                $('#productImages').append(`
+                            <div class="carousel-item ${activeClass}">
+                                <img style="width: 490px;height: auto;" src="/images/${image.anh}" class="d-block w-100" alt="ZIAZA">
+                            </div>
+                                `);
+                            });
+                        } else {
+                            // Nếu không có ảnh, hiển thị thông báo
+                            $('#productImages').append(`
+                            <div class="text-center mt-5">
+                            <img src="../images/logo.png" alt="">
+                                <h3 class="text-uppercase">Shop sẽ sớm cập nhật hình ảnh!</h3>
+                            </div>
+                        `);
+                        }
+
+
+
+                        // Cập nhật danh sách kích thước (Sử dụng input radio buttons)
+                        $('#sizeOptions').empty();
+                        product.listSize.forEach(function (size, index) {
+                            $('#sizeOptions').append(`
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="size" id="size${size.id}" value="${size.id}">
+                                <label class="form-check-label" for="size${size.id}">${size.ten}</label>
+                            </div>
+                        `);
+                        });
+
+                        // Cập nhật số lượng sản phẩm còn lại
+                        const totalQuantity = product.listSanPhamChiTiet.reduce((sum, item) => sum + item.soLuong, 0);
+                        $('#quantityLeft').text(totalQuantity); // Số lượng còn lại trong kho
+
+                        // Lắng nghe sự kiện thay đổi màu sắc hoặc kích thước
+                        $('input[name="color"], input[name="size"]').on('change', function() {
+                            updateQuantity(product);
+                        });
+
+                        // Xử lý tăng giảm số lượng mua
+                        $('#increaseQuantity').on('click', function() {
+                            let quantity = parseInt($('#quantityInput').val(), 10);
+                            const maxQuantity = getMaxQuantity(product); // Số lượng tối đa có thể chọn
+
+                            if (quantity < maxQuantity) {
+                                $('#quantityInput').val(quantity + 1);
+                            }
+                            updateQuantityDisplay();
+                        });
+
+                        $('#decreaseQuantity').on('click', function() {
+                            let quantity = parseInt($('#quantityInput').val(), 10);
+                            if (quantity > 1) {
+                                $('#quantityInput').val(quantity - 1);
+                            }
+                            updateQuantityDisplay();
+                        });
+
+                        // Sự kiện thay đổi trực tiếp trong input số lượng
+                        $('#quantityInput').on('input', function() {
+                            let quantity = parseInt($('#quantityInput').val(), 10);
+                            const maxQuantity = getMaxQuantity(product);
+                            if (quantity > maxQuantity) {
+                                $('#quantityInput').val(maxQuantity); // Giới hạn số lượng nhập vào
+                            } else if (quantity < 1) {
+                                $('#quantityInput').val(1); // Không cho nhập dưới 1
+                            }
+                            updateQuantityDisplay();
+                        });
+
+                        // Vô hiệu hóa các lựa chọn không hợp lệ (kích thước hoặc màu sắc không còn)
+                        disableUnavailableOptions(product);
+                    } else {
+                        console.log("No product data found.");
+                    }
+                },
+                error: function (error) {
+                    console.log("Error loading product details:", error);
+                }
+            });
+        }
+
+        // Hàm cập nhật số lượng còn lại dựa trên lựa chọn màu sắc và kích thước
+        function updateQuantity(product) {
+            const selectedColor = $('input[name="color"]:checked').val(); // Lấy giá trị màu sắc được chọn
+            const selectedSize = $('input[name="size"]:checked').val();   // Lấy giá trị kích thước được chọn
+
+            if (selectedColor && selectedSize) {
+                // Lọc ra sản phẩm chi tiết với màu sắc và kích thước đã chọn
+                const selectedProductDetail = product.listSanPhamChiTiet.find(item =>
+                    item.idMauSac == selectedColor && item.idSize == selectedSize
+                );
+
+                // Hiển thị số lượng nếu có sản phẩm chi tiết tương ứng
+                if (selectedProductDetail) {
+                    $('#quantityLeft').text(selectedProductDetail.soLuong); // Cập nhật số lượng
+                } else {
+                    $('#quantityLeft').text(0); // Nếu không có sản phẩm chi tiết tương ứng, hiển thị 0
+                }
+            } else {
+                $('#quantityLeft').text("Vui lòng Chọn màu sắc và kích thước"); // Hiển thị yêu cầu chọn đầy đủ khi chưa chọn màu sắc và kích thước
+            }
+
+            // Cập nhật tình trạng vô hiệu hóa các lựa chọn
+            disableUnavailableOptions(product);
+        }
+
+        // Hàm vô hiệu hóa các lựa chọn không hợp lệ (kích thước hoặc màu sắc không còn)
+        function disableUnavailableOptions(product) {
+            const selectedColor = $('input[name="color"]:checked').val(); // Lấy giá trị màu sắc được chọn
+            const selectedSize = $('input[name="size"]:checked').val();   // Lấy giá trị kích thước được chọn
+
+            // Vô hiệu hóa các màu sắc không có kích thước tương ứng
+            $('input[name="color"]').each(function() {
+                const colorId = $(this).val();
+                const availableSizes = product.listSanPhamChiTiet.filter(item =>
+                    item.idMauSac == colorId && item.soLuong > 0
+                ).map(item => item.idSize);
+
+                if (selectedSize && !availableSizes.includes(parseInt(selectedSize))) {
+                    $(this).prop('disabled', true); // Disable nếu không có size tương ứng
+                } else {
+                    $(this).prop('disabled', false); // Enable nếu có size tương ứng
+                }
+            });
+
+            // Vô hiệu hóa các kích thước không có màu sắc tương ứng
+            $('input[name="size"]').each(function() {
+                const sizeId = $(this).val();
+                const availableColors = product.listSanPhamChiTiet.filter(item =>
+                    item.idSize == sizeId && item.soLuong > 0
+                ).map(item => item.idMauSac);
+
+                if (selectedColor && !availableColors.includes(parseInt(selectedColor))) {
+                    $(this).prop('disabled', true); // Disable nếu không có màu tương ứng
+                } else {
+                    $(this).prop('disabled', false); // Enable nếu có màu tương ứng
+                }
+            });
+        }
+
+        // Lấy số lượng tối đa có thể chọn từ radio size và màu sắc
+        function getMaxQuantity(product) {
+            const selectedColor = $('input[name="color"]:checked').val();
+            const selectedSize = $('input[name="size"]:checked').val();
+
+            if (selectedColor && selectedSize) {
+                // Lọc ra sản phẩm chi tiết với màu sắc và kích thước đã chọn
+                const selectedProductDetail = product.listSanPhamChiTiet.find(item =>
+                    item.idMauSac == selectedColor && item.idSize == selectedSize
+                );
+                return selectedProductDetail ? selectedProductDetail.soLuong : 0;
+            }
+            return 0; // Nếu chưa chọn màu sắc hoặc kích thước, không cho phép tăng số lượng
+        }
+
+        // Lấy productId từ URL và gọi API để lấy chi tiết sản phẩm
+        const productId = getProductIdFromUrl();
+
+        // Kiểm tra nếu productId hợp lệ, sau đó gọi hàm loadProductDetails
+        if (productId) {
+            loadProductDetails(productId);
+        } else {
+            console.log("Product ID not found in URL.");
+        }
+    });
     fetchProducts();
-    // detailProduct();
 });
