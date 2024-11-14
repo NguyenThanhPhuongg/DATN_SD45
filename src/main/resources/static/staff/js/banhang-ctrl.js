@@ -28,15 +28,14 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         bill.qrCodeUrl = qr.toDataURL();
         $scope.bills.push(bill);
         $scope.activeIndex = $scope.bills.length - 1;
-        console.log($scope.activeIndex)
     };
     $scope.setActiveTab = function (index) {
         $scope.activeIndex = index;
     };
     $scope.initialize = function () {
-        $http.get("/rest/khuyenmai").then(resp => {
-            $scope.vouchers = resp.data.data;
-        });
+        // $http.get("/rest/khuyenmai").then(resp => {
+        //     $scope.vouchers = resp.data.data;
+        // });
         $http.get("/san-pham").then(resp => {
             $scope.products = resp.data.data;
         });
@@ -52,9 +51,6 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
                 });
             });
         });
-        const btn = document.querySelector('.btn-addtobill');
-        console.log(btn);
-        btn.setAttribute('data-bill', idhd)
         const detailModal = new bootstrap.Modal(document.getElementById('addProductModalDetail'), {
             keyboard: false
         });
@@ -71,8 +67,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
     };
 
     $scope.addProdBill = function (event) {
-        let idhd = event.target.getAttribute('data-bill')
-        console.log(idhd);
+        console.log($scope.activeIndex);
     };
 
     $scope.onPhoneChange = function(idBill) {

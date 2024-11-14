@@ -258,16 +258,15 @@
                         // console.log(result)
 
                         invoiceTotal += item.apiData.data.gia;
-                        // const resultText = `ID hóa đơn: ${result.id_hd} - Kết quả: ${result.apiData.data.sanPham.ten} - Thời gian: ${formatTimestamp(result.timestamp)}`;
                         let resultElement = document.createElement("tr")
                         resultElement.className=`sp-${index}-${id_hd}`
                         resultElement.innerHTML = `
                         <th class="" scope="row">${index + 1}</th>
                         <td><img width="50" src="../images/monnica.png" alt=""></td>
                         <td>
-                            <div class="name-prod">${item.apiData.data.sanPham.ten || 'Tên sản phẩm'}</div>
+                            <div class="name-prod">${item.apiData.data?.sanPham?.ten || 'Tên sản phẩm'}</div>
                             <div class="text-muted">
-                                <span class="size-prod">Size: ${item.apiData.data.size.ten || 'Không có size'}</span>
+                                <span class="size-prod">Size: ${item.apiData.data?.size?.ten || 'Không có size'}</span>
                             </div>
                         </td>
                         <td>

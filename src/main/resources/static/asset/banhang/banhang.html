@@ -53,17 +53,17 @@
                                             <th scope="row">Tên khách hàng</th>
                                             <td><input type="text" class="form-control form-control-sm" ng-keydown="onKeyDownName($event)" id="nameInput-{{ index + 1 }}"></td>
                                         </tr>
-                                        <tr>
-                                            <th scope="row">Mã giảm giá</th>
-                                            <td>
-                                                <div>
-                                                    <select id="selectedVoucher-{{ index + 1 }}"  ng-model="selectedVoucher" ng-change="onVoucherChange(index + 1)" class="form-select form-select-sm" >
-                                                        <option ng-repeat="voucher in vouchers" value="{{ voucher.giaTri }}">{{ voucher.ten }}</option>
-                                                    </select>
-                                                    <span class="text-nowrap d-block ms-2 " id="voucher-{{ index + 1 }}"></span>
-                                                </div>
-                                            </td>
-                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <th scope="row">Mã giảm giá</th>-->
+<!--                                            <td>-->
+<!--                                                <div>-->
+<!--                                                    <select id="selectedVoucher-{{ index + 1 }}"  ng-model="selectedVoucher" ng-change="onVoucherChange(index + 1)" class="form-select form-select-sm" >-->
+<!--                                                        <option ng-repeat="voucher in vouchers" value="{{ voucher.giaTri }}">{{ voucher.ten }}</option>-->
+<!--                                                    </select>-->
+<!--                                                    <span class="text-nowrap d-block ms-2 " id="voucher-{{ index + 1 }}"></span>-->
+<!--                                                </div>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
                                         <tr>
                                             <th scope="row">Tổng thanh toán</th>
                                             <td class="text-end price-bill-{{ index + 1 }}"></td>
