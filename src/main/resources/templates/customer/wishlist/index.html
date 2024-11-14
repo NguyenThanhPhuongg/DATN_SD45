@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="vi-VN" dir="LTR" xmlns:fb="http://www.facebook.com/2008/fbml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml" lang="vi-VN" dir="LTR"
+      xmlns:fb="http://www.facebook.com/2008/fbml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,7 +8,7 @@
     <title>Wishlist</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"
@@ -16,93 +17,99 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!--icon bs-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <script src="/js/main.js"></script>
-
+    <script src="/js/wishlist.js"></script>
     <style>
-        /*icon thung rac trong wishlist*/
-        .image-wrapper {
+
+        /* Sản phẩm */
+        .product {
             position: relative;
-            display: inline-block;
+            width: 250px;
+            height: auto; /* Đảm bảo chiều cao tự động điều chỉnh */
+            padding: 10px;
+            overflow: hidden; /* Ẩn các phần tử tràn ra ngoài */
+            text-align: center;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
 
-        .image-wrapper img {
-            display: block;
+        /* Hình ảnh sản phẩm */
+        .product img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease; /* Hiệu ứng phóng to khi hover */
         }
 
+        /* Nút xóa (delete icon) */
         .delete-icon {
             position: absolute;
             top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-        .delete-icon svg {
-            width: 30px;
-            height: 30px;
-            fill: red;
-        }
-        /*phan trang*/
-        .pagination {
+            right: 18px; /* Căn chỉnh lại vị trí của nút xóa */
+            width: 32px; /* Chiều rộng cố định */
+            height: 32px; /* Chiều cao cố định, giống với chiều rộng để tạo hình tròn */
             display: flex;
-            justify-content: center;
-            padding: 20px 0;
+            justify-content: center; /* Căn giữa theo chiều ngang */
+            align-items: center; /* Căn giữa theo chiều dọc */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .pagination a {
-            padding: 10px 15px;
-            margin: 0 5px;
-            text-decoration: none;
-            border: 1px solid #ddd; /* Border color */
-            border-radius: 5px;
-            color: #333; /* Text color */
-            transition: background-color 0.3s, color 0.3s;
+        /* Kích thước biểu tượng x trong nút xóa */
+        .delete-icon i {
+            color: black;
+            font-size: 18px; /* Kích thước biểu tượng */
         }
 
-        .pagination a:hover {
-            background-color: #f0f0f0; /* Hover background color */
+        /* Tên sản phẩm */
+        .product h3 {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #333;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Hiệu ứng màu sắc khi hover vào tên */
         }
 
-        .pagination a.active {
-            background-color: #333; /* Background for active page */
-            color: white; /* Text color for active page */
-        }
-
-        .pagination a.active:hover {
-            background-color: black; /* Change hover color for active page */
-            color: white; /* Ensure text remains white on hover */
-        }
-
-        .pagination a.prev, .pagination a.next {
-            font-weight: bold; /* Bold text for prev/next */
+        /* Giá sản phẩm */
+        .product div:last-child {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #d9534f; /* Màu đỏ cho giá */
+            margin-top: 5px;
         }
     </style>
+
+
 </head>
 <body>
 <div th:include="header :: body"></div>
 <main>
     <div>
-        <h2 class="title-page">Danh sách yêu thích</h2>
-        <div class="inner_row justify-center">
-            <div class="w-full flex -mx-3 flex-wrap">
-                <div class="md:w-3/12 w-6/12 p-3">
-                    <div class="image-wrapper">
-                        <a href="">
-                            <img class="w-full mb-2" src="/images/7.1b.webp" alt=""/>
-                            <div class="delete-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="red" viewBox="0 0 24 24"
-                                     strokeWidth="1.5" stroke="currentColor" class="size-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
-                                </svg>
-                            </div>
-                            <h3 class="text-xl my-1">Áo măng tô</h3>
-                            <div class="text-bodydark2">3,290,000đ</div>
-                        </a>
-                    </div>
-                </div>
+        <h2 class="title-page mt-5">Danh sách yêu thích</h2>
+        <div class="container">
+            <div class="row justify-content-start" id="wishlist-container">
+                <!-- Wishlist items will be loaded here by JavaScript -->
             </div>
         </div>
+
+        <!--        <div class="container">-->
+        <!--            <div class="row justify-content-start">-->
+        <!--                <div class="col-2 product">-->
+        <!--                    <a href=""><img src="/images/7.1b.webp" alt=""/></a>-->
+        <!--                    <a href="#">-->
+        <!--                        <div class="delete-icon" data-bs-toggle="tooltip" data-bs-placement="top"-->
+        <!--                             data-bs-title="Huỷ yêu thích">-->
+        <!--                            <i class="bi bi-x-lg"></i>-->
+        <!--                        </div>-->
+        <!--                    </a>-->
+        <!--                    <h3>Áo măng tô</h3>-->
+        <!--                    <div>3,290,000đ</div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
     </div>
     <div class="pagination">
         <a href="#" class="prev">«</a>
@@ -112,8 +119,7 @@
         <a href="#" class="page-num">4</a>
         <a href="#" class="next">»</a>
     </div>
-    <script src="/js/wishlist.js"></script>
 </main>
-<div th:include = "footer::body"></div>
+<div th:include="footer::body"></div>
 </body>
 </html>

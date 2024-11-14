@@ -167,4 +167,18 @@
 .user-dropdown .dropdown-menu {
     left: -50px;
 }
+#load-more {
+    display: block !important;
+}
+/* CSS cho hiệu ứng mờ dần */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+.fade-in {
+    opacity: 1;
+    transition: opacity 0.5s ease-in;
+}
+
 
