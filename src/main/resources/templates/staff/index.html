@@ -223,7 +223,8 @@
 
                             // Thêm `resultWithData` vào `results[id_hd]`
                             results[id_hd].push(resultWithData);
-
+                            console.log(results)
+                            localStorage.setItem("results", JSON.stringify(results));
                             if (!isUpdatingDatabase) {
                                 // Cập nhật giao diện với kết quả mới
                                 displayResults();
@@ -343,7 +344,10 @@
         window.removeItemQR = function(index, id_hd, idsp) {
             // Xóa phần tử trong results
             if (confirm('Bạn có chắc chắn muốn xóa?')) {
-                results[id_hd].splice(index, 1);
+                if (results.length > 0) {
+                    results[id_hd].splice(index, 1);
+                }
+
                 const eleBill = document.querySelector(`.price-bill-${id_hd}`);
                 const eleReturn = document.querySelector(`.return-money-${id_hd}`);
                 const eleDelete = document.querySelector(`.del-item-${id_hd}-${idsp}`);

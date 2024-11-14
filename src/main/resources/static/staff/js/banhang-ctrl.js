@@ -10,6 +10,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.phoneCustomer = null;
     $scope.products = null;
     $scope.productDetails = [];
+    $scope.invoiceTotal = 0;
     // Hàm thêm hóa đơn
     $scope.addBill = function () {
         const bill = {
@@ -66,8 +67,79 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         productlModal.show();
     };
 
-    $scope.addProdBill = function (event) {
-        console.log($scope.activeIndex);
+    $scope.addProdBill = function (item, event) {
+
+        function formatCurrency(amount) {
+            const formatter = new Intl.NumberFormat('vi-VN');
+            return formatter.format(amount);
+        }
+        const rows = document.querySelectorAll(`.display-result-${$scope.activeIndex + 1} tr`);
+        const groupContainer = document.querySelector(`.display-result-${$scope.activeIndex + 1}`);
+        const eleBill = document.querySelector(`.price-bill-${$scope.activeIndex + 1}`);
+        const detailModal = new bootstrap.Modal(document.getElementById('addProductModalDetail'));
+
+        $http.get(`/spct/${item.id}`).then(res => {
+            $scope.invoiceTotal += res.data.data.gia;
+            let resultElement = document.createElement("tr")
+            resultElement.className=`sp-${rows.length + 1}-${$scope.activeIndex + 1}`
+            resultElement.innerHTML = `
+                        <th class="" scope="row">${rows.length + 1}</th>
+                        <td><img width="50" src="../images/monnica.png" alt=""></td>
+                        <td>
+                            <div class="name-prod">${res.data.data?.sanPham?.ten || 'Tên sản phẩm'}</div>
+                            <div class="text-muted">
+                                <span class="size-prod">Size: ${res.data.data?.size?.ten || 'Không có size'}</span>
+                            </div>
+                        </td>
+                        <td>
+                          <input class="form-control quantity-input" type="number" min="1" value="1" max="${res.data.data.soLuong}" data-idsp="${res.data.data.id}" data-bill="${$scope.activeIndex + 1}" data-price="${res.data.data.gia}" data-id="${$scope.activeIndex + 1}" data-index="${rows.length + 1}">
+                        </td>
+                        <td class="text-end">
+                            <span>${formatCurrency(res.data.data.gia) || 'Giá không có'}</span>
+                        </td>
+                        <td class="text-end">
+                            <span class="price-display">${formatCurrency(res.data.data.gia) || 'Giá không có'}</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-danger del-item-${$scope.activeIndex + 1}-${res.data.data.id}" data-quantity="1" data-price="${res.data.data.gia}" onclick="removeItemQR(${rows.length + 1}, '${$scope.activeIndex + 1}', ${res.data.data.id})">
+                                <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                    <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+            groupContainer.appendChild(resultElement);
+
+            eleBill.textContent = `${formatCurrency($scope.invoiceTotal)} vnđ`;
+            eleBill.setAttribute('data-origin', formatCurrency($scope.invoiceTotal));
+            const quantityInput = resultElement.querySelector('.quantity-input');
+            quantityInput.addEventListener('input', updatePrice);
+
+
+        });
+        function updatePrice(event) {
+            const inputElement = event.target;
+            const quantity = parseInt(inputElement.value);
+            const price = parseFloat(inputElement.getAttribute('data-price'));
+            const productId = parseFloat(inputElement.getAttribute('data-idsp'));
+            const billID = parseFloat(inputElement.getAttribute('data-bill'));
+            const totalPrice = price * quantity;
+            const eleDelete = document.querySelector(`.del-item-${billID}-${productId}`);
+
+            const priceDisplay = inputElement.closest('tr').querySelector('.price-display');
+            priceDisplay.textContent = formatCurrency(totalPrice);
+            eleDelete.setAttribute('data-quantity', quantity);
+            let newInvoiceTotal = 0;
+            document.querySelectorAll(`.display-result-${$scope.activeIndex + 1} .quantity-input`).forEach(input => {
+                const itemPrice = parseFloat(input.getAttribute('data-price'));
+                const itemQuantity = parseInt(input.value);
+                newInvoiceTotal += itemPrice * itemQuantity;
+            });
+            eleBill.textContent = `${formatCurrency(newInvoiceTotal)} vnđ`;
+            eleBill.setAttribute('data-origin', formatCurrency($scope.invoiceTotal));
+            // Optionally, you can update a total cart price here if needed
+        };
+
     };
 
     $scope.onPhoneChange = function(idBill) {
@@ -176,7 +248,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         const billInfoEl = document.querySelector('.bill-info-head');
         const btnDoneEl = document.querySelector('.btn-done-bill');
         const priceBill = document.querySelector(`.price-bill-${idBill}`).textContent;
-        const voucherBill = document.querySelector(`#voucher-${idBill}`).textContent;
+        // const voucherBill = document.querySelector(`#voucher-${idBill}`).textContent;
         ListProdEl.innerHTML = ''; // Xóa danh sách cũ để tránh lặp lại khi mở lại modal
         let totalQuantity = 0;
         let chiTietList = [];
@@ -212,7 +284,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         let dataBill = {
             idNguoiDung: parseFloat(event.target.getAttribute('data-iduser')),
             tongTien: parseFloat(priceBill.replace(/[^0-9,]/g, '')),
-            diemSuDung: parseFloat(voucherBill.replace(/\D/g, '')),
+            diemSuDung: 0,
             chiTietList: chiTietList
         }
         $http.post("/api/hoa-don/thanh-toan", dataBill).then(resp => {
@@ -233,7 +305,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $location) {
         const totalVoucherEl = document.querySelector('.total-voucher');
         const totalPaymentEl = document.querySelector('.total-payment');
         totalQuantityEl.textContent = `Tổng số lượng: ${totalQuantity}`;
-        totalVoucherEl.textContent = `Giảm ${voucherBill}`;
+        // totalVoucherEl.textContent = `Giảm ${voucherBill}`;
         totalPaymentEl.textContent = `Tổng TT: ${priceBill}`;
 
         const billModal = new bootstrap.Modal(document.getElementById('paymentModal'), {
