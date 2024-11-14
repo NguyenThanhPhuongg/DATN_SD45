@@ -13,7 +13,7 @@ public interface KhuyenMaiRepository extends JpaRepository<KhuyenMai, Long> {
     @Query("SELECT p FROM KhuyenMai p WHERE p.id = ?1")
     List<KhuyenMai> findByCateId(Long cid);
 
-    boolean existsByMa(String ma);
+    boolean existsByMaAndIdNot(String ma, Long id);
 
     @Query("SELECT k FROM KhuyenMai k " +
             "WHERE (:keyword IS NULL OR k.ten LIKE %:keyword% OR k.ma LIKE %:keyword%) " +
@@ -21,4 +21,5 @@ public interface KhuyenMaiRepository extends JpaRepository<KhuyenMai, Long> {
             "ORDER BY k.ngayTao DESC")
     List<KhuyenMai> findByKeywordAndLoai(String keyword, Integer loai);
 
+    boolean existsByMa(String ma);
 }

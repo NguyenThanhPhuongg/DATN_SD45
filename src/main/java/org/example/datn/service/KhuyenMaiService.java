@@ -33,17 +33,24 @@ public class KhuyenMaiService {
     public void deleteById(Long id) {
         repo.deleteById(id);
     }
-    public void delete(KhuyenMai khuyenMai){
+
+    public void delete(KhuyenMai khuyenMai) {
         repo.delete(khuyenMai);
     }
 
-    public KhuyenMai saveKm(KhuyenMai khuyenMai){
+    public KhuyenMai saveKm(KhuyenMai khuyenMai) {
         return repo.save(khuyenMai);
     }
-    public boolean existsByMa(String ma){
+
+    public boolean existsByMaAndIdNot(String ma,Long id) {
+        return repo.existsByMaAndIdNot(ma, id);
+    }
+
+    public boolean existsByMa(String ma) {
         return repo.existsByMa(ma);
     }
-    public List<KhuyenMai> findByKeywordAndLoai(String keyword, Integer loai){
+
+    public List<KhuyenMai> findByKeywordAndLoai(String keyword, Integer loai) {
         return repo.findByKeywordAndLoai(keyword, loai);
     }
 }
