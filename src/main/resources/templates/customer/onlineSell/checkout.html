@@ -87,19 +87,20 @@
                         <img src="/images/fast-delivery.png" alt="Voucher Image">
                     </div>
                     <div class="voucher-text">
-                        <div>
-                            <h2>Mã Giảm Giá 10%</h2>
-                            <p>Áp dụng cho đơn hàng trên 500.000 ₫</p>
+                        <div class="voucher-info">
+                            <h2>Mã Giảm Giá</h2>
                         </div>
-                        <div>
-                            <button class="button"><span>Chọn voucher khác</span></button>
+                        <div class="voucher-button">
+                            <button class="button" onclick="openVoucherModal()"><span>Chọn voucher</span></button>
+                        </div>
+                        <div class="voucher">
                         </div>
                     </div>
                 </div>
-                <div class="col-right">
-                    <input type="text" class="input-field" placeholder="Nhập mã giảm giá">
-                    <button class="button"><span>Áp Dụng</span></button>
-                </div>
+                <!--                <div class="col-right">-->
+                <!--                    <input type="text" class="input-field" placeholder="Nhập mã giảm giá">-->
+                <!--                    <button class="button"><span>Áp Dụng</span></button>-->
+                <!--                </div>-->
             </div>
             <div class="row">
                 <h2>Phương thức vận chuyển</h2>
@@ -146,8 +147,8 @@
                     <td style="color: red;">₫30.000</td>
                 </tr>
                 <tr>
-                    <td>Tổng cộng Voucher giảm giá</td>
-                    <td>Không có voucher giảm giá</td>
+                    <td>Voucher giảm giá</td>
+                    <td id="voucherDiscount" style="color: red;">Không có voucher giảm giá</td>
                 </tr>
                 <tr>
                     <td>Tổng thanh toán</td>
@@ -157,6 +158,18 @@
             <div class="order-container">
                 <span>Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#">Điều khoản ZIAZA</a></span>
                 <button class="order-button" onclick="placeOrder()">Đặt hàng</button>
+            </div>
+        </div>
+    </div>
+    <!-- Voucher Modal -->
+    <div id="voucher-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Danh Sách Voucher</h2>
+            <div class="divider"></div>
+            <div id="voucher-list">Loading...</div>
+            <div id="button-section-voucher">
+                <button id="cancel-voucher-button" onclick="closeVoucherModal()">Hủy</button>
+                <button id="confirm-voucher-button" onclick="selectVoucher()">Xác Nhận</button>
             </div>
         </div>
     </div>

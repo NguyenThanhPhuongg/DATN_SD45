@@ -131,61 +131,65 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
+public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
+    HoaDon hoaDon = new HoaDon();
+    hoaDon.setIdNguoiDung(ua.getPrincipal());
+    hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
+    hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
+    hoaDon.setMa(getRandomNumber(8));
+    hoaDon.setDiemSuDung(0);
+    hoaDon.setNgayTao(LocalDateTime.now());
+    hoaDon.setNgayCapNhat(LocalDateTime.now());
+    hoaDon.setNguoiTao(ua.getPrincipal());
+    hoaDon.setNguoiCapNhat(ua.getPrincipal());
+    hoaDon.setNgayDatHang(LocalDateTime.now());
+    service.save(hoaDon);
 
-        HoaDon hoaDon = new HoaDon();
-        hoaDon.setIdNguoiDung(ua.getPrincipal());
-        hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
-        hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
-        hoaDon.setMa(getRandomNumber(8));
-        hoaDon.setDiemSuDung(0);
-        hoaDon.setNgayTao(LocalDateTime.now());
-        hoaDon.setNgayCapNhat(LocalDateTime.now());
-        hoaDon.setNguoiTao(ua.getPrincipal());
-        hoaDon.setNguoiCapNhat(ua.getPrincipal());
-        hoaDon.setNgayDatHang(LocalDateTime.now());
-        service.save(hoaDon);
+    var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
+            .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
 
-        var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
-                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
-
-        var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
-        BigDecimal tongTien = BigDecimal.ZERO;
-        for (GioHangChiTiet ghct : gioHangChiTiet) {
-            HoaDonChiTiet hdct = new HoaDonChiTiet();
-            hdct.setIdHoaDon(hoaDon.getId());
-            hdct.setIdSanPhamChiTiet(ghct.getIdSanPhamChiTiet());
-            hdct.setSoLuong(ghct.getSoLuong());
-            hdct.setGia(ghct.getGia());
-            BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
-            tongTien = tongTien.add(giaTien);
-            hdct.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
-            hdct.setNgayTao(LocalDateTime.now());
-            hdct.setNgayCapNhat(LocalDateTime.now());
-            hdct.setNguoiTao(ua.getPrincipal());
-            hdct.setNguoiCapNhat(ua.getPrincipal());
-            hoaDonChiTietService.save(hdct);
-            ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
-            gioHangChiTietService.save(ghct);
-        }
-
-        hoaDon.setTongTien(tongTien);
-        hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
-        service.save(hoaDon);
-        ThanhToan thanhToan = new ThanhToan();
-        thanhToan.setIdHoaDon(hoaDon.getId());
-        thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
-        thanhToan.setSoTien(hoaDon.getTongTien());
-        thanhToan.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusThanhToan.CHUA_THANH_TOAN.getValue() : StatusThanhToan.DANG_XU_LY.getValue());
-        thanhToanService.save(thanhToan);
-        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
-            HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            String ipAddress = VNPayUtil.getIpAddress(httpRequest);
-            String vnPayResponse = paymentService.createVnPayPayment(hoaDon, "NCB", ipAddress);
-            return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
-        }
-        return new ServiceResult();
+    var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
+    BigDecimal tongTien = BigDecimal.ZERO;
+    for (GioHangChiTiet ghct : gioHangChiTiet) {
+        HoaDonChiTiet hdct = new HoaDonChiTiet();
+        hdct.setIdHoaDon(hoaDon.getId());
+        hdct.setIdSanPhamChiTiet(ghct.getIdSanPhamChiTiet());
+        hdct.setSoLuong(ghct.getSoLuong());
+        hdct.setGia(ghct.getGia());
+        BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
+        tongTien = tongTien.add(giaTien);
+        hdct.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
+        hdct.setNgayTao(LocalDateTime.now());
+        hdct.setNgayCapNhat(LocalDateTime.now());
+        hdct.setNguoiTao(ua.getPrincipal());
+        hdct.setNguoiCapNhat(ua.getPrincipal());
+        hoaDonChiTietService.save(hdct);
+        ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
+        gioHangChiTietService.save(ghct);
     }
+
+    // Apply voucher discount
+    if (request.getGiaTriVoucher() != null) {
+        tongTien = tongTien.subtract(request.getGiaTriVoucher());
+    }
+
+    hoaDon.setTongTien(tongTien);
+    hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
+    service.save(hoaDon);
+    ThanhToan thanhToan = new ThanhToan();
+    thanhToan.setIdHoaDon(hoaDon.getId());
+    thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
+    thanhToan.setSoTien(hoaDon.getTongTien());
+    thanhToan.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusThanhToan.CHUA_THANH_TOAN.getValue() : StatusThanhToan.DANG_XU_LY.getValue());
+    thanhToanService.save(thanhToan);
+    if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
+        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String ipAddress = VNPayUtil.getIpAddress(httpRequest);
+        String vnPayResponse = paymentService.createVnPayPayment(hoaDon, "NCB", ipAddress);
+        return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+    return new ServiceResult();
+}
 
     public static String getRandomNumber(int len) {
         Random rnd = new Random();

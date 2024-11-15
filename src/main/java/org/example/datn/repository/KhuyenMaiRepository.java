@@ -22,4 +22,6 @@ public interface KhuyenMaiRepository extends JpaRepository<KhuyenMai, Long> {
     List<KhuyenMai> findByKeywordAndLoai(String keyword, Integer loai);
 
     boolean existsByMa(String ma);
+
+    List<KhuyenMai> findByIdIn(List<Long> ids);
 }

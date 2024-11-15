@@ -172,7 +172,9 @@ public class KhuyenMaiProcessor {
         if (service.existsByMaAndIdNot(request.getMa(), id)) {
             throw DuplicatedException.of("Mã khuyến mãi đã tồn tại");
         }
-    }private void validateCreateDuplicated(KhuyenMaiCreateUpdateRequest request) throws DuplicatedException {
+    }
+
+    private void validateCreateDuplicated(KhuyenMaiCreateUpdateRequest request) throws DuplicatedException {
         if (service.existsByMa(request.getMa())) {
             throw DuplicatedException.of("Mã khuyến mãi đã tồn tại");
         }
@@ -207,6 +209,17 @@ public class KhuyenMaiProcessor {
                 }).collect(Collectors.toList());
         model.setUserModels(userModels);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult getAllUserId(UserAuthentication ua) {
+        var apDungKhuyenMais = apDungKhuyenMaiService.findByIdNguoiDungAndDaSuDung(ua.getPrincipal(), false);
+        List<Long> khuyenMaiIds = apDungKhuyenMais.stream()
+                .map(ApDungKhuyenMai::getIdKhuyenMai)
+                .distinct()
+                .collect(Collectors.toList());
+        List<KhuyenMai> khuyenMais = service.findByIdIn(khuyenMaiIds);
+        List<KhuyenMaiModel> khuyenMaiModels = khuyenMais.stream().map(khuyenMaiTransformer::toModel).collect(Collectors.toList());
+        return new ServiceResult(khuyenMaiModels, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
 }

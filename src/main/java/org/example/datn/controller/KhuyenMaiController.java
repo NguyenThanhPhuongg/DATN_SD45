@@ -68,4 +68,9 @@ public class KhuyenMaiController {
     public ResponseEntity<ServiceResult> findByKeywordAndLoai(@RequestBody KhuyenMaiQuery request) {
         return ResponseEntity.ok(processor.findByKeywordAndLoai(request));
     }
+
+    @GetMapping("/get-list-by-user")
+    public ResponseEntity<ServiceResult> getAllUserId(UserAuthentication ua) {
+        return ResponseEntity.ok(processor.getAllUserId(ua));
+    }
 }

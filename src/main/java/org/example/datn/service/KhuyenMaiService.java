@@ -53,4 +53,8 @@ public class KhuyenMaiService {
     public List<KhuyenMai> findByKeywordAndLoai(String keyword, Integer loai) {
         return repo.findByKeywordAndLoai(keyword, loai);
     }
+
+    public List<KhuyenMai> findByIdIn(List<Long> ids) {
+        return repo.findByIdIn(ids);
+    }
 }

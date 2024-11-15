@@ -3,6 +3,7 @@ package org.example.datn.model.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -13,4 +14,5 @@ public class HoaDonRequest {
     private Long idPhuongThucVanChuyen;
     private Long idPhuongThucThanhToan;
     private Integer diemSuDung;
+    private BigDecimal giaTriVoucher;
 }
