@@ -77,7 +77,7 @@ public class KhuyenMaiProcessor {
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult create(KhuyenMaiCreateUpdateRequest request, UserAuthentication ua) throws DuplicatedException {
         if (request.getMa() != null && !request.getMa().isEmpty()) {
-            validateDuplicated(request);
+            validateCreateDuplicated(request);
         }
         KhuyenMai khuyenMai = khuyenMaiTransformer.toEntity(request);
         khuyenMai.setNguoiTao(ua.getPrincipal());
@@ -114,7 +114,7 @@ public class KhuyenMaiProcessor {
         KhuyenMai existingKhuyenMai = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy khuyến mãi"));
 
         if (request.getMa() != null && !request.getMa().isEmpty()) {
-            validateDuplicated(request);
+            validateUpdateDuplicated(request, id);
         }
         existingKhuyenMai.setMa(request.getMa());
         existingKhuyenMai.setTen(request.getTen());
@@ -168,7 +168,13 @@ public class KhuyenMaiProcessor {
         return apDungKhuyenMai;
     }
 
-    private void validateDuplicated(KhuyenMaiCreateUpdateRequest request) throws DuplicatedException {
+    private void validateUpdateDuplicated(KhuyenMaiCreateUpdateRequest request, Long id) throws DuplicatedException {
+        if (service.existsByMaAndIdNot(request.getMa(), id)) {
+            throw DuplicatedException.of("Mã khuyến mãi đã tồn tại");
+        }
+    }
+
+    private void validateCreateDuplicated(KhuyenMaiCreateUpdateRequest request) throws DuplicatedException {
         if (service.existsByMa(request.getMa())) {
             throw DuplicatedException.of("Mã khuyến mãi đã tồn tại");
         }
@@ -203,6 +209,17 @@ public class KhuyenMaiProcessor {
                 }).collect(Collectors.toList());
         model.setUserModels(userModels);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult getAllUserId(UserAuthentication ua) {
+        var apDungKhuyenMais = apDungKhuyenMaiService.findByIdNguoiDungAndDaSuDung(ua.getPrincipal(), false);
+        List<Long> khuyenMaiIds = apDungKhuyenMais.stream()
+                .map(ApDungKhuyenMai::getIdKhuyenMai)
+                .distinct()
+                .collect(Collectors.toList());
+        List<KhuyenMai> khuyenMais = service.findByIdIn(khuyenMaiIds);
+        List<KhuyenMaiModel> khuyenMaiModels = khuyenMais.stream().map(khuyenMaiTransformer::toModel).collect(Collectors.toList());
+        return new ServiceResult(khuyenMaiModels, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
 }

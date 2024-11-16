@@ -19,13 +19,22 @@ $(document).ready(function() {
             data: JSON.stringify(loginData),
             success: function(response) {
                 const token = response.token;
+                const role = response.vaiTro;
                 localStorage.setItem('token', token);
 
                 $('#message').html('<div class="alert alert-success">Đăng nhập thành công!</div>');
                 hideMessageAfterDelay();
-                setTimeout(function() {
+                if (role === 'USER') {
+                    setTimeout(function() {
+                        window.location.href = '/staff';
+                    }, 500);
+                } else if (role === 'CLIENT') {
+                    setTimeout(function() {
+                        window.location.href = '/';
+                    }, 500);
+                } else {
                     window.location.href = '/';
-                }, 500);
+                }
             },
             error: function(jqXHR) {
                 $('#message').html('<div class="alert alert-danger">Thông tin đăng nhập không chính xác!</div>');

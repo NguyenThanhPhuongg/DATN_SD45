@@ -109,5 +109,12 @@ window.onclick = function(event) {
         }
     }
 }
+// Kích hoạt tooltip cho tất cả các phần tử có data-bs-toggle="tooltip"
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
 
 

@@ -80,3 +80,29 @@ table {
     font-size: 16px;
     font-weight: bold;
 }
+.voucher-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.voucher-info {
+    flex-grow: 1;
+}
+
+.voucher-button {
+    margin-left: 20px;
+}
+.voucher-button .button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.voucher-button .button:hover {
+    background-color: gray;
+}
