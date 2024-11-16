@@ -1,5 +1,4 @@
-const app = angular.module("admin-app", ["ngRoute"]);
-
+const app = angular.module("admin-app", ["ngRoute", "firebase"]);
 app.config(function ($routeProvider) {
     $routeProvider
         // tổng quan

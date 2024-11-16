@@ -24,19 +24,18 @@ public class HDService {
     @Transactional
     public HoaDon taoHoaDon(HDRequest hdRrequest) {
         HoaDon hoaDon = new HoaDon();
-        hoaDon.setIdNguoiDung(hdRrequest.getIdNguoiDung());
-        hoaDon.setTongTien(hdRrequest.getTongTien());
-        hoaDon.setDiemSuDung(hdRrequest.getDiemSuDung());
+        hoaDon.setIdNguoiDung(hdRrequest.getIdCustomer());
+        hoaDon.setTongTien(hdRrequest.getTotalBill());
         hoaDon.setNgayTao(LocalDateTime.now());
         hoaDon.setNgayThanhToan(LocalDateTime.now());
         HoaDon savedHoaDon = hoaDonRepository.save(hoaDon);
         String maHoaDon = "HD" + String.format("%07d", savedHoaDon.getId());
         savedHoaDon.setMa(maHoaDon);
 
-        List<HoaDonChiTiet> chiTietList = hdRrequest.getChiTietList().stream().map(hdctRequest -> {
+        List<HoaDonChiTiet> chiTietList = hdRrequest.getItems().stream().map(hdctRequest -> {
             HoaDonChiTiet chiTiet = new HoaDonChiTiet();
             chiTiet.setIdHoaDon(savedHoaDon.getId());
-            chiTiet.setIdSanPhamChiTiet(hdctRequest.getIdSanPhamChiTiet());
+            chiTiet.setIdSanPhamChiTiet(hdctRequest.getId());
             chiTiet.setSoLuong(hdctRequest.getSoLuong());
             chiTiet.setNgayTao(LocalDateTime.now());
             return chiTiet;

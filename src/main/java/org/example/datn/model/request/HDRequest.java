@@ -8,13 +8,12 @@ import java.util.List;
 
 @Data
 public class HDRequest {
-    private Long idNguoiDung;
+    private Long idCustomer;
     private String ma;
-    private BigDecimal tongTien;
-    private Integer diemSuDung;
+    private BigDecimal totalBill;
     private Integer trangThai;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayThanhToan;
     private Long nguoiTao;
-    private List<HDCTRequest> chiTietList;
+    private List<HDCTRequest> items;
 }
