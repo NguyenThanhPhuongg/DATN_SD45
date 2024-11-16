@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.entity.Size;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.processor.SizeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,14 +33,16 @@ public class SizeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ServiceResult> add(@RequestBody @Valid Size size) {
-        return ResponseEntity.status(201).body(processor.save(size));
+    public ResponseEntity<ServiceResult> create(@RequestBody @Valid Size request, UserAuthentication ua) {
+        ServiceResult result = processor.save(request, ua);
+        return new ResponseEntity<>(result, HttpStatus.CREATED); // HttpStatus.CREATED cho response 201
     }
 
+    // Cập nhật danh mục theo ID với thông tin UserAuthentication
     @PutMapping("/update/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody @Valid Size size) {
-        size.setId(id); // Đặt ID để cập nhật
-        return ResponseEntity.ok(processor.save(size));
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody @Valid Size request, UserAuthentication ua) {
+        ServiceResult result = processor.update(id, request, ua);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
