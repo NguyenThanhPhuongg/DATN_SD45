@@ -1,5 +1,6 @@
 package org.example.datn.repository;
 
+import io.swagger.models.auth.In;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +20,11 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     Optional<SanPhamChiTiet> findByIdSanPhamAndIdSizeAndIdMauSac(Long idSanPham, Long idSize, Long idMauSac);
 
     List<SanPhamChiTiet> findByIdSanPham(Long idSanPham);
+
+    SanPhamChiTiet findByIdAndTrangThai(Long id, Integer trangThai);
+
+        // Custom query để lấy sản phẩm với trạng thái "active"
+        List<SanPhamChiTiet> findByTrangThai(Integer trangThai);
+
 
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Data
 public class HDCTRequest {
-    private Long idSanPhamChiTiet;
+    private Long id;
     private Integer soLuong;
     private BigDecimal gia;
     private Integer trangThai;
