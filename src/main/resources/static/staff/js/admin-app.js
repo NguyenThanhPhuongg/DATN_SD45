@@ -1,4 +1,42 @@
-const app = angular.module("admin-app", ["ngRoute"]);
+const app = angular.module("admin-app", ["ngRoute", "firebase"]);
+app.directive('currencyInput', function () {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, element, attrs, ngModel) {
+            // Hàm định dạng số thành tiền tệ
+            function formatCurrency(value) {
+                if (!value) return '';
+                return value.toLocaleString('vi-VN');
+            }
+
+            // Hàm loại bỏ định dạng (trả về số)
+            function parseCurrency(value) {
+                if (!value) return 0;
+                return parseInt(value.replace(/[^0-9]/g, ''), 10);
+            }
+
+            // Hiển thị giá trị định dạng
+            ngModel.$formatters.push(function (value) {
+                return formatCurrency(value);
+            });
+
+            // Xử lý giá trị đầu vào và cập nhật mô hình
+            ngModel.$parsers.push(function (value) {
+                const numericValue = parseCurrency(value);
+                ngModel.$setViewValue(formatCurrency(numericValue));
+                ngModel.$render();
+                return numericValue;
+            });
+
+            // Lắng nghe sự kiện blur để định dạng giá trị
+            element.on('blur', function () {
+                const formattedValue = formatCurrency(ngModel.$modelValue);
+                element.val(formattedValue);
+            });
+        },
+    };
+});
 
 app.config(function ($routeProvider) {
     $routeProvider

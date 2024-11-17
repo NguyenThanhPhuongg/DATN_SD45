@@ -27,5 +27,9 @@ public class HoaDonChiTietController {
     public ResponseEntity<ServiceResult> getAll() {
         return ResponseEntity.ok(processor.getAll());
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<ServiceResult> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(processor.getById(id));
+    }
 
 }
