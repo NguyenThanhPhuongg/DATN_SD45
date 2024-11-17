@@ -124,7 +124,9 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
 
     $scope.updateQuantity = function (bill, item) {
-        item.total = item.soLuong * item.gia;
+        if (item.soLuong <= 50) {
+            item.total = item.soLuong * item.gia;
+        }
         $scope.updateTotalBill(bill)
     };
     $scope.updateTotalBill = function (bill) {

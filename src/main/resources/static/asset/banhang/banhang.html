@@ -61,7 +61,7 @@
                             <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Hình ảnh</th>
+                                <th scope="col" >Hình ảnh</th>
                                 <th scope="col">Sản phẩm</th>
                                 <th scope="col" style="width: 120px;">Số lượng</th>
                                 <th scope="col" class="text-end">Đơn giá (VNĐ)</th>
@@ -72,15 +72,15 @@
                             <tbody>
                             <tr ng-repeat="item in bill.items">
                                 <th scope="row">{{$index + 1}}</th>
-                                <td><img ng-src="/images/{{item.image}}" alt=""></td>
+                                <td><img ng-src="/images/{{item.image}}" alt="" width="50"></td>
                                 <td>
                                     {{item.tenSanPham}} <br>
                                     <small class="text-muted">{{item.ghiChu}}</small>
                                 </td>
-                                <td><input type="number" class="form-control" ng-model="item.soLuong" min="1" max="item.soLuong"
+                                <td><input type="number" class="form-control" ng-model="item.soLuong" min="1" max="50"
                                            ng-init="item.soLuong = 1" ng-change="updateQuantity(bill, item)"/></td>
-                                <td class="text-end">{{ formatCurrency(item.gia)}}</td>
-                                <td class="text-end">{{ formatCurrency(item.soLuong * item.gia)}}</td>
+                                <td class="text-end">{{ formatCurrency(item.gia) }}</td>
+                                <td class="text-end">{{ item.soLuong <= 50 ? formatCurrency(item.soLuong * item.gia) : 'Số lượng không vượt quá 50'}}</td>
                                 <td class="text-center">
                                     <button ng-click="removeProduct(bill, item)" class="btn text-danger py-0">
                                         <svg width="17" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -181,7 +181,7 @@
                                 <tbody>
                                 <tr ng-repeat="product in listProduct | filter:searchFilter">
                                     <td>{{$index + 1}}</td>
-                                    <td><img  ng-src="/images/{{product.image}}" alt=""></td>
+                                    <td><img  ng-src="/images/{{product.image}}" width="50" alt=""></td>
                                     <td>
                                         {{product.tenSanPham}} <br>
                                         <small class="text-muted">{{product.ghiChu}}</small>
