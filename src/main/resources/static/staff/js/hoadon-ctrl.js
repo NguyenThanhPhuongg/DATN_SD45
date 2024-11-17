@@ -19,6 +19,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.searchText4 = '';
     $scope.searchText5 = '';
     // Thêm searchText cho các trạng thái khác nếu cần
+    var token = localStorage.getItem('token');
 
     $scope.initialize = function () {
         // Gọi API và kiểm tra dữ liệu
@@ -258,8 +259,15 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                item.trangThai = 2; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                var token = localStorage.getItem('token');
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 2;
+                $http.put(`/rest/hoadon/${updatedItem.id}`, updatedItem,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -280,8 +288,15 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                item.trangThai = 3; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                var token = localStorage.getItem('token');
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 3;
+                $http.put(`/rest/hoadon/${updatedItem.id}`, updatedItem,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -302,8 +317,15 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                item.trangThai = 4; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                var token = localStorage.getItem('token');
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 4;
+                $http.put(`/rest/hoadon/${updatedItem.id}`, updatedItem,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -324,10 +346,18 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                item.trangThai = 5; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                var token = localStorage.getItem('token');
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 5;
+                $http.put(`/rest/hoadon/${updatedItem.id}`, updatedItem,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
+
                 }).catch(error => {
                     swal("Error!", "Cập nhật thất bại", "error");
                     console.log("Error: ", error);
@@ -346,8 +376,14 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                item.trangThai = 6; // Cập nhật trạng thái
-                $http.put(`/rest/hoadon/${item.id}`, item).then(resp => {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 6;
+                $http.put(`/rest/hoadon/${updatedItem.id}`, updatedItem,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                 }).catch(error => {
@@ -359,6 +395,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $rootScope, $location) {
             }
         });
     };
+
 
     $scope.edit0 = function (item) {
         // Chuyển timestamp thành Date object

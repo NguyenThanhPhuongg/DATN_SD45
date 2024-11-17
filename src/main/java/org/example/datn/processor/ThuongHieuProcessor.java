@@ -2,8 +2,10 @@ package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.DanhMuc;
+import org.example.datn.entity.MauSac;
 import org.example.datn.entity.Thuonghieu;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.model.request.ThuongHieuRequest;
 import org.example.datn.model.response.DanhMucModel;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,16 +29,23 @@ public class ThuongHieuProcessor {
     private ThuongHieuService service;
     @Autowired
     private ThuongHieuTransformer transformer;
-    public ServiceResult save(Thuonghieu request){
-        service.save(request);
-        return new ServiceResult();
+
+    public ServiceResult save(Thuonghieu chatLieu, UserAuthentication ua) {
+        chatLieu.setNguoiTao(ua.getPrincipal());
+        chatLieu.setNgayTao(LocalDateTime.now());
+        chatLieu.setNguoiCapNhat(ua.getPrincipal());
+        chatLieu.setNgayCapNhat(LocalDateTime.now());
+        service.save(chatLieu);
+        return new ServiceResult(chatLieu, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult update(Long id, ThuongHieuRequest request){
-        var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("danhMuc.not.found"));
-        BeanUtils.copyProperties(request, p);
-        service.save(p);
-        return new ServiceResult();
+    public ServiceResult update(Long id, Thuonghieu chatLieu, UserAuthentication ua) {
+        Thuonghieu chatLieu1 = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại"));
+        BeanUtils.copyProperties(chatLieu, chatLieu1);
+        chatLieu.setNguoiCapNhat(ua.getPrincipal());
+        chatLieu.setNgayCapNhat(LocalDateTime.now());
+        service.save(chatLieu);
+        return new ServiceResult(chatLieu, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public ServiceResult delete(Long id){

@@ -309,6 +309,7 @@ async function fetchCartData() {
     }
 }
 
+
 function increaseQuantity(button, itemId) {
     const quantityInput = button.previousElementSibling;
     let quantity = parseInt(quantityInput.value);
@@ -600,10 +601,10 @@ async function placeOrder() {
         idDiaChiGiaoHang: idDiaChiGiaoHang,
         idPhuongThucVanChuyen: idPhuongThucVanChuyen,
         idPhuongThucThanhToan: idPhuongThucThanhToan,
-        diemSuDung: 0 // Có thể cập nhật nếu có điểm sử dụng
+        diemSuDung: 0, // Có thể cập nhật nếu có điểm sử dụng
+        giaTriVoucher: selectedVoucherValue // Add this line to include the voucher value
     };
 
-    // Lấy token từ localStorage
     const token = localStorage.getItem('token');
 
     // Gọi API để lưu đơn hàng
@@ -628,6 +629,7 @@ async function placeOrder() {
             if (result.data === null) {
                 // Nếu data là null, thông báo đặt hàng thành công và chuyển hướng đến /bill
                 alert('Đặt hàng thành công!');
+                await applyVoucher();
                 window.location.href = '/bill';
             } else if (typeof result.data === 'string') {
                 // Nếu data là một link (VNPay link), chuyển hướng tới link đó
@@ -643,6 +645,125 @@ async function placeOrder() {
         alert('Có lỗi xảy ra khi đặt hàng.');
     }
 }
+
+async function applyVoucher() {
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`/ap-dung-khuyen-mai/change?idKhuyenMai=${selectedVoucherId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Áp dụng khuyến mãi không thành công.');
+        }
+
+        const result = await response.json();
+        console.log('Voucher applied successfully:', result);
+
+    } catch (error) {
+        console.error('Error applying voucher:', error);
+    }
+}
+
+let selectedVoucherId = null;
+let selectedVoucherValue = 0;
+
+async function fetchVouchers() {
+    try {
+        const token = localStorage.getItem('token');
+
+        const response = await fetch('/khuyen-mai/get-list-by-user', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const result = await response.json();
+        const voucherListElement = document.getElementById('voucher-list');
+
+        if (result.data && result.data.length > 0) {
+            voucherListElement.innerHTML = result.data.map(voucher => `
+                <div style="background-color: #f0f0f0; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                    <input type="radio" name="voucher" value="${voucher.id}" data-value="${voucher.giaTri}" id="voucher-${voucher.id}">
+                    <label for="voucher-${voucher.id}">
+                        <strong style="font-size: 1.5em;">${voucher.ma}</strong> <span style="font-size: 1em; color: #FF0000">-${voucher.giaTri}đ</span><br>
+                        ${voucher.moTa}
+                    </label>
+                </div>
+            `).join('');
+        } else {
+            voucherListElement.innerHTML = 'Không có khuyến mãi nào';
+        }
+    } catch (error) {
+        console.error('Error fetching vouchers:', error);
+        document.getElementById('voucher-list').innerHTML = 'Lỗi khi tải danh sách khuyến mãi';
+    }
+}
+
+function selectVoucher() {
+    const selectedVoucher = document.querySelector('input[name="voucher"]:checked');
+    if (selectedVoucher) {
+        const voucherValue = parseFloat(selectedVoucher.getAttribute('data-value'));
+        if (isNaN(voucherValue) || voucherValue === null) {
+            alert('Voucher không hợp lệ.');
+            return;
+        }
+        selectedVoucherId = selectedVoucher.value;
+        selectedVoucherValue = voucherValue; // Store the voucher value as a number
+        const selectedVoucherLabel = selectedVoucher.nextElementSibling;
+        const voucherInfo = document.querySelector('.voucher');
+        const newVoucherInfo = `
+            <h2>${selectedVoucherLabel.querySelector('strong').textContent}</h2>
+            <p>${selectedVoucherLabel.querySelector('span').textContent}</p>
+        `;
+        voucherInfo.innerHTML = newVoucherInfo; // Update the voucher information
+        closeVoucherModal();
+        updateTotalPayment(); // Update the total payment amount
+    } else {
+        alert('Vui lòng chọn một khuyến mãi.');
+    }
+}
+
+function updateTotalPayment() {
+    const totalItemPriceText = document.getElementById('totalItemPrice').textContent;
+    console.log('totalItemPriceText', totalItemPriceText);  // In ra: "2.000.000 đ"
+
+// Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
+    const totalItemPrice = parseFloat(totalItemPriceText.replace(/[^\d.-]/g, '').replace(/\./g, ''));
+    console.log('totalItemPrice', totalItemPrice);  // In ra: 2000000
+
+    const shippingFee = 30000; // Default shipping fee
+    const totalPayment = totalItemPrice + shippingFee - selectedVoucherValue; // Subtract the voucher value and add shipping fee
+    console.log('totalPayment', totalPayment);
+    document.getElementById('totalPayment').textContent = `${totalPayment.toLocaleString()} đ`;
+    document.querySelector('.total-price').textContent = `Tổng Cộng: ${(totalItemPrice - selectedVoucherValue).toLocaleString()} ₫`; // Update the total price without shipping fee
+    document.getElementById('voucherDiscount').textContent = `${selectedVoucherValue.toLocaleString()} đ`;
+}
+
+function openVoucherModal() {
+    document.getElementById('voucher-modal').style.display = 'block';
+    document.body.style.overflow = "hidden";
+    fetchVouchers();
+}
+
+function closeVoucherModal() {
+    document.getElementById('voucher-modal').style.display = 'none';
+    document.body.style.overflow = "";
+}
+
+// Add event listener to the "Chọn voucher khác" button
+document.querySelector('.voucher-text button').addEventListener('click', openVoucherModal);
 
 
 

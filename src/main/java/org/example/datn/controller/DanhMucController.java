@@ -2,12 +2,15 @@ package org.example.datn.controller;
 
 import org.example.datn.entity.DanhMuc;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.processor.DanhMucProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
@@ -31,18 +34,17 @@ public class DanhMucController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    // Tạo mới danh mục
+    // Tạo mới danh mục với thông tin UserAuthentication
     @PostMapping
-    public ResponseEntity<ServiceResult> create(@RequestBody DanhMuc request) {
-        ServiceResult result = danhMucProcessor.save(request);
-        return new ResponseEntity<>(result, HttpStatus.CREATED); // Thay đổi từ HttpStatus.OK sang HttpStatus.CREATED
+    public ResponseEntity<ServiceResult> create(@RequestBody @Valid DanhMuc request, UserAuthentication ua) {
+        ServiceResult result = danhMucProcessor.save(request, ua);
+        return new ResponseEntity<>(result, HttpStatus.CREATED); // HttpStatus.CREATED cho response 201
     }
 
-
-    // Cập nhật danh mục theo ID
+    // Cập nhật danh mục theo ID với thông tin UserAuthentication
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody DanhMucRequest request) {
-        ServiceResult result = danhMucProcessor.update(id, request);
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody @Valid DanhMucRequest request, UserAuthentication ua) {
+        ServiceResult result = danhMucProcessor.update(id, request, ua);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

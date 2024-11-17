@@ -48,7 +48,8 @@ document.addEventListener('click', function(event) {
             // Khi người dùng nhấn vào "Đăng xuất", xóa token và tải lại trang
             dropdownItems[2].addEventListener('click', function() {
                 localStorage.removeItem('token'); // Xóa token khỏi localStorage
-                window.location.reload(); // Tải lại trang hiện tại
+                window.location.href = '/';
+                // window.location.reload(); // Tải lại trang hiện tại
             });
 
         } else {

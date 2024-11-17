@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ApDungKhuyenMaiService {
@@ -27,4 +28,12 @@ public class ApDungKhuyenMaiService {
     public void delete(ApDungKhuyenMai apDungKhuyenMai){
         repo.delete(apDungKhuyenMai);
     }
+
+    public List<ApDungKhuyenMai> findByIdNguoiDungAndDaSuDung(Long idNguoiDung, Boolean daSuDung){
+        return repo.findByIdNguoiDungAndDaSuDung(idNguoiDung, daSuDung);
+    }
+    public Optional<ApDungKhuyenMai> findByIdKhuyenMaiAndIdNguoiDung(Long idKhuyenMai, Long idNguoiDung){
+        return repo.findByIdKhuyenMaiAndIdNguoiDung(idKhuyenMai, idNguoiDung);
+    }
+
 }

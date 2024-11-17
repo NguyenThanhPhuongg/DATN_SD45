@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ApDungKhuyenMaiRepository extends JpaRepository<ApDungKhuyenMai, Long> {
@@ -16,4 +17,8 @@ public interface ApDungKhuyenMaiRepository extends JpaRepository<ApDungKhuyenMai
     void deleteByKhuyenMaiAndNotIn(@Param("idKhuyenMai") Long idKhuyenMai, @Param("idList") List<Long> idList);
 
     List<ApDungKhuyenMai> findByIdKhuyenMai(Long idKhuyenMai);
+
+    List<ApDungKhuyenMai> findByIdNguoiDungAndDaSuDung(Long idNguoiDung, Boolean daSuDung);
+
+    Optional<ApDungKhuyenMai> findByIdKhuyenMaiAndIdNguoiDung(Long idKhuyenMai, Long idNguoiDung);
 }

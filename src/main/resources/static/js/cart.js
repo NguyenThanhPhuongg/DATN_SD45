@@ -147,10 +147,13 @@ function renderCart(items) {
         const productItem = document.createElement('div');
         productItem.className = 'product-item';
         const itemHtml = `
-            <div>
+           <div>
                 <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} data-id="${item.id}">
-                <img src="${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}"> 
-                <span>${sanPham.ten || 'Sản phẩm không xác định'}<br>Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}</span>
+                <img class="product-image" src="/images/${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}">
+                <span>
+                    <span style="font-size: 20px;">${sanPham.ten || 'Sản phẩm không xác định'}</span>
+                    <span style="margin-left: 10px;">Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}</span>
+                </span>
             </div>
             <div class="price">₫${item.gia}</div>
             <div class="quantity">
@@ -199,4 +202,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Xóa selectedItems khỏi local storage khi trang được tải lại
     localStorage.removeItem('selectedItems');
     fetchCartData();
+});
+document.addEventListener('DOMContentLoaded', () => {
+    // Xóa selectedItems khỏi local storage khi trang được tải lại
+    localStorage.removeItem('selectedItems');
+    fetchCartData();
+
+    // Thêm sự kiện cho nút "Chọn Tất cả"
+    document.getElementById('selectAllCheckbox').addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        document.querySelectorAll('.product-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = isChecked;
+            handleCheckboxClick(checkbox.dataset.id, isChecked);
+        });
+    });
 });

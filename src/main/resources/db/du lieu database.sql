@@ -123,7 +123,7 @@ GO
 
 INSERT INTO [hoa_don] ([id_nguoi_dung], [ma], [id_dia_chi_giao_hang], [id_phuong_thuc_van_chuyen], [ngay_dat_hang], [ngay_thanh_toan], [tong_tien], [diem_su_dung], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
-(1, N'HĐ12345', 1, 1, GETDATE(), GETDATE(), 500000, 0, 0, GETDATE(), GETDATE(), 1, 1),
+(1, N'HĐ12383', 1, 1, GETDATE(), GETDATE(), 500000, 0, 0, GETDATE(), GETDATE(), 1, 1),
 (2, N'HĐ12346', 2, 2, GETDATE(), GETDATE(), 1000000, 100, 1, GETDATE(), GETDATE(), 1, 1),
 (3, N'HĐ12347', 3, 1, GETDATE(), GETDATE(), 200000, 0, 2, GETDATE(), GETDATE(), 1, 1),
 (4, N'HĐ12348', 4, 2, GETDATE(), GETDATE(), 700000, 50, 3, GETDATE(), GETDATE(), 1, 1),
@@ -132,7 +132,7 @@ GO
 
 INSERT INTO [chi_tiet_hoa_don] ([id_hoa_don], [id_san_pham_chi_tiet], [so_luong], [gia], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
-(1, 1, 2, 200000, 1, GETDATE(), GETDATE(), 1, 1),
+(4, 1, 2, 200000, 1, GETDATE(), GETDATE(), 1, 1),
 (2, 2, 5, 200000, 1, GETDATE(), GETDATE(), 1, 1),
 (3, 3, 1, 200000, 1, GETDATE(), GETDATE(), 1, 1),
 (4, 4, 3, 150000, 1, GETDATE(), GETDATE(), 1, 1),
@@ -187,21 +187,21 @@ GO
 INSERT INTO [san_pham] 
 ([id_danh_muc], [id_thuong_hieu], [id_chat_lieu], [ten], [ma], [xuat_xu], [mo_ta], [gia], [anh], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES
-(1, 1, 1, N'Áo thun nam', N'ATN001', N'Trung Quốc', N'Áo thun nam chất lượng cao', 199999, N'path_to_image1.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(1, 1, 2, N'Quần jean nam', N'QJN001', N'Việt Nam', N'Quần jean nam, bền và thời trang', 250900, N'path_to_image2.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(2, 2, 1, N'Áo sơ mi nữ', N'ASN001', N'Việt Nam', N'Áo sơ mi nữ thanh lịch, phù hợp với công sở', 350900, N'path_to_image3.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(2, 3, 2, N'Áo khoác nam', N'AKN001', N'Hàn Quốc', N'Áo khoác nam dày, ấm áp cho mùa đông', 450900, N'path_to_image4.jpg', 1, GETDATE(), GETDATE(), 1, 1),
-(3, 1, 3, N'Váy đầm nữ', N'VDN001', N'Thái Lan', N'Váy đầm nữ đẹp, nhẹ nhàng cho mùa hè', 399999, N'path_to_image5.jpg', 1, GETDATE(), GETDATE(), 1, 1);
+(1, 1, 1, N'Áo thun nam', N'ATN001', N'Trung Quốc', N'Áo thun nam chất lượng cao', 400000, N'path_to_image1.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(1, 1, 2, N'Quần jean nam', N'QJN001', N'Việt Nam', N'Quần jean nam, bền và thời trang', 200000, N'path_to_image2.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(2, 2, 1, N'Áo sơ mi nữ', N'ASN001', N'Việt Nam', N'Áo sơ mi nữ thanh lịch, phù hợp với công sở', 350000, N'path_to_image3.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(2, 3, 2, N'Áo khoác nam', N'AKN001', N'Hàn Quốc', N'Áo khoác nam dày, ấm áp cho mùa đông', 500000, N'path_to_image4.jpg', 1, GETDATE(), GETDATE(), 1, 1),
+(3, 1, 3, N'Váy đầm nữ', N'VDN001', N'Thái Lan', N'Váy đầm nữ đẹp, nhẹ nhàng cho mùa hè', 600000, N'path_to_image5.jpg', 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
 INSERT INTO [chi_tiet_san_pham] 
 ([id_san_pham], [id_size], [id_mau_sac], [so_luong], [gia], [ghi_chu], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES
-(1, 1, 1, 500, 199999, N'Áo thun màu đỏ, kích thước S', 1, GETDATE(), GETDATE(), 1, 1),
-(1, 2, 2, 300, 199999, N'Áo thun màu xanh, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
-(2, 3, 3, 400, 250900, N'Quần jean màu đen, kích thước L', 1, GETDATE(), GETDATE(), 1, 1),
-(3, 2, 4, 200, 350900, N'Áo sơ mi nữ màu trắng, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
-(4, 3, 5, 100, 450900, N'Áo khoác nam màu xanh, kích thước XL', 1, GETDATE(), GETDATE(), 1, 1);
+(1, 1, 1, 500, 400000, N'Áo thun màu đỏ, kích thước S', 1, GETDATE(), GETDATE(), 1, 1),
+(1, 2, 2, 300, 200000, N'Áo thun màu xanh, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
+(2, 3, 3, 400, 350000, N'Quần jean màu đen, kích thước L', 1, GETDATE(), GETDATE(), 1, 1),
+(3, 2, 4, 200, 500000, N'Áo sơ mi nữ màu trắng, kích thước M', 1, GETDATE(), GETDATE(), 1, 1),
+(4, 3, 5, 100, 600000, N'Áo khoác nam màu xanh, kích thước XL', 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
 INSERT INTO [thuong_hieu] ([ten], [mo_ta], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
@@ -240,22 +240,23 @@ VALUES
 (5, 5, 5, 5, N'Giá trị tuyệt vời cho sản phẩm, sẽ mua lại!', 1, 1, 1);
 GO
 
-INSERT INTO [khuyen_mai] ([ten], [mo_ta], [loai], [gia_tri], [ngay_bat_dau], [ngay_ket_thuc], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
+INSERT INTO [khuyen_mai] ([ten], [ma], [mo_ta], [loai], [gia_tri], [ngay_bat_dau], [ngay_ket_thuc], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
 VALUES
-(N'Giảm giá mùa thu', N'Miễn phí vận chuyển cho đơn hàng trên 500k', 1, 50.00, '2024-11-01', '2024-11-30', 1, 1, 1),
-(N'Khuyến mãi Black Friday', N'Tặng 20% cho các sản phẩm trong danh mục', 2, 20.00, '2024-11-20', '2024-11-25', 1, 1, 1),
-(N'Tặng quà cho khách hàng mới', N'Tặng quà cho đơn hàng đầu tiên', 3, 100.00, '2024-11-10', '2024-11-15', 1, 1, 1),
-(N'Mua 1 tặng 1', N'Mua 1 sản phẩm tặng 1 sản phẩm khác', 1, 0.00, '2024-12-01', '2024-12-10', 1, 1, 1),
-(N'Tặng voucher 10%', N'Tặng voucher giảm giá cho lần mua tiếp theo', 3, 10.00, '2024-11-05', '2024-11-10', 1, 1, 1);
+(N'Giảm giá mùa thu', N'KM001', N'Miễn phí vận chuyển cho đơn hàng trên 500k', 1, 50.00, '2024-11-01', '2024-11-30', 1, 1, 1),
+(N'Khuyến mãi Black Friday', N'KM002', N'Tặng 20% cho các sản phẩm trong danh mục', 2, 20.00, '2024-11-20', '2024-11-25', 1, 1, 1),
+(N'Tặng quà cho khách hàng mới', N'KM003', N'Tặng quà cho đơn hàng đầu tiên', 3, 100.00, '2024-11-10', '2024-11-15', 1, 1, 1),
+(N'Mua 1 tặng 1', N'KM004',N'Mua 1 sản phẩm tặng 1 sản phẩm khác', 1, 0.00, '2024-12-01', '2024-12-10', 1, 1, 1),
+(N'Tặng voucher 10%', N'KM005', N'Tặng voucher giảm giá cho lần mua tiếp theo', 3, 10.00, '2024-11-05', '2024-11-10', 1, 1, 1);
 GO
 
-INSERT INTO [ap_dung_khuyen_mai] ([id_khuyen_mai], [id_gio_hang], [id_hoa_don], [gia_tri_giam], [ngay_ap_dung], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
+INSERT INTO [ap_dung_khuyen_mai] ([id_khuyen_mai], [id_san_pham], [id_nguoi_dung],
+[gia_tri_giam], [ngay_ap_dung], [trang_thai], [da_su_dung], [nguoi_tao], [nguoi_cap_nhat])
 VALUES
-(1, 1, 1, 50.00, '2024-11-01', 1, 1, 1),
-(2, 2, 2, 20.00, '2024-11-20', 1, 1, 1),
-(3, 3, 3, 100.00, '2024-11-10', 1, 1, 1),
-(4, 4, 4, 0.00, '2024-12-01', 1, 1, 1),
-(5, 5, 5, 10.00, '2024-11-05', 1, 1, 1);
+(1, 1, 1, 50.00, '2024-11-01', 1, 0, 1, 1),
+(2, 2, 2, 20.00, '2024-11-20', 1, 0, 1, 1),
+(3, 3, 3, 100.00, '2024-11-10', 1, 0, 1, 1),
+(4, 4, 4, 0.00, '2024-12-01', 1, 0, 1, 1),
+(5, 5, 5, 10.00, '2024-11-05', 1, 0, 1, 1);
 GO
 
 INSERT INTO [blog] ([tac_gia], [title], [content], [hinh_anh], [content_2], [hinh_anh_2], [content_3], [hinh_anh_3], [trang_thai], [nguoi_tao], [nguoi_cap_nhat])
@@ -306,7 +307,7 @@ select * from gio_hang
 --select * from danh_muc 
 select * from size where id =1 
 select * from mau_sac 
---select * from chat_lieu 
+select * from chat_lieu 
 --select * from chuc_nang 
 --select * from nhom 
 --select * from nhom_chuc_nang 
@@ -315,18 +316,20 @@ select * from mau_sac
 --select * from hinh_anh 
 --select * from khuyen_mai 
 --select * from ap_dung_khuyen_mai 
---select * from blog
---select * from ap_dung_khuyen_mai 
-
---select * from thanh_toan
---select * from phuong_thuc_thanh_toan
 select * from chi_tiet_hoa_don 
---select * from gio_hang 
---select * from chi_tiet_gio_hang 
 select * from hoa_don 
---select * from phuong_thuc_van_chuyen 
---select * from dia_chi_giao_hang 
 select * from nguoi_dung 
+
+
+INSERT INTO [chi_tiet_hoa_don] ([id_hoa_don], [id_san_pham_chi_tiet], [so_luong], [gia], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
+VALUES 
+(7, 1, 2, 200000, 1, GETDATE(), GETDATE(), 1, 1),
+(7, 2, 5, 200000, 1, GETDATE(), GETDATE(), 1, 1),
+(7, 1, 1, 200000, 1, GETDATE(), GETDATE(), 1, 1),
+(7, 2, 3, 150000, 1, GETDATE(), GETDATE(), 1, 1),
+(7, 1, 4, 200000, 1, GETDATE(), GETDATE(), 1, 1);
+GO
+
 
 SELECT * FROM [san_pham];
 SELECT * FROM [chi_tiet_san_pham];

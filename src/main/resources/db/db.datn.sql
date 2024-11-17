@@ -3,7 +3,7 @@ GO
 USE [DB.DATN]
 GO
 
----DROP DATABASE [DB.DATN]
+----DROP DATABASE [DB.DATN]
 --- Chuc nang
 SET ANSI_NULLS ON
 GO
@@ -778,6 +778,30 @@ CREATE TABLE [yeu_cau_doi_tra_chi_tiet]
 ) ON [PRIMARY];
 GO
 
+--- san pham doi tra
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [san_pham_doi_tra]
+(
+    [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED
+    (
+        [id] ASC
+    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+    [id_san_pham_chi_tiet] BIGINT, 
+    [id_yeu_cau_doi_tra] BIGINT, 
+    [so_luong] INT, 
+    [ly_do] NVARCHAR(1000), 
+    [trang_thai] INT DEFAULT 1,
+    [ngay_tao] DATETIME DEFAULT GETDATE(),
+    [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
+    [nguoi_tao] BIGINT, 
+    [nguoi_cap_nhat] BIGINT 
+) ON [PRIMARY];
+GO
+
+
 --- Blog
 SET ANSI_NULLS ON
 GO
@@ -848,4 +872,5 @@ CREATE TABLE [rep_binh_luan]
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
 GO
+
 

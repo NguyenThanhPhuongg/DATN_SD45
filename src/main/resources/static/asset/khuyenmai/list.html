@@ -10,7 +10,8 @@
         </div>
         <div class="card-body">
             <div class="d-flex align-items-center mb-3">
-                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2" style="flex: 2;" />
+                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"
+                       style="flex: 2;"/>
 
                 <select ng-model="selectedLoai" class="form-select" ng-change="pager.updateItems()" style="flex: 1;">
                     <option value="">Tất cả Loại</option>
@@ -52,8 +53,13 @@
                     </td>
                     <td>
                         <div class="btn-group btn-group-xs">
-                            <button class="btn btn-link" type="button" data-bs-toggle="modal" data-bs-target="#viewDetailModal" ng-click="viewDetail(item.id)">
+                            <button class="btn btn-link" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#viewDetailModal" ng-click="viewDetail(item.id)">
                                 <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button class="btn btn-link" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#viewDetailModal" ng-click="editDetail(item.id)">
+                                <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-link" type="button" ng-click="delete(item)">
                                 <i class="fas fa-times icon-close"></i>
@@ -111,11 +117,13 @@
                                 <label class="form-label">Loại khuyến mãi</label>
                                 <div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="khuyenMaiLoai" ng-model="form.loai" ng-value="1" ng-change="onLoaiChange()">
+                                        <input class="form-check-input" type="radio" name="khuyenMaiLoai"
+                                               ng-model="form.loai" ng-value="1" ng-change="onLoaiChange()">
                                         <label class="form-check-label">Sản phẩm</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="khuyenMaiLoai" ng-model="form.loai" ng-value="2" ng-change="onLoaiChange()">
+                                        <input class="form-check-input" type="radio" name="khuyenMaiLoai"
+                                               ng-model="form.loai" ng-value="2" ng-change="onLoaiChange()">
                                         <label class="form-check-label">Người dùng</label>
                                     </div>
                                 </div>
@@ -125,29 +133,31 @@
                             <div class="form-group" ng-show="form.loai === 1">
                                 <label for="inputTen" class="form-label">Tên khuyến mãi</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
-<!--                                <span class="text-danger" ng-show="error.ten">Tên khuyến mãi phải từ 1 đến 100 ký tự.</span>-->
+                                <!--                                <span class="text-danger" ng-show="error.ten">Tên khuyến mãi phải từ 1 đến 100 ký tự.</span>-->
                             </div>
                             <div class="form-group" ng-show="form.loai === 2">
                                 <label for="inputMa" class="form-label">Mã khuyến mãi</label>
                                 <input type="text" class="form-control" id="inputMa" ng-model="form.ma">
-<!--                                <span class="text-danger" ng-show="error.ten">Tên khuyến mãi phải từ 1 đến 100 ký tự.</span>-->
+                                <!--                                <span class="text-danger" ng-show="error.ten">Tên khuyến mãi phải từ 1 đến 100 ký tự.</span>-->
                             </div>
-                            <div class="form-group" >
+                            <div class="form-group">
                                 <label for="inputMoTa" class="form-label">Mô tả</label>
                                 <input type="text" class="form-control" id="inputMoTa" ng-model="form.moTa">
                             </div>
-                            <div class="form-group" >
+                            <div class="form-group">
                                 <label for="inputGiaTri" class="form-label">Giá trị</label>
-                                <input type="number" class="form-control" id="inputGiaTri" ng-model="form.giaTri" >
+                                <input type="number" class="form-control" id="inputGiaTri" ng-model="form.giaTri">
                             </div>
                             <div class="form-group">
                                 <label for="inputNgayBatDau" class="form-label">Ngày bắt đầu</label>
-                                <input type="datetime-local" class="form-control" id="inputNgayBatDau" ng-model="form.ngayBatDau">
+                                <input type="datetime-local" class="form-control" id="inputNgayBatDau"
+                                       ng-model="form.ngayBatDau">
                             </div>
 
                             <div class="form-group">
                                 <label for="inputNgayKetThuc" class="form-label">Ngày kết thúc</label>
-                                <input type="datetime-local" class="form-control" id="inputNgayKetThuc" ng-model="form.ngayKetThuc">
+                                <input type="datetime-local" class="form-control" id="inputNgayKetThuc"
+                                       ng-model="form.ngayKetThuc">
                             </div>
 
 
@@ -157,7 +167,8 @@
                                 <table class="table table-striped">
                                     <thead>
                                     <tr>
-                                        <th><input type="checkbox" ng-model="selectAllProducts" ng-change="toggleSelectAllProducts()"></th>
+                                        <th><input type="checkbox" ng-model="selectAllProducts"
+                                                   ng-change="toggleSelectAllProducts()"></th>
                                         <th>STT</th>
                                         <th>Mã sản phẩm</th>
                                         <th>Tên sản phẩm</th>
@@ -167,7 +178,7 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="sp in products">
-                                        <td><input type="checkbox" ng-model="sp.selected" /></td>
+                                        <td><input type="checkbox" ng-model="sp.selected"/></td>
                                         <td>{{$index + 1}}</td>
                                         <td>{{sp.ma}}</td>
                                         <td>{{sp.ten}}</td>
@@ -179,13 +190,13 @@
                             </div>
 
 
-
                             <div ng-show="form.loai === 2">
                                 <label class="form-label">Chọn người dùng</label>
                                 <table class="table table-striped">
                                     <thead>
                                     <tr>
-                                        <th><input type="checkbox" ng-model="selectAllUsers" ng-change="toggleSelectAllUsers()"></th>
+                                        <th><input type="checkbox" ng-model="selectAllUsers"
+                                                   ng-change="toggleSelectAllUsers()"></th>
                                         <th>STT</th>
                                         <th>Tên người dùng</th>
                                         <th>Tên đăng nhập</th>
@@ -193,7 +204,7 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="nd in users">
-                                        <td><input type="checkbox" ng-model="nd.selected" /></td>
+                                        <td><input type="checkbox" ng-model="nd.selected"/></td>
                                         <td>{{$index + 1}}</td>
                                         <td>{{nd.profile.hoVaTen}}</td>
                                         <td>{{nd.userName}}</td>
@@ -212,11 +223,13 @@
         </div>
     </div>
     <!-- Modal Xem Chi Tiết -->
-    <div class="modal fade" id="viewDetailModal" tabindex="-1" aria-labelledby="viewDetailModalLabel" aria-hidden="true">
+    <div class="modal fade" id="viewDetailModal" tabindex="-1" aria-labelledby="viewDetailModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="viewDetailModalLabel">Chi Tiết Khuyến Mãi</h5>
+                    <h5 class="modal-title" id="viewDetailModalLabel">{{isEditMode ? 'Chỉnh sửa' : 'Chi Tiết'}} Khuyến
+                        Mãi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 200px);">
@@ -225,42 +238,61 @@
                             <!-- Hiển thị thông tin chi tiết khuyến mãi -->
                             <div class="form-group">
                                 <label for="detailTen" class="form-label">Tên khuyến mãi</label>
-                                <input type="text" class="form-control" id="detailTen" ng-model="detailForm.ten" disabled>
+                                <input type="text" class="form-control" id="detailTen" ng-model="detailForm.ten"
+                                       ng-disabled="!isEditMode">
                             </div>
                             <div class="form-group">
                                 <label for="detailMa" class="form-label">Mã khuyến mãi</label>
-                                <input type="text" class="form-control" id="detailMa" ng-model="detailForm.ma" disabled>
+                                <input type="text" class="form-control" id="detailMa" ng-model="detailForm.ma"
+                                       ng-disabled="!isEditMode">
                             </div>
                             <div class="form-group">
                                 <label for="detailMoTa" class="form-label">Mô tả</label>
-                                <input type="text" class="form-control" id="detailMoTa" ng-model="detailForm.moTa" disabled>
+                                <input type="text" class="form-control" id="detailMoTa" ng-model="detailForm.moTa"
+                                       ng-disabled="!isEditMode">
                             </div>
                             <div class="form-group">
                                 <label for="detailGiaTri" class="form-label">Giá trị</label>
-                                <input type="number" class="form-control" id="detailGiaTri" ng-model="detailForm.giaTri" disabled>
+                                <input type="number" class="form-control" id="detailGiaTri" ng-model="detailForm.giaTri"
+                                       ng-disabled="!isEditMode">
                             </div>
                             <div class="form-group">
                                 <label for="detailNgayBatDau" class="form-label">Ngày bắt đầu</label>
-                                <input type="datetime-local" class="form-control" id="detailNgayBatDau" ng-model="detailForm.ngayBatDau" disabled>
+                                <input type="datetime-local" class="form-control" id="detailNgayBatDau"
+                                       ng-model="detailForm.ngayBatDau" value="{{ detailForm.ngayBatDau }}"
+                                       ng-disabled="!isEditMode">
                             </div>
                             <div class="form-group">
                                 <label for="detailNgayKetThuc" class="form-label">Ngày kết thúc</label>
-                                <input type="datetime-local" class="form-control" id="detailNgayKetThuc" ng-model="detailForm.ngayKetThuc" disabled>
+                                <input type="datetime-local" class="form-control" id="detailNgayKetThuc"
+                                       ng-model="detailForm.ngayKetThuc" value="{{ detailForm.ngayKetThuc }}"
+                                       ng-disabled="!isEditMode">
                             </div>
                             <div class="form-group">
                                 <label for="detailLoai" class="form-label">Loại</label>
-                                <input type="text" class="form-control" id="detailLoai" ng-model="detailForm.loaiText" disabled>
+                                <select class="form-control" id="detailLoai" ng-model="detailForm.loai"
+                                        ng-options="loai for loai in loaiOptions"
+                                        ng-disabled="!isEditMode">
+                                    <option value="" disabled>Chọn loại</option>
+                                </select>
+
+                                <div ng-if="!isEditMode" class="form-control-plaintext">
+                                    {{ detailForm.loai }}
+                                </div>
                             </div>
+
                         </form>
                     </div>
 
-                    <!-- Table: Sản phẩm hoặc Người dùng (Dựa trên Loại) -->
-                    <div ng-show="detailForm.loaiText === 'Sản phẩm'">
+                    <!-- Table: Sản phẩm -->
+                    <div ng-show="detailForm.loai === 'Sản phẩm'">
                         <label class="form-label">Danh sách sản phẩm</label>
                         <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
+                                    <th><input type="checkbox" ng-model="selectAllProducts"
+                                               ng-change="toggleSelectAllProducts()" ng-disabled="!isEditMode"></th>
                                     <th>STT</th>
                                     <th>Mã sản phẩm</th>
                                     <th>Tên sản phẩm</th>
@@ -270,6 +302,10 @@
                                 </thead>
                                 <tbody>
                                 <tr ng-repeat="sp in products">
+                                    <td>
+                                        <input type="checkbox" ng-model="sp.selected" ng-checked="sp.selected"
+                                               ng-disabled="!isEditMode">
+                                    </td>
                                     <td>{{$index + 1}}</td>
                                     <td>{{sp.ma}}</td>
                                     <td>{{sp.ten}}</td>
@@ -281,12 +317,15 @@
                         </div>
                     </div>
 
-                    <div ng-show="detailForm.loaiText === 'Người dùng'">
+                    <!-- Table: Người dùng -->
+                    <div ng-show="detailForm.loai === 'Người dùng'">
                         <label class="form-label">Danh sách người dùng</label>
                         <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
+                                    <th><input type="checkbox" ng-model="selectAllUsers"
+                                               ng-change="toggleSelectAllUsers()" ng-disabled="!isEditMode"></th>
                                     <th>STT</th>
                                     <th>Tên người dùng</th>
                                     <th>Tên đăng nhập</th>
@@ -294,6 +333,10 @@
                                 </thead>
                                 <tbody>
                                 <tr ng-repeat="nd in users">
+                                    <td>
+                                        <input type="checkbox" ng-model="nd.selected" ng-checked="nd.selected"
+                                               ng-disabled="!isEditMode">
+                                    </td>
                                     <td>{{$index + 1}}</td>
                                     <td>{{nd.profile.hoVaTen}}</td>
                                     <td>{{nd.userName}}</td>
@@ -306,12 +349,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" ng-click="updateKhuyenMai()" ng-show="isEditMode">
+                        Lưu
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
-
 
 
 </div>

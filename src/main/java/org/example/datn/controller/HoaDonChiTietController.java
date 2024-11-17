@@ -19,7 +19,6 @@ public class HoaDonChiTietController {
 
     @Autowired
     HoaDonChiTietProcessor processor;
-
     @PostMapping("/get-list-by-status")
     public ResponseEntity<ServiceResult> getListByStatus(@RequestBody HoaDonChiTietRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.getListByStatus(request, ua));
@@ -27,6 +26,10 @@ public class HoaDonChiTietController {
     @GetMapping
     public ResponseEntity<ServiceResult> getAll() {
         return ResponseEntity.ok(processor.getAll());
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ServiceResult> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(processor.getById(id));
     }
 
 }

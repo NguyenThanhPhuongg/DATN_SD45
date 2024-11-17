@@ -132,6 +132,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, URI_GET_PERMIT).permitAll()
                 .antMatchers(HttpMethod.PUT, URI_PUT_PERMIT).permitAll()
                 .antMatchers(HttpMethod.DELETE, URI_DELETE_PERMIT).permitAll()
+//                .antMatchers("/staff/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll(); // Cho phép tất cả các request mà không cần xác thực
 
         // Optional: Uncomment if you want to allow form login and logout

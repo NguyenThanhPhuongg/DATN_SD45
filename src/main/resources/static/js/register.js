@@ -1,11 +1,25 @@
 $(document).ready(function() {
+    // Xử lý khi nhấn vào nút Đăng ký
     $('#registerButton').click(function(event) {
-        event.preventDefault();
+        event.preventDefault(); // Ngừng hành động mặc định của nút
 
+        handleRegister();  // Gọi hàm đăng ký
+    });
+
+    // Xử lý khi nhấn Enter trong form
+    $('#create_customer input').keypress(function(event) {
+        if (event.which === 13) { // Kiểm tra nếu phím Enter (key code 13) được nhấn
+            event.preventDefault();  // Ngừng hành động mặc định (nếu có)
+            handleRegister();  // Gọi hàm đăng ký
+        }
+    });
+
+    // Hàm xử lý đăng ký
+    function handleRegister() {
         const form = $('#create_customer')[0];
 
         if (!form.checkValidity()) {
-            form.reportValidity();
+            form.reportValidity();  // Hiển thị thông báo lỗi nếu form không hợp lệ
             return;
         }
 
@@ -39,8 +53,9 @@ $(document).ready(function() {
                 hideMessageAfterDelay();
             }
         });
-    });
+    }
 
+    // Hàm ẩn thông báo sau khi delay
     function hideMessageAfterDelay() {
         setTimeout(function() {
             $('#message').fadeOut('slow', function() {

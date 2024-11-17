@@ -91,7 +91,6 @@ public class JwtReader {
         var email = claims.get("email", String.class);
         var phone = claims.get("phone", String.class);
         var role = claims.get("role", String.class);
-        var departmentId = claims.get("departmentId", Long.class);
         var authorities = getAuthorities(userId, role, claims);
 
         return UserAuthentication.of(userId, username, fullName, email, phone, authorities, role);

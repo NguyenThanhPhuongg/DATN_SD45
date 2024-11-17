@@ -38,19 +38,22 @@
                     <td>{{item.ten}}</td>
                     <td>{{item.moTa}}</td>
                     <td>
-                        <div class="badge" ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                        <div class="badge" ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 2, 'bg-secondary': item.trangThai === 3}">
                             <span ng-if="item.trangThai === 1">Active</span>
-                            <span ng-if="item.trangThai === 3">Locked</span>
-                            <span ng-if="item.trangThai === 2">Khác</span>
+                            <span ng-if="item.trangThai === 2">Locked</span>
+                            <span ng-if="item.trangThai === 3">Khác</span>
                         </div>
                     </td>
                     <td>
                         <div class="btn-group btn-group-xs">
+                            <button class="btn btn-link" type="button" ng-click="updateTrangThaiTo1(item)">
+                                <i class="fas fa-check icon-check"></i>
+                            </button>
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
                                     data-bs-target="#exampleModal" ng-click="edit(item)">
                                 <i class="fas fa-info-circle"></i>
                             </button>
-                            <button class="btn btn-link" type="button" ng-click="delete(item)">
+                            <button class="btn btn-link" type="button" ng-click="updateTrangThaiTo2(item)">
                                 <i class="fas fa-times icon-close"></i>
                             </button>
                         </div>
