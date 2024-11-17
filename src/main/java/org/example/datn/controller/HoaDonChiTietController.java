@@ -19,7 +19,6 @@ public class HoaDonChiTietController {
 
     @Autowired
     HoaDonChiTietProcessor processor;
-
     @PostMapping("/get-list-by-status")
     public ResponseEntity<ServiceResult> getListByStatus(@RequestBody HoaDonChiTietRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.getListByStatus(request, ua));

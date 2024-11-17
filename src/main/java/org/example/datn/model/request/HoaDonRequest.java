@@ -14,5 +14,7 @@ public class HoaDonRequest {
     private Long idPhuongThucVanChuyen;
     private Long idPhuongThucThanhToan;
     private Integer diemSuDung;
+    private Integer trangThai;
+
     private BigDecimal giaTriVoucher;
 }

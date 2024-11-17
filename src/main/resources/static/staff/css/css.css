@@ -11389,3 +11389,10 @@ input:checked + .slider:before {
     border-radius: 10px;
 }
 
+/*////////////////// thóng ke*/
+#topProductsChart {
+    display: block;
+    margin: 0 auto; /* Căn giữa biểu đồ */
+    max-width: 100%; /* Biểu đồ không vượt quá cột */
+    height: 400px; /* Đặt chiều cao cố định */
+}

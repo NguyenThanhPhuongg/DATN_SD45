@@ -53,8 +53,8 @@ public class HoaDonController {
         return ResponseEntity.ok(processor.save(request, ua));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody HoaDonModel request) {
-        ServiceResult result = processor.update(id, request);
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody HoaDonRequest request,UserAuthentication ua) {
+        ServiceResult result = processor.update(id, request,ua);
         return ResponseEntity.ok(result);
     }
 

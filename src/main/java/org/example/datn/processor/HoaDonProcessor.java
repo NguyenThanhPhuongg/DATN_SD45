@@ -114,7 +114,7 @@ public class HoaDonProcessor {
         model.setTongTien(hoaDon.getTongTien());
         model.setDiemSuDung(hoaDon.getDiemSuDung());
         model.setTrangThai(hoaDon.getTrangThai());
-
+        model.setNgayCapNhat(hoaDon.getNgayCapNhat());
         return model;
     }
 
@@ -201,10 +201,11 @@ public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
         return sb.toString();
     }
 
-    public ServiceResult update(Long id, HoaDonModel request) {
+    public ServiceResult update(Long id, HoaDonRequest request, UserAuthentication ua) {
         HoaDon hoaDon = service.findById(id).orElseThrow(() -> new EntityNotFoundException("hoaDon.not.found"));
         BeanUtils.copyProperties(request, hoaDon);
-        // Lưu hóa đơn cập nhật
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
+        hoaDon.setNguoiCapNhat(ua.getPrincipal());
         service.save(hoaDon);
 
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
