@@ -1,6 +1,7 @@
 package org.example.datn.controller;
 
 import org.example.datn.entity.DanhMuc;
+import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DanhMucRequest;
@@ -52,9 +53,29 @@ public class HoaDonController {
     public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.save(request, ua));
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody HoaDonRequest request,UserAuthentication ua) {
-        ServiceResult result = processor.update(id, request,ua);
+//    @PutMapping("/{id}")
+//    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody HoaDonRequest request,UserAuthentication ua) {
+//        ServiceResult result = processor.update(id, request,ua);
+//        return ResponseEntity.ok(result);
+//    }
+
+    @GetMapping("/get-by-status")
+    public ResponseEntity<ServiceResult> getByTrangThai(@RequestParam Integer trangThai) {
+        ServiceResult result = processor.getByTrangThai(trangThai);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/update-status/{id}")
+    public ResponseEntity<ServiceResult> updateByTrangThai(@PathVariable Long id,
+                                                           UserAuthentication ua) throws DuplicatedException {
+        ServiceResult result = processor.updateStatus(id ,ua);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/update-huy-tra/{id}")
+    public ResponseEntity<ServiceResult> updateByTrangThaiHuyTra(@PathVariable Long id,
+                                                      UserAuthentication ua) {
+        ServiceResult result = processor.updateHuyHoaDon(id, ua);
         return ResponseEntity.ok(result);
     }
 

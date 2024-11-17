@@ -1,6 +1,7 @@
 package org.example.datn.controller;
 
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.processor.SanPhamProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +27,22 @@ public class SanPhamController {
     }
 
     @PostMapping
-    public ResponseEntity<ServiceResult> add(@RequestParam("file") MultipartFile file, @ModelAttribute SanPhamModel model) {
-        return ResponseEntity.ok(processor.save(model, file));
+    public ResponseEntity<ServiceResult> add(@RequestParam("file") MultipartFile file, @ModelAttribute SanPhamModel model, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.save(model, file,ua));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResult> update(@PathVariable Long id,
                                                 @RequestParam(value = "file", required = false) MultipartFile file,
-                                                @ModelAttribute SanPhamModel model) {
+                                                @ModelAttribute SanPhamModel model,
+                                                UserAuthentication ua) {
         // Kiểm tra nếu có file ảnh mới
         if (file != null && !file.isEmpty()) {
             // Nếu có ảnh mới, xử lý ảnh và cập nhật thông tin sản phẩm
-            return ResponseEntity.ok(processor.update(id, model, file));
+            return ResponseEntity.ok(processor.update(id, model, file,ua));
         } else {
             // Nếu không có ảnh mới, chỉ cập nhật thông tin sản phẩm mà không thay đổi ảnh
-            return ResponseEntity.ok(processor.update(id, model));
+            return ResponseEntity.ok(processor.update(id, model,ua));
         }
     }
     @DeleteMapping("/{id}")
@@ -49,8 +51,8 @@ public class SanPhamController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<ServiceResult> updateStatus(@PathVariable Long id, @RequestParam("status") int status) {
-        return ResponseEntity.ok(processor.updateStatus(id, status));
+    public ResponseEntity<ServiceResult> updateStatus(@PathVariable Long id, @RequestParam("status") int status, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.updateStatus(id, status,ua));
     }
 
 }

@@ -161,17 +161,22 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 1);
-                formData.append("ngayTao", now);
-                formData.append("ngayCapNhat", now);
-                formData.append("nguoiTao", 1);
-                formData.append("nguoiCapNhat", 1);
+                // formData.append("ngayTao", now);
+                // formData.append("ngayCapNhat", now);
+                // formData.append("nguoiTao", 1);
+                // formData.append("nguoiCapNhat", 1);
 
                 if ($scope.form.anh) {
                     formData.append("file", $scope.form.anh);
                 }
 
+                const token = localStorage.getItem('token'); // Điều chỉnh key 'authToken' theo token bạn lưu trữ trong localStorage
+
                 $http.post("/san-pham", formData, {
-                    headers: { 'Content-Type': undefined }
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
+                    }
                 }).then(response => {
                     $http.get("/san-pham").then(resp => {
                         const dataArray = resp.data.data;
@@ -190,8 +195,13 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                                 nguoiTao: 1,
                                 nguoiCapNhat: 1
                             }));
+                            const token = localStorage.getItem('token'); // Điều chỉnh key 'authToken' theo token bạn lưu trữ trong localStorage
 
-                            const addDetailsPromises = sanPhamChiTietList.map(detail => $http.post("/spct", detail));
+                            const addDetailsPromises = sanPhamChiTietList.map(detail => $http.post("/spct", detail, {
+                                headers: {
+                                    'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                                }
+                            }));
                             addDetailsPromises.push($scope.uploadImages(createdSanPham.id));
 
                             Promise.all(addDetailsPromises).then(() => {

@@ -80,7 +80,9 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
         $scope.pager.page = 0; // Reset về trang đầu tiên
         fetchUsers();
     });
-
+    $scope.newAccount = {
+        role: 'USER'
+    };
     // Hàm thêm tài khoản
     $scope.addAccount = function () {
         if ($scope.newAccount.password !== $scope.newAccount.retypePassword) {

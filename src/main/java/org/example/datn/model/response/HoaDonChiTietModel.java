@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,5 +20,6 @@ public class HoaDonChiTietModel {
     private BigDecimal gia;
     private Integer trangThai;
 
+    private HoaDonModel hoaDonModel;
     private SanPhamChiTietModel sanPhamChiTietModel;
 }

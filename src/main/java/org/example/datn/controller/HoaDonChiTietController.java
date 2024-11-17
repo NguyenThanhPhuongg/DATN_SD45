@@ -32,4 +32,8 @@ public class HoaDonChiTietController {
         return ResponseEntity.ok(processor.getById(id));
     }
 
+    @GetMapping("/get-id-hoa-don")
+    public ServiceResult getByIdHoaDon(@RequestParam Long idHoaDon) {
+        return processor.getByIdHoaDon(idHoaDon);
+    }
 }

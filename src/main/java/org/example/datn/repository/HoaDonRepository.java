@@ -11,12 +11,11 @@ import java.util.Optional;
 
 @Repository
 public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
-    @Query("SELECT p FROM HoaDon p WHERE p.id = ?1")
-    List<HoaDon> findByCateId(Long cid);
-
     HoaDon findTopByOrderByNgayTaoDesc();
 
     List<HoaDon> findByIdNguoiDung(Long idNguoiDung);
 
     Optional<HoaDon> findByMa(String ma);
+
+    List<HoaDon> findByTrangThai(Integer trangThai);
 }
