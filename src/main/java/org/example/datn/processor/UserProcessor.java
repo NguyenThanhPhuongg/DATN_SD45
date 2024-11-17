@@ -201,7 +201,7 @@ public class UserProcessor {
         var user = new User();
         user.setUserName(model.getEmail());
         user.setPassword(hashedPass);
-        user.setRole(UserRoles.CLIENT);
+        user.setRole(model.getRole() != null ? model.getRole() : UserRoles.CLIENT);
         user.setStatus(UserStatus.ACTIVE);
         user.setType(UserType.NORMAL);
         user.setXacThuc(false);
