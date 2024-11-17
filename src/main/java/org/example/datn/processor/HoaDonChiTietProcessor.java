@@ -22,7 +22,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+<<<<<<< HEAD
 import java.util.List;
+=======
+import javax.persistence.EntityNotFoundException;
+>>>>>>> dc62a7084b6166036f4cf72d42484c581565415d
 import java.util.stream.Collectors;
 
 /**
@@ -154,4 +158,15 @@ public class HoaDonChiTietProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    public ServiceResult getById(Long id) {
+        var model = service.findById(id)
+               .map(hoaDonChiTiet -> {
+                    var m = toModel(hoaDonChiTiet);
+                    var sanPhamChiTiet = sanPhamChiTietprocessor.findById(hoaDonChiTiet.getIdSanPhamChiTiet());
+                    m.setSanPhamChiTietModel(sanPhamChiTiet);
+                    return m;
+                })
+               .orElseThrow(() -> new EntityNotFoundException("hoaDonChiTiet.not.found"));
+        return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
 }

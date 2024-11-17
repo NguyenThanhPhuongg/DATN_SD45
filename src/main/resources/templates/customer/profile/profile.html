@@ -959,7 +959,7 @@
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
             cccd: document.getElementById('cccd').value,
-            gioiTinh: document.querySelector('input[name="gender"]:checked').value,
+            gioiTinh: document.querySelector('input[name="gender"]:checked')?.value || null,
             ngaySinh: document.getElementById('dob').value
         };
     }

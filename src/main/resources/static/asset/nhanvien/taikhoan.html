@@ -6,9 +6,12 @@
                 <i class="fas fa-table me-1"></i>
                 Danh sách tài khoản người dùng
             </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal" data-bs-target="#addModal">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-bs-toggle="modal"
+                 data-bs-target="#addModal">
                 <!-- Nút thêm mới -->
-                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addModal">Thêm mới</button>
+                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addModal">Thêm
+                    mới
+                </button>
             </div>
         </div>
         <div class="card-body">
@@ -20,7 +23,8 @@
             </div>
 
             <!-- Ô tìm kiếm theo hoVaTen -->
-            <input type="text" ng-model="searchText" placeholder="Tìm kiếm theo họ và tên..." class="form-control mb-3" ng-change="fetchUsers()"/>
+            <input type="text" ng-model="searchText" placeholder="Tìm kiếm theo họ và tên..." class="form-control mb-3"
+                   ng-change="fetchUsers()"/>
 
             <table class="table table-striped">
                 <thead>
@@ -46,10 +50,14 @@
                     <td>
                         <button class="btn btn-warning" ng-click="detailUser(user.id)">Xem chi tiết</button>
                         <!-- Nút Khóa khi người dùng có trạng thái ACTIVE -->
-                        <button class="btn btn-danger" ng-if="user.status === 'ACTIVE'" ng-click="prepareLockUser(user)">Khóa</button>
+                        <button class="btn btn-danger" ng-if="user.status === 'ACTIVE'"
+                                ng-click="prepareLockUser(user)">Khóa
+                        </button>
 
                         <!-- Nút Mở khóa khi người dùng có trạng thái LOCKED -->
-                        <button class="btn btn-success" ng-if="user.status === 'LOCKED'" ng-click="prepareUnlockUser(user)">Mở khóa</button>
+                        <button class="btn btn-success" ng-if="user.status === 'LOCKED'"
+                                ng-click="prepareUnlockUser(user)">Mở khóa
+                        </button>
                     </td>
                     </td>
                 </tr>
@@ -89,7 +97,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" ng-model="newAccount.email" required>
+                                <input type="email" class="form-control" id="email" ng-model="newAccount.email"
+                                       required>
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Số điện thoại</label>
@@ -97,15 +106,25 @@
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Mật khẩu</label>
-                                <input type="password" class="form-control" id="password" ng-model="newAccount.password" required>
+                                <input type="password" class="form-control" id="password" ng-model="newAccount.password"
+                                       required>
                             </div>
                             <div class="mb-3">
                                 <label for="retypePassword" class="form-label">Nhập lại mật khẩu</label>
-                                <input type="password" class="form-control" id="retypePassword" ng-model="newAccount.retypePassword" required>
+                                <input type="password" class="form-control" id="retypePassword"
+                                       ng-model="newAccount.retypePassword" required>
                             </div>
+<!--                            <div class="mb-3">-->
+<!--                                <label for="ngaySinh" class="form-label">Ngày sinh</label>-->
+<!--                                <input type="date" class="form-control" id="ngaySinh" ng-model="newAccount.ngaySinh"-->
+<!--                                       required>-->
+<!--                            </div>-->
                             <div class="mb-3">
-                                <label for="ngaySinh" class="form-label">Ngày sinh</label>
-                                <input type="date" class="form-control" id="ngaySinh" ng-model="newAccount.ngaySinh" required>
+                                <label for="role" class="form-label">Vai trò</label>
+                                <select class="form-control" id="role" ng-model="newAccount.role" required>
+                                    <option value="USER">Nhân viên</option>
+                                    <option value="CLIENT">Khách hàng</option>
+                                </select>
                             </div>
                         </form>
                     </div>
@@ -117,7 +136,8 @@
             </div>
         </div>
 
-        <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel"
+             aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -130,31 +150,38 @@
                         <form>
                             <div class="form-group">
                                 <label for="userName">Email</label>
-                                <input type="text" class="form-control" id="userName" ng-model="selectedUser.userName" readonly>
+                                <input type="text" class="form-control" id="userName" ng-model="selectedUser.userName"
+                                       readonly>
                             </div>
                             <div class="form-group">
                                 <label for="hoVaTen">Họ và tên</label>
-                                <input type="text" class="form-control" id="hoVaTen" ng-model="selectedUser.profile.hoVaTen" readonly>
+                                <input type="text" class="form-control" id="hoVaTen"
+                                       ng-model="selectedUser.profile.hoVaTen" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="phone">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phone" ng-model="selectedUser.profile.phone" readonly>
+                                <input type="text" class="form-control" id="phone" ng-model="selectedUser.profile.phone"
+                                       readonly>
                             </div>
                             <div class="form-group">
                                 <label for="ngaySinh">Ngày sinh</label>
-                                <input type="text" class="form-control" id="ngaySinh" ng-model="selectedUser.profile.ngaySinh | date:'dd/MM/yyyy'" readonly>
+                                <input type="text" class="form-control" id="ngaySinh"
+                                       ng-model="selectedUser.profile.ngaySinh | date:'dd/MM/yyyy'" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="gioiTinh">Giới tính</label>
-                                <input type="text" class="form-control" id="gioiTinh" ng-model="selectedUser.profile.gioiTinh" readonly>
+                                <input type="text" class="form-control" id="gioiTinh"
+                                       ng-model="selectedUser.profile.gioiTinh" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="diaChi">Địa chỉ</label>
-                                <input type="text" class="form-control" id="diaChi" ng-model="selectedUser.profile.diaChi" readonly>
+                                <input type="text" class="form-control" id="diaChi"
+                                       ng-model="selectedUser.profile.diaChi" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="cccd">CCCD</label>
-                                <input type="text" class="form-control" id="cccd" ng-model="selectedUser.profile.cccd" readonly>
+                                <input type="text" class="form-control" id="cccd" ng-model="selectedUser.profile.cccd"
+                                       readonly>
                             </div>
                         </form>
                     </div>
@@ -192,7 +219,6 @@
                 </div>
             </div>
         </div>
-
 
 
     </div>

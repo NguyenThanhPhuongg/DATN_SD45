@@ -68,7 +68,10 @@ $(document).ready(function () {
                     </div>
                     <div class="mt-2">
                         <p class="price" style="font-size: 20px">
-                            <b>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia)}</b>
+                            <b>${new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(product.gia)}</b>
                         </p>
                         <p class="name" style="font-size: 18px;">${product.ten}</p>
                     </div>
@@ -83,12 +86,12 @@ $(document).ready(function () {
     }
 
 // Gọi hàm để hiển thị sản phẩm ngay khi trang tải
-    $(document).ready(function() {
+    $(document).ready(function () {
         fetchProducts(); // Hiển thị sản phẩm của trang đầu tiên
     });
 
 // Sự kiện bấm vào nút "Xem thêm" hoặc "Ẩn bớt"
-    $('#load-more').on('click', function() {
+    $('#load-more').on('click', function () {
         // Nếu đang ở trang hiện tại và chưa đến trang cuối
         if (currentPage < totalPages - 1) {
             currentPage++;  // Chuyển sang trang kế tiếp
@@ -102,7 +105,7 @@ $(document).ready(function () {
     });
 
 // Sự kiện bấm vào nút mũi tên trái để quay lại trang đầu tiên
-    $('#prev-page').on('click', function() {
+    $('#prev-page').on('click', function () {
         currentPage = 0; // Quay về trang đầu tiên
         displayProducts(currentPage); // Hiển thị sản phẩm của trang đầu tiên
 
@@ -116,7 +119,7 @@ $(document).ready(function () {
         const productContainer = $('#product-info');
 
         // Ẩn container trước khi thay đổi nội dung để áp dụng hiệu ứng
-        productContainer.fadeOut(100, function() {
+        productContainer.fadeOut(100, function () {
             productContainer.empty();  // Xóa sản phẩm cũ
 
             const startIndex = page * productsPerPage;
@@ -135,7 +138,10 @@ $(document).ready(function () {
                     </div>
                     <div class="mt-2">
                         <p class="price" style="font-size: 20px">
-                            <b>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia)}</b>
+                            <b>${new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(product.gia)}</b>
                         </p>
                         <p class="name" style="font-size: 18px;">${product.ten}</p>
                     </div>
@@ -208,7 +214,6 @@ $(document).ready(function () {
                         }
 
 
-
                         // Cập nhật danh sách kích thước (Sử dụng input radio buttons)
                         $('#sizeOptions').empty();
                         product.listSize.forEach(function (size, index) {
@@ -225,12 +230,12 @@ $(document).ready(function () {
                         $('#quantityLeft').text(totalQuantity); // Số lượng còn lại trong kho
 
                         // Lắng nghe sự kiện thay đổi màu sắc hoặc kích thước
-                        $('input[name="color"], input[name="size"]').on('change', function() {
+                        $('input[name="color"], input[name="size"]').on('change', function () {
                             updateQuantity(product);
                         });
 
                         // Xử lý tăng giảm số lượng mua
-                        $('#increaseQuantity').on('click', function() {
+                        $('#increaseQuantity').on('click', function () {
                             let quantity = parseInt($('#quantityInput').val(), 10);
                             const maxQuantity = getMaxQuantity(product); // Số lượng tối đa có thể chọn
 
@@ -240,7 +245,7 @@ $(document).ready(function () {
                             updateQuantityDisplay();
                         });
 
-                        $('#decreaseQuantity').on('click', function() {
+                        $('#decreaseQuantity').on('click', function () {
                             let quantity = parseInt($('#quantityInput').val(), 10);
                             if (quantity > 1) {
                                 $('#quantityInput').val(quantity - 1);
@@ -249,7 +254,7 @@ $(document).ready(function () {
                         });
 
                         // Sự kiện thay đổi trực tiếp trong input số lượng
-                        $('#quantityInput').on('input', function() {
+                        $('#quantityInput').on('input', function () {
                             let quantity = parseInt($('#quantityInput').val(), 10);
                             const maxQuantity = getMaxQuantity(product);
                             if (quantity > maxQuantity) {
@@ -303,7 +308,7 @@ $(document).ready(function () {
             const selectedSize = $('input[name="size"]:checked').val();   // Lấy giá trị kích thước được chọn
 
             // Vô hiệu hóa các màu sắc không có kích thước tương ứng
-            $('input[name="color"]').each(function() {
+            $('input[name="color"]').each(function () {
                 const colorId = $(this).val();
                 const availableSizes = product.listSanPhamChiTiet.filter(item =>
                     item.idMauSac == colorId && item.soLuong > 0
@@ -317,7 +322,7 @@ $(document).ready(function () {
             });
 
             // Vô hiệu hóa các kích thước không có màu sắc tương ứng
-            $('input[name="size"]').each(function() {
+            $('input[name="size"]').each(function () {
                 const sizeId = $(this).val();
                 const availableColors = product.listSanPhamChiTiet.filter(item =>
                     item.idSize == sizeId && item.soLuong > 0
@@ -357,4 +362,57 @@ $(document).ready(function () {
         }
     });
     fetchProducts();
+
+    $(document).ready(function () {
+        function getProductIdFromUrl() {
+            const url = window.location.href;
+            const match = url.match(/\/productDetail\/(\d+)/);
+            return match ? match[1] : null;
+        }
+
+        function getSelectedProductDetails() {
+            const idSanPham = getProductIdFromUrl();
+            const idSize = $('input[name="size"]:checked').val();
+            const idMauSac = $('input[name="color"]:checked').val();
+            const soLuong = $('#quantityInput').val();
+
+            return {
+                idSanPham: idSanPham,
+                idSize: idSize,
+                idMauSac: idMauSac,
+                soLuong: soLuong
+            };
+        }
+
+        $('#addToCartButton').on('click', function () {
+            const productDetails = getSelectedProductDetails();
+
+            if (!productDetails.idSize || !productDetails.idMauSac || !productDetails.soLuong) {
+                alert('Vui lòng chọn màu sắc, kích thước và số lượng!');
+                return;
+            }
+
+            if (confirm('Bạn có chắc chắn muốn thêm sản phẩm vào giỏ hàng?')) {
+                const token = localStorage.getItem('token');
+
+                $.ajax({
+                    url: '/gio-hang-chi-tiet',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productDetails),
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (response) {
+                        alert('Sản phẩm đã được thêm vào giỏ hàng thành công!');
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error adding product to cart:', error);
+                        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+                    }
+                });
+            }
+        });
+    });
 });

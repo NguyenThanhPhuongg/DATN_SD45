@@ -79,7 +79,7 @@ public class ProfileProcessor {
         profile.setCccd(target.getCccd());
         profile.setGioiTinh(target.getGioiTinh());
         profile.setNgaySinh(parseOrNull(target.getNgaySinh()));
-
+        profile.setNgayCapNhat(LocalDateTime.now());
         // Nếu có file ảnh avatar thì xử lý upload
         if (file != null && !file.isEmpty()) {
             var url = saveImage(file);
