@@ -1,214 +1,270 @@
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 pb-3">
     <div class="d-grid gap-2 d-flex align-items-center justify-content-between mb-2">
         <h2 class="mt-4">Bán hàng tại quầy</h2>
-        <button class="btn btn-primary me-md-2" ng-click="addBill()" >Tạo hóa đơn</button>
+        <button class="btn btn-dark btn-sm me-md-2" ng-click="addBill()" >
+            <svg style="vertical-align: sub;" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Tạo hóa đơn
+        </button>
     </div>
-    <nav>
-        <div class="nav nav-tabs  mb-3" id="nav-tab" role="tablist">
-            <button ng-repeat="(index, bill) in bills" class="nav-link" ng-class="{'active': index === activeBill}"
-                    ng-click="setActiveBill(index)" data-bs-toggle="tab" data-bs-target="#bill{{bill.stt}}"
-                    type="button"> Hóa đơn {{bill.stt}}
-            </button>
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade" ng-repeat="(index, bill) in bills" ng-class="{'show active': index === activeBill}"
-             id="bill{{bill.stt}}" role="tabpanel">
-            <div class="d-grid gap-2 d-md-flex justify-content-between mb-2">
-                <h5 class="me-auto">Hóa đơn {{bill.stt}}</h5>
-                <button class="btn btn-primary me-md-2"  ng-click="showListProduct(bill)">Thêm sản phẩm</button>
-            </div>
-            <div class="row pb-3" style="font-size: 13px">
-                <div class="col-9">
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Hình ảnh</th>
-                            <th scope="col">Sản phẩm</th>
-                            <th scope="col" style="width: 120px;">Số lượng</th>
-                            <th scope="col" class="text-end">Đơn giá (VNĐ)</th>
-                            <th scope="col"class="text-end">Thành tiền (VNĐ)</th>
-                            <th scope="col">Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="item in bill.items">
-                            <th scope="row">{{$index + 1}}</th>
-                            <td><img ng-src="/images/{{item.image}}" alt=""></td>
-                            <td>
-                                {{item.tenSanPham}} <br>
-                                <small class="text-muted">{{item.ghiChu}}</small>
-                            </td>
-                            <td><input type="number" class="form-control" ng-model="item.soLuong" min="1" max="item.soLuong"
-                                       ng-init="item.soLuong = 1" ng-change="updateQuantity(bill, item)"/></td>
-                            <td class="text-end">{{ formatCurrency(item.gia)}}</td>
-                            <td class="text-end">{{ formatCurrency(item.soLuong * item.gia)}}</td>
-                            <td>
-                                <button ng-click="removeProduct(bill, item)" class="btn btn-sm btn-danger">Xóa</button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-3">
-                    <div class="card">
-                        <div class="card-header">
-                            Thông tin hóa đơn
-                        </div>
-                        <div class="card-body p-0">
-                            <table class="table">
-                                <tbody>
-                                <tr>
-                                    <th scope="row">Số điện thoại</th>
-                                    <td><input type="text" ng-model="bill.phoneCustomer" class="form-control form-control-sm" maxlength="10" ng-change="onPhoneChange(bill)" id="phoneInput-{{ index + 1 }}"></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Tên khách hàng</th>
-                                    <td><input type="text"  ng-model="bill.nameCustomer" class="form-control form-control-sm" ng-keydown="onKeyDownName(bill)" id="nameInput-{{ index + 1 }}"></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Tổng thanh toán</th>
-                                    <td class="text-end ">{{ formatCurrency(bill.totalBill)}} VNĐ</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Tiền khách đưa</th>
-                                    <td>
-                                        <input type="text" ng-model="bill.moneyCustomer" id="moneyCustomerInput" class="form-control" placeholder="Nhập tiền khách hàng" />
-                                        <span>Trả lại:
-                                                <b class="return-money">
-                                                    {{ (bill.moneyCustomer > bill.totalBill) ? formatCurrency(bill.moneyCustomer - bill.totalBill) : '0 VNĐ' }}
-                                                </b>
-                                        </span>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <div class="px-2 pb-2">
-                                <div class="form-check form-check-inline">
-                                    <input ng-model="bill.payCustomer" ng-change="onChangePayment(bill)" checked class="form-check-input" type="radio" name="payment" id="inlineRadio2" value="money">
-                                    <label class="form-check-label" for="inlineRadio2">Tiền mặt</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input ng-model="bill.payCustomer" ng-change="onChangePayment(bill)" class="form-check-input" type="radio" name="payment" id="inlineRadio1" value="bank">
-                                    <label class="form-check-label" for="inlineRadio1">Chuyển khoản</label>
-                                </div>
-                                <div ng-if="bill.payCustomer === 'bank'" class="qr-block">
-                                    <img width="150" ng-src="{{bill.payQRbank}}" alt="QR Code for Bank Transfer">
-                                </div>
-                                <div class="text-start mt-2">
-                                    <button ng-click="payBill(bill)" ng-disabled="bill.disabled" class="btn btn-primary btn-block w-100">{{ bill.disabled ? 'Đã thanh toán' : 'Thanh toán'}}</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="" ng-if="bills.length === 0">
+        <img class="img-fluid d-block m-auto" style="width: 180px;opacity: 0.7;" src="/images/box.png" alt="">
+        <h6 class="mt-3 pb-4 text-center text-muted">Hóa đơn trống!</h6>
+    </div>
+    <div class="" ng-if="bills.length > 0">
+        <nav>
+            <ul class="nav nav-tabs tabs-bill" id="nav-tab" role="tablist">
+                <li class="nav-item " ng-repeat="(index, bill) in bills" role="presentation">
+                    <button class="nav-link" ng-class="{'active': index === activeBill}"
+                            ng-click="setActiveBill(index)" data-bs-toggle="tab" data-bs-target="#bill{{bill.name}}"
+                            type="button"> Hóa đơn {{bill.name}}
+                    </button>
+                        <span ng-click="removeBill(index)">
+                        <svg width="14" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </span>
+                </li>
+                <li>
+                    <button class="btn" ng-click="addBill()" >
+                        <svg style="vertical-align: sub;" xmlns="http://www.w3.org/2000/svg" width="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </button>
 
-            <!-- Modal hiển thị danh sách sản phẩm -->
-            <div ng-if="showPopUp" class="product-list-modal">
-                <div class="dialog-bg" ng-click="closeProductList()"></div>
-                <div class="product-list-modal-content">
-                    <h5 class="d-flex justify-content-between">
-                        <span>Chọn sản phẩm để thêm vào hóa đơn</span>
-                        <button class="btn" ng-click="closeProductList()">
-                            <svg width="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </h5>
-<!--                    <input type="text" placeholder="Tìm kiếm tên" ng-model="searchQuery" ng-change="onChangeSearch()" id="searchProduct" class="form-control mb-3">-->
-                    <div class="list-body">
-                        <table class="table table-striped">
+                </li>
+            </ul>
+        </nav>
+        <div class="tab-content tab-content-bill" id="nav-tabContent">
+            <div class="tab-pane fade" ng-repeat="(index, bill) in bills" ng-class="{'show active': index === activeBill}"
+                 id="bill{{bill.name}}" role="tabpanel">
+                <div class="d-grid gap-2 d-md-flex justify-content-between mb-3">
+                    <h6 class="me-auto">Danh sách sản phẩm</h6>
+                    <button class="btn btn-dark btn-sm me-md-2"  ng-click="showListProduct(bill)">
+                        <svg style="vertical-align: text-bottom;" xmlns="http://www.w3.org/2000/svg"  width="18" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                        Thêm sản phẩm
+                    </button>
+                </div>
+                <div class="text-center pb-3" ng-if="bill.items.length === 0">
+                    Chưa có sản phẩm trong hóa đơn!
+                </div>
+                <div ng-if="bill.items.length > 0" class="row pb-3" style="font-size: 13px">
+                    <div class="col-9">
+                        <div class="text-center" ng-if="bill.items.length === 0">
+                            <img class="img-fluid d-block m-auto" src="images/box.png" alt="">
+                        </div>
+                        <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th>STT</th>
-                                <th>Hình ảnh</th>
-                                <th>Tên sản phẩm</th>
-                                <th>Số lượng</th>
-                                <th>Giá</th>
-                                <th>Chức năng</th>
+                                <th scope="col">#</th>
+                                <th scope="col">Hình ảnh</th>
+                                <th scope="col">Sản phẩm</th>
+                                <th scope="col" style="width: 120px;">Số lượng</th>
+                                <th scope="col" class="text-end">Đơn giá (VNĐ)</th>
+                                <th scope="col"class="text-end">Thành tiền (VNĐ)</th>
+                                <th scope="col" class="text-center">Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="product in listProduct | filter:searchFilter">
-                                <td>{{$index + 1}}</td>
-                                <td><img  ng-src="/images/{{product.image}}" alt=""></td>
+                            <tr ng-repeat="item in bill.items">
+                                <th scope="row">{{$index + 1}}</th>
+                                <td><img ng-src="/images/{{item.image}}" alt=""></td>
                                 <td>
-                                    {{product.tenSanPham}} <br>
-                                    <small class="text-muted">{{product.ghiChu}}</small>
+                                    {{item.tenSanPham}} <br>
+                                    <small class="text-muted">{{item.ghiChu}}</small>
                                 </td>
-                                <td>{{product.soLuong}}</td>
-                                <td>{{formatCurrency(product.gia)}}</td>
-                                <td>
-                                    <button data-bill="" class="btn btn-sm btn-info btn-addtobill" type="button" ng-click="addProductToBill(bill, product)">
-                                        Chọn
+                                <td><input type="number" class="form-control" ng-model="item.soLuong" min="1" max="item.soLuong"
+                                           ng-init="item.soLuong = 1" ng-change="updateQuantity(bill, item)"/></td>
+                                <td class="text-end">{{ formatCurrency(item.gia)}}</td>
+                                <td class="text-end">{{ formatCurrency(item.soLuong * item.gia)}}</td>
+                                <td class="text-center">
+                                    <button ng-click="removeProduct(bill, item)" class="btn text-danger py-0">
+                                        <svg width="17" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
                                     </button>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-end">
-                        <button class="btn btn-secondary" ng-click="closeProductList()">Đóng</button>
+                    <div class="col-3">
+                        <div class="card rounded-0">
+                            <div class="card-header">
+                                Thông tin hóa đơn
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table">
+                                    <tbody>
+                                    <tr>
+                                        <th scope="row">Số điện thoại</th>
+                                        <td><input type="text" ng-model="bill.phoneCustomer" class="form-control form-control-sm" maxlength="10" ng-change="onPhoneChange(bill)" id="phoneInput-{{ index + 1 }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Tên khách hàng</th>
+                                        <td><input type="text"  ng-model="bill.nameCustomer" class="form-control form-control-sm" ng-keydown="onKeyDownName(bill)" id="nameInput-{{ index + 1 }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Tổng tiền</th>
+                                        <td class="text-end ">{{ formatCurrency(bill.totalBill)}} VNĐ</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Tiền khách đưa</th>
+                                        <td>
+                                            <div class="input-group mb-1">
+                                                <input type="text" ng-model="bill.moneyCustomer" id="moneyCustomerInput" class="form-control" currency-input placeholder="Nhập số tiền" />
+                                                <span class="input-group-text" style=" font-size: 10px;padding: 3px;" >VNĐ</span>
+                                            </div>
+                                            <span>Trả lại:
+                                                <b class="return-money">
+                                                    {{ (bill.moneyCustomer > bill.totalBill) ? formatCurrency(bill.moneyCustomer - bill.totalBill) + ' VNĐ' : '0 VNĐ' }}
+                                                </b>
+                                        </span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="px-2 pb-2">
+                                    <div class="form-check form-check-inline">
+                                        <input ng-model="bill.payCustomer" ng-change="onChangePayment(bill)" checked class="form-check-input" type="radio" name="payment-{{bill.name}}" id="inlineRadio1-{{bill.name}}" value="money">
+                                        <label class="form-check-label" for="inlineRadio1-{{bill.name}}">Tiền mặt</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input ng-model="bill.payCustomer" ng-change="onChangePayment(bill)" class="form-check-input" type="radio" name="payment-{{bill.name}}" id="inlineRadio2-{{bill.name}}" value="bank">
+                                        <label class="form-check-label" for="inlineRadio2-{{bill.name}}">Chuyển khoản</label>
+                                    </div>
+                                    <div ng-if="bill.payCustomer === 'bank'" class="qr-block">
+                                        <img width="150" ng-src="{{bill.payQRbank}}" alt="QR Code for Bank Transfer">
+                                    </div>
+                                    <div class="text-start mt-2">
+                                        <button ng-click="payBill(bill)" ng-disabled="bill.disabled" class="btn btn-primary btn-block w-100">
+                                            <img width="24" class="me-1" style="vertical-align: bottom;" src="/images/secure-payment.png" alt="">
+                                            {{ bill.disabled ? 'Đã thanh toán ' + formatCurrency(bill.totalBill) + ' VNĐ' : 'Thanh toán ' + formatCurrency(bill.totalBill) + ' VNĐ'}}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Modal hóa đơn -->
-            <div class="modal fade" id="paymentModal-{{bill.stt}}" tabindex="-1" aria-labelledby="" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Thanh toán thành công</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <h6 class="mb-2"><b>Thông tin hóa đơn</b></h6>
-                            <div class="bill-info-head" >
-                                <p><b>Ngày mua:</b> <span>{{bill.dateBill}}</span></p>
-                                <p><b>Nhân viên bán hàng:</b> <span>...</span></p>
-                                <p><b>Người mua:</b> <span>{{bill.nameCustomer}}</span></p>
-                                <p><b>Số HĐ:</b> <span>{{bill.codeBill}}</span></p>
-                            </div>
-                            <table class="table table-bordered">
+                <!-- Modal hiển thị danh sách sản phẩm -->
+                <div ng-if="showPopUp" class="product-list-modal">
+                    <div class="dialog-bg" ng-click="closeProductList()"></div>
+                    <div class="product-list-modal-content">
+                        <h5 class="d-flex justify-content-between">
+                            <span>Chọn sản phẩm để thêm vào hóa đơn</span>
+                            <button class="btn" ng-click="closeProductList()">
+                                <svg width="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </h5>
+                        <input type="text" placeholder="Tìm kiếm tên sản phẩm" id="searchProduct" class="form-control mb-3">
+                        <div class="list-body">
+                            <table class="table table-striped" style="font-size: 13px" id="tableproductlist">
                                 <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Sản phẩm</th>
-                                    <th class="text-center">Số lượng</th>
-                                    <th class="text-end">Đơn giá (vnđ)</th>
-                                    <th class="text-end">Thành tiền (vnđ)</th>
+                                    <th>STT</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th class="text-end">Giá (VNĐ)</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th class="text-center">Chức năng</th>
                                 </tr>
                                 </thead>
-                                <tbody class="prod-in-bill">
-                                <tr ng-repeat="item in bill.items">
-                                    <th scope="row">{{$index + 1}}</th>
+                                <tbody>
+                                <tr ng-repeat="product in listProduct | filter:searchFilter">
+                                    <td>{{$index + 1}}</td>
+                                    <td><img  ng-src="/images/{{product.image}}" alt=""></td>
                                     <td>
-                                        {{item.tenSanPham}} <br>
-                                        <small class="text-muted">{{item.ghiChu}}</small>
+                                        {{product.tenSanPham}} <br>
+                                        <small class="text-muted">{{product.ghiChu}}</small>
                                     </td>
-                                    <td>{{item.soLuong}}</td>
-                                    <td class="text-end">{{ formatCurrency(item.gia)}}</td>
-                                    <td class="text-end">{{ formatCurrency(item.soLuong * item.gia)}}</td>
+                                    <td>{{product.soLuong}}</td>
+                                    <td  class="text-end">{{formatCurrency(product.gia)}}</td>
+                                    <td  class="text-center">
+                                        <span
+                                                class="badge rounded-pill"
+                                                ng-class="product.trangThai === 0 ? 'bg-danger' : 'bg-success'">
+                                            {{ product.trangThai === 0 ? 'Inactive' : 'Active'}}
+                                        </span>
+                                    </td>
+                                    <td  class="text-center">
+                                        <button data-bill="" style="font-size: 13px" ng-disabled="product.trangThai === 0" class="btn btn-sm rounded-pill py-0 btn-primary btn-addtobill" type="button" ng-click="addProductToBill(bill, product)">
+                                            Chọn
+                                        </button>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
-                            <div class="d-flex fw-bold justify-content-between">
-                                <div class="total-quantity">Tổng số lượng: {{bill.totalQuantity}}</div>
-                                <div class="total-total">Tổng thanh toán: {{formatCurrency(bill.totalBill)}} VNĐ</div>
-                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button"  data-bs-dismiss="modal" ng-click="printBill(bill)" class="btn btn-info btn-done-bill">In hóa đơn</button>
-                            <button type="button"  data-bs-dismiss="modal" ng-click="clearBill(bill)" class="btn btn-primary btn-done-bill">Hoàn thành</button>
+                        <div class="text-end">
+                            <button class="btn btn-secondary" ng-click="closeProductList()">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal hóa đơn -->
+                <div class="modal fade" id="paymentModal-{{bill.name}}" tabindex="-1" aria-labelledby="" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Thanh toán thành công</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="font-size: 13px;">
+                                <h6 class="mb-2"><b>Thông tin hóa đơn</b></h6>
+                                <div class="bill-info-head" >
+                                    <p class="mb-1"><b>Ngày mua:</b> <span>{{bill.dateBill}}</span></p>
+                                    <p class="mb-1"><b>Nhân viên bán hàng:</b> <span>...</span></p>
+                                    <p class="mb-1"><b>Người mua:</b> <span>{{bill.nameCustomer}}</span></p>
+                                    <p><b>Số HĐ:</b> <span>{{bill.codeBill}}</span></p>
+                                </div>
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Sản phẩm</th>
+                                        <th class="text-center">Số lượng</th>
+                                        <th class="text-end">Đơn giá (vnđ)</th>
+                                        <th class="text-end">Thành tiền (vnđ)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="prod-in-bill">
+                                    <tr ng-repeat="item in bill.items">
+                                        <th scope="row">{{$index + 1}}</th>
+                                        <td>
+                                            {{item.tenSanPham}} <br>
+                                            <small class="text-muted">{{item.ghiChu}}</small>
+                                        </td>
+                                        <td>{{item.soLuong}}</td>
+                                        <td class="text-end">{{ formatCurrency(item.gia)}}</td>
+                                        <td class="text-end">{{ formatCurrency(item.soLuong * item.gia)}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex fw-bold justify-content-between">
+                                    <div class="total-quantity">Tổng số lượng: {{bill.totalQuantity}}</div>
+                                    <div class="total-total">Tổng thanh toán: {{formatCurrency(bill.totalBill)}} VNĐ</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button"  data-bs-dismiss="modal" ng-click="printBill(bill)" class="btn btn-primary btn-done-bill">In hóa đơn</button>
+                                <button type="button"  data-bs-dismiss="modal" ng-click="clearBill(bill)" class="btn btn-success btn-done-bill">Hoàn thành</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="liveToast" class="toast border-0 bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex justify-content-between align-items-center">

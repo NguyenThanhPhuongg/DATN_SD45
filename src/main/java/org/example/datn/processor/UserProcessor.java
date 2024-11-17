@@ -199,6 +199,7 @@ public class UserProcessor {
 
         var hashedPass = userService.encodePassword(model.getPassword());
         var user = new User();
+
         user.setUserName(model.getEmail());
         user.setPassword(hashedPass);
         user.setRole(UserRoles.CLIENT);
@@ -212,7 +213,8 @@ public class UserProcessor {
         profile.setEmail(model.getEmail());
         profile.setPhone(model.getPhone());
         profile.setNgaySinh(model.getNgaySinh());
-        profile.setHoVaTen(StringUtils.substringBeforeLast(user.getUserName(), "@"));
+//        profile.setHoVaTen(StringUtils.substringBeforeLast(user.getUserName(), "@"));
+        profile.setHoVaTen(model.getName());
         profileService.save(profile);
 
         var gioGang = new GioHang();

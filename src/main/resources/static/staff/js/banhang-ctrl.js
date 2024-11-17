@@ -15,7 +15,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     sync.$asObject().$watch(function () {
         sync.$asObject().forEach(function (product) {
             // Tìm hóa đơn mà sản phẩm thuộc về
-            const billIndex = $scope.bills.findIndex(bill => bill.stt === product.bill);
+            const billIndex = $scope.bills.findIndex(bill => bill.name === product.bill);
             if (billIndex !== -1) {
 
                 if (!addedProductIds[product.bill]) {
@@ -42,13 +42,50 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         ref.remove()
     };
     $scope.clearData();
+    $scope.generateBillName = function (lastName) {
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        // Nếu không có hóa đơn nào, bắt đầu từ "A"
+        if (!lastName) return "A";
+
+        // Lấy phần chữ cái của tên hóa đơn, ví dụ: "Hóa đơn A" -> "A"
+        let letters = lastName.replace("Hóa đơn ", "").trim();
+
+        // Chuyển từ chữ cái sang số thứ tự
+        let index = 0;
+        for (let i = 0; i < letters.length; i++) {
+            index = index * 26 + (letters.charCodeAt(i) - "A".charCodeAt(0) + 1);
+        }
+
+        // Tăng chỉ số để tạo tên tiếp theo
+        index++;
+
+        // Chuyển từ số thứ tự sang chữ cái
+        let nextName = "";
+        while (index > 0) {
+            index--; // Trừ 1 để đảm bảo chỉ số 0-based
+            nextName = alphabet[index % 26] + nextName;
+            index = Math.floor(index / 26);
+        }
+        return nextName;
+
+    };
     $scope.addBill = function () {
+        // Lấy tên hóa đơn cuối cùng
+        const lastBillName = $scope.bills.length > 0
+            ? $scope.bills[$scope.bills.length - 1].name
+            : null;
+
+        // Tạo tên hóa đơn mới
+        const newBillName = $scope.generateBillName(lastBillName);
         let bill = {
             stt: $scope.bills.length + 1,
+            name: newBillName,
             totalBill: 0,
             disabled: false,
             totalQuantity: 0,
             nameCustomer: "",
+            search: "",
             idCustomer: "",
             phoneCustomer: '',
             moneyCustomer: 0,
@@ -61,6 +98,14 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         $scope.bills.push(bill);
         $scope.activeBill = $scope.bills.length - 1;
     };
+    $scope.removeBill = function (index) {
+        $scope.bills.splice(index, 1);
+
+        // Đặt lại hóa đơn đang hoạt động (activeBill)
+        if ($scope.activeBill >= $scope.bills.length) {
+            $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá
+        }
+    };
     $scope.setActiveBill = function (index) {
         $scope.activeBill = index;
     };
@@ -68,10 +113,10 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         const index = bill.items.findIndex(item => item.id === product.id);
         if (index !== -1) {
             bill.items.splice(index, 1);
-            if (!addedProductIds[bill.stt]) {
-                addedProductIds[bill.stt] = new Set();
+            if (!addedProductIds[bill.name]) {
+                addedProductIds[bill.name] = new Set();
             }
-            addedProductIds[bill.stt].delete(product.id)
+            addedProductIds[bill.name].delete(product.id)
             $scope.updateTotalBill(bill)
         } else {
             console.log("Sản phẩm không được tìm thấy trong mảng items.");
@@ -88,10 +133,33 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }, 0);
     };
     $scope.showListProduct = function () {
-        // Gọi API lấy danh sách sản phẩm ban đầu
         $http.get('/san-pham').then(resp => {
             if (resp.status === 200) {
                 $scope.showPopUp = true;
+                setTimeout(() => {
+                    const searchInput = document.getElementById('searchProduct');
+                    searchInput.addEventListener('keyup', function() {
+                        const filter = this.value.toLowerCase();
+                        const rows = document.querySelectorAll('#tableproductlist tbody tr');
+                        rows.forEach(row => {
+                            const cells = row.getElementsByTagName('td');
+                            let rowContainsSearchText = false;
+
+                            for (let i = 0; i < cells.length; i++) {
+                                if (cells[i].textContent.toLowerCase().includes(filter)) {
+                                    rowContainsSearchText = true;
+                                    break;
+                                }
+                            }
+
+                            if (rowContainsSearchText) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
+                }, 200);
                 const productList = resp.data.data; // Danh sách sản phẩm
                 const requests = productList.map(item =>
                     $http.get(`/san-pham/${item.id}`).then(detailResp => {
@@ -207,7 +275,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             if (resp.status === 200) {
                 bill.codeBill = resp.data.ma;
                 bill.dateBill = resp.data.ngayThanhToan;
-                const billModal = new bootstrap.Modal(document.getElementById(`paymentModal-${bill.stt}`), {
+                const billModal = new bootstrap.Modal(document.getElementById(`paymentModal-${bill.name}`), {
                     keyboard: false
                 });
                 billModal.show();
@@ -219,7 +287,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         bill.disabled = true;
     };
     $scope.printBill = function (bill) {
-        var innerContents = document.getElementById(`paymentModal-${bill.stt}`).innerHTML;
+        var innerContents = document.getElementById(`paymentModal-${bill.name}`).innerHTML;
         var popupWinindow = window.open('', '_blank', 'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
         popupWinindow.document.open();
         popupWinindow.document.write(`
