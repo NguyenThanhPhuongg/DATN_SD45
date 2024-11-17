@@ -663,6 +663,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+--drop table khuyen_mai
 CREATE TABLE [khuyen_mai]
 (
     [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED
@@ -682,6 +683,7 @@ CREATE TABLE [khuyen_mai]
     [nguoi_tao] BIGINT,
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
+
 GO
 
 --- ap dung khuyen mai
@@ -689,6 +691,8 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--drop table [ap_dung_khuyen_mai]
 CREATE TABLE [ap_dung_khuyen_mai]
 (
     [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED

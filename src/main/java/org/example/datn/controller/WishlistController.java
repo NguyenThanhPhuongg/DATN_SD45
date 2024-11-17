@@ -1,9 +1,9 @@
 package org.example.datn.controller;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.Wishlist;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.repository.WishlistRepository;
 import org.example.datn.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,23 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Controller
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/wishlist")
+@RequestMapping("/yeu-thich")
 public class WishlistController {
 
     @Autowired
     private WishlistService wishlistService;
 
-    @GetMapping("/{userId}")
-    public List<SanPham> getUserFavoriteProducts(@PathVariable Long userId) {
-        return wishlistService.getFavoriteProductsByUserId(userId);
+    @GetMapping()
+    public List<SanPham> getUserFavoriteProducts(UserAuthentication ua) {
+        return wishlistService.getFavoriteProductsByUserId(ua);
     }
 
-    @GetMapping("/hien-thi")
-    public List<Wishlist> getAll() {
-        return wishlistService.getAll();
-    }
+//    @GetMapping("/hien-thi")
+//    public List<Wishlist> getAll() {
+//        return wishlistService.getAll();
+//    }
 
 }
