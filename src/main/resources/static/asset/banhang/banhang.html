@@ -40,15 +40,16 @@
             <div class="tab-pane fade" ng-repeat="(index, bill) in bills" ng-class="{'show active': index === activeBill}"
                  id="bill{{bill.name}}" role="tabpanel">
                 <div class="d-grid gap-2 d-md-flex justify-content-between mb-3">
-                    <h6 class="me-auto">Danh sách sản phẩm</h6>
-                    <button class="btn btn-dark btn-sm me-md-2"  ng-click="showListProduct(bill)">
+                    <h6 ng-if="bill.totalQuantity > 0" class="me-auto">Tổng sản phẩm ({{bill.totalQuantity}})</h6>
+                    <button class="btn btn-dark btn-sm ms-auto"  ng-click="showListProduct(bill)">
                         <svg style="vertical-align: text-bottom;" xmlns="http://www.w3.org/2000/svg"  width="18" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
                         Thêm sản phẩm
                     </button>
                 </div>
-                <div class="text-center pb-3" ng-if="bill.items.length === 0">
+                <div class="text-center pb-3 text-muted" ng-if="bill.items.length === 0">
+                    <img src="/images/shopping-cart.png" width="32" class="me-2" alt="">
                     Chưa có sản phẩm trong hóa đơn!
                 </div>
                 <div ng-if="bill.items.length > 0" class="row pb-3" style="font-size: 13px">

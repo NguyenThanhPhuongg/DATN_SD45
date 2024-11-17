@@ -131,6 +131,9 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         bill.totalBill = bill.items.reduce(function (total, product) {
             return total + (product.soLuong * product.gia);
         }, 0);
+        bill.totalQuantity = bill.items.reduce(function (total, product) {
+            return total + product.soLuong;
+        }, 0);
     };
     $scope.showListProduct = function () {
         $http.get('/san-pham').then(resp => {
@@ -268,9 +271,6 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }
     };
     $scope.payBill = function (bill) {
-        bill.items.forEach(item => {
-            bill.totalQuantity += item.soLuong;
-        });
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
                 bill.codeBill = resp.data.ma;
