@@ -205,6 +205,8 @@ public class UserProcessor {
         user.setStatus(UserStatus.ACTIVE);
         user.setType(UserType.NORMAL);
         user.setXacThuc(false);
+        user.setNgayTao(LocalDateTime.now());
+        user.setNgayCapNhat(LocalDateTime.now());
         userService.save(user);
 
         var profile = new Profile();
@@ -212,7 +214,9 @@ public class UserProcessor {
         profile.setEmail(model.getEmail());
         profile.setPhone(model.getPhone());
         profile.setNgaySinh(model.getNgaySinh());
-        profile.setHoVaTen(StringUtils.substringBeforeLast(user.getUserName(), "@"));
+        profile.setHoVaTen(model.getName());
+        profile.setNgayTao(LocalDateTime.now());
+        profile.setNgayCapNhat(LocalDateTime.now());
         profileService.save(profile);
 
         var gioGang = new GioHang();

@@ -1,5 +1,18 @@
 $(document).ready(function() {
+    // Hàm xử lý đăng nhập khi nhấn nút Đăng nhập
     $('#loginButton').click(function() {
+        handleLogin();
+    });
+
+    // Xử lý khi nhấn Enter trong form
+    $('#username, #password').keypress(function(event) {
+        if (event.which === 13) { // Kiểm tra nếu phím Enter (key code 13) được nhấn
+            handleLogin();
+        }
+    });
+
+    // Hàm đăng nhập chính
+    function handleLogin() {
         const form = $('#create_customer')[0];
 
         if (!form.checkValidity()) {
@@ -24,7 +37,7 @@ $(document).ready(function() {
 
                 $('#message').html('<div class="alert alert-success">Đăng nhập thành công!</div>');
                 hideMessageAfterDelay();
-                if (role === 'USER') {
+                if (role === 'USER' || role === 'ADMIN') {
                     setTimeout(function() {
                         window.location.href = '/staff';
                     }, 500);
@@ -41,8 +54,9 @@ $(document).ready(function() {
                 hideMessageAfterDelay();
             }
         });
-    });
+    }
 
+    // Hàm ẩn thông báo sau khi delay
     function hideMessageAfterDelay() {
         setTimeout(function() {
             $('#message').fadeOut('slow', function() {
