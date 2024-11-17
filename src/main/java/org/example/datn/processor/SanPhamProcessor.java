@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -115,7 +116,7 @@ public class SanPhamProcessor {
 
 
     // Thêm mới sản phẩm
-    public ServiceResult save(SanPhamModel model, MultipartFile file) {
+    public ServiceResult save(SanPhamModel model, MultipartFile file, UserAuthentication ua) {
         SanPham sanPham = new SanPham();
         BeanUtils.copyProperties(model, sanPham);
 
@@ -128,13 +129,16 @@ public class SanPhamProcessor {
                 return new ServiceResult("Lỗi khi lưu ảnh", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_400);
             }
         }
-
+        sanPham.setNguoiTao(ua.getPrincipal());
+        sanPham.setNgayTao(LocalDateTime.now());
+        sanPham.setNguoiCapNhat(ua.getPrincipal());
+        sanPham.setNgayCapNhat(LocalDateTime.now());
         service.save(sanPham);
         return new ServiceResult("Sản phẩm đã được thêm thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     // Cập nhật thông tin sản phẩm
-    public ServiceResult update(Long id, SanPhamModel model, MultipartFile file) {
+    public ServiceResult update(Long id, SanPhamModel model, MultipartFile file,UserAuthentication ua) {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
         BeanUtils.copyProperties(model, sanPham);
 
@@ -147,17 +151,20 @@ public class SanPhamProcessor {
                 return new ServiceResult("Lỗi khi lưu ảnh", SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
             }
         }
-
+        sanPham.setNguoiCapNhat(ua.getPrincipal());
+        sanPham.setNgayCapNhat(LocalDateTime.now());
         service.update(sanPham);
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
 
     // Cập nhật nếu không có ảnh mới
-    public ServiceResult update(Long id, SanPhamModel model) {
+    public ServiceResult update(Long id, SanPhamModel model,UserAuthentication ua) {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
         BeanUtils.copyProperties(model, sanPham);
 
+        sanPham.setNguoiCapNhat(ua.getPrincipal());
+        sanPham.setNgayCapNhat(LocalDateTime.now());
         // Không thay đổi ảnh nếu không có ảnh mới
         service.update(sanPham);
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
@@ -170,9 +177,11 @@ public class SanPhamProcessor {
     }
 
 
-    public ServiceResult updateStatus(Long id, Integer trangThai) {
+    public ServiceResult updateStatus(Long id, Integer trangThai, UserAuthentication ua) {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật trạng thái"));
         sanPham.setTrangThai(trangThai); // Cập nhật trạng thái
+        sanPham.setNguoiCapNhat(ua.getPrincipal());
+        sanPham.setNgayCapNhat(LocalDateTime.now());
         service.update(sanPham); // Lưu thay đổi vào database
         return new ServiceResult("Trạng thái sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }

@@ -814,13 +814,9 @@ CREATE TABLE [blog]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [tac_gia] NVARCHAR(255),
-    [title] NVARCHAR(255),
-    [content] NVARCHAR(MAX),
+    [tieu_de] NVARCHAR(255),
+    [mo_ta] NVARCHAR(MAX),
     [hinh_anh] NVARCHAR(MAX),
-    [content_2] NVARCHAR(MAX),
-    [hinh_anh_2] NVARCHAR(MAX),
-    [content_3] NVARCHAR(MAX),
-    [hinh_anh_3] NVARCHAR(MAX),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
@@ -828,6 +824,39 @@ CREATE TABLE [blog]
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
 GO
+
+--- Blog chi tiet
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [blog_chi_tiet]
+(
+    [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED
+    (
+        [id] ASC
+    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+    [id_blog] BIGINT,
+    [thu_tu] INT,
+    [tieu_de] NVARCHAR(255),
+    [noi_dung] NVARCHAR(MAX),
+    [loai] VARCHAR(20),
+    [hinh_anh] NVARCHAR(MAX),
+    [trang_thai] INT DEFAULT 1,
+    [ngay_tao] DATETIME DEFAULT GETDATE(),
+    [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
+    [nguoi_tao] BIGINT,
+    [nguoi_cap_nhat] BIGINT
+    UNIQUE (id_blog, thu_tu) -- Mỗi bài viết không trùng thứ tự phần
+
+) ON [PRIMARY];
+GO
+
+--public enum LoaiNoiDung {
+--    TEXT,
+--    IMAGE,
+--    VIDEO
+--}
 
 --- Bình luận
 SET ANSI_NULLS ON

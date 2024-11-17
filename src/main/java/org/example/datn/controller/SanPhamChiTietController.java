@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.processor.SanPhamChiTietProcessor;
@@ -34,13 +35,13 @@ public class SanPhamChiTietController {
     }
 
     @PostMapping
-    public ResponseEntity<ServiceResult> add(@RequestBody SanPhamChiTietModel model) {
-        return ResponseEntity.ok(processor.save(model));
+    public ResponseEntity<ServiceResult> add(@RequestBody SanPhamChiTietModel model, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.save(model,ua));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody SanPhamChiTietModel model) {
-        return ResponseEntity.ok(processor.update(id, model));
+    public ResponseEntity<ServiceResult> update(@PathVariable Long id, @RequestBody SanPhamChiTietModel model,UserAuthentication ua) {
+        return ResponseEntity.ok(processor.update(id, model,ua));
     }
 
     @DeleteMapping("/{id}")

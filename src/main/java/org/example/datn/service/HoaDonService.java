@@ -41,4 +41,8 @@ public class HoaDonService {
     public Optional<HoaDon> findByMa(String ma) {
         return repo.findByMa(ma);
     }
+    public List<HoaDon> finByTrangThai(Integer trangThai) {
+        return repo.findByTrangThai(trangThai);
+    }
+
 }

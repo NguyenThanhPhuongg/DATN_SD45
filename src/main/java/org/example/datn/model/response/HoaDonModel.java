@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,6 +35,7 @@ public class HoaDonModel extends CommonModel {
     private UserModel userModel;
     private DiaChiGiaoHangModel diaChiGiaoHangModel;
     private PhuongThucVanChuyenModel phuongThucVanChuyenModel;
+    private List<HoaDonChiTietModel> hoaDonChiTietModels;
 
 
 }

@@ -18,6 +18,7 @@ import org.example.datn.model.response.*;
 import org.example.datn.processor.auth.AuthenticationChannelProvider;
 import org.example.datn.processor.auth.AuthoritiesValidator;
 import org.example.datn.service.*;
+import org.example.datn.transformer.HoaDonChiTietTransformer;
 import org.example.datn.transformer.HoaDonTransformer;
 import org.example.datn.transformer.ProfileTransformer;
 import org.example.datn.transformer.UserTransformer;
@@ -78,7 +79,8 @@ public class HoaDonProcessor {
 
     @Autowired
     ThanhToanService thanhToanService;
-
+    @Autowired
+    HoaDonChiTietTransformer hoaDonChiTietTransformer;
     @Autowired
     private PaymentService paymentService;
 
@@ -131,65 +133,65 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
-    HoaDon hoaDon = new HoaDon();
-    hoaDon.setIdNguoiDung(ua.getPrincipal());
-    hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
-    hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
-    hoaDon.setMa(getRandomNumber(8));
-    hoaDon.setDiemSuDung(0);
-    hoaDon.setNgayTao(LocalDateTime.now());
-    hoaDon.setNgayCapNhat(LocalDateTime.now());
-    hoaDon.setNguoiTao(ua.getPrincipal());
-    hoaDon.setNguoiCapNhat(ua.getPrincipal());
-    hoaDon.setNgayDatHang(LocalDateTime.now());
-    service.save(hoaDon);
+    public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
+        HoaDon hoaDon = new HoaDon();
+        hoaDon.setIdNguoiDung(ua.getPrincipal());
+        hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
+        hoaDon.setIdPhuongThucVanChuyen(request.getIdPhuongThucVanChuyen());
+        hoaDon.setMa(getRandomNumber(8));
+        hoaDon.setDiemSuDung(0);
+        hoaDon.setNgayTao(LocalDateTime.now());
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
+        hoaDon.setNguoiTao(ua.getPrincipal());
+        hoaDon.setNguoiCapNhat(ua.getPrincipal());
+        hoaDon.setNgayDatHang(LocalDateTime.now());
+        service.save(hoaDon);
 
-    var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
-            .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
+        var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
+                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
 
-    var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
-    BigDecimal tongTien = BigDecimal.ZERO;
-    for (GioHangChiTiet ghct : gioHangChiTiet) {
-        HoaDonChiTiet hdct = new HoaDonChiTiet();
-        hdct.setIdHoaDon(hoaDon.getId());
-        hdct.setIdSanPhamChiTiet(ghct.getIdSanPhamChiTiet());
-        hdct.setSoLuong(ghct.getSoLuong());
-        hdct.setGia(ghct.getGia());
-        BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
-        tongTien = tongTien.add(giaTien);
-        hdct.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
-        hdct.setNgayTao(LocalDateTime.now());
-        hdct.setNgayCapNhat(LocalDateTime.now());
-        hdct.setNguoiTao(ua.getPrincipal());
-        hdct.setNguoiCapNhat(ua.getPrincipal());
-        hoaDonChiTietService.save(hdct);
-        ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
-        gioHangChiTietService.save(ghct);
+        var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
+        BigDecimal tongTien = BigDecimal.ZERO;
+        for (GioHangChiTiet ghct : gioHangChiTiet) {
+            HoaDonChiTiet hdct = new HoaDonChiTiet();
+            hdct.setIdHoaDon(hoaDon.getId());
+            hdct.setIdSanPhamChiTiet(ghct.getIdSanPhamChiTiet());
+            hdct.setSoLuong(ghct.getSoLuong());
+            hdct.setGia(ghct.getGia());
+            BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
+            tongTien = tongTien.add(giaTien);
+            hdct.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
+            hdct.setNgayTao(LocalDateTime.now());
+            hdct.setNgayCapNhat(LocalDateTime.now());
+            hdct.setNguoiTao(ua.getPrincipal());
+            hdct.setNguoiCapNhat(ua.getPrincipal());
+            hoaDonChiTietService.save(hdct);
+            ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
+            gioHangChiTietService.save(ghct);
+        }
+
+        // Apply voucher discount
+        if (request.getGiaTriVoucher() != null) {
+            tongTien = tongTien.subtract(request.getGiaTriVoucher());
+        }
+
+        hoaDon.setTongTien(tongTien);
+        hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
+        service.save(hoaDon);
+        ThanhToan thanhToan = new ThanhToan();
+        thanhToan.setIdHoaDon(hoaDon.getId());
+        thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
+        thanhToan.setSoTien(hoaDon.getTongTien());
+        thanhToan.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusThanhToan.CHUA_THANH_TOAN.getValue() : StatusThanhToan.DANG_XU_LY.getValue());
+        thanhToanService.save(thanhToan);
+        if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
+            HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String ipAddress = VNPayUtil.getIpAddress(httpRequest);
+            String vnPayResponse = paymentService.createVnPayPayment(hoaDon, "NCB", ipAddress);
+            return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+        }
+        return new ServiceResult();
     }
-
-    // Apply voucher discount
-    if (request.getGiaTriVoucher() != null) {
-        tongTien = tongTien.subtract(request.getGiaTriVoucher());
-    }
-
-    hoaDon.setTongTien(tongTien);
-    hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
-    service.save(hoaDon);
-    ThanhToan thanhToan = new ThanhToan();
-    thanhToan.setIdHoaDon(hoaDon.getId());
-    thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
-    thanhToan.setSoTien(hoaDon.getTongTien());
-    thanhToan.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusThanhToan.CHUA_THANH_TOAN.getValue() : StatusThanhToan.DANG_XU_LY.getValue());
-    thanhToanService.save(thanhToan);
-    if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
-        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String ipAddress = VNPayUtil.getIpAddress(httpRequest);
-        String vnPayResponse = paymentService.createVnPayPayment(hoaDon, "NCB", ipAddress);
-        return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
-    }
-    return new ServiceResult();
-}
 
     public static String getRandomNumber(int len) {
         Random rnd = new Random();
@@ -201,14 +203,106 @@ public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
         return sb.toString();
     }
 
-    public ServiceResult update(Long id, HoaDonRequest request, UserAuthentication ua) {
-        HoaDon hoaDon = service.findById(id).orElseThrow(() -> new EntityNotFoundException("hoaDon.not.found"));
-        BeanUtils.copyProperties(request, hoaDon);
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult updateStatus(Long id, UserAuthentication ua) {
+        // Tìm hóa đơn theo ID
+        HoaDon hoaDon = service.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+        // Xác định trạng thái mới dựa trên trạng thái hiện tại
+        Integer newTrangThai;
+        switch (hoaDon.getTrangThai()) {
+            case 0:
+            case 1:
+                newTrangThai = StatusHoaDon.CHO_GIAO_HANG.getValue();
+                break;
+            case 2:
+                newTrangThai = StatusHoaDon.VAN_CHUYEN.getValue();
+                break;
+            case 3:
+                newTrangThai = StatusHoaDon.HOAN_THANH.getValue();
+                break;
+            default:
+                throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
+        }
+        // Cập nhật trạng thái hóa đơn
+        hoaDon.setTrangThai(newTrangThai);
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiCapNhat(ua.getPrincipal());
+
+        // Cập nhật trạng thái các chi tiết hóa đơn
+        updateHoaDonChiTiet(id, newTrangThai);
+
+        // Lưu hóa đơn
         service.save(hoaDon);
 
-        return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+        // Trả về kết quả thành công
+        return new ServiceResult("Hóa đơn đã được cập nhật trạng thái thành công",
+                SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    // Cập nhật trạng thái cho các chi tiết hóa đơn
+    private void updateHoaDonChiTiet(Long idHoaDon, Integer trangThai) {
+        var hoaDonChiTietList = hoaDonChiTietService.findByIdHoaDon(idHoaDon);
+        hoaDonChiTietList.forEach(e -> e.setTrangThai(trangThai));
+        hoaDonChiTietService.saveAll(hoaDonChiTietList);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult updateHuyHoaDon(Long id, UserAuthentication ua) {
+        // Tìm hóa đơn theo ID
+        HoaDon hoaDon = service.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+        // Xác định trạng thái mới dựa trên trạng thái hiện tại
+        Integer newTrangThai;
+        switch (hoaDon.getTrangThai()) {
+            case 0:
+            case 1:
+                newTrangThai = StatusHoaDon.DA_HUY.getValue();
+                break;
+            case 2:
+                newTrangThai = StatusHoaDon.DA_HUY.getValue();
+                break;
+            case 3:
+                newTrangThai = StatusHoaDon.DA_HUY.getValue();
+                break;
+            default:
+                throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
+        }
+        // Cập nhật trạng thái hóa đơn
+        hoaDon.setTrangThai(newTrangThai);
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
+        hoaDon.setNguoiCapNhat(ua.getPrincipal());
+
+        // Cập nhật trạng thái các chi tiết hóa đơn
+        updateHoaDonChiTiet(id, newTrangThai);
+
+        // Lưu hóa đơn
+        service.save(hoaDon);
+
+        // Trả về kết quả thành công
+        return new ServiceResult("Hóa đơn đã được cập nhật trạng thái thành công",
+                SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+
+    public ServiceResult getByTrangThai(Integer trangThai) {
+        List<HoaDon> hoaDons = service.finByTrangThai(trangThai);
+        List<HoaDonModel> models = hoaDons.stream().map(e -> {
+            var model = hoaDonTransformer.toModel(e);
+            var hoaDonChiTiets = hoaDonChiTietService.findByIdHoaDon(e.getId());
+            var hoaDonChiTietModels = hoaDonChiTiets.stream().map(hoaDonChiTietTransformer::toModel).collect(Collectors.toList());
+            var diaChiGiaoHangModel = diaChiGiaoHangProcessor.findById(e.getIdDiaChiGiaoHang());
+            var phuongThucVanChuyenModel = phuongThucVanChuyenProcessor.findById(e.getIdPhuongThucVanChuyen());
+            var userModel = userProcessor.findById(e.getIdDiaChiGiaoHang());
+            model.setDiaChiGiaoHangModel(diaChiGiaoHangModel);
+            model.setPhuongThucVanChuyenModel(phuongThucVanChuyenModel);
+            model.setUserModel(userModel);
+            model.setHoaDonChiTietModels(hoaDonChiTietModels);
+            return model;
+        }).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
 

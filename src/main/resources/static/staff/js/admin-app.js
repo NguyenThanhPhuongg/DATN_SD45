@@ -134,28 +134,8 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/hoadon/chitiethoadon.html",
             controller: "hdct-ctrl"
         })
-        .when("/choxacnhan", {
-            templateUrl: "asset/hoadon/choxacnhan.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/chogiaohang", {
-            templateUrl: "asset/hoadon/chogiaohang.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/dangvanchuyen", {
-            templateUrl: "asset/hoadon/dangvanchuyen.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoanthanh", {
-            templateUrl: "asset/hoadon/hoanthanh.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/dahuy", {
-            templateUrl: "asset/hoadon/dahuy.html",
-            controller: "hoadon-ctrl"
-        })
-        .when("/hoantra", {
-            templateUrl: "asset/hoadon/hoantra.html",
+        .when("/hoadon", {
+            templateUrl: "asset/hoadon/hoadon.html",
             controller: "hoadon-ctrl"
         })
 

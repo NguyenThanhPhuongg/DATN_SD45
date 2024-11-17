@@ -4,6 +4,7 @@ import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.DiaChiGiaoHangModel;
 import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,16 +60,22 @@ public class SanPhamChiTietProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult save(SanPhamChiTietModel model) {
+    public ServiceResult save(SanPhamChiTietModel model, UserAuthentication ua) {
         SanPhamChiTiet sanPham = new SanPhamChiTiet();
         BeanUtils.copyProperties(model, sanPham);
+        sanPham.setNguoiTao(ua.getPrincipal());
+        sanPham.setNgayTao(LocalDateTime.now());
+        sanPham.setNguoiCapNhat(ua.getPrincipal());
+        sanPham.setNgayCapNhat(LocalDateTime.now());
         service.save(sanPham);
         return new ServiceResult("Sản phẩm đã được thêm thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult update(Long id, SanPhamChiTietModel model) {
+    public ServiceResult update(Long id, SanPhamChiTietModel model, UserAuthentication ua) {
         SanPhamChiTiet sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
         BeanUtils.copyProperties(model, sanPham);
+        sanPham.setNguoiCapNhat(ua.getPrincipal());
+        sanPham.setNgayCapNhat(LocalDateTime.now());
         service.save(sanPham);
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
