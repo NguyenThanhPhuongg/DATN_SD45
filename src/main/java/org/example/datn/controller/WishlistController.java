@@ -1,5 +1,6 @@
 package org.example.datn.controller;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.Wishlist;
@@ -27,4 +28,10 @@ public class WishlistController {
     public List<SanPham> getUserFavoriteProducts(@PathVariable Long userId) {
         return wishlistService.getFavoriteProductsByUserId(userId);
     }
+
+    @GetMapping("/hien-thi")
+    public List<Wishlist> getAll() {
+        return wishlistService.getAll();
+    }
+
 }
