@@ -56,6 +56,7 @@ public class GioHangChiTietProcessor {
 //        var gioHangChiTiet = new GioHangChiTiet();
 //        BeanUtils.copyProperties(request, gioHangChiTiet);
 //        gioHangChiTiet.setIdGioHang(gioHang.getId());
+        var sanPham = sanPhamService.findById(request.getIdSanPham()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var spct = spctService.findByIdSanPhamAndIdSizeAndIdMauSac(request.getIdSanPham(), request.getIdSize(), request.getIdMauSac())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var soLuongConLai = spct.getSoLuong();
@@ -79,7 +80,7 @@ public class GioHangChiTietProcessor {
             BeanUtils.copyProperties(request, ghct);
             ghct.setIdGioHang(gioHang.getId());
             ghct.setIdSanPhamChiTiet(spct.getId());
-            ghct.setGia(spct.getGia());
+            ghct.setGia(sanPham.getGia());
             ghct.setIdSanPhamChiTiet(spct.getId());
             ghct.setTrangThai(StatusGioHang.CHUA_DAT_HANG.getValue());
             service.save(ghct);

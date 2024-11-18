@@ -432,7 +432,7 @@ function populateTable(data) {
     let totalItemPrice = 0; // Biến lưu tổng tiền hàng
 
     data.forEach(item => {
-        const gia = item.gia; // Lấy giá từ sản phẩm chi tiết
+        const gia = item.sanPham.gia; // Lấy giá từ sản phẩm chi tiết
         const soLuong = item.soLuong; // Lấy số lượng
         const tongCong = gia * soLuong; // Tính tổng cộng
 
