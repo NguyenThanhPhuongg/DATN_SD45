@@ -1425,6 +1425,20 @@ input[type="number"] {
     text-align: center;
 }
 
+.shadow-container {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng */
+    border-radius: 8px; /* Tùy chọn bo góc */
+    padding: 20px; /* Tùy chọn khoảng cách nội dung */
+    background-color: #fff; /* Đặt màu nền trắng */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+.shadow-container:hover {
+    transform: translateY(-5px); /* Hiệu ứng nổi khi hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Tăng độ rõ khi hover */
+}
+
+
 
 
 

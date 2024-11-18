@@ -22,11 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-<<<<<<< HEAD
+
 import java.util.List;
-=======
 import javax.persistence.EntityNotFoundException;
->>>>>>> dc62a7084b6166036f4cf72d42484c581565415d
 import java.util.stream.Collectors;
 
 /**
