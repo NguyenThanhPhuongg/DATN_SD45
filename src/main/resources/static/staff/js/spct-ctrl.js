@@ -118,7 +118,14 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                $http.put('/san-pham/' + item.id + '/status?status=2')
+                const token = localStorage.getItem('token');
+                $http({
+                    method: 'PUT',
+                    url: '/san-pham/' + item.id + '/status?status=2',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Thêm token vào header Authorization
+                    }
+                })
                     .then(function (response) {
                         $scope.initialize();
                         swal("Success!", "Ẩn sản phẩm thành công", "success");
@@ -135,22 +142,29 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.updateStatus1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn Hiện sản phẩm này không?",
+            text: "Bạn có chắc muốn Ẩn sản phẩm này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
-                $http.put('/san-pham/' + item.id + '/status?status=1')
+                const token = localStorage.getItem('token');
+                $http({
+                    method: 'PUT',
+                    url: '/san-pham/' + item.id + '/status?status=1',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Thêm token vào header Authorization
+                    }
+                })
                     .then(function (response) {
                         $scope.initialize();
-                        swal("Success!", "Hiện sản phẩm thành công", "success");
+                        swal("Success!", "Ẩn sản phẩm thành công", "success");
                     }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Hiện sản phẩm thất bại", "error");
+                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
                 });
             } else {
-                swal("Hủy cập nhật", "Hiện sản phẩm đã bị hủy", "error");
+                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
             }
         });
     };
@@ -228,16 +242,18 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 1);
-                formData.append("ngayCapNhat", now);
-                formData.append("nguoiCapNhat", 1);
+                // formData.append("ngayCapNhat", now);
+                // formData.append("nguoiCapNhat", 1);
 
                 formData.append("ma", $scope.form.ma);
-                formData.append("ngayTao", now);
-                formData.append("nguoiTao", $scope.form.nguoiTao);
+                // formData.append("ngayTao", now);
+                // formData.append("nguoiTao", $scope.form.nguoiTao);
+                const token = localStorage.getItem('token');
 
                 $http.put(`/san-pham/${$scope.form.id}`, formData, {
                     headers: {
-                        "Content-Type": undefined
+                        'Content-Type': undefined,
+                        'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
                     }
                 }).then(function (response) {
                     $scope.initialize();
@@ -252,6 +268,7 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
             }
         });
     };
+
 
     $scope.validateFields = function () {
         let isValid = true;

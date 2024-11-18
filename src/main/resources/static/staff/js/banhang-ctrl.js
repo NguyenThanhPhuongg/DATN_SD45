@@ -5,6 +5,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     $scope.activeBill = 0;
     $scope.showPopUp = false;
     $scope.listProduct = [];
+    $scope.vouchers = [];
     $scope.searchQuery = '';
     // Thiết lập Firebase
     var ref = new Firebase("https://dantn-742db-default-rtdb.firebaseio.com");
@@ -42,6 +43,23 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         ref.remove()
     };
     $scope.clearData();
+
+    $http.get("/khuyen-mai").then(resp => {
+        if (resp.data.code === '200') {
+            $scope.vouchers = resp.data.data
+        }
+    });
+
+    var unloadHandler = function (event) {
+        localStorage.setItem('bills', JSON.stringify($scope.bills))
+    };
+    window.addEventListener('beforeunload', unloadHandler);
+    $scope.$on('$destroy', function () {
+        window.removeEventListener('beforeunload', unloadHandler);
+    });
+    if (localStorage.getItem('bills')) {
+        $scope.bills = JSON.parse(localStorage.getItem('bills'));
+    }
     $scope.generateBillName = function (lastName) {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -93,6 +111,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             payQRbank: null,
             codeBill: null,
             dateBill: null,
+            diemThuong: 0,
             items: []
         };
         $scope.bills.push(bill);
@@ -123,12 +142,22 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }
     };
 
+
     $scope.updateQuantity = function (bill, item) {
-        if (item.soLuong <= 50) {
-            item.total = item.soLuong * item.gia;
+        item.soLuong = Number(item.soLuong);
+        if (isNaN(item.soLuong)) {
+            item.quantity = 50
         }
-        $scope.updateTotalBill(bill)
+        item.total = item.soLuong * item.gia;
+        if (item.soLuong >= 50) {
+            item.soLuong = 50;
+        }
+        if (item.soLuong < 1) {
+            item.soLuong = 1;
+        }
+        $scope.updateTotalBill(bill);
     };
+
     $scope.updateTotalBill = function (bill) {
         bill.totalBill = bill.items.reduce(function (total, product) {
             return total + (product.soLuong * product.gia);
@@ -198,7 +227,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
 
     $scope.searchFilter = function(product) {
-        console.log(1111)
+
         if (!$scope.searchQuery) {
             return true; // Trả về tất cả sản phẩm khi không có từ khóa tìm kiếm
         }
@@ -209,15 +238,21 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     $scope.closeProductList = function () {
         $scope.showPopUp = false
     };
+
     $scope.addProductToBill = function (bill, product) {
-        bill.items.push({
-            tenSanPham: product.tenSanPham,
-            id: product.id,
-            image: product.image,
-            gia: product.gia,
-            ghiChu: product.ghiChu,
-            soLuong: 1
-        });
+        const existingProduct = bill.items.find(item => item.id === product.id);
+        if (existingProduct) {
+            existingProduct.soLuong++;
+        } else {
+            bill.items.push({
+                tenSanPham: product.tenSanPham,
+                id: product.id,
+                image: product.image,
+                gia: product.gia,
+                ghiChu: product.ghiChu,
+                soLuong: 1
+            });
+        }
         $scope.updateTotalBill(bill);
         $scope.showPopUp = false
     };
