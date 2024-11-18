@@ -10,21 +10,16 @@ import org.example.datn.jwt.JwtGenerator;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.*;
-import org.example.datn.model.request.AuthModel;
-import org.example.datn.model.request.ChangePasswordModel;
-import org.example.datn.model.request.HoaDonRequest;
-import org.example.datn.model.request.RegisterModel;
+import org.example.datn.model.request.*;
 import org.example.datn.model.response.*;
 import org.example.datn.processor.auth.AuthenticationChannelProvider;
 import org.example.datn.processor.auth.AuthoritiesValidator;
 import org.example.datn.service.*;
-import org.example.datn.transformer.HoaDonChiTietTransformer;
-import org.example.datn.transformer.HoaDonTransformer;
-import org.example.datn.transformer.ProfileTransformer;
-import org.example.datn.transformer.UserTransformer;
+import org.example.datn.transformer.*;
 import org.example.datn.utils.VNPayUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -83,6 +78,18 @@ public class HoaDonProcessor {
     HoaDonChiTietTransformer hoaDonChiTietTransformer;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private SanPhamChiTietService sanPhamChiTietService;
+    @Autowired
+    private SanPhamChiTietTransformer sanPhamChiTietTransformer;
+    @Autowired
+    private SanPhamService sanPhamService;
+    @Autowired
+    private SanPhamTransformer sanPhamTransformer;
+    @Autowired
+    private MauSacService mauSacService;
+    @Autowired
+    private SizeService sizeService;
 
     public ServiceResult getAll() {
         var list = service.getAll();
@@ -174,7 +181,7 @@ public class HoaDonProcessor {
             tongTien = tongTien.subtract(request.getGiaTriVoucher());
         }
 
-        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen()) .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phương thức vận chuyển"));
+        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phương thức vận chuyển"));
         tongTien = tongTien.add(phuongThucVanChuyen.getPhiVanChuyen());
 
         hoaDon.setTongTien(tongTien);
@@ -304,6 +311,37 @@ public class HoaDonProcessor {
             model.setHoaDonChiTietModels(hoaDonChiTietModels);
             return model;
         }).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    public ServiceResult getListByStatus(HoaDonChiTietRequest request, UserAuthentication ua) {
+        List<HoaDon> hoaDons = service.findByIdNguoiDungAndTrangThai(ua.getPrincipal(), request.getStatus());
+
+        List<HoaDonModel> models = hoaDons.stream().map(hoaDon -> {
+            HoaDonModel model = hoaDonTransformer.toModel(hoaDon);
+
+            List<HoaDonChiTietModel> hoaDonChiTietModels = hoaDonChiTietService.findByIdHoaDon(hoaDon.getId()).stream()
+                    .map(hoaDonChiTiet -> {
+                        HoaDonChiTietModel hoaDonChiTietModel = hoaDonChiTietTransformer.toModel(hoaDonChiTiet);
+
+                        sanPhamChiTietService.findById(hoaDonChiTiet.getIdSanPhamChiTiet()).ifPresent(spct -> {
+                            SanPhamChiTietModel spctModel = sanPhamChiTietTransformer.toModel(spct);
+                            sanPhamService.findById(spct.getIdSanPham()).ifPresent(sanPham ->
+                                    spctModel.setSanPhamModel(sanPhamTransformer.toModel(sanPham))
+                            );
+                            sizeService.findById(spct.getIdSize()).ifPresent(spctModel::setSize);
+                            mauSacService.findById(spct.getIdMauSac()).ifPresent(spctModel::setMauSac);
+                            hoaDonChiTietModel.setSanPhamChiTietModel(spctModel);
+                        });
+
+                        return hoaDonChiTietModel;
+                    })
+                    .collect(Collectors.toList());
+
+            model.setHoaDonChiTietModels(hoaDonChiTietModels);
+            return model;
+        }).collect(Collectors.toList());
+
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 

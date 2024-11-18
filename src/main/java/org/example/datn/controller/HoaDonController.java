@@ -5,6 +5,7 @@ import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DanhMucRequest;
+import org.example.datn.model.request.HoaDonChiTietRequest;
 import org.example.datn.model.request.HoaDonRequest;
 import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.processor.DanhMucProcessor;
@@ -77,6 +78,11 @@ public class HoaDonController {
                                                       UserAuthentication ua) {
         ServiceResult result = processor.updateHuyHoaDon(id, ua);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/get-list-by-status")
+    public ResponseEntity<ServiceResult> getListByStatus(@RequestBody HoaDonChiTietRequest request, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.getListByStatus(request, ua));
     }
 
 }

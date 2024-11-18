@@ -15,7 +15,10 @@
             margin-right: auto;
             width: 1200px;
             background-color: #f0f0f0;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow */
+            height: 1000px; /* Increase the height as needed */
+            overflow: hidden; /* Prevent content from overflowing */
+            position: relative; /* Ensure positioned children are contained */
         }
 
         /* CSS cho sidebar */
@@ -65,8 +68,10 @@
             padding: 20px;
             margin-left: 20px;
             background-color: #fff;
-            height: 800px;
+            height: 100%; /* Ensure it takes full height of the parent */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: auto; /* Add scroll if content overflows */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
 
         .form-group {
@@ -303,17 +308,31 @@
             cursor: pointer;
         }
 
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 20px;
+            background-color: #fff;
+            height: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Prevent content from overflowing */
+            position: relative; /* Ensure positioned children are contained */
+        }
+
         .order-contents {
             margin-top: 20px;
             border: 1px solid #ddd;
             padding: 10px;
             background-color: #f9f9f9;
             display: flex;
-            flex-direction: column; /* Đặt các ô theo chiều dọc */
-            max-height: 70vh; /* Đặt chiều cao tối đa để tránh chèn lên footer */
-            overflow-y: auto; /* Thêm cuộn dọc */
-            border-radius: 8px; /* Bo góc cho toàn bộ container */
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+            flex-direction: column;
+            overflow-y: auto; /* Add vertical scroll if content overflows */
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Ensure it takes full width of the parent */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            max-height: 100%; /* Ensure it does not exceed the height of the parent */
+            position: absolute; /* Position it within the content container */
         }
 
         .order-item {
@@ -552,6 +571,123 @@
             margin-right: 8px; /* Khoảng cách giữa hình ảnh và văn bản */
         }
 
+        /* General order container */
+        .order-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        /* Header of the order */
+        .order-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .order-header h2 {
+            font-size: 1.2em;
+            margin: 0;
+            color: #333;
+        }
+
+        .order-header .status {
+            font-weight: bold;
+            color: #ff5722;
+        }
+
+        /* Order items */
+        .order-details {
+            margin-bottom: 15px;
+        }
+
+        .order-item {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item h3 {
+            font-size: 1.1em;
+            margin: 0 0 10px;
+        }
+
+        .classification p {
+            margin: 5px 0;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #ff5722;
+        }
+
+        .total {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Total amount section (below order details) */
+        .order-total {
+            font-size: 24px; /* Set font size to 24px */
+            font-weight: bold;
+            color: #f44336; /* Set color to red */
+            margin-top: 20px; /* Create space before the total */
+            text-align: right; /* Align the total amount to the right */
+        }
+
+        .order-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 10px; /* Add some space between buttons */
+        }
+
+        .order-actions button,
+        .order-actions .cancel-order {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .order-actions button:hover {
+            background-color: #45a049;
+        }
+
+        .order-actions .cancel-order {
+            background-color: #ff5722;
+        }
+
+        .order-actions .cancel-order:hover {
+            background-color: #e64a19;
+        }
+
+        /* Refund message */
+        .refund {
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .refund-label {
+            font-weight: bold;
+        }
+
+        .refund-amount {
+            color: #ff5722;
+        }
+
 
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
@@ -711,6 +847,7 @@
                 <div class="tab-links">
                     <ul>
                         <li><a href="#" class="tab-link" data-status="null">Tất cả</a></li>
+                        <li><a href="#" class="tab-link" data-status="0">Chờ xác nhận</a></li>
                         <li><a href="#" class="tab-link" data-status="1">Chờ thanh toán</a></li>
                         <li><a href="#" class="tab-link" data-status="2">Chờ giao hàng</a></li>
                         <li><a href="#" class="tab-link" data-status="3">Vận chuyển</a></li>
@@ -815,7 +952,7 @@
     // Hàm để lấy dữ liệu đơn hàng từ API
     async function fetchOrderData(status) {
         const token = localStorage.getItem('token'); // Lấy token từ localStorage
-        const response = await fetch('/hoa-don-chi-tiet/get-list-by-status', {
+        const response = await fetch('/rest/hoadon/get-list-by-status', {
             method: 'POST', // Sử dụng phương thức POST
             headers: {
                 'Content-Type': 'application/json',
@@ -847,38 +984,78 @@
     // Hàm để hiển thị dữ liệu đơn hàng lên giao diện
     function displayOrderData(orderList) {
         const orderContents = document.getElementById('order-contents');
-        orderContents.innerHTML = ''; // Xóa nội dung cũ
+        orderContents.innerHTML = ''; // Clear previous content
 
         if (orderList && orderList.length > 0) {
             orderList.forEach(order => {
-                const orderItem = document.createElement('div');
-                orderItem.classList.add('order-item');
+                // Create a container for the entire order
+                const orderContainer = document.createElement('div');
+                orderContainer.classList.add('order-container'); // Class for styling the whole order
 
-                const trangThaiMoTa = trangThaiMap[order.trangThai] || 'Không xác định';
-                const thanhTien = order.soLuong * order.gia;
-
-                orderItem.innerHTML = `
-                <h3>Sản phẩm: ${order.sanPhamChiTietModel.sanPhamModel.ten} <span class="status">${trangThaiMoTa}</span></h3>
-                <div class="classification">
-                    <p>Phân loại hàng: màu ${order.sanPhamChiTietModel.mauSac.ten}, size ${order.sanPhamChiTietModel.size.ten}</p>
-                    <p class="price">₫${order.gia}</p>
-                </div>
-                <p>x${order.soLuong}</p>
-                ${order.trangThai !== 6 ? `<div class="total">Thành tiền: ₫${thanhTien}</div>` : ''}
-                <div class="actions">
-                    ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
-                    ${order.trangThai === 5 ? '<button class="cancel-details">Xem chi tiết hủy đơn</button>' : ''}
-                    ${order.trangThai === 1 || order.trangThai === 0 ? '<button class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>' : ''}
-                    ${order.trangThai === 6 ? `<div class="refund"><span class="refund-label">Số tiền hoàn lại:</span> <span class="refund-amount">₫${thanhTien}</span></div>` : ''}
-                </div>
+                // Create order header
+                const orderHeader = document.createElement('div');
+                orderHeader.classList.add('order-header');
+                orderHeader.innerHTML = `
+                <h2>Mã đơn hàng: ${order.ma}</h2>
+                <span class="status">${trangThaiMap[order.trangThai] || 'Không xác định'}</span>
             `;
-                orderContents.appendChild(orderItem); // Thêm thông tin đơn hàng vào nội dung hiển thị
+                orderContainer.appendChild(orderHeader);
+
+                // Create order details
+                const orderDetails = document.createElement('div');
+                orderDetails.classList.add('order-details');
+
+
+                // Add order items
+                order.hoaDonChiTietModels.forEach((hdct, index) => {
+                    const orderItem = document.createElement('div');
+                    orderItem.classList.add('order-item');
+
+                    const thanhTien = hdct.soLuong * hdct.gia;
+                    orderItem.innerHTML = `
+                    <h3>Sản phẩm: ${hdct.sanPhamChiTietModel.sanPhamModel.ten}</h3>
+                    <div class="classification">
+                        <p>Phân loại hàng: màu ${hdct.sanPhamChiTietModel.mauSac.ten}, size ${hdct.sanPhamChiTietModel.size.ten}</p>
+                        <p class="price">₫${hdct.gia}</p>
+                    </div>
+                    <p>x${hdct.soLuong}</p>
+                `;
+                    orderDetails.appendChild(orderItem);
+
+                    // Add a horizontal line between order items, except the last one
+                    if (index < order.hoaDonChiTietModels.length - 1) {
+                        const separator = document.createElement('hr');
+                        orderDetails.appendChild(separator);
+                    }
+                });
+
+                // Create the total amount div (placed below the order details)
+                const totalDiv = document.createElement('div');
+                totalDiv.classList.add('order-total');
+                totalDiv.innerHTML = `<strong>Tổng cộng: ₫${order.tongTien}</strong>`;
+                orderContainer.appendChild(orderDetails); // Add the order details first
+                orderContainer.appendChild(totalDiv); // Then add the total amount after details
+
+                // Create actions section outside the order-items
+                const orderActions = document.createElement('div');
+                orderActions.classList.add('order-actions');
+
+                // Add action buttons based on order status
+                orderActions.innerHTML = `
+                ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
+                ${order.trangThai === 5 ? '<button class="cancel-details">Xem chi tiết hủy đơn</button>' : ''}
+                ${order.trangThai === 1 || order.trangThai === 0 ? '<button class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>' : ''}
+                ${order.trangThai === 6 ? `<div class="refund"><span class="refund-label">Số tiền hoàn lại:</span> <span class="refund-amount">₫${order.tongTien}</span></div>` : ''}
+            `;
+                orderContainer.appendChild(orderActions); // Add the actions (buy again, cancel, etc.)
+
+                // Add the entire order container to the orderContents
+                orderContents.appendChild(orderContainer);
             });
         } else {
-            orderContents.innerHTML = '<p>Không có đơn hàng nào.</p>'; // Hiển thị thông báo nếu không có đơn hàng
+            orderContents.innerHTML = '<p>Không có đơn hàng nào.</p>'; // Display message if no orders
         }
     }
-
 
     // Gọi dữ liệu đơn hàng khi tab "Tất cả" được kích hoạt lần đầu
     document.querySelector('.tab-link[data-status="null"]').classList.add('active');
