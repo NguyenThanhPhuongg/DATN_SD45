@@ -52,10 +52,6 @@ public class SanPhamController {
             return ResponseEntity.ok(processor.update(id, model,ua));
         }
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
-        return ResponseEntity.ok(processor.delete(id));
-    }
 
     @PutMapping("/{id}/status")
     public ResponseEntity<ServiceResult> updateStatus(@PathVariable Long id, @RequestParam("status") int status, UserAuthentication ua) {
@@ -66,4 +62,9 @@ public class SanPhamController {
     public List<SanPham> searchProducts(@RequestParam String ten) {
         return service.searchProductsByName(ten);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(processor.delete(id));
+    }
+
 }

@@ -91,6 +91,8 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                 item.idSize === detail.idSize && item.idMauSac === detail.idMauSac && item.idSanPham === $scope.selectedProductId
             );
 
+            const token = localStorage.getItem('token'); // Điều chỉnh key 'authToken' theo token bạn lưu trữ trong localStorage
+
             if (existingDetailIndex !== -1) {
                 // Nếu đã tồn tại, cập nhật thông tin sản phẩm chi tiết
                 const existingDetail = $scope.items[existingDetailIndex];
@@ -99,22 +101,28 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                 existingDetail.ghiChu = detail.ghiChu;
 
                 // Gọi API để cập nhật sản phẩm chi tiết
-                return $http.put(`/spct/${existingDetail.id}`, existingDetail); // Sử dụng ID của sản phẩm chi tiết để cập nhật
+                return $http.put(`/spct/${existingDetail.id}`, existingDetail,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                        }
+                    }); // Sử dụng ID của sản phẩm chi tiết để cập nhật
             } else {
                 // Nếu không tồn tại, tạo một sản phẩm chi tiết mới
                 return $http.post("/spct", {
-                    idSanPham: $scope.selectedProductId,
-                    idSize: detail.idSize,
-                    idMauSac: detail.idMauSac,
-                    soLuong: detail.soLuong,
-                    gia: detail.gia,
-                    ghiChu: detail.ghiChu,
-                    trangThai: 1,
-                    ngayTao: new Date().toISOString(),
-                    ngayCapNhat: new Date().toISOString(),
-                    nguoiTao: 1,
-                    nguoiCapNhat: 1
-                });
+                        idSanPham: $scope.selectedProductId,
+                        idSize: detail.idSize,
+                        idMauSac: detail.idMauSac,
+                        soLuong: detail.soLuong,
+                        gia: detail.gia,
+                        ghiChu: detail.ghiChu,
+                        trangThai: 1,
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                        }
+                    });
             }
         });
 
@@ -206,9 +214,15 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
         }).then((willUpdate) => {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
-                item.ngayCapNhat = new Date(); // Chỉ cập nhật ngày sửa
-                item.nguoiCapNhat = 2;
-                $http.put(`/spct/${item.id}`, item).then(resp => {
+
+                // Lấy token từ localStorage
+                const token = localStorage.getItem('token'); // Thay 'authToken' bằng khóa token thực tế của bạn
+
+                $http.put(`/spct/${item.id}`, item, {
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
+                    }
+                }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
                     swal("Success!", "Cập nhật thành công", "success");
                     $('#exampleModal').modal('hide');
@@ -223,51 +237,38 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     };
 
     $scope.update2 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái sản phẩm này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 2; // Cập nhật trạng thái
-                $http.put(`/spct/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật trạng thái sản phẩm thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật trạng thái sản phẩm thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái sản phẩm đã bị hủy", "error");
+        let updatedItem = angular.copy(item);
+        updatedItem.trangThai = 2;
+        var token = localStorage.getItem('token');
+        $http.put(`/spct/${updatedItem.id}`, updatedItem, {
+            headers: {
+                'Authorization': 'Bearer ' + token
             }
+        }).then(resp => {
+            $scope.initialize();
+            swal("Success!", "Đã cập nhật trạng thái thành 2", "success");
+        }).catch(error => {
+            swal("Error!", "Cập nhật trạng thái thất bại", "error");
+            console.log("Error: ", error);
         });
     };
 
     $scope.update1 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái sản phẩm này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 1; // Cập nhật trạng thái
-                $http.put(`/spct/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật trạng thái sản phẩm thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật trạng thái sản phẩm thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái sản phẩm đã bị hủy", "error");
+        let updatedItem = angular.copy(item);
+        updatedItem.trangThai = 1;
+        var token = localStorage.getItem('token');
+        $http.put(`/spct/${updatedItem.id}`, updatedItem, {
+            headers: {
+                'Authorization': 'Bearer ' + token
             }
+        }).then(resp => {
+            $scope.initialize();
+            swal("Success!", "Đã cập nhật trạng thái thành 2", "success");
+        }).catch(error => {
+            swal("Error!", "Cập nhật trạng thái thất bại", "error");
+            console.log("Error: ", error);
         });
     };
-
     // Gọi hàm initialize khi controller được khởi tạo
     $scope.initialize();
 });

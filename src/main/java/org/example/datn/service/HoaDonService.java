@@ -45,4 +45,7 @@ public class HoaDonService {
         return repo.findByTrangThai(trangThai);
     }
 
+    public List<HoaDon> findByIdNguoiDungAndTrangThai(Long idNguoiDung, Integer trangThai) {
+        return repo.findByIdNguoiDungAndTrangThai(idNguoiDung, trangThai);
+    }
 }
