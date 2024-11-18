@@ -63,7 +63,7 @@ public class GioHangChiTietProcessor {
             throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
         }
 
-        var gioHangChiTiet = service.findByIdGioHangAndIdSanPhamChiTiet(gioHang.getId(), spct.getId());
+        var gioHangChiTiet = service.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(gioHang.getId(), spct.getId(), StatusGioHang.CHUA_DAT_HANG.getValue());
 
         if (gioHangChiTiet.isPresent()) {
             var currentQuantity = gioHangChiTiet.get().getSoLuong();
