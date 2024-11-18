@@ -836,11 +836,11 @@
                     <button id="save-button" onclick="submitNewAddress()">Lưu</button>
                     <button onclick="cancelNewAddress()">Hủy</button>
                 </div>
-                <div id="confirm-dialog" class="confirm-dialog" style="display: none;">
-                    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
-                    <button id="confirm-yes">Có</button>
-                    <button id="confirm-no">Không</button>
-                </div>
+                <!--                <div id="confirm-dialog" class="confirm-dialog" style="display: none;">-->
+                <!--                    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>-->
+                <!--                    <button id="confirm-yes">Có</button>-->
+                <!--                    <button id="confirm-no">Không</button>-->
+                <!--                </div>-->
             </div>
 
             <div id="orders-tabs" class="tabs">
@@ -865,11 +865,11 @@
     </div>
 </main>
 <div id="notification" class="notification"></div>
-<!--<div id="confirm-dialog" class="confirm-dialog" style="display: none;">-->
-<!--    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>-->
-<!--    <button id="confirm-yes">Có</button>-->
-<!--    <button id="confirm-no">Không</button>-->
-<!--</div>-->
+<div id="confirm-dialog" class="confirm-dialog" style="display: none;">
+    <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+    <button id="confirm-yes">Có</button>
+    <button id="confirm-no">Không</button>
+</div>
 
 
 <div th:include="footer::body"></div>
@@ -1044,7 +1044,10 @@
                 orderActions.innerHTML = `
                 ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
                 ${order.trangThai === 5 ? '<button class="cancel-details">Xem chi tiết hủy đơn</button>' : ''}
-                ${order.trangThai === 1 || order.trangThai === 0 ? '<button class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>' : ''}
+               ${order.trangThai === 1 || order.trangThai === 0
+                    ? `<button onclick="showCancelConfirmDialog(${order.id})" class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>`
+                    : ''}
+
                 ${order.trangThai === 6 ? `<div class="refund"><span class="refund-label">Số tiền hoàn lại:</span> <span class="refund-amount">₫${order.tongTien}</span></div>` : ''}
             `;
                 orderContainer.appendChild(orderActions); // Add the actions (buy again, cancel, etc.)
@@ -1391,6 +1394,7 @@
     // Hàm để hủy thêm mới địa chỉ
     function cancelNewAddress() {
         document.getElementById('add-address-form').style.display = 'none'; // Ẩn form thêm mới
+        document.getElementById('add-address-button').style.display = 'block';
         document.getElementById('address-list').style.display = 'block'; // Hiển thị lại danh sách địa chỉ
         clearFormErrors(); // Xóa tất cả lỗi
         document.getElementById('hoTen').value = '';
@@ -1531,6 +1535,46 @@
         errorElement.style.color = 'red';
         errorElement.textContent = message;
         inputElement.parentNode.appendChild(errorElement);
+    }
+
+    // Function to show the confirmation dialog
+    function showCancelConfirmDialog(orderId) {
+        console.log("Hàm showCancelConfirmDialog được gọi với orderId: ", orderId);
+        document.getElementById('confirm-dialog').style.display = 'block';
+        document.getElementById('confirm-message').innerText = 'Bạn có chắc chắn muốn hủy đơn hàng này không?';
+        document.getElementById('confirm-yes').onclick = function () {
+            cancelOrder(orderId);
+        };
+    }
+
+    // Function to call the cancel order API
+    async function cancelOrder(orderId) {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/rest/hoadon/cancel/${orderId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            hienThiThongBao('Đơn hàng đã được hủy thành công!', true);
+            document.getElementById('confirm-dialog').style.display = 'none';
+            fetchOrderDataForActiveTab(); // Refresh the order list for the active tab
+        } else {
+            hienThiThongBao('Có lỗi xảy ra khi hủy đơn hàng.', false);
+        }
+    }
+
+    // Function to fetch order data for the currently active tab
+    function fetchOrderDataForActiveTab() {
+        const activeTab = document.querySelector('.tab-link.active');
+        if (activeTab) {
+            let status = activeTab.dataset.status;
+            status = status === "null" ? null : parseInt(status, 10);
+            fetchOrderData(status);
+        }
     }
 </script>
 </body>

@@ -345,5 +345,32 @@ public class HoaDonProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult cancelOrder(Long id, UserAuthentication ua) {
+        HoaDon hoaDon = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+        if (hoaDon.getTrangThai() != StatusHoaDon.CHO_XAC_NHAN.getValue() &&
+                hoaDon.getTrangThai() != StatusHoaDon.CHO_THANH_TOAN.getValue()) {
+            throw new IllegalArgumentException("Hóa đơn không thể hủy vì trạng thái không hợp lệ.");
+        }
+
+        List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.findByIdHoaDon(id);
+        hoaDonChiTiets.forEach(hoaDonChiTiet -> {
+            hoaDonChiTiet.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+        });
+
+        hoaDonChiTietService.saveAll(hoaDonChiTiets);
+
+        hoaDon.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
+        hoaDon.setNguoiCapNhat(ua.getPrincipal());
+
+        service.save(hoaDon);
+
+        // Trả về kết quả thành công
+        return new ServiceResult();
+    }
+
+
 
 }

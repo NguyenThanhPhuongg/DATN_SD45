@@ -69,13 +69,13 @@ public class HoaDonController {
     @PutMapping("/update-status/{id}")
     public ResponseEntity<ServiceResult> updateByTrangThai(@PathVariable Long id,
                                                            UserAuthentication ua) throws DuplicatedException {
-        ServiceResult result = processor.updateStatus(id ,ua);
+        ServiceResult result = processor.updateStatus(id, ua);
         return ResponseEntity.ok(result);
     }
 
     @PutMapping("/update-huy-tra/{id}")
     public ResponseEntity<ServiceResult> updateByTrangThaiHuyTra(@PathVariable Long id,
-                                                      UserAuthentication ua) {
+                                                                 UserAuthentication ua) {
         ServiceResult result = processor.updateHuyHoaDon(id, ua);
         return ResponseEntity.ok(result);
     }
@@ -83,6 +83,11 @@ public class HoaDonController {
     @PostMapping("/get-list-by-status")
     public ResponseEntity<ServiceResult> getListByStatus(@RequestBody HoaDonChiTietRequest request, UserAuthentication ua) {
         return ResponseEntity.ok(processor.getListByStatus(request, ua));
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<ServiceResult> cancelOrder(@PathVariable Long id, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.cancelOrder(id, ua));
     }
 
 }
