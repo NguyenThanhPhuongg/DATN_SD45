@@ -5,6 +5,7 @@ import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.DanhMucRequest;
+import org.example.datn.model.request.HoaDonChiTietRequest;
 import org.example.datn.model.request.HoaDonRequest;
 import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.processor.DanhMucProcessor;
@@ -68,15 +69,25 @@ public class HoaDonController {
     @PutMapping("/update-status/{id}")
     public ResponseEntity<ServiceResult> updateByTrangThai(@PathVariable Long id,
                                                            UserAuthentication ua) throws DuplicatedException {
-        ServiceResult result = processor.updateStatus(id ,ua);
+        ServiceResult result = processor.updateStatus(id, ua);
         return ResponseEntity.ok(result);
     }
 
     @PutMapping("/update-huy-tra/{id}")
     public ResponseEntity<ServiceResult> updateByTrangThaiHuyTra(@PathVariable Long id,
-                                                      UserAuthentication ua) {
+                                                                 UserAuthentication ua) {
         ServiceResult result = processor.updateHuyHoaDon(id, ua);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/get-list-by-status")
+    public ResponseEntity<ServiceResult> getListByStatus(@RequestBody HoaDonChiTietRequest request, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.getListByStatus(request, ua));
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<ServiceResult> cancelOrder(@PathVariable Long id, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.cancelOrder(id, ua));
     }
 
 }
