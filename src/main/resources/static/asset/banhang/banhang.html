@@ -77,10 +77,16 @@
                                     {{item.tenSanPham}} <br>
                                     <small class="text-muted">{{item.ghiChu}}</small>
                                 </td>
-                                <td><input type="number" class="form-control" ng-model="item.soLuong" min="1" max="50"
-                                           ng-init="item.soLuong = 1" ng-change="updateQuantity(bill, item)"/></td>
-                                <td class="text-end">{{ formatCurrency(item.gia) }}</td>
-                                <td class="text-end">{{ item.soLuong <= 50 ? formatCurrency(item.soLuong * item.gia) : 'Số lượng không vượt quá 50'}}</td>
+                                <td>
+                                    <input type="number" class="form-control" ng-model="item.soLuong" min="1" max="50"
+                                           ng-init="item.soLuong = 1" ng-change="updateQuantity(bill, item)"/>
+                                </td>
+                                <td class="text-end">
+                                    {{ formatCurrency(item.gia) }}
+                                </td>
+                                <td class="text-end">
+                                    {{ formatCurrency(item.soLuong * item.gia) }}
+                                </td>
                                 <td class="text-center">
                                     <button ng-click="removeProduct(bill, item)" class="btn text-danger py-0">
                                         <svg width="17" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -94,36 +100,70 @@
                     </div>
                     <div class="col-3">
                         <div class="card rounded-0">
-                            <div class="card-header">
+                            <h6 class="card-header">
                                 Thông tin hóa đơn
-                            </div>
+                            </h6>
                             <div class="card-body p-0">
                                 <table class="table">
                                     <tbody>
                                     <tr>
-                                        <th scope="row">Số điện thoại</th>
-                                        <td><input type="text" ng-model="bill.phoneCustomer" class="form-control form-control-sm" maxlength="10" ng-change="onPhoneChange(bill)" id="phoneInput-{{ index + 1 }}"></td>
+                                        <td>
+                                            <div class="input-group">
+                                            <span class="input-group-text">
+                                                <svg width="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                                                </svg>
+                                            </span>
+                                                <input type="text" ng-model="bill.phoneCustomer" class="form-control form-control-sm" maxlength="10" ng-change="onPhoneChange(bill)" placeholder="Số điện thoại khách hàng" id="phoneInput-{{ index + 1 }}">
+                                            </div>
+                                        </td>
+
                                     </tr>
                                     <tr>
-                                        <th scope="row">Tên khách hàng</th>
-                                        <td><input type="text"  ng-model="bill.nameCustomer" class="form-control form-control-sm" ng-keydown="onKeyDownName(bill)" id="nameInput-{{ index + 1 }}"></td>
+                                        <td>
+                                            <div class="input-group">
+                                            <span class="input-group-text">
+                                                <svg width="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                                </svg>
+                                            </span>
+                                                <input type="text" ng-model="bill.nameCustomer"
+                                                       placeholder="Tên khách hàng"
+                                                       class="form-control form-control-sm" ng-keydown="onKeyDownName(bill)"
+                                                       id="nameInput-{{ index + 1 }}">
+                                            </div>
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Tổng tiền</th>
-                                        <td class="text-end ">{{ formatCurrency(bill.totalBill)}} VNĐ</td>
+                                        <td>
+                                            <select name="" ng-model="item.diemThuong" class="form-control mb-1 form-control-sm">
+                                                <option value="" selected>-- Chọn khuyễn mãi --</option>
+                                                <option ng-repeat="voucher in vouchers" ng-value="voucher.giaTri">{{ voucher.ten }}</option>
+                                            </select>
+                                            <span>Giảm {{ item.diemThuong }}%</span>
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Tiền khách đưa</th>
+                                        <td>
+                                            <div class="d-flex justify-content-between">
+                                                <div scope="row">Tổng tiền</div>
+                                                <div class="text-end ">{{formatCurrency(((100 - item.diemThuong)/100) * bill.totalBill)}} VNĐ</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>
                                             <div class="input-group mb-1">
-                                                <input type="text" ng-model="bill.moneyCustomer" id="moneyCustomerInput" class="form-control" currency-input placeholder="Nhập số tiền" />
-                                                <span class="input-group-text" style=" font-size: 10px;padding: 3px;" >VNĐ</span>
+                                                <input  type="text" ng-model="bill.moneyCustomer" id="moneyCustomerInput"
+                                                       class="form-control" currency-input placeholder="Nhập số tiền khách đưa"/>
+                                                <span class="input-group-text" style=" font-size: 11px;padding: 7px;" >VNĐ</span>
                                             </div>
-                                            <span>Trả lại:
+                                            <span ng-if="bill.moneyCustomer > 0" ng-class="{'text-danger' :  bill.moneyCustomer < bill.totalBill}">
+                                                {{ bill.moneyCustomer < bill.totalBill ? 'Còn thiếu:' : 'Trả lại:' }}
                                                 <b class="return-money">
-                                                    {{ (bill.moneyCustomer > bill.totalBill) ? formatCurrency(bill.moneyCustomer - bill.totalBill) + ' VNĐ' : '0 VNĐ' }}
+                                                    {{ bill.moneyCustomer > 0 ? formatCurrency(bill.moneyCustomer - bill.totalBill) + ' VNĐ' : '0 VNĐ' }}
                                                 </b>
-                                        </span>
+                                            </span>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -141,7 +181,7 @@
                                         <img width="150" ng-src="{{bill.payQRbank}}" alt="QR Code for Bank Transfer">
                                     </div>
                                     <div class="text-start mt-2">
-                                        <button ng-click="payBill(bill)" ng-disabled="bill.disabled" class="btn btn-primary btn-block w-100">
+                                        <button ng-click="payBill(bill)" ng-disabled="bill.disabled || bill.moneyCustomer < bill.totalBill && bill.moneyCustomer > 0" class="btn btn-primary btn-block w-100">
                                             <img width="24" class="me-1" style="vertical-align: bottom;" src="/images/secure-payment.png" alt="">
                                             {{ bill.disabled ? 'Đã thanh toán ' + formatCurrency(bill.totalBill) + ' VNĐ' : 'Thanh toán ' + formatCurrency(bill.totalBill) + ' VNĐ'}}
                                         </button>
