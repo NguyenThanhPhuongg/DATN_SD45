@@ -148,7 +148,7 @@ public class HoaDonProcessor {
         service.save(hoaDon);
 
         var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
-                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phương thức thanh toán"));
 
         var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
         BigDecimal tongTien = BigDecimal.ZERO;
@@ -170,10 +170,12 @@ public class HoaDonProcessor {
             gioHangChiTietService.save(ghct);
         }
 
-        // Apply voucher discount
         if (request.getGiaTriVoucher() != null) {
             tongTien = tongTien.subtract(request.getGiaTriVoucher());
         }
+
+        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen()) .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phương thức vận chuyển"));
+        tongTien = tongTien.add(phuongThucVanChuyen.getPhiVanChuyen());
 
         hoaDon.setTongTien(tongTien);
         hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
