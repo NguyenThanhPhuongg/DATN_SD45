@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/review.css">
     <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/productDetail.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -222,5 +223,28 @@
 </main>
 <div th:include="footer::body"></div>
 <!--<script src="/js/prodcutDetail.js"></script>-->
+<!-- Thông báo không có token -->
+<div id="tokenWarning" class="alert alert-warning fixed-top w-100" role="alert" style="display: none; z-index: 1050;">
+    <div class="container text-center">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="font-size: 24px;">
+            <strong>Cảnh báo!</strong> Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.
+            <button type="button" class="btn-close" id="closeTokenWarning" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận -->
+<div id="confirmModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Xác nhận thêm vào giỏ hàng</h3>
+        <p>Bạn có chắc chắn muốn thêm sản phẩm vào giỏ hàng?</p>
+        <div class="modal-actions">
+            <button id="confirmAddToCart" class="btn-confirm">Xác nhận</button>
+            <button id="cancelAddToCart" class="btn-cancel">Hủy</button>
+        </div>
+    </div>
+</div>
+
+
 </body>
 </html>
