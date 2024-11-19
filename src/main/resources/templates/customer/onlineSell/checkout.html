@@ -64,21 +64,21 @@
         </div>
         <!-- Separate Product Section -->
         <div class="product">
-            <div class="title_product">
-                <div><h2>Sản phẩm</h2></div>
-                <div class="spacer"></div>
-                <div><span>Đơn giá</span></div>
-                <div><span>Số lượng</span></div>
-                <div><span>Thành tiền</span></div>
-            </div>
-            <div>
-                <table id="products">
-                    <tbody>
-                    <!-- Dữ liệu sẽ được thêm vào đây -->
-                    </tbody>
-                </table>
-            </div>
+            <table id="products">
+                <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Dữ liệu sẽ được thêm vào đây -->
+                </tbody>
+            </table>
         </div>
+
         <!-- Payment and Shipping Section -->
         <div class="pay_item_product">
             <div class="row">
@@ -176,6 +176,34 @@
 </main>
 <div id="message"></div>
 <div th:include="footer::body"></div>
+<!-- Confirmation Modal -->
+<!-- Modal xác nhận -->
+<!--<div id="confirmationModal" class="modal">-->
+<!--    <div class="modal-content">-->
+<!--        <span class="close" onclick="closeConfirmationModal()">&times;</span>-->
+<!--        <h2>Bạn có chắc chắn muốn đặt hàng?</h2>-->
+<!--        <div class="modal-buttons">-->
+<!--            <button id="confirmPlaceOrder">Đồng ý</button>-->
+<!--            <button id="cancelPlaceOrder">Hủy</button>-->
+<!--        </div>-->
+
+<!--    </div>-->
+<!--</div>-->
+<div id="confirmationModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <span class="custom-close" onclick="closeConfirmationModal()">&times;</span>
+        <h1>Xác nhận đặt hàng</h1>
+        <p>Bạn có chắc chắn muốn đặt hàng không?</p>
+
+        <div class="custom-modal-buttons">
+            <button id="confirmPlaceOrder">Đồng ý</button>
+            <button id="cancelPlaceOrder">Hủy</button>
+        </div>
+    </div>
+</div>
+
+
+
 
 </body>
 </html>
