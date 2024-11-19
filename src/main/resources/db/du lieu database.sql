@@ -319,8 +319,8 @@ select * from chat_lieu
 select * from chi_tiet_hoa_don 
 select * from hoa_don 
 select * from nguoi_dung 
-
-
+select * from phuong_thuc_van_chuyen
+select * from chi_tiet_gio_hang
 INSERT INTO [chi_tiet_hoa_don] ([id_hoa_don], [id_san_pham_chi_tiet], [so_luong], [gia], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
 (7, 1, 2, 200000, 1, GETDATE(), GETDATE(), 1, 1),

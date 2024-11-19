@@ -45,7 +45,8 @@
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>
-                        <div>
+                        <div class="badge"
+                             ng-class="{'bg-success': item.idCha === 1, 'bg-danger': item.idCha === 2, 'bg-secondary': item.idCha === 3}">
                             <span ng-if="item.idCha === 1">Nam</span>
                             <span ng-if="item.idCha === 2">Nữ</span>
                             <span ng-if="item.idCha === 3">Khác</span>
@@ -82,7 +83,8 @@
                 <!-- Bộ chọn số lượng dữ liệu hiển thị -->
                 <div class="me-auto">
                     <label for="pageSizeSelect" class="me-2">Hiển thị:</label>
-                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()" class="form-select d-inline-block w-auto">
+                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()"
+                            class="form-select d-inline-block w-auto">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>
                         <option value="15">15</option>
@@ -137,27 +139,6 @@
                                 <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
                                 <span class="text-danger"
                                       ng-show="error.ten">Tên danh mục phải từ 1 đến 100 ký tự.</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Trạng thái</label>
-                                <div class="mt-2">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="1">
-                                        <label class="form-check-label">Active</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="3">
-                                        <label class="form-check-label">Locked</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="2">
-                                        <label class="form-check-label">Khác</label>
-                                    </div>
-                                </div>
-                                <span class="text-danger" ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
                             </div>
                             <div class="col-md-12 mt-3">
                                 <label for="inputMoTa" class="form-label">Mô tả</label>
