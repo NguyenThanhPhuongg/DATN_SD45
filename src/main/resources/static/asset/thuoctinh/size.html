@@ -127,7 +127,7 @@
                                 <span class="text-danger"
                                       ng-show="error.ten">Tên size phải từ 1 đến 100 ký tự.</span>
                             </div>
-                            <div class="col-md-6 mt-2">
+                            <div class="col-md-7 mt-2">
                                 <label for="inputIDCha" class="form-label">Size cha</label>
                                 <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
                                     <option ng-value="1" selected>Áo</option>
@@ -135,27 +135,6 @@
                                     <option ng-value="3">Giầy</option>
                                 </select>
                                 <span class="text-danger" ng-show="error.idCha">Phải chọn Size cha.</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Trạng thái</label>
-                                <div class="mt-2">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="1">
-                                        <label class="form-check-label">Active</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="3">
-                                        <label class="form-check-label">Locked</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="trangThai"
-                                               ng-model="form.trangThai" ng-value="2">
-                                        <label class="form-check-label">Khác</label>
-                                    </div>
-                                </div>
-                                <span class="text-danger" ng-show="error.trangThai">Vui lòng chọn trạng thái.</span>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputNgayTao" class="form-label">Ngày tạo</label>

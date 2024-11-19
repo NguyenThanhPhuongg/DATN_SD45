@@ -7,7 +7,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
 
     $scope.pager = {
         page: 0,
-        size: 5, // Giá trị mặc định
+        size: 10, // Giá trị mặc định
         items: [],
         count: 0,
         first: function () {
@@ -97,10 +97,45 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         return !Object.values(errorContainer).includes(true);
     };
 
+    $scope.create = function () {
+        $scope.error1 = {};
+        if (!$scope.validateForm($scope.formAdd, $scope.error1)) {
+            toastr.error("Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "Lỗi!");
+            return;
+        }
+
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willAdd) => {
+            if (willAdd) {
+                let item = angular.copy($scope.formAdd);
+                var token = localStorage.getItem('token');
+                item.trangThai = 1; // Thiết lập mặc định giá trị trangThai là 1
+                $http.post(`/rest/danhmuc`, item, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    $scope.resetAdd();
+                    $('#addModal').modal('hide');
+                    toastr.success("Thêm mới thành công", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Thêm mới thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
+            }
+        });
+    };
+
     $scope.update = function () {
         $scope.error = {};
         if (!$scope.validateForm($scope.form, $scope.error)) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
+            toastr.error("Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "Lỗi!");
             return;
         }
 
@@ -108,7 +143,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
             title: "Xác nhận",
             text: "Bạn có chắc muốn cập nhật danh mục này không?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
@@ -120,103 +155,87 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    swal("Success!", "Cập nhật thành công", "success");
+                    $('#exampleModal').modal('hide');
+                    toastr.success("Cập nhật thành công", "Thành công!");
                 }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
+                    toastr.error("Cập nhật thất bại", "Lỗi!");
+                    console.error("Error: ", error);
                 });
             }
         });
     };
 
-    $scope.delete = function (item) {
+    $scope.updateTrangThaiTo1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn xóa danh mục này không?",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                $http.delete(`/rest/danhmuc/${item.id}`).then(resp => {
-                    $scope.initialize();
-                    $scope.reset();
-                    swal("Success!", "Xóa thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Xóa thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            }
-        });
-    };
-
-    $scope.create = function () {
-        $scope.error1 = {};
-        if (!$scope.validateForm($scope.formAdd, $scope.error1)) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
-            return;
-        }
-
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn thêm danh mục này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willAdd) => {
-            if (willAdd) {
-                let item = angular.copy($scope.formAdd);
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 1;
                 var token = localStorage.getItem('token');
-                item.trangThai = 1;  // Thiết lập mặc định giá trị trangThai là 1
-                $http.post(`/rest/danhmuc`, item, {
+                $http.put(`/rest/danhmuc/${updatedItem.id}`, updatedItem, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    $scope.resetAdd();
-                    swal("Success!", "Thêm mới thành công", "success");
+                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
                 }).catch(error => {
-                    swal("Error!", "Thêm mới thất bại", "error");
-                    console.log("Error: ", error);
+                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    console.error("Error: ", error);
                 });
             }
         });
     };
 
-    // Phương thức cập nhật trangThai thành 2
     $scope.updateTrangThaiTo2 = function (item) {
-        let updatedItem = angular.copy(item);
-        updatedItem.trangThai = 2;
-        var token = localStorage.getItem('token');
-        $http.put(`/rest/danhmuc/${updatedItem.id}`, updatedItem, {
-            headers: {
-                'Authorization': 'Bearer ' + token
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 2;
+                var token = localStorage.getItem('token');
+                $http.put(`/rest/danhmuc/${updatedItem.id}`, updatedItem, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
             }
-        }).then(resp => {
-            $scope.initialize();
-            swal("Success!", "Đã cập nhật trạng thái thành 2", "success");
-        }).catch(error => {
-            swal("Error!", "Cập nhật trạng thái thất bại", "error");
-            console.log("Error: ", error);
         });
     };
 
-    // Phương thức cập nhật trangThai thành 1
-    $scope.updateTrangThaiTo1 = function (item) {
-        let updatedItem = angular.copy(item);
-        updatedItem.trangThai = 1;
-        var token = localStorage.getItem('token');
-        $http.put(`/rest/danhmuc/${updatedItem.id}`, updatedItem, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(resp => {
-            $scope.initialize();
-            swal("Success!", "Đã cập nhật trạng thái thành 1", "success");
-        }).catch(error => {
-            swal("Error!", "Cập nhật trạng thái thất bại", "error");
-            console.log("Error: ", error);
-        });
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
     };
+
 });
