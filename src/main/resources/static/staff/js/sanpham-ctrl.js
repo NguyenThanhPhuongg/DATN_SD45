@@ -13,30 +13,38 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
     // Khởi tạo dữ liệu
     $scope.initialize = function () {
+        // Lấy danh sách danh mục với trangThai = 1
         $http.get("/rest/danhmuc").then(resp => {
-            $scope.danhmuc = resp.data.data;
+            $scope.danhmuc = resp.data.data.filter(item => item.trangThai === 1);
         });
 
+        // Lấy danh sách thương hiệu với trangThai = 1
         $http.get("/rest/thuonghieu").then(resp => {
-            $scope.thuonghieu = resp.data.data;
+            $scope.thuonghieu = resp.data.data.filter(item => item.trangThai === 1);
         });
 
+        // Lấy danh sách chất liệu với trangThai = 1
         $http.get("/chat-lieu/get-list").then(resp => {
-            $scope.chatlieu = resp.data.data;
+            $scope.chatlieu = resp.data.data.filter(item => item.trangThai === 1);
         });
+
+        // Lấy danh sách size với trangThai = 1
         $http.get("/size/get-list").then(resp => {
-            $scope.size = resp.data.data;
-            $scope.filterSizesByIdCha();
+            $scope.size = resp.data.data.filter(item => item.trangThai === 1);
+            $scope.filterSizesByIdCha(); // Nếu có logic riêng để lọc theo idCha
         });
 
+        // Lấy danh sách màu sắc với trangThai = 1
         $http.get("/mau-sac/get-list").then(resp => {
-            $scope.mausac = resp.data.data;
-            $scope.filterColorsByIdCha();
+            $scope.mausac = resp.data.data.filter(item => item.trangThai === 1);
+            $scope.filterColorsByIdCha(); // Nếu có logic riêng để lọc theo idCha
         });
 
+        // Khởi tạo các biến cần thiết
         $scope.productDetails = []; // Khởi tạo mảng sản phẩm chi tiết
         $scope.form.anh = ""; // Đặt lại ảnh mặc định hoặc rỗng
     };
+
 
     $scope.initialize();
 
@@ -140,10 +148,10 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
         // Display confirmation prompt before creating product
         swal({
-            title: "Xác nhận thêm sản phẩm",
-            text: "Bạn có chắc chắn muốn thêm sản phẩm này không?",
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn thêm danh mục này không?",
             icon: "warning",
-            buttons: ["Hủy", "Đồng ý"],
+            buttons: true,
             dangerMode: true,
         }).then((willCreate) => {
             if (willCreate) {
@@ -216,16 +224,14 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                     }).catch(error => {
                         console.error("Lỗi khi lấy sản phẩm mới nhất:", error);
                     });
-
-                    swal("Thành công!", "Sản phẩm và chi tiết sản phẩm đã được thêm thành công", "success");
+                    toastr.success("Sản phẩm và chi tiết sản phẩm đã được thêm thành công", "Thành công!");
                 }).catch(error => {
                     console.error("Có lỗi khi thêm sản phẩm", error);
                     $scope.errorMessage = "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.";
-                    swal("Lỗi!", "Lỗi khi thêm chi tiết sản phẩm hoặc hình ảnh", "error");
+                    toastr.error("Chưa có ảnh or sản phẩm chi tiết", "Lỗi!");
                 });
             } else {
-                // Operation canceled by user
-                swal("Hủy bỏ", "Sản phẩm chưa được thêm.", "info");
+                toastr.info("Sản phẩm chưa được thêm.", "Hủy bỏ");
             }
         });
     };
@@ -292,7 +298,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                 document.getElementById("imagePath3").value = resp.data.filePath;  // hiển thị đường dẫn ở input
             }).catch(error => {
                 console.error("Lỗi khi tải lên ảnh:", error);
-                alert("Có lỗi khi tải lên ảnh. Vui lòng kiểm tra lại.");
+                toastr.error("Có lỗi khi tải ảnh lên", "Lỗi!");
             });
         } else {
             swal("Lỗi!", "Vui lòng chọn ảnh sản phẩm.", "error");
@@ -335,7 +341,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
             isValid = false;
         }
 
-        if (!$scope.form.gia || $scope.form.gia < 100000 || $scope.form.gia > 100000000) {
+        if (!$scope.form.gia || $scope.form.gia < 10000 || $scope.form.gia > 100000000) {
             $scope.errorMessages.gia = "Giá phải lớn hơn 100,000 và nhỏ hơn 100,000,000.";
             isValid = false;
         }
@@ -361,5 +367,23 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         }
 
         return isValid;
+    };
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
     };
 });

@@ -58,9 +58,9 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
     $scope.updateStatus2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn khóa hình ảnh này không?",
+            text: "Bạn có chắc muốn khóa hình ảnh này?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
@@ -69,13 +69,13 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
                     .then(function (response) {
                         // Tải lại dữ liệu sau khi cập nhật thành công
                         $scope.initialize();
-                        swal("Success!", "Khóa hình ảnh thành công", "success");
+                        toastr.success("Khóa hình ảnh thành công", "Thành công!");
                     }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Khóa hình ảnh thất bại", "error");
+                    toastr.success("Khóa hình ảnh thất bại", "Lỗi!");
                 });
             } else {
-                swal("Hủy cập nhật", "Khóa hình ảnh đã bị hủy", "error");
+                toastr.info("Hủy hành động", "Hủy!");
             }
         });
     };
@@ -83,9 +83,9 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
     $scope.updateStatus1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn khóa hình ảnh này không?",
+            text: "Bạn có chắc muốn mở khóa hình ảnh này?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
@@ -93,13 +93,13 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
                     .then(function (response) {
                         // Tải lại dữ liệu sau khi cập nhật thành công
                         $scope.initialize();
-                        swal("Success!", "Khóa hình ảnh thành công", "success");
+                        toastr.success("Mở khóa hình ảnh thành công", "Thành công!");
                     }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Khóa hình ảnh thất bại", "error");
+                    toastr.error("Mở khóa hình ảnh thất bại", "Lỗi!");
                 });
             } else {
-                swal("Hủy cập nhật", "Khóa hình ảnh đã bị hủy", "error");
+                toastr.info("Hủy hành động", "Hủy!");
             }
         });
     };
@@ -107,9 +107,9 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
     $scope.deleteImage = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn xóa hình ảnh này không?",
+            text: "Bạn có chắc muốn xóa hình ảnh này?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
@@ -118,13 +118,13 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
                     .then(function (response) {
                         // Tải lại danh sách sau khi xóa thành công
                         $scope.initialize();
-                        swal("Success!", "Xóa hình ảnh thành công", "success");
+                        toastr.success("Xóa hình ảnh thành công", "Thành công!");
                     }).catch(function (error) {
                     console.error("Xóa hình ảnh thất bại", error);
-                    swal("Error!", "Xóa hình ảnh thất bại", "error");
+                    toastr.error("Xóa hình ảnh thất bại", "Lỗi!");
                 });
             } else {
-                swal("Hủy xóa", "Xóa hình ảnh đã bị hủy", "error");
+                toastr.info("Hủy hành động", "Hủy!");
             }
         });
     };
@@ -137,9 +137,9 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
             // Hiển thị thông báo xác nhận trước khi tải ảnh lên
             swal({
                 title: "Xác nhận",
-                text: "Bạn có chắc muốn tải lên ảnh sản phẩm này?",
+                text: "Bạn có chắc muốn tài hình ảnh lên?",
                 icon: "warning",
-                buttons: true,
+                buttons: ["Hủy", "Xác nhận"],
                 dangerMode: true,
             }).then((willUpload) => {
                 if (willUpload) {
@@ -163,19 +163,17 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
                         $('#addModal').modal('hide');
 
                         // Hiển thị thông báo thành công
-                        swal("Thành công!", "Ảnh đã được tải lên thành công.", "success");
+                        toastr.success("Tải hình ảnh lên thành công", "Thành công!");
                     }).catch(error => {
                         console.error("Lỗi khi tải lên ảnh:", error);
-                        swal("Lỗi!", "Có lỗi khi tải ảnh lên. Vui lòng thử lại.", "error");
+                        toastr.success("Có lỗi khi tải hình ảnh lên", "Lỗi!");
                     });
                 } else {
-                    // Nếu người dùng hủy, thông báo đã hủy
-                    swal("Hủy tải ảnh", "Tải ảnh đã bị hủy.", "error");
+                    toastr.success("Hủy hành đông", "Hủy!");
                 }
             });
         } else {
-            // Nếu không có file nào được chọn
-            swal("Lỗi!", "Vui lòng chọn ảnh sản phẩm.", "error");
+            toastr.warning("Vui lòng chọn ảnh trước khi thêm", "Hủy!");
         }
     };
 
@@ -199,6 +197,23 @@ app.controller("hinhanh-ctrl", function ($scope, $rootScope, $http) {
         $scope.form = {};  // Đặt lại form về trạng thái ban đầu
     };
 
-
     $scope.initialize();
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
 });

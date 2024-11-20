@@ -18,7 +18,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.selectedProductId = $rootScope.selectedProductId; // Lấy ID sản phẩm từ rootScope
     $scope.selectedProductTen = $rootScope.selectedProductTen; // Lấy ID sản phẩm từ rootScope
     $scope.pager = {
-        page: 0, size: 5, items: [], count: 0, first: function () {
+        page: 0, size: 10, items: [], count: 0, first: function () {
             this.page = 0;
             this.updateItems();
         }, prev: function () {
@@ -55,13 +55,14 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
         }).catch(error => console.error("Lỗi khi tải danh mục: ", error));
 
         $http.get("/size/get-list").then(resp => {
-            $scope.size = resp.data.data;
+            $scope.size = resp.data.data.filter(item => item.trangThai === 1);
             $scope.filterSizesByIdCha();
             $scope.productDetails = []; // Khởi tạo mảng sản phẩm chi tiết
+
         });
 
         $http.get("/mau-sac/get-list").then(resp => {
-            $scope.mausac = resp.data.data;
+            $scope.mausac = resp.data.data.filter(item => item.trangThai === 1);
             $scope.filterColorsByIdCha();
         });
 
@@ -80,59 +81,84 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.add = function () {
         // Kiểm tra xem đã chọn màu sắc và size hay chưa
         if ($scope.productDetails.length === 0) {
-            swal("Warning!", "Vui lòng thêm ít nhất một sản phẩm chi tiết!", "warning");
+            toastr.info("Vui lòng thêm ít nhất một sản phẩm chi tiết!", "Lỗi!");
             return;
         }
 
-        // Tạo một danh sách sản phẩm chi tiết từ mảng productDetails
-        const addDetailsPromises = $scope.productDetails.map(detail => {
-            // Kiểm tra xem sản phẩm chi tiết đã tồn tại trong danh sách hay chưa
-            const existingDetailIndex = $scope.items.findIndex(item =>
-                item.idSize === detail.idSize && item.idMauSac === detail.idMauSac && item.idSanPham === $scope.selectedProductId
-            );
+        // Kiểm tra giá của từng sản phẩm chi tiết
+        for (let i = 0; i < $scope.productDetails.length; i++) {
+            const detail = $scope.productDetails[i];
 
-            const token = localStorage.getItem('token'); // Điều chỉnh key 'authToken' theo token bạn lưu trữ trong localStorage
-
-            if (existingDetailIndex !== -1) {
-                // Nếu đã tồn tại, cập nhật thông tin sản phẩm chi tiết
-                const existingDetail = $scope.items[existingDetailIndex];
-                existingDetail.soLuong = detail.soLuong;
-                existingDetail.gia = detail.gia;
-                existingDetail.ghiChu = detail.ghiChu;
-
-                // Gọi API để cập nhật sản phẩm chi tiết
-                return $http.put(`/spct/${existingDetail.id}`, existingDetail,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
-                        }
-                    }); // Sử dụng ID của sản phẩm chi tiết để cập nhật
-            } else {
-                // Nếu không tồn tại, tạo một sản phẩm chi tiết mới
-                return $http.post("/spct", {
-                        idSanPham: $scope.selectedProductId,
-                        idSize: detail.idSize,
-                        idMauSac: detail.idMauSac,
-                        soLuong: detail.soLuong,
-                        gia: detail.gia,
-                        ghiChu: detail.ghiChu,
-                        trangThai: 1,
-                    },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
-                        }
-                    });
+            // Kiểm tra giá trị có hợp lệ hay không (>= 50,000 và <= 100,000,000)
+            if (detail.gia < 50000 || detail.gia > 100000000) {
+                toastr.warning("Giá sản phẩm chi tiết phải nằm trong khoảng từ 50.000 đến 100.000.000!", "Lỗi!");
+                return;
             }
-        });
+        }
 
-        Promise.all(addDetailsPromises).then(() => {
-            $scope.initialize();  // Cập nhật lại dữ liệu
-            $('#addModal').modal('hide');
-            swal("Success!", "Thêm hoặc cập nhật sản phẩm chi tiết thành công!", "success");
-        }).catch(error => {
-            console.error("Lỗi khi thêm hoặc cập nhật chi tiết sản phẩm:", error);
-            swal("Error!", "Có lỗi xảy ra khi thêm hoặc cập nhật chi tiết sản phẩm!", "error");
+        // Hiển thị confirmation trước khi thực hiện thêm hoặc cập nhật
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc chắn muốn thêm hoặc cập nhật sản phẩm chi tiết?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willAdd) => {
+            if (willAdd) {
+                // Tạo một danh sách sản phẩm chi tiết từ mảng productDetails
+                const addDetailsPromises = $scope.productDetails.map(detail => {
+                    // Kiểm tra xem sản phẩm chi tiết đã tồn tại trong danh sách hay chưa
+                    const existingDetailIndex = $scope.items.findIndex(item =>
+                        item.idSize === detail.idSize && item.idMauSac === detail.idMauSac && item.idSanPham === $scope.selectedProductId
+                    );
+
+                    const token = localStorage.getItem('token'); // Điều chỉnh key 'authToken' theo token bạn lưu trữ trong localStorage
+
+                    if (existingDetailIndex !== -1) {
+                        // Nếu đã tồn tại, cập nhật thông tin sản phẩm chi tiết
+                        const existingDetail = $scope.items[existingDetailIndex];
+                        existingDetail.soLuong = detail.soLuong;
+                        existingDetail.gia = detail.gia;
+                        existingDetail.ghiChu = detail.ghiChu;
+
+                        // Gọi API để cập nhật sản phẩm chi tiết
+                        return $http.put(`/spct/${existingDetail.id}`, existingDetail,
+                            {
+                                headers: {
+                                    'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                                }
+                            }); // Sử dụng ID của sản phẩm chi tiết để cập nhật
+                    } else {
+                        // Nếu không tồn tại, tạo một sản phẩm chi tiết mới
+                        return $http.post("/spct", {
+                                idSanPham: $scope.selectedProductId,
+                                idSize: detail.idSize,
+                                idMauSac: detail.idMauSac,
+                                soLuong: detail.soLuong,
+                                gia: detail.gia,
+                                ghiChu: detail.ghiChu,
+                                trangThai: 1,
+                            },
+                            {
+                                headers: {
+                                    'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                                }
+                            });
+                    }
+                });
+
+                // Chờ tất cả các yêu cầu hoàn thành
+                Promise.all(addDetailsPromises).then(() => {
+                    $scope.initialize();  // Cập nhật lại dữ liệu
+                    $('#addModal').modal('hide');
+                    toastr.success("hêm hoặc cập nhật sản phẩm chi tiết thành công!", "Thành công");
+                }).catch(error => {
+                    console.error("Lỗi khi thêm hoặc cập nhật chi tiết sản phẩm:", error);
+                    toastr.error("Có lỗi xảy ra khi thêm hoặc cập nhật chi tiết sản phẩm!", "Lỗi");
+                });
+            } else {
+                toastr.info("Hành động bị hủy bỏ!", "Thông báo");
+            }
         });
     };
 
@@ -201,20 +227,19 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
 
         // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
         if (!isValid) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
+            toastr.error("Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "Lỗi!");
             return; // Ngừng thực hiện nếu không hợp lệ
         }
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật sản phẩm này không?",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
-
                 // Lấy token từ localStorage
                 const token = localStorage.getItem('token'); // Thay 'authToken' bằng khóa token thực tế của bạn
 
@@ -224,51 +249,89 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                     }
                 }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
+                    toastr.success("Cập nhật thành công", "Thành công!");
                     $('#exampleModal').modal('hide');
                 }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
+                    toastr.error("Cập nhật thất bại", "Thành công!");
                     console.log("Error: ", error);
                 });
             } else {
-                swal("Hủy cập nhật", "Cập nhật sản phẩm đã bị hủy", "error");
+                toastr.info("Cập nhật sản phẩm đã bị hủy", "Hủy cập nhật!");
+            }
+        });
+    };
+
+    $scope.update1 = function (item) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 1;
+                var token = localStorage.getItem('token');
+                $http.put(`/spct/${updatedItem.id}`, updatedItem, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
             }
         });
     };
 
     $scope.update2 = function (item) {
-        let updatedItem = angular.copy(item);
-        updatedItem.trangThai = 2;
-        var token = localStorage.getItem('token');
-        $http.put(`/spct/${updatedItem.id}`, updatedItem, {
-            headers: {
-                'Authorization': 'Bearer ' + token
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 2;
+                var token = localStorage.getItem('token');
+                $http.put(`/spct/${updatedItem.id}`, updatedItem, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
             }
-        }).then(resp => {
-            $scope.initialize();
-            swal("Success!", "Đã cập nhật trạng thái thành 2", "success");
-        }).catch(error => {
-            swal("Error!", "Cập nhật trạng thái thất bại", "error");
-            console.log("Error: ", error);
-        });
-    };
-
-    $scope.update1 = function (item) {
-        let updatedItem = angular.copy(item);
-        updatedItem.trangThai = 1;
-        var token = localStorage.getItem('token');
-        $http.put(`/spct/${updatedItem.id}`, updatedItem, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(resp => {
-            $scope.initialize();
-            swal("Success!", "Đã cập nhật trạng thái thành 2", "success");
-        }).catch(error => {
-            swal("Error!", "Cập nhật trạng thái thất bại", "error");
-            console.log("Error: ", error);
         });
     };
     // Gọi hàm initialize khi controller được khởi tạo
     $scope.initialize();
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
 });

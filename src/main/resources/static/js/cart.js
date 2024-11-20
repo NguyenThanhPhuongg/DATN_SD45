@@ -119,7 +119,7 @@ function handleDelete(itemId) {
         })
             .then(response => response.json())
             .then(result => {
-                if (result.success) {
+                if (result.code === '200') {
                     // Fetch lại dữ liệu giỏ hàng sau khi xóa thành công
                     fetchCartData();
                 } else {

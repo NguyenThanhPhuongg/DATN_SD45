@@ -5,35 +5,26 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
     $scope.selectedLoai = null;
     $scope.searchText = ''; // Biến tìm kiếm
     $scope.pager = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
+        page: 0, size: 10, items: [], count: 0, first: function () {
             this.page = 0;
             this.updateItems();
-        },
-        prev: function () {
+        }, prev: function () {
             if (this.page > 0) {
                 this.page--;
                 this.updateItems();
             }
-        },
-        next: function () {
+        }, next: function () {
             if (this.page < this.count - 1) {
                 this.page++;
                 this.updateItems();
             }
-        },
-        last: function () {
+        }, last: function () {
             this.page = this.count - 1;
             this.updateItems();
-        },
-        updateItems: function () {
+        }, updateItems: function () {
             // Lọc các mục theo tìm kiếm và loại
             const filteredItems = $scope.items.filter(item => {
-                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
-                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
                 const matchesLoai = !$scope.selectedLoai || item.loai === Number($scope.selectedLoai);
                 return matchesSearch && matchesLoai;
             });
@@ -47,8 +38,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
     // Hàm để gọi API lấy danh sách khuyến mãi
     $scope.getKhuyenMaiList = function () {
         var requestData = {
-            keyword: $scope.searchText,
-            loai: $scope.selectedLoai
+            keyword: $scope.searchText, loai: $scope.selectedLoai
         };
 
         $http.post('/khuyen-mai/get-list', requestData)
@@ -63,7 +53,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             })
             .catch(function (error) {
                 console.error("Lỗi khi gọi API: ", error);
-                alert('Có lỗi xảy ra khi tải dữ liệu khuyến mãi.');
+                toastr.error("Có lỗi xảy ra khi tải dữ liệu khuyến mãi.", "Lỗi!");
             });
     };
 
@@ -100,21 +90,16 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
     // Dữ liệu khuyến mãi
     $scope.form = {
         loai: null,  // 1: Sản phẩm, 2: Người dùng
-        ma: '',
-        ten: '',
-        moTa: '',
-        giaTri: 0,
-        ngayBatDau: '',
-        ngayKetThuc: '',
-        idSanPhamList: [],
-        idNguoiDungList: []
+        ma: '', ten: '', moTa: '', giaTri: 0, ngayBatDau: '', ngayKetThuc: '', idSanPhamList: [], idNguoiDungList: []
     };
+
     $scope.saveKhuyenMai = function () {
         // Kiểm tra nếu chưa chọn loai
         if (!$scope.form.loai) {
-            alert('Vui lòng chọn đối tượng khuyến mãi.');
+            toastr.error("Vui lòng chọn đối tượng khuyến mãi.", "Lỗi!");
             return;  // Dừng hàm nếu không chọn loại
         }
+
         // Nếu bạn sử dụng Day.js
         var ngayBatDau = dayjs($scope.form.ngayBatDau).format('YYYY-MM-DDTHH:mm:ss');
         var ngayKetThuc = dayjs($scope.form.ngayKetThuc).format('YYYY-MM-DDTHH:mm:ss');
@@ -136,7 +121,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             // Kiểm tra nếu không có sản phẩm nào được chọn
             var selectedProducts = $scope.products.filter(product => product.selected);
             if (selectedProducts.length === 0) {
-                alert('Vui lòng chọn sản phẩm trong khuyến mãi.');
+                toastr.error("Vui lòng chọn sản phẩm trong khuyến mãi.", "Lỗi!");
                 return;  // Dừng hàm nếu không có sản phẩm nào được chọn
             }
             angular.forEach(selectedProducts, function (product) {
@@ -149,7 +134,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             // Kiểm tra nếu không có người dùng nào được chọn
             var selectedUsers = $scope.users.filter(user => user.selected);
             if (selectedUsers.length === 0) {
-                alert('Vui lòng chọn người dùng trong khuyến mãi.');
+                toastr.error("Vui lòng chọn người dùng trong khuyến mãi.", "Lỗi!");
                 return;  // Dừng hàm nếu không có người dùng nào được chọn
             }
             angular.forEach(selectedUsers, function (user) {
@@ -157,24 +142,39 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             });
         }
 
-        // Lấy token từ localStorage
-        var token = localStorage.getItem('token');
-
-        // Gửi dữ liệu đến API để lưu, kèm theo token trong headers
-        $http.post('/khuyen-mai/create', requestData, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
+        // Hiển thị hộp thoại xác nhận trước khi lưu
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc chắn muốn lưu khuyến mãi này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
         })
-            .then(function (response) {
-                // Hiển thị thông báo thành công
-                alert('Khuyến mãi đã được lưu thành công!');
-                $('#addNewModal').modal('hide'); // Đóng modal sau khi lưu thành công
-                $scope.resetForm();
-                $scope.getKhuyenMaiList();// Reset form sau khi lưu thành công
-            }, function (error) {
-                console.error('Có lỗi xảy ra khi lưu khuyến mãi:', error);
-                alert('Có lỗi xảy ra khi lưu khuyến mãi. Vui lòng thử lại!');
+            .then((willSave) => {
+                if (willSave) {
+                    // Lấy token từ localStorage
+                    var token = localStorage.getItem('token');
+
+                    // Gửi dữ liệu đến API để lưu, kèm theo token trong headers
+                    $http.post('/khuyen-mai/create', requestData, {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    })
+                        .then(function (response) {
+                            // Hiển thị thông báo thành công
+                            toastr.success("Khuyến mãi đã được lưu thành công!", "Thành công!");
+                            $('#addNewModal').modal('hide'); // Đóng modal sau khi lưu thành công
+                            $scope.resetForm();
+                            $scope.getKhuyenMaiList(); // Reset form sau khi lưu thành công
+                        }, function (error) {
+                            console.error('Có lỗi xảy ra khi lưu khuyến mãi:', error);
+                            toastr.error("Có lỗi xảy ra khi lưu khuyến mãi. Vui lòng thử lại!", "Lỗi!");
+                        });
+                } else {
+                    // Người dùng hủy thao tác
+                    toastr.info("Hủy hành động!", "Hủy!");
+                }
             });
     };
 
@@ -220,27 +220,34 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
 
     $scope.delete = function (item) {
         // Xác nhận người dùng muốn xóa không
-        if (confirm('Bạn có chắc chắn muốn xóa mục này?')) {
-            // Gửi yêu cầu DELETE tới API
-            $http.delete('/khuyen-mai/' + item.id)
-                .then(function (response) {
-                    // Thông báo xóa thành công
-                    alert('Khuyến mãi đã được xóa thành công!');
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn xóa khuyến mãi này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                $http.delete('/khuyen-mai/' + item.id)
+                    .then(function (response) {
+                        // Thông báo xóa thành công
+                        toastr.success("Khuyến mãi đã được xóa thành công!.", "Thành công!");
 
-                    // Loại bỏ mục bị xóa khỏi danh sách hiện tại
-                    var index = $scope.items.indexOf(item);
-                    if (index !== -1) {
-                        $scope.items.splice(index, 1);
-                    }
+                        // Loại bỏ mục bị xóa khỏi danh sách hiện tại
+                        var index = $scope.items.indexOf(item);
+                        if (index !== -1) {
+                            $scope.items.splice(index, 1);
+                        }
 
-                    // Gọi lại API để tải lại danh sách sau khi xóa
-                    $scope.getKhuyenMaiList();
-                }, function (error) {
-                    // Xử lý lỗi khi xóa không thành công
-                    console.error('Có lỗi xảy ra khi xóa:', error);
-                    alert('Có lỗi xảy ra khi xóa. Vui lòng thử lại!');
-                });
-        }
+                        // Gọi lại API để tải lại danh sách sau khi xóa
+                        $scope.getKhuyenMaiList();
+                    }, function (error) {
+                        // Xử lý lỗi khi xóa không thành công
+                        console.error('Có lỗi xảy ra khi xóa:', error);
+                        toastr.error("Có lỗi xảy ra khi xóa. Vui lòng thử lại!,", "Lỗi!");
+                    });
+            }
+        });
     };
 
     $scope.loaiOptions = ["Sản phẩm", "Người dùng"];
@@ -264,7 +271,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
                     // Tải sản phẩm và người dùng khi ở chế độ chỉnh sửa
                     if (data.loai === 1) {
 
-                        $scope.loadProducts().then(function() {
+                        $scope.loadProducts().then(function () {
                             // Đánh dấu các sản phẩm đã được chọn
                             $scope.selectedProducts = data.sanPhamModels.map(function (sp) {
                                 let product = $scope.products.find(p => p.id === sp.id);
@@ -274,10 +281,10 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
                                 } else {
                                     console.log('Product not found:', sp.id);
                                 }
-                                return { id: sp.id, selected: true };
+                                return {id: sp.id, selected: true};
                             });
                         });
-                    }else {
+                    } else {
 
                         $scope.loadUsers().then(function () {
                             // Đánh dấu các người dùng đã được chọn
@@ -327,7 +334,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
     $scope.updateKhuyenMai = function () {
         // Kiểm tra nếu chưa chọn loai
         if (!$scope.detailForm.loai) {
-            alert('Vui lòng chọn đối tượng khuyến mãi.');
+            toastr.warning("Vui lòng chọn đối tượng khuyến mãi.", "Vui lòng!");
             return;  // Dừng hàm nếu không chọn loại
         }
 
@@ -352,7 +359,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         if ($scope.detailForm.loai === 'Sản phẩm') {
             var selectedProducts = $scope.products.filter(product => product.selected);
             if (selectedProducts.length === 0) {
-                alert('Vui lòng chọn sản phẩm trong khuyến mãi.');
+                toastr.warning("Vui lòng chọn sản phẩm trong khuyến mãi.", "Vui lòng!");
                 return;
             }
             angular.forEach(selectedProducts, function (product) {
@@ -364,7 +371,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         if ($scope.detailForm.loai === 'Người dùng') {
             var selectedUsers = $scope.users.filter(user => user.selected);
             if (selectedUsers.length === 0) {
-                alert('Vui lòng chọn người dùng trong khuyến mãi.');
+                toastr.warning("Vui lòng chọn người dùng trong khuyến mãi.", "Vui lòng!");
                 return;  // Dừng hàm nếu không có người dùng nào được chọn
             }
             angular.forEach(selectedUsers, function (user) {
@@ -372,27 +379,57 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             });
         }
 
-        // Lấy token từ localStorage
-        var token = localStorage.getItem('token');
+        // Hiển thị hộp thoại xác nhận trước khi cập nhật
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc chắn muốn cập nhật khuyến mãi này không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willUpdate) => {
+                if (willUpdate) {
+                    // Lấy token từ localStorage
+                    var token = localStorage.getItem('token');
 
-        // Gửi dữ liệu đến API để cập nhật khuyến mãi
-        $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        })
-            .then(function (response) {
-                // Hiển thị thông báo thành công
-                alert('Khuyến mãi đã được cập nhật thành công!');
-                $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
-                $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
-            }, function (error) {
-                console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
-                alert('Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!');
+                    // Gửi dữ liệu đến API để cập nhật khuyến mãi
+                    $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    })
+                        .then(function (response) {
+                            // Hiển thị thông báo thành công
+                            toastr.success("Khuyến mãi đã được cập nhật thành công!", "Thành công!");
+                            $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
+                            $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
+                        }, function (error) {
+                            console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
+                            toastr.error("Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!", "Lỗi!");
+                        });
+                } else {
+                    // Người dùng hủy thao tác
+                    toastr.info("Hủy hành động!", "Hủy!");
+                }
             });
     };
 
 
-
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
 
 });
