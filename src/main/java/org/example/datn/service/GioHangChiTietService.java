@@ -35,8 +35,8 @@ public class GioHangChiTietService {
         return repo.findByIdGioHangAndTrangThai(idGioHang, status);
     }
 
-    public Optional<GioHangChiTiet> findByIdGioHangAndIdSanPhamChiTiet(Long idGioHang, Long idSanPhamChiTiet){
-        return repo.findByIdGioHangAndIdSanPhamChiTiet(idGioHang, idSanPhamChiTiet);
+    public Optional<GioHangChiTiet> findByIdGioHangAndIdSanPhamChiTietAndTrangThai(Long idGioHang, Long idSanPhamChiTiet, Integer trangThai){
+        return repo.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(idGioHang, idSanPhamChiTiet, trangThai);
     }
 
     public List<GioHangChiTiet> findByIdIn(List<Long> ids){
