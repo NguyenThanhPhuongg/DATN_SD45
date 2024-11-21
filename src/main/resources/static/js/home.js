@@ -155,9 +155,6 @@ $(document).ready(function () {
         });
     }
 
-
-    // Gọi hàm fetchProducts để hiển thị danh sách sản phẩm
-
     $(document).ready(function () {
         // Hàm lấy productId từ URL
         function getProductIdFromUrl() {
@@ -278,6 +275,7 @@ $(document).ready(function () {
         }
 
         // Hàm cập nhật số lượng còn lại dựa trên lựa chọn màu sắc và kích thước
+        // Hàm cập nhật số lượng còn lại và giá tiền dựa trên lựa chọn màu sắc và kích thước
         function updateQuantity(product) {
             const selectedColor = $('input[name="color"]:checked').val(); // Lấy giá trị màu sắc được chọn
             const selectedSize = $('input[name="size"]:checked').val();   // Lấy giá trị kích thước được chọn
@@ -288,19 +286,27 @@ $(document).ready(function () {
                     item.idMauSac == selectedColor && item.idSize == selectedSize
                 );
 
-                // Hiển thị số lượng nếu có sản phẩm chi tiết tương ứng
                 if (selectedProductDetail) {
-                    $('#quantityLeft').text(selectedProductDetail.soLuong); // Cập nhật số lượng
+                    // Cập nhật số lượng
+                    $('#quantityLeft').text(selectedProductDetail.soLuong);
+
+                    // Cập nhật giá tiền
+                    $('#productPrice').text(selectedProductDetail.gia.toLocaleString() + ' VND');
                 } else {
-                    $('#quantityLeft').text(0); // Nếu không có sản phẩm chi tiết tương ứng, hiển thị 0
+                    // Nếu không có sản phẩm chi tiết tương ứng
+                    $('#quantityLeft').text(0);
+                    $('#productPrice').text('Không khả dụng');
                 }
             } else {
-                $('#quantityLeft').text("Vui lòng Chọn màu sắc và kích thước"); // Hiển thị yêu cầu chọn đầy đủ khi chưa chọn màu sắc và kích thước
+                // Hiển thị yêu cầu chọn đầy đủ khi chưa chọn màu sắc và kích thước
+                $('#quantityLeft').text("Vui lòng chọn màu sắc và kích thước");
+                $('#productPrice').text("Vui lòng chọn màu sắc và kích thước");
             }
 
             // Cập nhật tình trạng vô hiệu hóa các lựa chọn
             disableUnavailableOptions(product);
         }
+
 
         // Hàm vô hiệu hóa các lựa chọn không hợp lệ (kích thước hoặc màu sắc không còn)
         function disableUnavailableOptions(product) {
@@ -361,6 +367,7 @@ $(document).ready(function () {
             console.log("Product ID not found in URL.");
         }
     });
+
     fetchProducts();
 
     $(document).ready(function () {

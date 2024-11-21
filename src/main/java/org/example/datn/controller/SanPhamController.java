@@ -1,13 +1,17 @@
 package org.example.datn.controller;
 
+import org.example.datn.entity.SanPham;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.processor.SanPhamProcessor;
+import org.example.datn.service.SanPhamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController("SanPhamApi")
 @RequestMapping("/san-pham")
@@ -15,6 +19,9 @@ public class SanPhamController {
 
     @Autowired
     SanPhamProcessor processor;
+
+    @Autowired
+    SanPhamService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResult> getById(@PathVariable Long id) {
@@ -51,6 +58,10 @@ public class SanPhamController {
         return ResponseEntity.ok(processor.updateStatus(id, status,ua));
     }
 
+    @GetMapping("/search")
+    public List<SanPham> searchProducts(@RequestParam String ten) {
+        return service.searchProductsByName(ten);
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
         return ResponseEntity.ok(processor.delete(id));

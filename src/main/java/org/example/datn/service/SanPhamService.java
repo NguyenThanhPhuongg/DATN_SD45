@@ -37,4 +37,7 @@ public class SanPhamService {
         repo.deleteById(id);
     }
 
+    public List<SanPham> searchProductsByName(String ten) {
+        return repo.findByTenContaining(ten);
+    }
 }
