@@ -171,7 +171,8 @@
 
         .profile-form-container {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column; /* Arrange children in a column */
+            justify-content: flex-start; /* Align children to the start of the container */
             height: calc(100% - 100px);
         }
 
@@ -185,6 +186,26 @@
 
         .profile-form-container .form-section {
             margin-right: 20px;
+        }
+
+        .profile-form-container .form-group {
+            margin-bottom: 15px;
+        }
+
+        #change-password-button {
+            display: block;
+            margin: 20px auto 0 auto; /* 20px from the top, auto for left and right margins to center the button */
+            padding: 10px 20px;
+            background-color: #ff5722;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        #change-password-button:hover {
+            background-color: #e64a19;
         }
 
         .profile-pic-section {
@@ -1592,27 +1613,74 @@
             document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
             document.getElementById('profile-link').classList.add('active');
         } else {
-            hienThiThongBao('Có lỗi xảy ra khi đổi mật khẩu.', false);
+            hienThiThongBao('Mật khẩu không chính xác!', false);
         }
     }
 
-    // Gán sự kiện click cho nút "Đổi mật khẩu"
-    document.getElementById('change-password-button').addEventListener('click', function (event) {
-        event.preventDefault();
-        const oldPassword = document.getElementById('old-password').value;
-        const password = document.getElementById('new-password').value;
-        const retypePassword = document.getElementById('confirm-password').value;
+    function hienThiModalXacNhan(message, callback) {
+        const modal = document.getElementById("confirm-dialog");
+        const messageElement = document.getElementById("confirm-message");
+        const btnYes = document.getElementById("confirm-yes");
+        const btnNo = document.getElementById("confirm-no");
 
-        // Kiểm tra mật khẩu mới và xác nhận mật khẩu có khớp nhau không
-        if (password !== retypePassword) {
-            hienThiThongBao('Mật khẩu mới và xác nhận mật khẩu không khớp.', false);
+        // Cập nhật thông báo
+        messageElement.textContent = message;
+
+        // Hiển thị modal
+        modal.style.display = "block";
+
+        // Xử lý khi nhấn nút "Có"
+        btnYes.onclick = function () {
+            modal.style.display = "none"; // Ẩn modal
+            callback(true); // Gọi callback với giá trị true
+        };
+
+        // Xử lý khi nhấn nút "Không"
+        btnNo.onclick = function () {
+            modal.style.display = "none"; // Ẩn modal
+            callback(false); // Gọi callback với giá trị false
+        };
+    }
+
+    // Sử dụng modal xác nhận trong nút đổi mật khẩu
+    document.getElementById("change-password-button").addEventListener("click", function (event) {
+        event.preventDefault();
+
+        const oldPassword = document.getElementById("old-password").value.trim();
+        const password = document.getElementById("new-password").value.trim();
+        const retypePassword = document.getElementById("confirm-password").value.trim();
+
+        // Kiểm tra các trường không được rỗng
+        if (!oldPassword || !password || !retypePassword) {
+            hienThiThongBao("Vui lòng nhập đầy đủ thông tin.", false);
             return;
         }
 
-        // Tạo đối tượng yêu cầu đổi mật khẩu và gọi hàm doiMatKhau
-        const request = {oldPassword, password, retypePassword};
-        doiMatKhau(request);
+        // Kiểm tra mật khẩu mới và xác nhận mật khẩu
+        if (password !== retypePassword) {
+            hienThiThongBao("Mật khẩu mới và xác nhận mật khẩu không khớp.", false);
+            return;
+        }
+
+        // Kiểm tra mật khẩu mới có hợp lệ
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*([0-9]|[^0-9dA-Za-z])).{8,100}$/;
+        if (!pattern.test(password)) {
+            hienThiThongBao(
+                "Mật khẩu phải từ 8 đến 100 ký tự, chứa ít nhất 1 chữ thường, 1 chữ hoa, và 1 ký tự đặc biệt hoặc số.",
+                false
+            );
+            return;
+        }
+
+        // Hiển thị modal xác nhận trước khi gọi API
+        hienThiModalXacNhan("Bạn có chắc chắn muốn đổi mật khẩu không?", function (confirmed) {
+            if (confirmed) {
+                const request = {oldPassword, password, retypePassword};
+                doiMatKhau(request); // Gọi API đổi mật khẩu
+            }
+        });
     });
+
 
     // Hàm để gọi API lấy danh sách địa chỉ
     async function layDanhSachDiaChi() {
@@ -2072,11 +2140,11 @@
 
         confirmMessage.textContent = 'Bạn có chắc chắn muốn mua lại các sản phẩm này?';
         confirmDialog.style.display = 'block';
-        confirmYes.onclick = function() {
+        confirmYes.onclick = function () {
             confirmDialog.style.display = 'none';
             processBuyAgain(order);
         };
-        confirmNo.onclick = function() {
+        confirmNo.onclick = function () {
             confirmDialog.style.display = 'none';
         };
     }
@@ -2126,8 +2194,6 @@
                 hienThiThongBao('Có lỗi xảy ra khi gọi API.', false);
             });
     }
-
-
 
 
 </script>
