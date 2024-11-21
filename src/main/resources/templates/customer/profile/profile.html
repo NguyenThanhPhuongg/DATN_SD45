@@ -880,6 +880,139 @@
             }
         }
 
+        /* Nội dung modal */
+        .-detail-modal-content {
+            background-color: white;
+            width: 60%;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -150px;
+            margin-left: -400px;
+        }
+
+
+
+        /* Nội dung modal */
+        .-detail-modal-content {
+            background-color: white;
+            width: 60%;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            margin-left: -400px;
+        }
+
+
+        /* Tiêu đề modal */
+        .-detail-modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Chi tiết sản phẩm */
+        .product-detail {
+            display: flex;
+            margin-bottom: 15px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .product-detail img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .product-info {
+            flex-grow: 1;
+            margin-left: 20px;
+            text-align: left;
+        }
+
+        .product-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .product-info p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        /* Lý do hủy đơn */
+        #cancel-reason {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #cancel-reason h5 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #cancel-reason p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* Nút đóng modal */
+        #close-detail-cancel-modal {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #close-detail-cancel-modal:hover {
+            background-color: #2980b9;
+        }
+
+        /* Khi modal hiển thị */
+        .cancel-detail-modal.show {
+            display: flex;
+        }
+
+        /* Mã đơn hàng */
+        #order-code {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        #order-code h3 {
+            color: #e74c3c;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
@@ -1107,7 +1240,6 @@
         <button id="close-detail-cancel-modal" onclick="closeCancelModal()">Đóng</button>
     </div>
 </div>
-
 
 
 <div th:include="footer::body"></div>
@@ -1864,7 +1996,11 @@
                     const orderDetails = data.data; // Dữ liệu trả về từ API
 
                     let contentHTML = '';
-
+                    contentHTML = `
+                    <div id="order-code">
+                        <h3>Mã đơn hàng: ${orderDetails.ma}</h3>
+                    </div>
+` + contentHTML;
                     // Lặp qua các chi tiết sản phẩm và tạo HTML
                     orderDetails.hoaDonChiTietModels.forEach(item => {
                         contentHTML += `
