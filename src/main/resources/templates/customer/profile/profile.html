@@ -171,8 +171,7 @@
 
         .profile-form-container {
             display: flex;
-            flex-direction: column; /* Arrange children in a column */
-            justify-content: flex-start; /* Align children to the start of the container */
+            justify-content: space-between;
             height: calc(100% - 100px);
         }
 
@@ -188,10 +187,9 @@
             margin-right: 20px;
         }
 
-        .profile-form-container .form-group {
-            margin-bottom: 15px;
+        .profile-pic-section {
+            text-align: center;
         }
-
         #change-password-button {
             display: block;
             margin: 20px auto 0 auto; /* 20px from the top, auto for left and right margins to center the button */
@@ -206,10 +204,6 @@
 
         #change-password-button:hover {
             background-color: #e64a19;
-        }
-
-        .profile-pic-section {
-            text-align: center;
         }
 
         .profile-pic-section img {
@@ -1148,10 +1142,11 @@
                             <label for="confirm-password">Xác nhận mật khẩu</label>
                             <input type="password" id="confirm-password" name="confirm-password">
                         </div>
-                    </div>
-                    <div class="form-group">
                         <button type="submit" id="change-password-button">Đổi Mật Khẩu</button>
                     </div>
+<!--                    <div class="form-group">-->
+<!--                        <button type="submit" id="change-password-button">Đổi Mật Khẩu</button>-->
+<!--                    </div>-->
                 </form>
             </div>
             <div id="address-form" class="tabs">
@@ -1675,7 +1670,7 @@
         // Hiển thị modal xác nhận trước khi gọi API
         hienThiModalXacNhan("Bạn có chắc chắn muốn đổi mật khẩu không?", function (confirmed) {
             if (confirmed) {
-                const request = {oldPassword, password, retypePassword};
+                const request = { oldPassword, password, retypePassword };
                 doiMatKhau(request); // Gọi API đổi mật khẩu
             }
         });
@@ -2140,11 +2135,11 @@
 
         confirmMessage.textContent = 'Bạn có chắc chắn muốn mua lại các sản phẩm này?';
         confirmDialog.style.display = 'block';
-        confirmYes.onclick = function () {
+        confirmYes.onclick = function() {
             confirmDialog.style.display = 'none';
             processBuyAgain(order);
         };
-        confirmNo.onclick = function () {
+        confirmNo.onclick = function() {
             confirmDialog.style.display = 'none';
         };
     }
@@ -2194,6 +2189,8 @@
                 hienThiThongBao('Có lỗi xảy ra khi gọi API.', false);
             });
     }
+
+
 
 
 </script>
