@@ -190,6 +190,21 @@
         .profile-pic-section {
             text-align: center;
         }
+        #change-password-button {
+            display: block;
+            margin: 20px auto 0 auto; /* 20px from the top, auto for left and right margins to center the button */
+            padding: 10px 20px;
+            background-color: #ff5722;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        #change-password-button:hover {
+            background-color: #e64a19;
+        }
 
         .profile-pic-section img {
             width: 150px;
@@ -1127,10 +1142,11 @@
                             <label for="confirm-password">Xác nhận mật khẩu</label>
                             <input type="password" id="confirm-password" name="confirm-password">
                         </div>
-                    </div>
-                    <div class="form-group">
                         <button type="submit" id="change-password-button">Đổi Mật Khẩu</button>
                     </div>
+<!--                    <div class="form-group">-->
+<!--                        <button type="submit" id="change-password-button">Đổi Mật Khẩu</button>-->
+<!--                    </div>-->
                 </form>
             </div>
             <div id="address-form" class="tabs">
@@ -1592,27 +1608,74 @@
             document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
             document.getElementById('profile-link').classList.add('active');
         } else {
-            hienThiThongBao('Có lỗi xảy ra khi đổi mật khẩu.', false);
+            hienThiThongBao('Mật khẩu không chính xác!', false);
         }
     }
 
-    // Gán sự kiện click cho nút "Đổi mật khẩu"
-    document.getElementById('change-password-button').addEventListener('click', function (event) {
-        event.preventDefault();
-        const oldPassword = document.getElementById('old-password').value;
-        const password = document.getElementById('new-password').value;
-        const retypePassword = document.getElementById('confirm-password').value;
+    function hienThiModalXacNhan(message, callback) {
+        const modal = document.getElementById("confirm-dialog");
+        const messageElement = document.getElementById("confirm-message");
+        const btnYes = document.getElementById("confirm-yes");
+        const btnNo = document.getElementById("confirm-no");
 
-        // Kiểm tra mật khẩu mới và xác nhận mật khẩu có khớp nhau không
-        if (password !== retypePassword) {
-            hienThiThongBao('Mật khẩu mới và xác nhận mật khẩu không khớp.', false);
+        // Cập nhật thông báo
+        messageElement.textContent = message;
+
+        // Hiển thị modal
+        modal.style.display = "block";
+
+        // Xử lý khi nhấn nút "Có"
+        btnYes.onclick = function () {
+            modal.style.display = "none"; // Ẩn modal
+            callback(true); // Gọi callback với giá trị true
+        };
+
+        // Xử lý khi nhấn nút "Không"
+        btnNo.onclick = function () {
+            modal.style.display = "none"; // Ẩn modal
+            callback(false); // Gọi callback với giá trị false
+        };
+    }
+
+    // Sử dụng modal xác nhận trong nút đổi mật khẩu
+    document.getElementById("change-password-button").addEventListener("click", function (event) {
+        event.preventDefault();
+
+        const oldPassword = document.getElementById("old-password").value.trim();
+        const password = document.getElementById("new-password").value.trim();
+        const retypePassword = document.getElementById("confirm-password").value.trim();
+
+        // Kiểm tra các trường không được rỗng
+        if (!oldPassword || !password || !retypePassword) {
+            hienThiThongBao("Vui lòng nhập đầy đủ thông tin.", false);
             return;
         }
 
-        // Tạo đối tượng yêu cầu đổi mật khẩu và gọi hàm doiMatKhau
-        const request = {oldPassword, password, retypePassword};
-        doiMatKhau(request);
+        // Kiểm tra mật khẩu mới và xác nhận mật khẩu
+        if (password !== retypePassword) {
+            hienThiThongBao("Mật khẩu mới và xác nhận mật khẩu không khớp.", false);
+            return;
+        }
+
+        // Kiểm tra mật khẩu mới có hợp lệ
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*([0-9]|[^0-9dA-Za-z])).{8,100}$/;
+        if (!pattern.test(password)) {
+            hienThiThongBao(
+                "Mật khẩu phải từ 8 đến 100 ký tự, chứa ít nhất 1 chữ thường, 1 chữ hoa, và 1 ký tự đặc biệt hoặc số.",
+                false
+            );
+            return;
+        }
+
+        // Hiển thị modal xác nhận trước khi gọi API
+        hienThiModalXacNhan("Bạn có chắc chắn muốn đổi mật khẩu không?", function (confirmed) {
+            if (confirmed) {
+                const request = { oldPassword, password, retypePassword };
+                doiMatKhau(request); // Gọi API đổi mật khẩu
+            }
+        });
     });
+
 
     // Hàm để gọi API lấy danh sách địa chỉ
     async function layDanhSachDiaChi() {
@@ -1707,8 +1770,10 @@
             if (response.ok) {
                 hienThiThongBao('Địa chỉ đã được xóa thành công!');
                 hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi xóa thành công
+            } else if (response.status === 500) {
+                hienThiThongBao('Không thể xóa địa chỉ mặc định.', false);
             } else {
-                hienThiThongBao('Lỗi khi xóa địa chỉ, vui lòng kim tra lại!', false);
+                hienThiThongBao('Lỗi khi xóa địa chỉ, vui lòng kiểm tra lại!', false);
             }
             document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
@@ -1805,23 +1870,23 @@
 
         // Kiểm tra hợp lệ
         if (!hoTen || hoTen.length > 100) {
-            showError('hoTen', 'Họ tên không được để trống và không vượt quá 100 ký tự.');
+            hienThiThongBao('Họ tên không được để trống và không vượt quá 100 ký tự.', false);
             valid = false;
         }
         if (!sdt || sdt.length < 10 || sdt.length > 15) {
-            showError('sdt', 'Số điện thoại phải có từ 10 đến 15 ký tự.');
+            hienThiThongBao('Số điện thoại phải có từ 10 đến 15 ký tự.', false);
             valid = false;
         }
         if (!diaChi) {
-            showError('diaChi', 'Địa chỉ không được để trống.');
+            hienThiThongBao('Địa chỉ không được để trống.', false);
             valid = false;
         }
         if (!thanhPho) {
-            showError('thanhPho', 'Thành phố không được để trống.');
+            hienThiThongBao('Thành phố không được để trống.', false);
             valid = false;
         }
         if (!quocGia) {
-            showError('quocGia', 'Quốc gia không được để trống.');
+            hienThiThongBao('Quốc gia không được để trống.', false);
             valid = false;
         }
 
@@ -1859,7 +1924,7 @@
 
         // Xử lý phản hồi từ API
         if (response.ok) {
-            hienThiThongBao(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!');
+            hienThiThongBao(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!', true);
             // Xóa các giá trị đã nhập trong form sau khi thêm thành công
             document.getElementById('hoTen').value = '';
             document.getElementById('diaChi').value = '';
@@ -1871,9 +1936,10 @@
         } else {
             console.error('Lỗi khi thêm hoặc cập nhật địa chỉ');
             const errorData = await response.json();
-            hienThiThongBao(`Lỗi: ${errorData.message}`);
+            hienThiThongBao(`Lỗi: ${errorData.message}`, false);
         }
     }
+
 
     async function chinhSuaDiaChi(id) {
         // Hiển thị form trước khi gọi API lấy thông tin địa chỉ
