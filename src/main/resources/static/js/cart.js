@@ -122,6 +122,7 @@ function handleDelete(itemId) {
                 if (result.code === '200') {
                     // Fetch lại dữ liệu giỏ hàng sau khi xóa thành công
                     fetchCartData();
+                    location.reload();
                 } else {
                     console.error('Xóa sản phẩm thất bại', result.message);
                 }

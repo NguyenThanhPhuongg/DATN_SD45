@@ -37,7 +37,7 @@ public class GioHangChiTietProcessor {
     private GioHangService gioHangService;
 
     @Autowired
-    private GioHangChiTietTranformer tranformer;
+    private GioHangChiTietTranformer gioHangChiTietTranformer;
 
     @Autowired
     private SanPhamChiTietService spctService;
@@ -53,9 +53,6 @@ public class GioHangChiTietProcessor {
     public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua) {
 
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
-//        var gioHangChiTiet = new GioHangChiTiet();
-//        BeanUtils.copyProperties(request, gioHangChiTiet);
-//        gioHangChiTiet.setIdGioHang(gioHang.getId());
         var sanPham = sanPhamService.findById(request.getIdSanPham()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var spct = spctService.findByIdSanPhamAndIdSizeAndIdMauSac(request.getIdSanPham(), request.getIdSize(), request.getIdMauSac())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));

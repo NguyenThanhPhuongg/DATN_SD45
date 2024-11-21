@@ -380,7 +380,14 @@ public class HoaDonProcessor {
 
     private void cancelOrderDetails(HoaDon hoaDon) {
         List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.findByIdHoaDon(hoaDon.getId());
-        hoaDonChiTiets.forEach(chiTiet -> chiTiet.setTrangThai(StatusHoaDon.DA_HUY.getValue()));
+        hoaDonChiTiets.forEach(hoaDonChiTiet -> {
+            hoaDonChiTiet.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+            Optional<SanPhamChiTiet> sanPhamChiTietOpt = sanPhamChiTietService.findById(hoaDonChiTiet.getIdSanPhamChiTiet());
+            sanPhamChiTietOpt.ifPresent(sanPhamChiTiet -> {
+                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + hoaDonChiTiet.getSoLuong());
+                sanPhamChiTietService.save(sanPhamChiTiet);
+            });
+        });
         hoaDonChiTietService.saveAll(hoaDonChiTiets);
     }
 
