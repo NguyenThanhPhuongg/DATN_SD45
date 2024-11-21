@@ -688,6 +688,197 @@
             color: #ff5722;
         }
 
+        /* Style cho modal confirm cancel */
+        #confirm-cancel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Overlay background (hiển thị mờ phía sau modal) */
+        #confirm-cancel::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: -1;
+        }
+
+        /* Style cho phần tiêu đề của modal */
+        #confirm-cancel-message {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Style cho phần lựa chọn lý do hủy */
+        #cancel-reason-container {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        /* Style cho mỗi label chứa radio button */
+        #cancel-reason-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        /* Style cho các radio button */
+        #cancel-reason-container input[type="radio"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            margin-top: 5px;
+        }
+
+        /* Style cho các nút xác nhận và hủy */
+        #confirm-cancel-yes, #confirm-cancel-no {
+            padding: 10px 20px;
+            margin-top: 10px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* Style cho nút xác nhận */
+        #confirm-cancel-yes {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #confirm-cancel-yes:hover {
+            background-color: #45a049;
+        }
+
+        /* Style cho nút hủy */
+        #confirm-cancel-no {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #confirm-cancel-no:hover {
+            background-color: #e53935;
+        }
+
+        /* Đảm bảo modal không bị tràn ra ngoài khi có nội dung dài */
+        #confirm-cancel button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+
+        /* Thiết lập responsive cho modal */
+        @media (max-width: 600px) {
+            #confirm-cancel {
+                width: 90%;
+            }
+        }
+
+        /* General modal styles */
+        .cancel-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent background */
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .-detail-modal-content {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease-out; /* Animation for fade-in effect */
+        }
+
+        /* Title styling */
+        .-detail-modal-content h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Product detail styling */
+        .product-detail {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .product-detail h4 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .product-detail p {
+            font-size: 1rem;
+            color: #777;
+            margin: 5px 0;
+        }
+
+        /* Close button styling */
+        #close-detail-cancel-modal {
+            background-color: #ff5733; /* Red color for close button */
+            color: white;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        #close-detail-cancel-modal:hover {
+            background-color: #e14a2b; /* Darker red on hover */
+        }
+
+        /* Animation for modal fade-in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
 
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
@@ -870,6 +1061,53 @@
     <button id="confirm-yes">Có</button>
     <button id="confirm-no">Không</button>
 </div>
+<div id="confirm-cancel" class="confirm-dialog" style="display: none;">
+    <h2 id="confirm-cancel-message">Lý do huỷ:</h2>
+    <div id="cancel-reason-container">
+        <label>
+            <input type="radio" name="cancel-reason" value="Tôi muốn cập nhật địa chỉ/sđt nhận hàng">
+            Tôi muốn cập nhật địa chỉ/sđt nhận hàng
+        </label><br>
+        <label>
+            <input type="radio" name="cancel-reason" value="Tôi muốn thêm, thay đổi mã giảm giá">
+            Tôi muốn thêm, thay đổi mã giảm giá
+        </label><br>
+        <label>
+            <input type="radio" name="cancel-reason"
+                   value="Tôi muốn thay đổi sản phẩm( kích thước, màu sắc, số lượng...)">
+            Tôi muốn thay đổi sản phẩm( kích thước, màu sắc, số lượng...)
+        </label><br>
+        <label>
+            <input type="radio" name="cancel-reason" value="Thủ tục thanh toán rắc rối">
+            Thủ tục thanh toán rắc rối
+        </label><br>
+        <label>
+            <input type="radio" name="cancel-reason"
+                   value="Tôi tìm thấy chỗ mua khác tốt hơn( rẻ hơn, uy tín, giao nhanh hơn ...)">
+            Tôi tìm thấy chỗ mua khác tốt hơn( rẻ hơn, uy tín, giao nhanh hơn ...)
+        </label><br>
+        <label>
+            <input type="radio" name="cancel-reason" value="Tôi không có nhu cầu mua nữa">
+            Tôi không có nhu cầu mua nữa
+        </label><br>
+        <label>
+            <input type="radio" name="cancel-reason" value="Tôi không tìm thấy lý do hủy phù hợp">
+            Tôi không tìm thấy lý do hủy phù hợp
+        </label>
+    </div>
+
+    <button id="confirm-cancel-yes">Xác nhận</button>
+    <button id="confirm-cancel-no">Hủy</button>
+</div>
+<!-- Modal để hiển thị chi tiết hủy đơn -->
+<div id="cancel-detail-modal" class="cancel-detail-modal" style="display: none;">
+    <div class="-detail-modal-content">
+        <h3>Chi tiết hủy đơn</h3>
+        <div id="cancel-details-content"></div> <!-- Phần nội dung chi tiết sản phẩm sẽ được cập nhật ở đây -->
+        <button id="close-detail-cancel-modal" onclick="closeCancelModal()">Đóng</button>
+    </div>
+</div>
+
 
 
 <div th:include="footer::body"></div>
@@ -1013,7 +1251,10 @@
 
                     const thanhTien = hdct.soLuong * hdct.gia;
                     orderItem.innerHTML = `
-                    <h3>Sản phẩm: ${hdct.sanPhamChiTietModel.sanPhamModel.ten}</h3>
+                    <h3>
+                        <img src="images/${hdct.sanPhamChiTietModel.sanPhamModel.anh}" alt="" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                        ${hdct.sanPhamChiTietModel.sanPhamModel.ten}
+                    </h3>
                     <div class="classification">
                         <p>Phân loại hàng: màu ${hdct.sanPhamChiTietModel.mauSac.ten}, size ${hdct.sanPhamChiTietModel.size.ten}</p>
                         <p class="price">₫${hdct.gia}</p>
@@ -1043,7 +1284,10 @@
                 // Add action buttons based on order status
                 orderActions.innerHTML = `
                 ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
-                ${order.trangThai === 5 ? '<button class="cancel-details">Xem chi tiết hủy đơn</button>' : ''}
+               ${order.trangThai === 5 ?
+                    `<button class="cancel-details" onclick="showCancelDetailsModal(${order.id})">Xem chi tiết hủy đơn</button>`
+                    : ''}
+
                ${order.trangThai === 1 || order.trangThai === 0
                     ? `<button onclick="showCancelConfirmDialog(${order.id})" class="cancel-order" style="background-color: #ff5722; color: #fff;">Hủy đơn hàng</button>`
                     : ''}
@@ -1539,28 +1783,56 @@
 
     // Function to show the confirmation dialog
     function showCancelConfirmDialog(orderId) {
-        console.log("Hàm showCancelConfirmDialog được gọi với orderId: ", orderId);
-        document.getElementById('confirm-dialog').style.display = 'block';
-        document.getElementById('confirm-message').innerText = 'Bạn có chắc chắn muốn hủy đơn hàng này không?';
-        document.getElementById('confirm-yes').onclick = function () {
-            cancelOrder(orderId);
+        document.getElementById('confirm-cancel').style.display = 'block';
+        document.getElementById('confirm-cancel-yes').onclick = function () {
+            const orderInfo = getSelectedCancelReason();
+            if (orderInfo) {
+                cancelOrder(orderId, orderInfo);
+            } else {
+                hienThiThongBao('Vui lòng chọn lý do hủy.', false);
+            }
+        };
+        document.getElementById('confirm-cancel-no').onclick = function () {
+            document.getElementById('confirm-cancel').style.display = 'none';
+            resetCancelReasonSelection();
         };
     }
 
+    function resetCancelReasonSelection() {
+        const cancelReasonRadios = document.getElementsByName('cancel-reason');
+        for (let i = 0; i < cancelReasonRadios.length; i++) {
+            cancelReasonRadios[i].checked = false;
+        }
+    }
+
+    function getSelectedCancelReason() {
+        const cancelReasonRadios = document.getElementsByName('cancel-reason');
+        for (let i = 0; i < cancelReasonRadios.length; i++) {
+            if (cancelReasonRadios[i].checked) {
+                return cancelReasonRadios[i].value;
+            }
+        }
+        return null;
+    }
+
+
     // Function to call the cancel order API
-    async function cancelOrder(orderId) {
+    async function cancelOrder(orderId, orderInfo) {
         const token = localStorage.getItem('token');
         const response = await fetch(`/rest/hoadon/cancel/${orderId}`, {
-            method: 'PUT',
+            method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            }
+            },
+            body: JSON.stringify({orderInfo})
         });
 
         if (response.ok) {
             const result = await response.json();
             hienThiThongBao('Đơn hàng đã được hủy thành công!', true);
-            document.getElementById('confirm-dialog').style.display = 'none';
+            document.getElementById('confirm-cancel').style.display = 'none'; // Ẩn modal
+            resetCancelReasonSelection();
             fetchOrderDataForActiveTab(); // Refresh the order list for the active tab
         } else {
             hienThiThongBao('Có lỗi xảy ra khi hủy đơn hàng.', false);
@@ -1576,6 +1848,69 @@
             fetchOrderData(status);
         }
     }
+
+    // Hàm để hiển thị chi tiết hủy đơn trong modal
+    function showCancelDetailsModal(orderId) {
+        fetch(`rest/hoadon/get/${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`  // Gửi token nếu cần
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === "200") {
+                    const cancelDetailsContent = document.getElementById('cancel-details-content');
+                    const orderDetails = data.data; // Dữ liệu trả về từ API
+
+                    let contentHTML = '';
+
+                    // Lặp qua các chi tiết sản phẩm và tạo HTML
+                    orderDetails.hoaDonChiTietModels.forEach(item => {
+                        contentHTML += `
+                    <div class="product-detail">
+                        <img src="images/${item.sanPhamChiTietModel.sanPhamModel.anh}" alt="${item.sanPhamChiTietModel.sanPhamModel.ten}" />
+                        <div class="product-info">
+                            <h4>${item.sanPhamChiTietModel.sanPhamModel.ten}</h4>
+                            <p>Size: ${item.sanPhamChiTietModel.size.ten}</p>
+                            <p>Màu sắc: ${item.sanPhamChiTietModel.mauSac.ten}</p>
+                            <p>Số lượng: ${item.soLuong}</p>
+                            <p class="price">Giá: ₫${item.gia}</p>
+                        </div>
+                    </div>
+                `;
+                    });
+
+                    // Add reason for cancellation section
+                    contentHTML += `
+                    <div id="cancel-reason">
+                        <h5>Lý do hủy đơn:</h5>
+                        <p>${orderDetails.lyDoHuy || 'Chưa có lý do'}</p>
+                    </div>
+                `;
+
+                    // Cập nhật nội dung chi tiết vào modal
+                    cancelDetailsContent.innerHTML = contentHTML;
+
+                    // Hiển thị modal
+                    document.getElementById('cancel-detail-modal').style.display = 'block';
+                } else {
+                    hienThiThongBao('Không tìm thấy thông tin chi tiết.', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching cancel details:', error);
+                hienThiThongBao('Có lỗi xảy ra khi tải thông tin chi tiết.', false);
+            });
+    }
+
+    // Hàm để đóng modal
+    function closeCancelModal() {
+        // Ẩn modal khi nhấn nút "Đóng"
+        document.getElementById('cancel-detail-modal').style.display = 'none';
+    }
+
+
 </script>
 </body>
 </html>

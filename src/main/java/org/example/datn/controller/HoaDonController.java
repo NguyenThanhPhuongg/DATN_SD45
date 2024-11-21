@@ -4,6 +4,7 @@ import org.example.datn.entity.DanhMuc;
 import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.request.CancelOrderRequest;
 import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.model.request.HoaDonChiTietRequest;
 import org.example.datn.model.request.HoaDonRequest;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 @CrossOrigin("*")
 @RestController
@@ -85,9 +87,16 @@ public class HoaDonController {
         return ResponseEntity.ok(processor.getListByStatus(request, ua));
     }
 
-    @PutMapping("/cancel/{id}")
-    public ResponseEntity<ServiceResult> cancelOrder(@PathVariable Long id, UserAuthentication ua) {
-        return ResponseEntity.ok(processor.cancelOrder(id, ua));
+    @PostMapping("/cancel/{id}")
+    public ResponseEntity<ServiceResult> cancelOrder(@PathVariable Long id, @RequestBody CancelOrderRequest request, UserAuthentication ua) throws IOException, InterruptedException {
+        return ResponseEntity.ok(processor.cancelOrder(id, request, ua));
     }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ServiceResult> get(@PathVariable Long id) {
+        ServiceResult result = processor.get(id);
+        return ResponseEntity.ok(result);
+    }
+
 
 }
