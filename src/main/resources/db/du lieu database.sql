@@ -117,8 +117,8 @@ GO
 
 INSERT INTO [phuong_thuc_van_chuyen] ([ten], [mo_ta], [phi_van_chuyen], [loai], [ghi_chu], [thoi_gian_giao_hang], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
-(N'Vận chuyển qua bưu điện', N'Dịch vụ vận chuyển qua bưu điện, giao hàng nhanh chóng và tiện lợi.', 30.00, 1, N'Phí vận chuyển tùy theo địa chỉ giao hàng', N'2-3 ngày', 1, GETDATE(), GETDATE(), 1, 1),
-(N'Vận chuyển nội địa', N'Dịch vụ vận chuyển qua xe tải, chuyển hàng nội địa trong cùng thành phố.', 50.00, 2, N'Phí vận chuyển tính theo khoảng cách và trọng lượng.', N'1-2 ngày', 1, GETDATE(), GETDATE(), 1, 1);
+(N'Vận chuyển qua bưu điện', N'Dịch vụ vận chuyển qua bưu điện, giao hàng nhanh chóng và tiện lợi.', 30000, 1, N'Phí vận chuyển tùy theo địa chỉ giao hàng', N'2-3 ngày', 1, GETDATE(), GETDATE(), 1, 1),
+(N'Vận chuyển nội địa', N'Dịch vụ vận chuyển qua xe tải, chuyển hàng nội địa trong cùng thành phố.', 50000, 2, N'Phí vận chuyển tính theo khoảng cách và trọng lượng.', N'1-2 ngày', 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
 INSERT INTO [hoa_don] ([id_nguoi_dung], [ma], [id_dia_chi_giao_hang], [id_phuong_thuc_van_chuyen], [ngay_dat_hang], [ngay_thanh_toan], [tong_tien], [diem_su_dung], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])

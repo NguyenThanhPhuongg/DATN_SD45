@@ -103,32 +103,58 @@ function handleQuantityChange(itemId, isIncreasing) {
         .catch(error => console.error('Lỗi khi gọi API', error));
 }
 
-function handleDelete(itemId) {
-    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');
-    if (confirmDelete) {
-        // Gọi đến API để xóa sản phẩm
-        const token = localStorage.getItem('token');
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-
-        fetch(`/gio-hang-chi-tiet/${itemId}`, {
-            method: 'DELETE',
-            headers: headers
-        })
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === '200') {
-                    // Fetch lại dữ liệu giỏ hàng sau khi xóa thành công
-                    fetchCartData();
-                } else {
-                    console.error('Xóa sản phẩm thất bại', result.message);
-                }
-            })
-            .catch(error => console.error('Lỗi khi gọi API', error));
-    }
+function hienThiThongBao(message, success = true) {
+    const notification = document.getElementById('notification');
+    notification.innerText = message;
+    notification.style.backgroundColor = success ? 'rgba(0, 128, 0, 0.8)' : 'rgba(255, 0, 0, 0.8)';
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
 }
+
+function handleDelete(itemId) {
+    currentItemId = itemId;
+
+    const confirmDialog = document.getElementById('confirm-dialog');
+    confirmDialog.style.display = 'flex';
+    confirmDialog.style.opacity = '1';
+
+    document.getElementById('confirm-yes').onclick = function () {
+        deleteItem(currentItemId);
+        confirmDialog.style.display = 'none';
+    };
+
+    document.getElementById('confirm-no').onclick = function () {
+        confirmDialog.style.display = 'none';
+    };
+}
+
+function deleteItem(itemId) {
+    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+
+    fetch(`/gio-hang-chi-tiet/${itemId}`, {
+        method: 'DELETE',
+        headers: headers
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === '200') {
+                hienThiThongBao('Xóa sản phẩm thnh công!', true);
+                fetchCartData();
+                location.reload();
+            } else {
+                console.error('Xóa sản phẩm thất bại', result.message);
+                hienThiThongBao('Xóa sản phẩm thất bại!', false);
+            }
+        })
+        .catch(error => console.error('Lỗi khi gọi API', error));
+}
+
 
 function renderCart(items) {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];

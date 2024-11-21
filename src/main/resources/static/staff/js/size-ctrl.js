@@ -98,9 +98,22 @@ app.controller("size-ctrl", function ($scope, $http) {
         $scope.form = angular.copy(item);
     };
 
-    $scope.validateForm = function (form, errorContainer) {
-        errorContainer.ten = !form.ten || form.ten.length < 1 || form.ten.length > 100;
-        errorContainer.idCha = !form.idCha;
+    $scope.validateForm = function (formAdd, errorContainer) {
+
+        var nameRegex = /^[0-9!@#$%^&*()_+~?"><,./\\]+$/;
+        if (!formAdd.ten || formAdd.ten.length < 5 || formAdd.ten.length > 100 || nameRegex.test(formAdd.ten)) {
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục phải từ 5-100 kí tự và chỉ chứa số và ký tự đặc biệt.", "Lỗi!");
+        } else {
+            errorContainer.ten = false;
+        }
+
+        if (!formAdd.idCha) {
+            errorContainer.idCha = true;
+            toastr.error("Bạn chưa chọn danh mục cha.", "Lỗi!");
+        } else {
+            errorContainer.idCha = false;
+        }
 
         return !Object.values(errorContainer).includes(true);
     };
@@ -108,7 +121,6 @@ app.controller("size-ctrl", function ($scope, $http) {
     $scope.create = function () {
         $scope.error1 = {};
         if (!$scope.validateForm($scope.formAdd, $scope.error1)) {
-            toastr.error("Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "Lỗi!");
             return;
         }
 
@@ -143,7 +155,6 @@ app.controller("size-ctrl", function ($scope, $http) {
     $scope.update = function () {
         $scope.error = {};
         if (!$scope.validateForm($scope.form, $scope.error)) {
-            toastr.error("Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "Lỗi!");
             return;
         }
 

@@ -28,6 +28,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -230,6 +231,7 @@ public class HoaDonProcessor {
                 break;
             case 3:
                 newTrangThai = StatusHoaDon.HOAN_THANH.getValue();
+                hoaDon.setNgayThanhToan(LocalDateTime.now());
                 break;
             default:
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
@@ -258,7 +260,7 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult updateHuyHoaDon(Long id, UserAuthentication ua) {
+    public ServiceResult updateHuyHoaDon(Long id, UserAuthentication ua, String lyDoHuy) {
         // Tìm hóa đơn theo ID
         HoaDon hoaDon = service.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
@@ -280,13 +282,14 @@ public class HoaDonProcessor {
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
         }
         // Cập nhật trạng thái hóa đơn
+        hoaDon.setLyDoHuy(lyDoHuy);
         hoaDon.setTrangThai(newTrangThai);
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiCapNhat(ua.getPrincipal());
 
         // Cập nhật trạng thái các chi tiết hóa đơn
         updateHoaDonChiTiet(id, newTrangThai);
-
+        cancelOrderDetails(hoaDon);
         // Lưu hóa đơn
         service.save(hoaDon);
 
@@ -346,31 +349,81 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult cancelOrder(Long id, UserAuthentication ua) {
-        HoaDon hoaDon = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
-
+    public ServiceResult cancelOrder(Long id, CancelOrderRequest request, UserAuthentication ua) throws IOException, InterruptedException {
+        HoaDon hoaDon = service.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
         if (hoaDon.getTrangThai() != StatusHoaDon.CHO_XAC_NHAN.getValue() &&
-                hoaDon.getTrangThai() != StatusHoaDon.CHO_THANH_TOAN.getValue()) {
+                hoaDon.getTrangThai() != StatusHoaDon.CHO_THANH_TOAN.getValue()
+                && hoaDon.getTrangThai() != StatusHoaDon.VAN_CHUYEN.getValue()
+                && hoaDon.getTrangThai() != StatusHoaDon.CHO_GIAO_HANG.getValue()) {
             throw new IllegalArgumentException("Hóa đơn không thể hủy vì trạng thái không hợp lệ.");
         }
+        if (hoaDon.getNgayThanhToan() == null) {
+            cancelOrderDetails(hoaDon);
+            hoaDon.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+        } else {
+            String ipAddress = VNPayUtil.getIpAddress(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+            Long amount = hoaDon.getTongTien().longValue() * 100L;
+            ServiceResult result = paymentService.refundTransaction(hoaDon.getMa(), amount, ipAddress, ua);
 
-        List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.findByIdHoaDon(id);
-        hoaDonChiTiets.forEach(hoaDonChiTiet -> {
-            hoaDonChiTiet.setTrangThai(StatusHoaDon.DA_HUY.getValue());
-        });
+            if (!SystemConstant.STATUS_SUCCESS.equals(result.getMessage())) {
+                return new ServiceResult("Hoàn tiền thất bại", SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
+            }
 
-        hoaDonChiTietService.saveAll(hoaDonChiTiets);
+            cancelOrderDetails(hoaDon);
+            hoaDon.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+        }
 
-        hoaDon.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+        hoaDon.setLyDoHuy(request.getOrderInfo());
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiCapNhat(ua.getPrincipal());
-
         service.save(hoaDon);
 
-        // Trả về kết quả thành công
         return new ServiceResult();
     }
 
+    private void cancelOrderDetails(HoaDon hoaDon) {
+        List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.findByIdHoaDon(hoaDon.getId());
+        hoaDonChiTiets.forEach(hoaDonChiTiet -> {
+            hoaDonChiTiet.setTrangThai(StatusHoaDon.DA_HUY.getValue());
+            Optional<SanPhamChiTiet> sanPhamChiTietOpt = sanPhamChiTietService.findById(hoaDonChiTiet.getIdSanPhamChiTiet());
+            sanPhamChiTietOpt.ifPresent(sanPhamChiTiet -> {
+                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + hoaDonChiTiet.getSoLuong());
+                sanPhamChiTietService.save(sanPhamChiTiet);
+            });
+        });
+        hoaDonChiTietService.saveAll(hoaDonChiTiets);
+    }
+
+    public ServiceResult get(Long id) {
+        HoaDon hoaDon = service.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+        HoaDonModel model = hoaDonTransformer.toModel(hoaDon);
+
+        // Lấy danh sách chi tiết hóa đơn
+        List<HoaDonChiTietModel> hoaDonChiTietModels = hoaDonChiTietService.findByIdHoaDon(hoaDon.getId()).stream()
+                .map(hoaDonChiTiet -> {
+                    HoaDonChiTietModel hoaDonChiTietModel = hoaDonChiTietTransformer.toModel(hoaDonChiTiet);
+
+                    sanPhamChiTietService.findById(hoaDonChiTiet.getIdSanPhamChiTiet()).ifPresent(spct -> {
+                        SanPhamChiTietModel spctModel = sanPhamChiTietTransformer.toModel(spct);
+                        sanPhamService.findById(spct.getIdSanPham()).ifPresent(sanPham ->
+                                spctModel.setSanPhamModel(sanPhamTransformer.toModel(sanPham))
+                        );
+                        sizeService.findById(spct.getIdSize()).ifPresent(spctModel::setSize);
+                        mauSacService.findById(spct.getIdMauSac()).ifPresent(spctModel::setMauSac);
+                        hoaDonChiTietModel.setSanPhamChiTietModel(spctModel);
+                    });
+
+                    return hoaDonChiTietModel;
+                })
+                .collect(Collectors.toList());
+
+        model.setHoaDonChiTietModels(hoaDonChiTietModels);
+
+        return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
 
 
 }
