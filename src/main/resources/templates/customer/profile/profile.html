@@ -896,7 +896,6 @@
         }
 
 
-
         /* Nội dung modal */
         .-detail-modal-content {
             background-color: white;
@@ -1006,6 +1005,7 @@
             border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
         }
+
         #order-code h3 {
             color: #e74c3c;
             font-size: 24px;
@@ -1395,27 +1395,30 @@
                 `;
                     orderDetails.appendChild(orderItem);
 
-                    // Add a horizontal line between order items, except the last one
                     if (index < order.hoaDonChiTietModels.length - 1) {
                         const separator = document.createElement('hr');
                         orderDetails.appendChild(separator);
                     }
                 });
 
-                // Create the total amount div (placed below the order details)
                 const totalDiv = document.createElement('div');
                 totalDiv.classList.add('order-total');
                 totalDiv.innerHTML = `<strong>Tổng cộng: ₫${order.tongTien}</strong>`;
-                orderContainer.appendChild(orderDetails); // Add the order details first
-                orderContainer.appendChild(totalDiv); // Then add the total amount after details
+                orderContainer.appendChild(orderDetails);
+                orderContainer.appendChild(totalDiv);
 
-                // Create actions section outside the order-items
                 const orderActions = document.createElement('div');
                 orderActions.classList.add('order-actions');
 
                 // Add action buttons based on order status
                 orderActions.innerHTML = `
-                ${order.trangThai === 4 || order.trangThai === 5 ? '<button class="buy-again">Mua lại</button>' : ''}
+                ${order.trangThai === 4 || order.trangThai === 5 ?
+                    `<button class="buy-again" onclick='buyAgain(${JSON.stringify(order)})'>Mua lại</button>` : ''}
+
+
+
+
+
                ${order.trangThai === 5 ?
                     `<button class="cancel-details" onclick="showCancelDetailsModal(${order.id})">Xem chi tiết hủy đơn</button>`
                     : ''}
@@ -2045,6 +2048,86 @@
         // Ẩn modal khi nhấn nút "Đóng"
         document.getElementById('cancel-detail-modal').style.display = 'none';
     }
+
+    function buyAgain(order) {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            hienThiThongBao('Bạn cần đăng nhập để thực hiện hành động này.', false);
+            return;
+        }
+
+        if (typeof order === 'string') {
+            order = JSON.parse(order);
+        }
+
+        showConfirmDialog(order);
+    }
+
+    function showConfirmDialog(order) {
+        const confirmDialog = document.getElementById('confirm-dialog');
+        const confirmMessage = document.getElementById('confirm-message');
+        const confirmYes = document.getElementById('confirm-yes');
+        const confirmNo = document.getElementById('confirm-no');
+
+        confirmMessage.textContent = 'Bạn có chắc chắn muốn mua lại các sản phẩm này?';
+        confirmDialog.style.display = 'block';
+        confirmYes.onclick = function() {
+            confirmDialog.style.display = 'none';
+            processBuyAgain(order);
+        };
+        confirmNo.onclick = function() {
+            confirmDialog.style.display = 'none';
+        };
+    }
+
+    function processBuyAgain(order) {
+        // Lấy các chi tiết sản phẩm từ đơn hàng
+        const products = order.hoaDonChiTietModels.map(item => ({
+            idSanPham: item.sanPhamChiTietModel.idSanPham,
+            idSize: item.sanPhamChiTietModel.size.id,
+            idMauSac: item.sanPhamChiTietModel.mauSac.id,
+            soLuong: item.soLuong
+        }));
+
+        const requests = products.map(product => {
+            const requestBody = {
+                idSanPham: product.idSanPham,
+                idSize: product.idSize,
+                idMauSac: product.idMauSac,
+                soLuong: product.soLuong
+            };
+
+            return fetch('/gio-hang-chi-tiet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Gửi token trong header Authorization
+                },
+                body: JSON.stringify(requestBody)
+            });
+        });
+
+        Promise.all(requests)
+            .then(responses => Promise.all(responses.map(response => response.json())))
+            .then(data => {
+                const allSuccess = data.every(item => item.code === '200');
+
+                if (allSuccess) {
+                    hienThiThongBao('Sản phẩm đã được thêm vào giỏ hàng.', true);
+                    setTimeout(function () {
+                        location.href = '/cart';
+                    }, 1000);
+                } else {
+                    hienThiThongBao('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', false);
+                }
+            })
+            .catch(error => {
+                hienThiThongBao('Có lỗi xảy ra khi gọi API.', false);
+            });
+    }
+
+
 
 
 </script>
