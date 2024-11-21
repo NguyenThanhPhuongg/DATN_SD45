@@ -1770,8 +1770,10 @@
             if (response.ok) {
                 hienThiThongBao('Địa chỉ đã được xóa thành công!');
                 hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi xóa thành công
+            } else if (response.status === 500) {
+                hienThiThongBao('Không thể xóa địa chỉ mặc định.', false);
             } else {
-                hienThiThongBao('Lỗi khi xóa địa chỉ, vui lòng kim tra lại!', false);
+                hienThiThongBao('Lỗi khi xóa địa chỉ, vui lòng kiểm tra lại!', false);
             }
             document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
@@ -1868,23 +1870,23 @@
 
         // Kiểm tra hợp lệ
         if (!hoTen || hoTen.length > 100) {
-            showError('hoTen', 'Họ tên không được để trống và không vượt quá 100 ký tự.');
+            hienThiThongBao('Họ tên không được để trống và không vượt quá 100 ký tự.', false);
             valid = false;
         }
         if (!sdt || sdt.length < 10 || sdt.length > 15) {
-            showError('sdt', 'Số điện thoại phải có từ 10 đến 15 ký tự.');
+            hienThiThongBao('Số điện thoại phải có từ 10 đến 15 ký tự.', false);
             valid = false;
         }
         if (!diaChi) {
-            showError('diaChi', 'Địa chỉ không được để trống.');
+            hienThiThongBao('Địa chỉ không được để trống.', false);
             valid = false;
         }
         if (!thanhPho) {
-            showError('thanhPho', 'Thành phố không được để trống.');
+            hienThiThongBao('Thành phố không được để trống.', false);
             valid = false;
         }
         if (!quocGia) {
-            showError('quocGia', 'Quốc gia không được để trống.');
+            hienThiThongBao('Quốc gia không được để trống.', false);
             valid = false;
         }
 
@@ -1922,7 +1924,7 @@
 
         // Xử lý phản hồi từ API
         if (response.ok) {
-            hienThiThongBao(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!');
+            hienThiThongBao(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!', true);
             // Xóa các giá trị đã nhập trong form sau khi thêm thành công
             document.getElementById('hoTen').value = '';
             document.getElementById('diaChi').value = '';
@@ -1934,9 +1936,10 @@
         } else {
             console.error('Lỗi khi thêm hoặc cập nhật địa chỉ');
             const errorData = await response.json();
-            hienThiThongBao(`Lỗi: ${errorData.message}`);
+            hienThiThongBao(`Lỗi: ${errorData.message}`, false);
         }
     }
+
 
     async function chinhSuaDiaChi(id) {
         // Hiển thị form trước khi gọi API lấy thông tin địa chỉ
