@@ -180,5 +180,37 @@
     opacity: 1;
     transition: opacity 0.5s ease-in;
 }
+.icon-heart {
+    cursor: pointer;
+
+}
+/* Ẩn nút "Add to wishlist" khi không hover */
+.product .add-to-wishlist-btn {
+    display: none;
+    position: absolute; /* Đặt vị trí nút ở vị trí thích hợp */
+    bottom: 10px; /* Đảm bảo nút xuất hiện dưới cùng của sản phẩm */
+    left: 50%;
+    transform: translateX(-50%); /* Căn giữa nút */
+    padding: 8px 15px;
+    background-color: #1d9f41;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 10; /* Đảm bảo nút không bị che khuất */
+    margin-bottom: 60px;
+}
+
+/* Hiển thị nút khi hover vào sản phẩm */
+.product:hover .add-to-wishlist-btn {
+    display: block; /* Hiển thị nút khi hover vào .product */
+}
+
+/* Cải thiện kiểu dáng của nút khi hover */
+.product .add-to-wishlist-btn:hover {
+    background-color: #0056b3;
+}
+
+
 
 

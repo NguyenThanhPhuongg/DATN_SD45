@@ -57,25 +57,31 @@ $(document).ready(function () {
             // Thêm sản phẩm vào container
             productsToShow.forEach(product => {
                 const productHtml = `
-                <div class="product">
-                    <div class="image-wrapper">
-                        <a href="/productDetail/${product.id}">
-                            <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
+            <div class="product" data-product-id="${product.id}">
+                <div class="image-wrapper">
+                    <a href="/productDetail/${product.id}">
+                        <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
+                    </a>
+                    <div class="icon-heart">
+                        <a href="#" class="add-to-wishlist">
+                            <i class="bi bi-heart heart"></i>
                         </a>
-                        <div class="icon-heart">
-                            <a href="#"><i class="bi bi-heart heart"></i></a>
-                        </div>
                     </div>
-                    <div class="mt-2">
-                        <p class="price" style="font-size: 20px">
-                            <b>${new Intl.NumberFormat('vi-VN', {
+                </div>
+                <div class="mt-2">
+                    <p class="price" style="font-size: 20px">
+                        <b>${new Intl.NumberFormat('vi-VN', {
                     style: 'currency',
                     currency: 'VND'
                 }).format(product.gia)}</b>
-                        </p>
-                        <p class="name" style="font-size: 18px;">${product.ten}</p>
-                    </div>
+                    </p>
+                    <p class="name" style="font-size: 18px;">${product.ten}</p> 
                 </div>
+                <div>
+                    <!-- Nút add to wishlist -->
+                    <button class="add-to-wishlist-btn">Add to wishlist</button>
+                </div>
+            </div>
             `;
                 productContainer.append(productHtml);
             });
@@ -84,7 +90,6 @@ $(document).ready(function () {
             productContainer.removeClass('fade-out').addClass('fade-in');
         }, 500); // Độ trễ phù hợp với thời gian của CSS fade-out
     }
-
 // Gọi hàm để hiển thị sản phẩm ngay khi trang tải
     $(document).ready(function () {
         fetchProducts(); // Hiển thị sản phẩm của trang đầu tiên
@@ -120,20 +125,22 @@ $(document).ready(function () {
 
         // Ẩn container trước khi thay đổi nội dung để áp dụng hiệu ứng
         productContainer.fadeOut(100, function () {
-            productContainer.empty();  // Xóa sản phẩm cũ
+            productContainer.empty(); // Xóa sản phẩm cũ
 
             const startIndex = page * productsPerPage;
             const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage);
 
             productsToShow.forEach(product => {
                 const productHtml = `
-                <div class="product">
+                <div class="product" data-product-id="${product.id}">
                     <div class="image-wrapper">
                         <a href="/productDetail/${product.id}">
                             <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
                         </a>
                         <div class="icon-heart">
-                            <a href="#"><i class="bi bi-heart heart"></i></a>
+                            <div class="add-to-wishlist" data-product-id="${product.id}">
+                                <i class="bi bi-heart heart"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-2">
@@ -145,6 +152,11 @@ $(document).ready(function () {
                         </p>
                         <p class="name" style="font-size: 18px;">${product.ten}</p>
                     </div>
+                    <div>
+                        <!-- Nút Add to wishlist -->
+<!--                        <button class="add-to-wishlist-btn" data-product-id="${product.id}">Add to wishlist</button>-->
+                        <button class="add-to-wishlist-btn" data-product-id="${product.id}">Add to wishlist</button>
+                    </div>
                 </div>
             `;
                 productContainer.append(productHtml);
@@ -152,6 +164,96 @@ $(document).ready(function () {
 
             // Hiển thị lại container với hiệu ứng mờ dần
             productContainer.fadeIn(100);
+
+            // Gắn sự kiện hover vào các sản phẩm
+            $('.product').hover(
+                function () {
+                    $(this).find('.add-to-wishlist-btn').fadeIn(200); // Hiển thị nút khi hover vào
+                },
+                function () {
+                    $(this).find('.add-to-wishlist-btn').fadeOut(200); // Ẩn nút khi hover ra
+                }
+            );
+
+            // Gắn sự kiện click cho nút "Add to wishlist"
+            $('.add-to-wishlist-btn').off('click').on('click', function (e) {
+                e.preventDefault(); // Ngăn hành động mặc định của nút
+
+                const productId = $(this).data('product-id');
+                const authToken = localStorage.getItem("token"); // Lấy token từ localStorage (đảm bảo token được lưu với key là "token")
+
+                // Kiểm tra nếu không có token
+                if (!authToken) {
+                    showToast('Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích.', 'danger');
+                    return; // Dừng xử lý nếu không có token
+                }
+
+                const heartIcon = $(this).closest('.product').find('.icon-heart i');
+                const button = $(this);
+
+                // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
+                $.ajax({
+                    url: `/yeu-thich/${productId}/check`, // API kiểm tra sản phẩm đã có trong wishlist
+                    method: 'GET',
+                    headers: {
+                        "Authorization": `Bearer ${authToken}` // Truyền token trong header Authorization
+                    },
+                    success: function (isInWishlist) {
+                        if (isInWishlist) {
+                            // Nếu sản phẩm đã có trong danh sách yêu thích
+                            showToast('Sản phẩm đã có trong danh sách yêu thích.', 'info');
+                            heartIcon.removeClass('bi-heart').addClass('bi-heart-fill'); // Thay đổi icon thành trái tim đầy
+                            button.text("Added to wishlist").attr('disabled', true); // Cập nhật nút và vô hiệu hóa
+                        } else {
+                            // Nếu sản phẩm chưa có trong danh sách yêu thích, thêm vào
+                            button.attr('disabled', true); // Vô hiệu hóa nút ngay khi nhấn
+
+                            // Gửi yêu cầu AJAX để thêm sản phẩm vào wishlist
+                            $.ajax({
+                                url: `/yeu-thich/${productId}`, // Đường dẫn API để thêm vào wishlist
+                                method: 'POST',
+                                headers: {
+                                    "Authorization": `Bearer ${authToken}` // Truyền token trong header Authorization
+                                },
+                                success: function () {
+                                    showToast('Đã thêm sản phẩm vào danh sách yêu thích!', 'success');
+                                    heartIcon.removeClass('bi-heart').addClass('bi-heart-fill'); // Thay đổi icon thành trái tim đầy
+                                    button.text("Added to wishlist").attr('disabled', true); // Cập nhật nút và vô hiệu hóa
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Lỗi khi thêm sản phẩm vào danh sách yêu thích:", error);
+                                    showToast('Có lỗi khi thêm sản phẩm vào yêu thích.', 'danger');
+                                    button.attr('disabled', false); // Bật lại nút nếu có lỗi
+                                }
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Lỗi khi kiểm tra sản phẩm trong wishlist:", error);
+                        showToast('Có lỗi khi kiểm tra danh sách yêu thích.', 'danger');
+                    }
+                });
+            });
+
+            // Hàm hiển thị thông báo Toast
+            function showToast(message, type) {
+                const toastBody = $('#toast .toast-body');
+                toastBody.text(message);
+
+                // Cập nhật màu sắc của Toast tùy theo loại
+                const toast = $('#toast');
+                if (type === 'success') {
+                    toast.removeClass('bg-danger').addClass('bg-success');
+                } else if (type === 'danger') {
+                    toast.removeClass('bg-success').addClass('bg-danger');
+                } else if (type === 'info') {
+                    toast.removeClass('bg-danger').removeClass('bg-success').addClass('bg-info');
+                }
+
+                // Hiển thị Toast
+                toast.toast({ delay: 3000 });
+                toast.toast('show');
+            }
         });
     }
 

@@ -2,9 +2,7 @@ package org.example.datn.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.datn.entity.SanPham;
-import org.example.datn.entity.Wishlist;
 import org.example.datn.model.UserAuthentication;
-import org.example.datn.repository.WishlistRepository;
 import org.example.datn.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +35,21 @@ public class WishlistController {
         }
     }
 
-//ADD
+    @PostMapping("/{productId}")
+    public ResponseEntity<Void> addProductToWishlist(@PathVariable Long productId, UserAuthentication ua) {
+        boolean result = wishlistService.addProductToWishlist(productId, ua);
+
+        if (result) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();  // Trả về 201 Created nếu thêm thành công
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();  // Trả về 400 Bad Request nếu đã có sản phẩm trong danh sách yêu thích
+        }
+    }
+    @GetMapping("/{productId}/check")
+    public ResponseEntity<Boolean> isProductInWishlist(@PathVariable Long productId, UserAuthentication ua) {
+        boolean isInWishlist = wishlistService.isProductInWishlist(productId, ua);
+        return ResponseEntity.ok(isInWishlist);
+    }
+
 
 }
