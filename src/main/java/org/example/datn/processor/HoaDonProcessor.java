@@ -231,6 +231,7 @@ public class HoaDonProcessor {
                 break;
             case 3:
                 newTrangThai = StatusHoaDon.HOAN_THANH.getValue();
+                hoaDon.setNgayThanhToan(LocalDateTime.now());
                 break;
             default:
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
@@ -259,7 +260,7 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult updateHuyHoaDon(Long id, UserAuthentication ua) {
+    public ServiceResult updateHuyHoaDon(Long id, UserAuthentication ua, String lyDoHuy) {
         // Tìm hóa đơn theo ID
         HoaDon hoaDon = service.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
@@ -281,13 +282,14 @@ public class HoaDonProcessor {
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
         }
         // Cập nhật trạng thái hóa đơn
+        hoaDon.setLyDoHuy(lyDoHuy);
         hoaDon.setTrangThai(newTrangThai);
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiCapNhat(ua.getPrincipal());
 
         // Cập nhật trạng thái các chi tiết hóa đơn
         updateHoaDonChiTiet(id, newTrangThai);
-
+        cancelOrderDetails(hoaDon);
         // Lưu hóa đơn
         service.save(hoaDon);
 
@@ -351,7 +353,9 @@ public class HoaDonProcessor {
         HoaDon hoaDon = service.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
         if (hoaDon.getTrangThai() != StatusHoaDon.CHO_XAC_NHAN.getValue() &&
-                hoaDon.getTrangThai() != StatusHoaDon.CHO_THANH_TOAN.getValue()) {
+                hoaDon.getTrangThai() != StatusHoaDon.CHO_THANH_TOAN.getValue()
+                && hoaDon.getTrangThai() != StatusHoaDon.VAN_CHUYEN.getValue()
+                && hoaDon.getTrangThai() != StatusHoaDon.CHO_GIAO_HANG.getValue()) {
             throw new IllegalArgumentException("Hóa đơn không thể hủy vì trạng thái không hợp lệ.");
         }
         if (hoaDon.getNgayThanhToan() == null) {

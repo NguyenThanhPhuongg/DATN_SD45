@@ -142,8 +142,9 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
     // Thêm sản phẩm
     $scope.create = function () {
-        if (!$scope.validateFields()) {
-            return; // Stop if validation fails
+        $scope.error = {};
+        if (!$scope.validateForm($scope.form, $scope.error)) {
+            return;
         }
 
         // Display confirmation prompt before creating product
@@ -169,10 +170,6 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 1);
-                // formData.append("ngayTao", now);
-                // formData.append("ngayCapNhat", now);
-                // formData.append("nguoiTao", 1);
-                // formData.append("nguoiCapNhat", 1);
 
                 if ($scope.form.anh) {
                     formData.append("file", $scope.form.anh);
@@ -327,46 +324,59 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         $scope.errorMessage = "";
     };
 
-    $scope.validateFields = function () {
-        let isValid = true;
-        $scope.errorMessages = {};
+    $scope.validateForm = function (form, errorContainer) {
 
-        if (!$scope.form.ten || $scope.form.ten.length < 5 || $scope.form.ten.length > 300) {
-            $scope.errorMessages.ten = "Tên sản phẩm phải có từ 5 đến 300 ký tự.";
-            isValid = false;
+        var nameRegex = /^[0-9!@#$%^&*()_+~?"><,./\\]+$/;
+        if (!form.ten || form.ten.length < 5 || form.ten.length > 100 || nameRegex.test(form.ten)) {
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục phải từ 5-100 kí tự và chỉ chứa số và ký tự đặc biệt.", "Lỗi!");
+        } else {
+            errorContainer.ten = false;
         }
 
-        if (!$scope.form.moTa || $scope.form.moTa.length < 5 || $scope.form.moTa.length > 300) {
-            $scope.errorMessages.moTa = "Mô tả phải có từ 5 đến 300 ký tự.";
-            isValid = false;
+        var descriptionSpecialCharsRegex = /^[!@#$%^&*()_+~?"><,./\\]+$/;
+        if (!form.moTa || form.moTa.length < 5 || form.moTa.length > 300 || descriptionSpecialCharsRegex.test(form.moTa)) {
+            errorContainer.moTa = true;
+            toastr.error("Mô tả danh mục phải từ 5-300 kí tự và chỉ chứa ký tự đặc biệt.", "Lỗi!");
+        } else {
+            errorContainer.moTa = false;
         }
 
         if (!$scope.form.gia || $scope.form.gia < 10000 || $scope.form.gia > 100000000) {
-            $scope.errorMessages.gia = "Giá phải lớn hơn 100,000 và nhỏ hơn 100,000,000.";
-            isValid = false;
+            errorContainer.gia = true;
+            toastr.error("Giá phải từ 10.000 đến 100.000.000 .", "Lỗi!");
+        } else {
+            errorContainer.gia = false;
         }
 
-        if (!$scope.form.idDanhMuc) {
-            $scope.errorMessages.idDanhMuc = "Vui lòng chọn danh mục.";
-            isValid = false;
+        if (!form.idDanhMuc) {
+            errorContainer.idDanhMuc = true;
+            toastr.error("Bạn chưa chọn danh mục.", "Lỗi!");
+        } else {
+            errorContainer.idDanhMuc = false;
         }
 
-        if (!$scope.form.idThuongHieu) {
-            $scope.errorMessages.idThuongHieu = "Vui lòng chọn thương hiệu.";
-            isValid = false;
+        if (!form.idThuongHieu) {
+            errorContainer.idThuongHieu = true;
+            toastr.error("Bạn chưa chọn thương hiệu.", "Lỗi!");
+        } else {
+            errorContainer.idThuongHieu = false;
         }
 
-        if (!$scope.form.idChatLieu) {
-            $scope.errorMessages.idChatLieu = "Vui lòng chọn chất liệu.";
-            isValid = false;
+        if (!form.idChatLieu) {
+            errorContainer.idChatLieu = true;
+            toastr.error("Bạn chưa chọn chất liệu.", "Lỗi!");
+        } else {
+            errorContainer.idChatLieu = false;
         }
 
-        if (!$scope.form.anh) {
-            $scope.errorMessages.anh = "Vui lòng chọn một file ảnh.";
-            isValid = false;
+        if (!form.anh) {
+            errorContainer.anh = true;
+            toastr.error("Bạn chưa chọn ảnh sản phẩm.", "Lỗi!");
+        } else {
+            errorContainer.anh = false;
         }
-
-        return isValid;
+        return !Object.values(errorContainer).includes(true);
     };
 
     toastr.options = {

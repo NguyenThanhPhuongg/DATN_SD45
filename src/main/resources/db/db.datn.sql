@@ -379,6 +379,7 @@ CREATE TABLE [hoa_don]
     [ngay_thanh_toan] DATETIME DEFAULT GETDATE(),
     [tong_tien] DECIMAL(10,2),
     [diem_su_dung] INT,
+    [ly_do_huy] NVARCHAR(300),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),

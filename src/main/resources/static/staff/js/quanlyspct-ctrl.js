@@ -94,6 +94,10 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                 toastr.warning("Giá sản phẩm chi tiết phải nằm trong khoảng từ 50.000 đến 100.000.000!", "Lỗi!");
                 return;
             }
+            if (detail.soLuong < 100 || detail.soLuong > 1000) {
+                toastr.warning("Số lượng sản phẩm chi tiết phải nằm trong khoảng từ 100 - 1000 sản phẩm!", "Lỗi!");
+                return;
+            }
         }
 
         // Hiển thị confirmation trước khi thực hiện thêm hoặc cập nhật
@@ -210,6 +214,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
         $scope.error = {
             soLuong: false,
             gia: false,
+            ghiChu: false
         };
 
         // Kiểm tra các trường dữ liệu
@@ -218,16 +223,23 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
         if (!$scope.form.gia || $scope.form.gia < 100000 || $scope.form.gia > 100000000) {
             $scope.error.gia = true;
             isValid = false;
+            toastr.error("Giá sản phẩm phải từ 10.000 đến 100.000.000.", "Lỗi!");
         }
 
         if (!$scope.form.soLuong || $scope.form.soLuong < 100 || $scope.form.soLuong > 10000) {
             $scope.error.soLuong = true;
             isValid = false;
+            toastr.error("Số lượng sản phẩm phải từ 1 đến 1.000 sản phẩm.", "Lỗi!");
+        }
+
+        if (!$scope.form.ghiChu || $scope.form.ghiChu.length < 5 || $scope.form.ghiChu.length > 300) {
+            $scope.error.ghiChu = true;
+            isValid = false;
+            toastr.error("Ghi chú phải từ 5 - 10 ký tự.", "Lỗi!");
         }
 
         // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
         if (!isValid) {
-            toastr.error("Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "Lỗi!");
             return; // Ngừng thực hiện nếu không hợp lệ
         }
 

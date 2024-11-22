@@ -58,7 +58,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
     };
 
     $scope.getHoaDonChiTietById = function (idHoaDon) {
-        $http.get('/hoa-don-chi-tiet/get-id-hoa-don', { params: { idHoaDon: idHoaDon } })
+        $http.get('/hoa-don-chi-tiet/get-id-hoa-don', {params: {idHoaDon: idHoaDon}})
             .then(response => {
                 $scope.hoaDonChiTiets = response.data.data; // Gán danh sách hóa đơn chi tiết
             })
@@ -67,8 +67,8 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
             });
     };
 
-    $scope.getTotalQuantity = function() {
-        return $scope.hoaDonChiTiets.reduce(function(total, detail) {
+    $scope.getTotalQuantity = function () {
+        return $scope.hoaDonChiTiets.reduce(function (total, detail) {
             return total + detail.soLuong; // Cộng dồn số lượng
         }, 0);
     };
@@ -76,12 +76,18 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
 
     $scope.getTitleByTrangThai = function (trangThai) {
         switch (trangThai) {
-            case 0: return "chờ xác nhận";
-            case 2: return "chờ giao hàng";
-            case 3: return "đang vận chuyển";
-            case 4: return "đã giao";
-            case 5: return "đã hủy";
-            default: return "không xác định";
+            case 0:
+                return "chờ xác nhận";
+            case 2:
+                return "chờ giao hàng";
+            case 3:
+                return "đang vận chuyển";
+            case 4:
+                return "đã giao";
+            case 5:
+                return "đã hủy";
+            default:
+                return "không xác định";
         }
     };
 
@@ -92,7 +98,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
     };
 
     $scope.getHoaDonsByTrangThai = function (trangThai) {
-        $http.get('/rest/hoadon/get-by-status', { params: { trangThai: trangThai } })
+        $http.get('/rest/hoadon/get-by-status', {params: {trangThai: trangThai}})
             .then(response => {
                 $scope.hoaDons = response.data.data;
                 $scope.pager.updateItems();
@@ -131,34 +137,59 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
         });
     };
 
-    $scope.updateHuyTraHoaDon = function (hoaDonId) {
+
+    $scope.selectedLyDoHuy = '';  // Lý do hủy được chọn
+    $scope.hoaDonId = null;  // ID hóa đơn cần cập nhật
+
+    // Mở modal và lưu ID hóa đơn
+    $scope.openModal = function (hoaDonId) {
+        $scope.hoaDonId = hoaDonId; // Lưu ID hóa đơn
+    };
+
+    $scope.updateCancelOrder = function () {
+        if (!$scope.selectedLyDoHuy) {
+            toastr.error("Bạn chưa nhập lý do hủy", "Lỗi!");
+            return;
+        }
+
         swal({
             title: "Xác nhận",
             text: "Bạn có chắc muốn hủy đơn hàng này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
-        }).then((willCancel) => {
-            if (willCancel) {
-                // Thực hiện cập nhật trạng thái hủy trả nếu người dùng xác nhận
-                $http.put('/rest/hoadon/update-huy-tra/' + hoaDonId, {}, {
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                var cancelOrderRequest = {
+                    orderInfo: $scope.selectedLyDoHuy
+                };
+
+                // Lấy token từ localStorage
+                var token = localStorage.getItem('token');  // Thay 'token' bằng tên bạn đã lưu trong localStorage
+
+                // Gửi yêu cầu hủy đơn hàng
+                $http.post('/rest/hoadon/cancel/' + $scope.hoaDonId, cancelOrderRequest, {
                     headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        'Authorization': 'Bearer ' + token  // Thêm token vào header Authorization
                     }
                 })
-                    .then(response => {
+                    .then(function (response) {
                         toastr.success("Hủy đơn hàng thành công", "Thành công!");
-                        $scope.getHoaDonsByTrangThai($scope.trangThai); // Refresh danh sách
+                        // Đóng modal sau khi hủy thành công
+                        $('#lyDoHuy').modal('hide');
+                        // Refresh danh sách hóa đơn nếu cần
+                        $scope.getHoaDonsByTrangThai($scope.trangThai);
                     })
-                    .catch(error => {
-                        console.error("Lỗi khi cập nhật trạng thái:", error);
-                        toastr.success("Cố lỗi không thể hủy đơn hàng", "Lỗi!");
+                    .catch(function (error) {
+                        toastr.error("Có lỗi không thể hủy đơn hàng", "Lỗi!");
+                        console.error(error);
                     });
             } else {
                 toastr.info("Hành động đã hủy", "Hủy!");
             }
         });
     };
+
 
     // Gọi khi trang được tải
     $scope.loadHoaDonsFromUrl();

@@ -77,8 +77,9 @@ public class HoaDonController {
 
     @PutMapping("/update-huy-tra/{id}")
     public ResponseEntity<ServiceResult> updateByTrangThaiHuyTra(@PathVariable Long id,
-                                                                 UserAuthentication ua) {
-        ServiceResult result = processor.updateHuyHoaDon(id, ua);
+                                                                 UserAuthentication ua,
+                                                                 @RequestBody String lyDoHuy) {
+        ServiceResult result = processor.updateHuyHoaDon(id, ua, lyDoHuy);
         return ResponseEntity.ok(result);
     }
 
