@@ -86,26 +86,179 @@ table {
     justify-content: space-between;
 }
 
-.voucher-info {
-    flex-grow: 1;
+/* Container chính của phần Pay Item Product */
+.pay_item_product {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
-.voucher-button {
-    margin-left: 20px;
+/* Căn chỉnh các phần tử trong row */
+.row {
+    display: flex;
+    flex-wrap: wrap;  /* Cho phép các phần tử xuống dòng nếu cần */
+    gap: 20px; /* Khoảng cách giữa các phần tử */
+    margin-bottom: 20px;
 }
+
+/* Đảm bảo tất cả phần tử trong col-left được căn chỉnh đẹp */
+.col-left {
+    display: flex; /* Sử dụng Flexbox để căn chỉnh */
+    align-items: center; /* Căn chỉnh các phần tử theo chiều dọc */
+    justify-content: flex-start; /* Căn chỉnh các phần tử theo chiều ngang */
+    gap: 20px; /* Khoảng cách giữa các phần tử */
+}
+
+/* Căn chỉnh hình ảnh voucher */
+.voucher-image img {
+    width: 60px; /* Đặt chiều rộng hình ảnh voucher */
+    height: 60px; /* Đặt chiều cao hình ảnh voucher */
+    object-fit: cover; /* Đảm bảo hình ảnh không bị biến dạng */
+    border-radius: 8px; /* Bo góc cho hình ảnh */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ nhẹ cho hình ảnh */
+}
+
+/* Căn chỉnh thông tin voucher */
+.voucher-text {
+    display: flex;
+    flex-direction: column; /* Căn chỉnh các phần tử theo chiều dọc */
+    justify-content: center; /* Căn chỉnh trung tâm theo chiều dọc */
+}
+
+/* Căn chỉnh tiêu đề voucher */
+.voucher-info h2 {
+    font-size: 1.2rem; /* Chỉnh kích thước font */
+    font-weight: bold; /* Đậm tiêu đề */
+    color: #333; /* Màu chữ tối */
+    margin: 0; /* Xóa margin */
+    margin-left: 10px;
+    text-transform: uppercase; /* Viết hoa tiêu đề */
+}
+
+/* Style cho nút chọn voucher */
 .voucher-button .button {
-    background-color: gray;
+    background-color: #28a745; /* Màu nền nút */
+    color: white; /* Màu chữ nút */
+    border: none; /* Xóa viền */
+    padding: 10px 20px; /* Padding cho nút */
+    border-radius: 5px; /* Bo góc cho nút */
+    font-size: 1rem; /* Kích thước font */
+    font-weight: bold; /* Đậm chữ */
+    cursor: pointer; /* Chỉ thị con trỏ chuột */
+    transition: background-color 0.3s ease; /* Hiệu ứng khi hover */
+}
+
+/* Thay đổi màu nền khi hover */
+.voucher-button .button:hover {
+    background-color: #218838; /* Màu nền nút khi hover */
+}
+
+/* Khoảng cách và căn chỉnh cho phần voucher */
+.voucher {
+    margin-top: 10px; /* Khoảng cách giữa các phần tử trong voucher */
+}
+
+
+/* Style cho phần phương thức vận chuyển */
+#shipping-method {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.shipping-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+}
+
+.shipping-text {
+    flex: 1;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.change-button {
+    background-color: #007bff;
     color: white;
-    border: none;
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 14px;
     transition: background-color 0.3s;
 }
 
-.voucher-button .button:hover {
-    background-color: gray;
+/* Hover hiệu ứng cho nút thay đổi phương thức vận chuyển */
+.change-button:hover {
+    background-color: #0056b3;
 }
+
+/* Style cho phần bảo hành */
+.guarantee {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.guarantee-icon {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.guarantee-text {
+    font-size: 1em;
+    color: #333;
+}
+
+/* Tạo kiểu cho phần tổng tiền */
+.total-price {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #e74c3c;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Cấu trúc Flexbox để hiển thị các payment options theo hàng ngang */
+#payment-options {
+    display: flex;
+    gap: 10px; /* Khoảng cách giữa các option */
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+}
+
+/* Đóng khung từng payment option */
+.payment-option {
+    padding: 10px 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Màu nền khi hover */
+.payment-option:hover {
+    background-color: #EE4D2D;
+    border-color: #EE4D2D;
+}
+
+/* Màu nền khi chọn (hover và chọn được thêm lớp 'selected') */
+.payment-option.selected {
+    background-color: #EE4D2D;
+    border-color: #EE4D2D;
+}
+
+/* Tùy chỉnh font và text */
+.payment-option span {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 /* Modal container */
 #address-modal {
     position: fixed;
@@ -121,40 +274,12 @@ table {
     align-items: center;
 }
 
-/* Modal content */
-/*.modal-content {*/
-/*    background-color: #fefefe;*/
-/*    margin: auto;*/
-/*    padding: 20px;*/
-/*    border: 1px solid #888;*/
-/*    width: 80%;*/
-/*    max-width: 600px;*/
-/*    border-radius: 10px;*/
-/*    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);*/
-/*    animation: fadeIn 0.3s;*/
-/*}*/
-
-/* Modal header */
-/*.modal-content h2 {*/
-/*    margin-top: 0;*/
-/*    font-size: 24px;*/
-/*    font-weight: bold;*/
-/*    text-align: center;*/
-/*}*/
-
 /* Divider */
 .divider {
     height: 1px;
     background-color: #ddd;
     margin: 20px 0;
 }
-
-/* Address list */
-/*#address-list {*/
-/*    max-height: 300px;*/
-/*    overflow-y: auto;*/
-/*    margin-bottom: 20px;*/
-/*}*/
 
 /* New address form */
 #new-address-form input {
@@ -175,15 +300,7 @@ button {
     font-size: 16px;
 }
 
-/*button.change-button {*/
-/*    background-color: #007bff;*/
-/*    color: white;*/
-/*}*/
-
-/*button.change-button:hover {*/
-/*    background-color: #0056b3;*/
-/*}*/
-
+/* Button styles */
 button#add-address-button {
     background-color: #28a745;
     color: white;
@@ -216,6 +333,7 @@ button#confirm-button:hover, button#confirm-shipping-button:hover, button#confir
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
 /* Modal confirm  dat hang */
 .custom-modal {
     display: none;
@@ -231,7 +349,7 @@ button#confirm-button:hover, button#confirm-shipping-button:hover, button#confir
     transition: opacity 0.3s ease;
 }
 
-
+/* Modal content */
 .custom-modal-content {
     background-color: #fff;
     padding: 40px 40px 50px 40px;
@@ -248,7 +366,6 @@ button#confirm-button:hover, button#confirm-shipping-button:hover, button#confir
     justify-content: space-between;
 }
 
-
 .custom-close {
     position: absolute;
     top: 10px;
@@ -262,7 +379,6 @@ button#confirm-button:hover, button#confirm-shipping-button:hover, button#confir
 .custom-close:hover {
     color: #333;
 }
-
 
 .custom-modal-content h1 {
     text-align: center;
@@ -278,7 +394,6 @@ button#confirm-button:hover, button#confirm-shipping-button:hover, button#confir
     margin-bottom: 30px;
 }
 
-
 .custom-modal-buttons {
     display: flex;
     justify-content: space-around;
@@ -292,43 +407,33 @@ button#confirm-button:hover, button#confirm-shipping-button:hover, button#confir
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s ease-in-out;
-    width: 45%;
+    transition: background-color 0.3s ease;
 }
 
-.custom-modal-buttons button#confirmPlaceOrder {
-    background-color: #28a745;
+.custom-modal-buttons button.cancel-btn {
+    background-color: #e74c3c;
     color: white;
 }
 
-.custom-modal-buttons button#cancelPlaceOrder {
-    background-color: #dc3545;
+.custom-modal-buttons button.confirm-btn {
+    background-color: #2ecc71;
     color: white;
 }
 
-
-.custom-modal-buttons button:hover {
-    transform: translateY(-2px);
+.custom-modal-buttons button.cancel-btn:hover {
+    background-color: #c0392b;
 }
 
-.custom-modal-buttons button#confirmPlaceOrder:hover {
-    background-color: #218838;
+.custom-modal-buttons button.confirm-btn:hover {
+    background-color: #27ae60;
 }
 
-.custom-modal-buttons button#cancelPlaceOrder:hover {
-    background-color: #c82333;
-}
-
-/* Hiệu ứng hiển thị modal */
-.custom-modal.show {
+/* Đảm bảo các phần tử modal có hiệu ứng fade-in khi mở */
+.custom-modal.open {
     display: flex;
-    opacity: 1;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-.custom-modal.hide {
-    display: none;
-    opacity: 0;
-}
 /* Container chính của sản phẩm */
 .product {
     margin: 20px;

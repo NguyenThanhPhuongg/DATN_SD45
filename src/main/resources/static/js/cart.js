@@ -31,12 +31,28 @@ function handleCheckout() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
 
     if (selectedItems.length === 0) {
-        // Hiển thị thông báo lỗi bằng Toastr
-        toastr.warning('Không có sản phẩm nào được chọn!', 'Cảnh báo');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            text: 'Không có sản phẩm nào được chọn!',
+            confirmButtonText: 'OK'
+        });
     } else {
-        window.location.href = '/checkout';
+        Swal.fire({
+            icon: 'question',
+            title: 'Bạn có chắc chắn?',
+            text: 'Bạn muốn tiếp tục đến trang thanh toán?',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/checkout';
+            }
+        });
     }
 }
+
 
 
 function updateTotalSection() {

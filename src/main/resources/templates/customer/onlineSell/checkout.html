@@ -103,10 +103,6 @@
                         </div>
                     </div>
                 </div>
-                <!--                <div class="col-right">-->
-                <!--                    <input type="text" class="input-field" placeholder="Nhập mã giảm giá">-->
-                <!--                    <button class="button"><span>Áp Dụng</span></button>-->
-                <!--                </div>-->
             </div>
             <div class="row">
                 <h2>Phương thức vận chuyển</h2>
@@ -168,17 +164,18 @@
         </div>
     </div>
     <!-- Voucher Modal -->
-    <div id="voucher-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Danh Sách Voucher</h2>
-            <div class="divider"></div>
-            <div id="voucher-list">Loading...</div>
-            <div id="button-section-voucher">
-                <button id="cancel-voucher-button" onclick="closeVoucherModal()">Hủy</button>
-                <button id="confirm-voucher-button" onclick="selectVoucher()">Xác Nhận</button>
-            </div>
+  <!-- Voucher Modal -->
+<div id="voucher-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Danh Sách Voucher</h2>
+        <div class="divider"></div>
+        <div id="voucher-list" style="overflow-y: auto;">Loading...</div>
+        <div id="button-section-voucher">
+            <button id="cancel-voucher-button" onclick="closeVoucherModal()">Hủy</button>
+            <button id="confirm-voucher-button" onclick="selectVoucher()">Xác Nhận</button>
         </div>
     </div>
+</div>
 </main>
 <div id="message"></div>
 <div th:include="footer::body"></div>

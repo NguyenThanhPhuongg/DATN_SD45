@@ -844,8 +844,8 @@ function closeVoucherModal() {
     document.body.style.overflow = "";
 }
 
-// Add event listener to the "Chọn voucher khác" button
-document.querySelector('.voucher-text button').addEventListener('click', openVoucherModal);
+// // Add event listener to the "Chọn voucher khác" button
+// document.querySelector('.voucher-text button').addEventListener('click', openVoucherModal);
 
 
 
