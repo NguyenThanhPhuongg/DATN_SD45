@@ -1027,6 +1027,7 @@
             font-size: 24px;
             font-weight: bold;
         }
+
         /* Khung bao quanh toàn bộ danh sách voucher */
         #voucher-list {
             display: flex;
@@ -1099,6 +1100,15 @@
     <link rel="stylesheet" href="../css/headerAll.css">
     <script src="/js/headerJs.js"></script>
     <link rel="stylesheet" href="../css/style.css">
+    <!-- Thêm SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Thêm Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+
+    <!-- Thêm Toastr JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
 </head>
 <body>
 <div th:include="header-all::body"></div>
@@ -1613,21 +1623,42 @@
             formData.append('file', file);
         }
 
-        const response = await fetch('profile/update', {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            body: formData
-        });
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn cập nhật thông tin?',
+            text: 'Các thay đổi sẽ được lưu lại!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy bỏ',
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('profile/update', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
 
-        if (response.ok) {
-            const data = await response.json();
-            hienThiThongBao('Cập nhật thành công!', true);
-            window.location.reload();
-        } else {
-            hienThiThongBao('Có lỗi xảy ra khi cập nhật thông tin.', false);
-        }
+                    if (response.ok) {
+                        const data = await response.json();
+                        toastr.success('Cập nhật thành công!', 'Thành công');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        toastr.error('Có lỗi xảy ra khi cập nhật thông tin.', 'Lỗi');
+                    }
+                } catch (error) {
+                    toastr.error('Đã xảy ra lỗi trong quá trình cập nhật.', 'Lỗi');
+                }
+            } else {
+                toastr.info('Hủy bỏ cập nhật', 'Thông báo');
+            }
+        });
     }
 
 
@@ -1659,7 +1690,7 @@
             body: JSON.stringify(request)
         });
         if (response.ok) {
-            hienThiThongBao('Đổi mật khẩu thành công!', true);
+            toastr.success('Đổi mật khẩu thành công!', 'Thành công');
             // Clear the password form
             document.getElementById('old-password').value = '';
             document.getElementById('new-password').value = '';
@@ -1670,7 +1701,7 @@
             document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
             document.getElementById('profile-link').classList.add('active');
         } else {
-            hienThiThongBao('Mật khẩu không chính xác!', false);
+            toastr.error('Mật khẩu không chính xác!', 'Lỗi');
         }
     }
 
@@ -1709,29 +1740,36 @@
 
         // Kiểm tra các trường không được rỗng
         if (!oldPassword || !password || !retypePassword) {
-            hienThiThongBao("Vui lòng nhập đầy đủ thông tin.", false);
+            toastr.error('Vui lòng nhập đầy đủ thông tin!', 'Lỗi');
             return;
         }
 
         // Kiểm tra mật khẩu mới và xác nhận mật khẩu
         if (password !== retypePassword) {
-            hienThiThongBao("Mật khẩu mới và xác nhận mật khẩu không khớp.", false);
+            toastr.error('Mật khẩu mới và xác nhận mật khẩu không khớp!', 'Lỗi');
             return;
         }
 
         // Kiểm tra mật khẩu mới có hợp lệ
         const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*([0-9]|[^0-9dA-Za-z])).{8,100}$/;
         if (!pattern.test(password)) {
-            hienThiThongBao(
-                "Mật khẩu phải từ 8 đến 100 ký tự, chứa ít nhất 1 chữ thường, 1 chữ hoa, và 1 ký tự đặc biệt hoặc số.",
-                false
+            toastr.error(
+                'Mật khẩu phải từ 8 đến 100 ký tự, chứa ít nhất 1 chữ thường, 1 chữ hoa, và 1 ký tự đặc biệt hoặc số!', 'Lỗi'
             );
             return;
         }
 
-        // Hiển thị modal xác nhận trước khi gọi API
-        hienThiModalXacNhan("Bạn có chắc chắn muốn đổi mật khẩu không?", function (confirmed) {
-            if (confirmed) {
+        // Sử dụng SweetAlert2 để hiển thị modal xác nhận
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn đổi mật khẩu không?',
+            text: "Hành động này không thể hoàn tác.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đổi mật khẩu',
+            cancelButtonText: 'Hủy bỏ',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
                 const request = {oldPassword, password, retypePassword};
                 doiMatKhau(request); // Gọi API đổi mật khẩu
             }
@@ -1831,14 +1869,13 @@
                 method: 'DELETE'
             });
             if (response.ok) {
-                hienThiThongBao('Địa chỉ đã được xóa thành công!');
+                toastr.success('Địa chỉ đã được xóa thành công!', 'Thành công');
                 hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi xóa thành công
             } else if (response.status === 500) {
-                hienThiThongBao('Không thể xóa địa chỉ mặc định.', false);
+                toastr.error('Không thể xóa địa chỉ mặc định.', 'Lỗi');
             } else {
-                hienThiThongBao('Lỗi khi xóa địa chỉ, vui lòng kiểm tra lại!', false);
+                toastr.error('Lỗi khi xóa địa chỉ, vui lòng kiểm tra lại!', 'Lỗi');
             }
-            document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
         }
     }
@@ -1850,32 +1887,53 @@
                 method: 'PUT'
             });
             if (response.ok) {
-                hienThiThongBao('Địa chỉ đã được thiết lập mặc định!');
+                toastr.success('Địa chỉ đã được thiết lập mặc định!', 'Thành công');
                 hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi thay đổi mặc định thành công
             } else {
                 console.error('Lỗi khi thiết lập địa chỉ mặc định');
-                hienThiThongBao('Lỗi khi thiết lập địa chỉ mặc định, vui lòng kim tra lại!', false);
+                toastr.error('Lỗi khi thiết lập địa chỉ mặc định, vui lòng kiểm tra lại!', 'Lỗi');
             }
-            document.getElementById('confirm-dialog').style.display = 'none';
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
         }
     }
 
-    // Hàm để hiển thị thông báo xác nhận dùng chung
+    // Hàm để hiển thị thông báo xác nhận dùng chung với Swal
     function hienThiXacNhanHanhDong(id, action) {
         diaChiIdToHandle = id;
         confirmAction = action;
+
         let message = 'Bạn có chắc chắn muốn thực hiện hành động này không?';
+        let title = 'Xác nhận hành động';
+
         if (action === 'default') {
             message = 'Bạn có chắc chắn muốn thiết lập địa chỉ này làm mặc định không?';
+            title = 'Thiết lập mặc định';
         } else if (action === 'delete') {
             message = 'Bạn có chắc chắn muốn xóa địa chỉ này không?';
+            title = 'Xóa địa chỉ';
         }
-        document.getElementById('confirm-message').innerText = message;
-        document.getElementById('confirm-dialog').style.display = 'block';
+
+        // Sử dụng SweetAlert để hiển thị hộp thoại xác nhận
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gọi hành động tùy theo loại
+                if (confirmAction === 'default') {
+                    thietLapMacDinh();
+                } else if (confirmAction === 'delete') {
+                    xoaDiaChi();
+                }
+            }
+        });
     }
 
-    // Hàm để xử lý hành động xác nhận
+    // Hàm xử lý các hành động xác nhận
     function xacNhanHanhDong() {
         if (confirmAction === 'default') {
             thietLapMacDinh();
@@ -1883,6 +1941,7 @@
             xoaDiaChi();
         }
     }
+
 
     // Gán sự kiện cho các nút xác nhận
     document.getElementById('confirm-yes').addEventListener('click', xacNhanHanhDong);
@@ -1933,23 +1992,23 @@
 
         // Kiểm tra hợp lệ
         if (!hoTen || hoTen.length > 100) {
-            hienThiThongBao('Họ tên không được để trống và không vượt quá 100 ký tự.', false);
+            toastr.error('Họ tên không được để trống và không vượt quá 100 ký tự.', 'Lỗi');
             valid = false;
         }
         if (!sdt || sdt.length < 10 || sdt.length > 15) {
-            hienThiThongBao('Số điện thoại phải có từ 10 đến 15 ký tự.', false);
+            toastr.error('Số điện thoại phải có từ 10 đến 15 ký tự.', 'Lỗi');
             valid = false;
         }
         if (!diaChi) {
-            hienThiThongBao('Địa chỉ không được để trống.', false);
+            toastr.error('Địa chỉ không được để trống.', 'Lỗi');
             valid = false;
         }
         if (!thanhPho) {
-            hienThiThongBao('Thành phố không được để trống.', false);
+            toastr.error('Thành phố không được để trống.', 'Lỗi');
             valid = false;
         }
         if (!quocGia) {
-            hienThiThongBao('Quốc gia không được để trống.', false);
+            toastr.error('Quốc gia không được để trống.', 'Lỗi');
             valid = false;
         }
 
@@ -1963,45 +2022,61 @@
             quocGia
         };
 
-        // Gọi API tương ứng dựa trên trạng thái (thêm mới hoặc chỉnh sửa)
-        let response;
-        if (isEditing) {
-            response = await fetch(`/dia-chi/${diaChiIdToHandle}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(newAddress)
-            });
-        } else {
-            response = await fetch('/dia-chi/insert', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(newAddress)
-            });
-        }
+        // Sử dụng SweetAlert để xác nhận trước khi gọi API
+        const result = await Swal.fire({
+            title: 'Bạn có chắc chắn muốn lưu địa chỉ này?',
+            text: 'Bạn sẽ không thể thay đổi thông tin sau khi đã lưu!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Lưu',
+            cancelButtonText: 'Hủy',
+        });
 
-        // Xử lý phản hồi từ API
-        if (response.ok) {
-            hienThiThongBao(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!', true);
-            // Xóa các giá trị đã nhập trong form sau khi thêm thành công
-            document.getElementById('hoTen').value = '';
-            document.getElementById('diaChi').value = '';
-            document.getElementById('sdt').value = '';
-            document.getElementById('thanhPho').value = '';
-            document.getElementById('quocGia').value = '';
-            cancelNewAddress(); // Ẩn form và hiển thị lại danh sách địa chỉ
-            hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ
+        // Nếu người dùng chọn xác nhận (confirm)
+        if (result.isConfirmed) {
+            // Gọi API tương ứng dựa trên trạng thái (thêm mới hoặc chỉnh sửa)
+            let response;
+            if (isEditing) {
+                response = await fetch(`/dia-chi/${diaChiIdToHandle}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(newAddress)
+                });
+            } else {
+                response = await fetch('/dia-chi/insert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(newAddress)
+                });
+            }
+
+            // Xử lý phản hồi từ API
+            if (response.ok) {
+                toastr.success(isEditing ? 'Địa chỉ đã được cập nhật thành công!' : 'Địa chỉ mới đã được thêm thành công!', 'Thành công');
+                // Xóa các giá trị đã nhập trong form sau khi thêm thành công
+                document.getElementById('hoTen').value = '';
+                document.getElementById('diaChi').value = '';
+                document.getElementById('sdt').value = '';
+                document.getElementById('thanhPho').value = '';
+                document.getElementById('quocGia').value = '';
+                cancelNewAddress(); // Ẩn form và hiển thị lại danh sách địa chỉ
+                hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ
+            } else {
+                console.error('Lỗi khi thêm hoặc cập nhật địa chỉ');
+                const errorData = await response.json();
+                toastr.error(`Lỗi: ${errorData.message}`, 'Lỗi');
+            }
         } else {
-            console.error('Lỗi khi thêm hoặc cập nhật địa chỉ');
-            const errorData = await response.json();
-            hienThiThongBao(`Lỗi: ${errorData.message}`, false);
+            toastr.info('Hành động bị hủy', 'Thông báo');
         }
     }
+
 
 
     async function chinhSuaDiaChi(id) {
@@ -2053,7 +2128,7 @@
             if (orderInfo) {
                 cancelOrder(orderId, orderInfo);
             } else {
-                hienThiThongBao('Vui lòng chọn lý do hủy.', false);
+                toastr.error('Vui lòng chọn lý do hủy!', 'Lỗi');
             }
         };
         document.getElementById('confirm-cancel-no').onclick = function () {
@@ -2094,12 +2169,12 @@
 
         if (response.ok) {
             const result = await response.json();
-            hienThiThongBao('Đơn hàng đã được hủy thành công!', true);
+            toastr.success('Đơn hàng đã được hủy thành công!', 'Thành công');
             document.getElementById('confirm-cancel').style.display = 'none'; // Ẩn modal
             resetCancelReasonSelection();
             fetchOrderDataForActiveTab(); // Refresh the order list for the active tab
         } else {
-            hienThiThongBao('Có lỗi xảy ra khi hủy đơn hàng.', false);
+            toastr.error('Có lỗi xảy ra khi hủy đơn hàng.', 'Lỗi');
         }
     }
 
@@ -2163,12 +2238,12 @@
                     // Hiển thị modal
                     document.getElementById('cancel-detail-modal').style.display = 'block';
                 } else {
-                    hienThiThongBao('Không tìm thấy thông tin chi tiết.', false);
+                    toastr.error('Không tìm thấy thông tin chi tiết!', 'Lỗi');
                 }
             })
             .catch(error => {
                 console.error('Error fetching cancel details:', error);
-                hienThiThongBao('Có lỗi xảy ra khi tải thông tin chi tiết.', false);
+                toastr.error('Có lỗi xảy ra khi tải thông tin chi tiết!', 'Lỗi');
             });
     }
 
@@ -2182,7 +2257,7 @@
         const token = localStorage.getItem('token');
 
         if (!token) {
-            hienThiThongBao('Bạn cần đăng nhập để thực hiện hành động này.', false);
+            toastr.error('Bạn cần đăng nhập để thực hiện hành động này.', 'Lỗi');
             return;
         }
 
@@ -2194,20 +2269,19 @@
     }
 
     function showConfirmDialog(order) {
-        const confirmDialog = document.getElementById('confirm-dialog');
-        const confirmMessage = document.getElementById('confirm-message');
-        const confirmYes = document.getElementById('confirm-yes');
-        const confirmNo = document.getElementById('confirm-no');
-
-        confirmMessage.textContent = 'Bạn có chắc chắn muốn mua lại các sản phẩm này?';
-        confirmDialog.style.display = 'block';
-        confirmYes.onclick = function () {
-            confirmDialog.style.display = 'none';
-            processBuyAgain(order);
-        };
-        confirmNo.onclick = function () {
-            confirmDialog.style.display = 'none';
-        };
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn mua lại các sản phẩm này?',
+            text: 'Các sản phẩm sẽ được thêm vào giỏ hàng của bạn.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                processBuyAgain(order); // Gọi hàm mua lại sản phẩm
+            }
+        });
     }
 
     function processBuyAgain(order) {
@@ -2243,16 +2317,16 @@
                 const allSuccess = data.every(item => item.code === '200');
 
                 if (allSuccess) {
-                    hienThiThongBao('Sản phẩm đã được thêm vào giỏ hàng.', true);
+                    toastr.success('Sản phẩm đã được thêm vào giỏ hàng.', 'Thành công');
                     setTimeout(function () {
-                        location.href = '/cart';
+                        location.href = '/cart'; // Chuyển hướng đến trang giỏ hàng
                     }, 1000);
                 } else {
-                    hienThiThongBao('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', false);
+                    toastr.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'Lỗi');
                 }
             })
             .catch(error => {
-                hienThiThongBao('Có lỗi xảy ra khi gọi API.', false);
+                toastr.error('Có lỗi xảy ra khi gọi API.', 'Lỗi');
             });
     }
 
@@ -2303,7 +2377,10 @@
                 voucherItem.innerHTML = `
                 <h3>Mã Voucher: ${voucher.ma || 'N/A'}</h3>
                 <p>Mô tả: ${voucher.moTa || 'Không có mô tả'}</p>
-                <p>Giá trị: ${voucher.giaTri ? voucher.giaTri.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 'Chưa có giá trị'}</p>
+                <p>Giá trị: ${voucher.giaTri ? voucher.giaTri.toLocaleString('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }) : 'Chưa có giá trị'}</p>
                 <p>Ngày hết hạn: ${formattedDate}</p>
             `;
                 voucherListContainer.appendChild(voucherItem);
@@ -2312,7 +2389,6 @@
             voucherListContainer.innerHTML = '<p>Không có voucher nào.</p>';
         }
     }
-
 
 
 </script>

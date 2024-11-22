@@ -97,7 +97,7 @@ function selectAddress() {
 
         closeModal(); // Đóng modal sau khi chọn địa chỉ
     } else {
-        showNotification('Vui lòng chọn một địa chỉ.', 'error');
+        toastr.error('Vui lòng chọn một địa chỉ.', 'Lỗi');
     }
 }
 
@@ -118,23 +118,23 @@ async function addNewAddress() {
 
     // Kiểm tra các điều kiện ràng buộc
     if (!newHoTen || newHoTen.length > 100) {
-        document.getElementById('error-message').innerText = 'Họ tên không được để trống và không vượt quá 100 ký tự.';
+        toastr.error('Họ tên không được để trống và không vượt quá 100 ký tự.', 'Lỗi');
         return;
     }
     if (!newSdt || newSdt.length < 10 || newSdt.length > 15) {
-        document.getElementById('error-message').innerText = 'Số điện thoại không được để trống và phải có từ 10 đến 15 ký tự.';
+        toastr.error('Số điện thoại không được để trống và phải có từ 10 đến 15 ký tự.', 'Lỗi');
         return;
     }
     if (!newDiaChi) {
-        document.getElementById('error-message').innerText = 'Địa chỉ không được để trống.';
+        toastr.error('Địa chỉ không được để trống.', 'Lỗi');
         return;
     }
     if (!newThanhPho) {
-        document.getElementById('error-message').innerText = 'Thành phố không được để trống.';
+        toastr.error('Thành phố không được để trống.', 'Lỗi');
         return;
     }
     if (!newQuocGia) {
-        document.getElementById('error-message').innerText = 'Quốc gia không được để trống.';
+        toastr.error('Quốc gia không được để trống.', 'Lỗi');
         return;
     }
 
@@ -147,39 +147,56 @@ async function addNewAddress() {
         quocGia: newQuocGia
     };
 
-    try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('dia-chi/insert', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(requestData)
-        });
+    // Hiển thị hộp thoại xác nhận trước khi gửi yêu cầu
+    const isConfirmed = await Swal.fire({
+        title: 'Xác nhận',
+        text: "Bạn có chắc chắn muốn thêm địa chỉ này không?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Hủy',
+    });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+    if (isConfirmed.isConfirmed) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('dia-chi/insert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+
+            toastr.success('Địa chỉ đã được thêm thành công!', 'Thành công');
+            console.log(result);
+
+            document.getElementById('new-address-form').style.display = 'none';
+            document.getElementById('address-list').style.display = 'block';
+            document.getElementById('error-message').innerText = ''; // Xóa thông báo lỗi
+            isAddingNewAddress = false;
+
+            fetchAddressList();
+            clearFormModal();
+
+        } catch (error) {
+            console.error('Error adding new address:', error);
+            toastr.error('Lỗi khi thêm địa chỉ mới.', 'Lỗi');
         }
-
-        const result = await response.json();
-
-        // Hiển thị thông báo thành công và cập nhật lại danh sách địa chỉ
-        console.log(result);
-        document.getElementById('new-address-form').style.display = 'none';
-        document.getElementById('address-list').style.display = 'block';
-        document.getElementById('error-message').innerText = ''; // Xóa thông báo lỗi
-        isAddingNewAddress = false;
-
-        // Cập nhật lại danh sách địa chỉ sau khi thêm mới
-        fetchAddressList();
-        clearFormModal();
-
-    } catch (error) {
-        console.error('Error adding new address:', error);
-        document.getElementById('error-message').innerText = 'Lỗi khi thêm địa chỉ mới.';
+    } else {
+       // Nếu người dùng hủy, thông báo với toastr
+        toastr.info('Bạn đã hủy thao tác thêm địa chỉ.', 'Thông báo');
     }
 }
+
+
 
 function handleConfirmButton() {
     if (isAddingNewAddress) {
@@ -619,79 +636,86 @@ function closeConfirmationModal() {
 
 async function placeOrder() {
     // Hiển thị modal xác nhận trước khi tiếp tục
-    showConfirmationModal(async function (isConfirmed) {
-        if (!isConfirmed) {
-            return; // Nếu người dùng không đồng ý, dừng lại
+    const isConfirmed = await Swal.fire({
+        title: "Xác nhận",
+        text: "Bạn có chắc chắn muốn tiếp tục đặt hàng?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Xác nhận",
+        cancelButtonText: "Hủy",
+        reverseButtons: true
+    }).then(result => result.isConfirmed);
+
+    if (!isConfirmed) {
+        return; // Nếu người dùng không đồng ý, dừng lại
+    }
+
+    const idDiaChiGiaoHang = addressDataId;
+    const idPhuongThucVanChuyen = phuongThucVanChuyenId;
+
+    // Kiểm tra phương thức thanh toán
+    if (!phuongThucThanhToanId) {
+        toastr.warning('Vui lòng chọn phương thức thanh toán.', 'Cảnh báo');
+        return;
+    }
+
+    const idPhuongThucThanhToan = phuongThucThanhToanId;
+    const selectedItems = JSON.parse(localStorage.getItem('selectedItems'));
+
+    // Kiểm tra giỏ hàng
+    if (!selectedItems || selectedItems.length === 0) {
+        toastr.warning('Giỏ hàng của bạn đang trống.', 'Cảnh báo');
+        return;
+    }
+
+    // Tạo đối tượng HoaDonRequest
+    const request = {
+        idGioHangChiTiet: selectedItems,
+        idDiaChiGiaoHang: idDiaChiGiaoHang,
+        idPhuongThucVanChuyen: idPhuongThucVanChuyen,
+        idPhuongThucThanhToan: idPhuongThucThanhToan,
+        diemSuDung: 0,
+        giaTriVoucher: selectedVoucherValue
+    };
+
+    const token = localStorage.getItem('token');
+
+    // Gọi API để lưu đơn hàng
+    try {
+        const response = await fetch('/rest/hoadon/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(request),
+        });
+
+        if (!response.ok) {
+            throw new Error('Lưu đơn hàng không thành công.');
         }
 
-        const idDiaChiGiaoHang = addressDataId;
-        const idPhuongThucVanChuyen = phuongThucVanChuyenId;
+        const result = await response.json();
 
-        // Kiểm tra phương thức thanh toán
-        if (!phuongThucThanhToanId) {
-            showNotification('Vui lòng chọn phương thức thanh toán.', 'yellow');
-            return;
-        }
-
-        const idPhuongThucThanhToan = phuongThucThanhToanId;
-        const selectedItems = JSON.parse(localStorage.getItem('selectedItems'));
-
-        // Kiểm tra giỏ hàng
-        if (!selectedItems || selectedItems.length === 0) {
-            showNotification('Giỏ hàng của bạn đang trống.', 'yellow');
-            return;
-        }
-
-        // Tạo đối tượng HoaDonRequest
-        const request = {
-            idGioHangChiTiet: selectedItems,
-            idDiaChiGiaoHang: idDiaChiGiaoHang,
-            idPhuongThucVanChuyen: idPhuongThucVanChuyen,
-            idPhuongThucThanhToan: idPhuongThucThanhToan,
-            diemSuDung: 0,
-            giaTriVoucher: selectedVoucherValue
-        };
-
-        const token = localStorage.getItem('token');
-
-        // Gọi API để lưu đơn hàng
-        try {
-            const response = await fetch('/rest/hoadon/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(request),
-            });
-
-            if (!response.ok) {
-                throw new Error('Lưu đơn hàng không thành công.');
+        if (result.code === "200") {
+            if (result.data === null) {
+                // Đặt hàng thành công và chuyển hướng đến /bill
+                toastr.success('Đặt hàng thành công!', 'Thành công');
+                await applyVoucher();
+                window.location.href = '/bill';
+            } else if (typeof result.data === 'string') {
+                // Chuyển hướng tới VNPay link
+                window.location.href = result.data;
             }
-
-            const result = await response.json();
-
-            if (result.code === "200") {
-                if (result.data === null) {
-                    // Đặt hàng thành công và chuyển hướng đến /bill
-                    showNotification('Đặt hàng thành công!', 'success');
-                    await applyVoucher();
-                    window.location.href = '/bill';
-                } else if (typeof result.data === 'string') {
-                    // Chuyển hướng tới VNPay link
-                    window.location.href = result.data;
-                }
-            } else {
-                showNotification(`Có lỗi xảy ra: ${result.message}`, 'yellow');
-            }
-
-        } catch (error) {
-            console.error('Error placing order:', error);
-            showNotification('Có lỗi xảy ra khi đặt hàng.', 'yellow');
+        } else {
+            toastr.warning(`Có lỗi xảy ra: ${result.message}`, 'Cảnh báo');
         }
-    });
+
+    } catch (error) {
+        console.error('Error placing order:', error);
+        toastr.error('Có lỗi xảy ra khi đặt hàng.', 'Lỗi');
+    }
 }
-
 
 async function applyVoucher() {
     const token = localStorage.getItem('token');
@@ -712,10 +736,14 @@ async function applyVoucher() {
         const result = await response.json();
         console.log('Voucher applied successfully:', result);
 
+        toastr.success('Khuyến mãi đã được áp dụng thành công!', 'Thành công');
+
     } catch (error) {
         console.error('Error applying voucher:', error);
+        toastr.error('Có lỗi xảy ra khi áp dụng khuyến mãi.', 'Lỗi');
     }
 }
+
 
 let selectedVoucherId = null;
 let selectedVoucherValue = 0;
@@ -760,27 +788,34 @@ async function fetchVouchers() {
 
 function selectVoucher() {
     const selectedVoucher = document.querySelector('input[name="voucher"]:checked');
+
     if (selectedVoucher) {
         const voucherValue = parseFloat(selectedVoucher.getAttribute('data-value'));
+
         if (isNaN(voucherValue) || voucherValue === null) {
-            showNotification('Voucher không hợp lệ.', 'error');
+            toastr.error('Voucher không hợp lệ.', 'Lỗi');
             return;
         }
+
         selectedVoucherId = selectedVoucher.value;
-        selectedVoucherValue = voucherValue; // Store the voucher value as a number
+        selectedVoucherValue = voucherValue; // Lưu giá trị voucher dưới dạng số
+
         const selectedVoucherLabel = selectedVoucher.nextElementSibling;
         const voucherInfo = document.querySelector('.voucher');
         const newVoucherInfo = `
             <h2>${selectedVoucherLabel.querySelector('strong').textContent}</h2>
             <p>${selectedVoucherLabel.querySelector('span').textContent}</p>
         `;
-        voucherInfo.innerHTML = newVoucherInfo; // Update the voucher information
+
+        voucherInfo.innerHTML = newVoucherInfo;
         closeVoucherModal();
-        updateTotalPayment(); // Update the total payment amount
+        updateTotalPayment();
+        toastr.success('Voucher đã được chọn thành công!', 'Thành công');
     } else {
-        showNotification('Vui lòng chọn một voucher.', 'error');
+        toastr.error('Vui lòng chọn một voucher.', 'Lỗi');
     }
 }
+
 
 function updateTotalPayment() {
     const totalItemPriceText = document.getElementById('totalItemPrice').textContent;

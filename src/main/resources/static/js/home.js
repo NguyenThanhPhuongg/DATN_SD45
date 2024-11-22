@@ -458,13 +458,21 @@ $(document).ready(function () {
             const productDetails = getSelectedProductDetails();
 
             if (!productDetails.idSize || !productDetails.idMauSac || !productDetails.soLuong) {
-                showNotification('Vui lòng chọn màu sắc, kích thước và số lượng!', 'yellow');
+                toastr.warning('Vui lòng chọn màu sắc, kích thước và số lượng!', 'Lỗi');
                 return;
             }
 
-            // Hiển thị modal xác nhận
-            showConfirmModal(function (confirmed) {
-                if (confirmed) {
+            Swal.fire({
+                title: 'Xác nhận',
+                text: 'Bạn có chắc chắn muốn thêm sản phẩm vào giỏ hàng?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true,
+                dangerMode: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
                     const token = localStorage.getItem('token');
 
                     $.ajax({
@@ -476,19 +484,21 @@ $(document).ready(function () {
                             'Authorization': `Bearer ${token}`
                         },
                         success: function (response) {
-                            showNotification('Sản phẩm đã được thêm vào giỏ hàng thành công!', 'success');
+                            toastr.success('Sản phẩm đã được thêm vào giỏ hàng thành công!', 'Thành công');
+
                             setTimeout(function () {
                                 location.reload();
-                            }, 1000);
+                            }, 800);
                         },
                         error: function (error) {
                             console.error('Error adding product to cart:', error);
-                            showNotification('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'yellow');
+                            toastr.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'Lỗi');
                         }
                     });
                 }
             });
         });
+
     });
 
 

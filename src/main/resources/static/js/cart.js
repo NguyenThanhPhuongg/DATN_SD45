@@ -29,27 +29,15 @@ function handleCheckboxClick(itemId, isChecked) {
 
 function handleCheckout() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
-    const alertBox = document.querySelector('.alert');
+
     if (selectedItems.length === 0) {
-        if (!alertBox) {
-            const newAlertBox = document.createElement('div');
-            newAlertBox.classList.add('alert', 'alert-warning', 'text-center');
-            newAlertBox.textContent = 'Không có sản phẩm nào được chọn!';
-            document.body.appendChild(newAlertBox);
-            setTimeout(() => {
-                newAlertBox.remove();
-            }, 3000);
-        } else {
-            alertBox.textContent = 'Không có sản phẩm nào được chọn!';
-            alertBox.classList.add('show');
-            setTimeout(() => {
-                alertBox.classList.remove('show');
-            }, 3000);
-        }
+        // Hiển thị thông báo lỗi bằng Toastr
+        toastr.warning('Không có sản phẩm nào được chọn!', 'Cảnh báo');
     } else {
         window.location.href = '/checkout';
     }
 }
+
 
 function updateTotalSection() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
@@ -114,20 +102,19 @@ function hienThiThongBao(message, success = true) {
 }
 
 function handleDelete(itemId) {
-    currentItemId = itemId;
-
-    const confirmDialog = document.getElementById('confirm-dialog');
-    confirmDialog.style.display = 'flex';
-    confirmDialog.style.opacity = '1';
-
-    document.getElementById('confirm-yes').onclick = function () {
-        deleteItem(currentItemId);
-        confirmDialog.style.display = 'none';
-    };
-
-    document.getElementById('confirm-no').onclick = function () {
-        confirmDialog.style.display = 'none';
-    };
+    Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa sản phẩm này?',
+        text: 'Hành động này không thể hoàn tác!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            deleteItem(itemId);
+        }
+    });
 }
 
 function deleteItem(itemId) {
@@ -144,15 +131,20 @@ function deleteItem(itemId) {
         .then(response => response.json())
         .then(result => {
             if (result.code === '200') {
-                hienThiThongBao('Xóa sản phẩm thnh công!', true);
+                toastr.success('Sản phẩm đã được xóa thành công!', 'Thành công');
                 fetchCartData();
-                location.reload();
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
             } else {
                 console.error('Xóa sản phẩm thất bại', result.message);
-                hienThiThongBao('Xóa sản phẩm thất bại!', false);
+                toastr.error('Xóa sản phẩm thất bại!', 'Lỗi');
             }
         })
-        .catch(error => console.error('Lỗi khi gọi API', error));
+        .catch(error => {
+            console.error('Lỗi khi gọi API', error);
+            toastr.error('Có lỗi xảy ra khi gọi API.', 'Lỗi');
+        });
 }
 
 
