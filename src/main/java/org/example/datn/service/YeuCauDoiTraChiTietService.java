@@ -1,5 +1,6 @@
 package org.example.datn.service;
 
+import org.example.datn.entity.HoaDonChiTiet;
 import org.example.datn.entity.YeuCauDoiTra;
 import org.example.datn.entity.YeuCauDoiTraChiTiet;
 import org.example.datn.repository.YeuCauDoiTraChiTietRepository;
@@ -37,5 +38,11 @@ public class YeuCauDoiTraChiTietService {
 
     public void delete(Long id) {
         repo.deleteById(id);
+    }
+    public List<YeuCauDoiTraChiTiet> findByIdYeuCauDoiTra(Long idDoiTra) {
+        return repo.findByIdYeuCauDoiTra(idDoiTra);
+    }
+    public void saveAll(List<YeuCauDoiTraChiTiet> yeuCauDoiTraChiTiets) {
+        repo.saveAll(yeuCauDoiTraChiTiets);
     }
 }

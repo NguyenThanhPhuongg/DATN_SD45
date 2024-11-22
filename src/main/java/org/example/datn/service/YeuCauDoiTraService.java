@@ -38,4 +38,8 @@ public class YeuCauDoiTraService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    public List<YeuCauDoiTra> findByLoaiAndTrangThai(String loai, Integer trangThai) {
+        return repo.findByLoaiAndTrangThai(loai, trangThai);
+    }
 }

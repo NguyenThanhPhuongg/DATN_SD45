@@ -1,10 +1,44 @@
-// app.controller("khuyenmai-ctrl", function ($scope, $http) {
+// app.controller("doitrahang-ctrl", function ($scope, $http, $rootScope, $location) {
 //     $scope.items = [];
 //     $scope.form = {};
-//     $scope.formAdd = {};
-//     $scope.selectedLoai = null;
-//     $scope.searchText = ''; // Biến tìm kiếm
-//     $scope.pager = {
+//
+//
+//     $scope.selectedID = null;
+//     $scope.selectedMAHD = null;
+//     $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
+//     $scope.searchText2 = '';
+//     $scope.searchText3 = '';
+//     $scope.searchText4 = '';
+//     $scope.searchText5 = '';
+//     $scope.searchText6 = '';
+//     // Thêm searchText cho các trạng thái khác nếu cần
+//
+//     $scope.initialize = function () {
+//         // Gọi API và kiểm tra dữ liệu
+//         $http.get("/yeu-cau").then(resp => {
+//             console.log("Dữ liệu từ API: ", resp.data); // Kiểm tra dữ liệu từ API
+//             // Kiểm tra xem resp.data.data có phải là mảng không
+//             if (Array.isArray(resp.data.data)) {
+//                 $scope.items = resp.data.data.map(item => ({
+//                     ...item,
+//                     ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
+//                     ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
+//                 }));
+//                 $scope.pagerDH0.updateItems();
+//                 $scope.pagerDH1.updateItems();
+//                 $scope.pagerDH2.updateItems();
+//                 $scope.pagerTH0.updateItems();
+//                 $scope.pagerTH1.updateItems();
+//                 $scope.pagerTH2.updateItems();
+//             } else {
+//                 console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
+//             }
+//         }).catch(error => {
+//             console.error("Lỗi khi tải danh mục: ", error);
+//         });
+//     };
+//
+//     $scope.pagerDH0 = {
 //         page: 0,
 //         size: 5,
 //         items: [],
@@ -30,369 +64,293 @@
 //             this.updateItems();
 //         },
 //         updateItems: function () {
-//             // Lọc các mục theo tìm kiếm và loại
 //             const filteredItems = $scope.items.filter(item => {
-//                 const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
-//                     item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
-//                 const matchesLoai = !$scope.selectedLoai || item.loai === Number($scope.selectedLoai);
-//                 return matchesSearch && matchesLoai;
+//                 const statusMatches = item.trangThai === 0;
+//                 const loaiYeuCau = item.loai === 'EXCHANGE';
+//                 const idMatches = item.id.toString().includes($scope.searchText1);
+//                 return statusMatches && idMatches && loaiYeuCau;
 //             });
-//
-//             // Cập nhật số trang
 //             this.count = Math.ceil(filteredItems.length / this.size);
-//             // Cập nhật danh sách các mục cho trang hiện tại
 //             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
 //         }
 //     };
-//     // Hàm để gọi API lấy danh sách khuyến mãi
-//     $scope.getKhuyenMaiList = function () {
-//         var requestData = {
-//             keyword: $scope.searchText,
-//             loai: $scope.selectedLoai
-//         };
 //
-//         $http.post('/khuyen-mai/get-list', requestData)
-//             .then(function (response) {
-//                 // Xử lý dữ liệu trả về từ API
-//                 if (response.data && response.data.data) {
-//                     $scope.items = response.data.data; // Gán dữ liệu vào mảng items
-//                     $scope.pager.updateItems(); // Cập nhật danh sách khuyến mãi cho pager
-//                 } else {
-//                     console.error("Dữ liệu không hợp lệ");
-//                 }
-//             })
-//             .catch(function (error) {
-//                 console.error("Lỗi khi gọi API: ", error);
-//                 alert('Có lỗi xảy ra khi tải dữ liệu khuyến mãi.');
+//     $scope.pagerDH1 = {
+//         page: 0,
+//         size: 5,
+//         items: [],
+//         count: 0,
+//         first: function () {
+//             this.page = 0;
+//             this.updateItems();
+//         },
+//         prev: function () {
+//             if (this.page > 0) {
+//                 this.page--;
+//                 this.updateItems();
+//             }
+//         },
+//         next: function () {
+//             if (this.page < this.count - 1) {
+//                 this.page++;
+//                 this.updateItems();
+//             }
+//         },
+//         last: function () {
+//             this.page = this.count - 1;
+//             this.updateItems();
+//         },
+//         updateItems: function () {
+//             const filteredItems = $scope.items.filter(item => {
+//                 const statusMatches = item.trangThai === 1;
+//                 const loaiYeuCau = item.loai === 'EXCHANGE';
+//                 const idMatches = item.id.toString().includes($scope.searchText1);
+//                 return statusMatches && idMatches && loaiYeuCau;
 //             });
+//             this.count = Math.ceil(filteredItems.length / this.size);
+//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+//         }
+//     };
+//
+//     $scope.pagerDH2 = {
+//         page: 0,
+//         size: 5,
+//         items: [],
+//         count: 0,
+//         first: function () {
+//             this.page = 0;
+//             this.updateItems();
+//         },
+//         prev: function () {
+//             if (this.page > 0) {
+//                 this.page--;
+//                 this.updateItems();
+//             }
+//         },
+//         next: function () {
+//             if (this.page < this.count - 1) {
+//                 this.page++;
+//                 this.updateItems();
+//             }
+//         },
+//         last: function () {
+//             this.page = this.count - 1;
+//             this.updateItems();
+//         },
+//         updateItems: function () {
+//             const filteredItems = $scope.items.filter(item => {
+//                 const statusMatches = item.trangThai === 2;
+//                 const loaiYeuCau = item.loai === 'EXCHANGE';
+//                 const idMatches = item.id.toString().includes($scope.searchText1);
+//                 return statusMatches && idMatches && loaiYeuCau;
+//             });
+//             this.count = Math.ceil(filteredItems.length / this.size);
+//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+//         }
 //     };
 //
 //
-//     // Hàm gọi khi thay đổi từ khóa tìm kiếm hoặc loại khuyến mãi
-//     $scope.$watch('searchText', function (newValue, oldValue) {
+//     $scope.pagerTH0 = {
+//         page: 0,
+//         size: 5,
+//         items: [],
+//         count: 0,
+//         first: function () {
+//             this.page = 0;
+//             this.updateItems();
+//         },
+//         prev: function () {
+//             if (this.page > 0) {
+//                 this.page--;
+//                 this.updateItems();
+//             }
+//         },
+//         next: function () {
+//             if (this.page < this.count - 1) {
+//                 this.page++;
+//                 this.updateItems();
+//             }
+//         },
+//         last: function () {
+//             this.page = this.count - 1;
+//             this.updateItems();
+//         },
+//         updateItems: function () {
+//             const filteredItems = $scope.items.filter(item => {
+//                 const statusMatches = item.trangThai === 0;
+//                 const loaiYeuCau = item.loai === 'RETURN';
+//                 const idMatches = item.id.toString().includes($scope.searchText1);
+//                 return statusMatches && idMatches && loaiYeuCau;
+//             });
+//             this.count = Math.ceil(filteredItems.length / this.size);
+//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+//         }
+//     };
+//
+//     $scope.pagerTH1 = {
+//         page: 0,
+//         size: 5,
+//         items: [],
+//         count: 0,
+//         first: function () {
+//             this.page = 0;
+//             this.updateItems();
+//         },
+//         prev: function () {
+//             if (this.page > 0) {
+//                 this.page--;
+//                 this.updateItems();
+//             }
+//         },
+//         next: function () {
+//             if (this.page < this.count - 1) {
+//                 this.page++;
+//                 this.updateItems();
+//             }
+//         },
+//         last: function () {
+//             this.page = this.count - 1;
+//             this.updateItems();
+//         },
+//         updateItems: function () {
+//             const filteredItems = $scope.items.filter(item => {
+//                 const statusMatches = item.trangThai === 1;
+//                 const loaiYeuCau = item.loai === 'RETURN';
+//                 const idMatches = item.id.toString().includes($scope.searchText1);
+//                 return statusMatches && idMatches && loaiYeuCau;
+//             });
+//             this.count = Math.ceil(filteredItems.length / this.size);
+//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+//         }
+//     };
+//
+//     $scope.pagerTH2 = {
+//         page: 0,
+//         size: 5,
+//         items: [],
+//         count: 0,
+//         first: function () {
+//             this.page = 0;
+//             this.updateItems();
+//         },
+//         prev: function () {
+//             if (this.page > 0) {
+//                 this.page--;
+//                 this.updateItems();
+//             }
+//         },
+//         next: function () {
+//             if (this.page < this.count - 1) {
+//                 this.page++;
+//                 this.updateItems();
+//             }
+//         },
+//         last: function () {
+//             this.page = this.count - 1;
+//             this.updateItems();
+//         },
+//         updateItems: function () {
+//             const filteredItems = $scope.items.filter(item => {
+//                 const statusMatches = item.trangThai === 2;
+//                 const loaiYeuCau = item.loai === 'RETURN';
+//                 const idMatches = item.id.toString().includes($scope.searchText1);
+//                 return statusMatches && idMatches && loaiYeuCau;
+//             });
+//             this.count = Math.ceil(filteredItems.length / this.size);
+//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+//         }
+//     };
+//
+//     // Theo dõi sự thay đổi trong ô tìm kiếm cho từng trạng thái
+//     $scope.$watch('searchText1', function (newValue, oldValue) {
 //         if (newValue !== oldValue) {
-//             $scope.getKhuyenMaiList(); // Gọi lại API khi thay đổi từ khóa tìm kiếm
+//             $scope.pagerDH0.updateItems();
+//         }
+//     });
+//     $scope.$watch('searchText2', function (newValue, oldValue) {
+//         if (newValue !== oldValue) {
+//             $scope.pagerDH1.updateItems();
+//         }
+//     });
+//     $scope.$watch('searchText3', function (newValue, oldValue) {
+//         if (newValue !== oldValue) {
+//             $scope.pagerTH0.updateItems();
+//         }
+//     });
+//     $scope.$watch('searchText4', function (newValue, oldValue) {
+//         if (newValue !== oldValue) {
+//             $scope.pagerTH1.updateItems();
+//         }
+//     });
+//     $scope.$watch('searchText5', function (newValue, oldValue) {
+//         if (newValue !== oldValue) {
+//             $scope.pagerTH2.updateItems();
 //         }
 //     });
 //
-//     // Hàm gọi khi thay đổi loại khuyến mãi
-//     $scope.$watch('selectedLoai', function (newValue, oldValue) {
-//         if (newValue !== oldValue) {
-//             $scope.getKhuyenMaiList(); // Gọi lại API khi thay đổi loại khuyến mãi
-//         }
-//     });
 //
-//     // Khởi tạo danh sách khuyến mãi khi load trang
-//     $scope.initialize = function () {
-//         $scope.getKhuyenMaiList(); // Lấy danh sách khuyến mãi
-//     };
-//
-//     // Khởi tạo trang ban đầu
-//     $scope.initialize();
-//     // Mở modal tạo mới khuyến mãi
-//     $scope.openCreateModal = function () {
-//         $scope.form = {};  // Reset dữ liệu form trước khi mở modal
-//         $('#addNewModal').modal('show');  // Mở modal
-//         $scope.loadProducts();
-//         $scope.loadUsers();
-//     };
-//
-//     // Dữ liệu khuyến mãi
-//     $scope.form = {
-//         loai: null,  // 1: Sản phẩm, 2: Người dùng
-//         ma: '',
-//         ten: '',
-//         moTa: '',
-//         giaTri: 0,
-//         ngayBatDau: '',
-//         ngayKetThuc: '',
-//         idSanPhamList: [],
-//         idNguoiDungList: []
-//     };
-//     $scope.saveKhuyenMai = function () {
-//         // Kiểm tra nếu chưa chọn loai
-//         if (!$scope.form.loai) {
-//             alert('Vui lòng chọn đối tượng khuyến mãi.');
-//             return;  // Dừng hàm nếu không chọn loại
-//         }
-//         // Nếu bạn sử dụng Day.js
-//         var ngayBatDau = dayjs($scope.form.ngayBatDau).format('YYYY-MM-DDTHH:mm:ss');
-//         var ngayKetThuc = dayjs($scope.form.ngayKetThuc).format('YYYY-MM-DDTHH:mm:ss');
-//
-//         var requestData = {
-//             ma: $scope.form.loai === 1 ? '' : $scope.form.ma,  // Nếu loai là 1 thì không gửi ma
-//             ten: $scope.form.loai === 2 ? '' : $scope.form.ten, // Nếu loai là 2 thì không gửi ten
-//             moTa: $scope.form.moTa,
-//             giaTri: $scope.form.giaTri,
-//             ngayBatDau: ngayBatDau,
-//             ngayKetThuc: ngayKetThuc,
-//             loai: $scope.form.loai,
-//             idSanPhamList: [],
-//             idNguoiDungList: []
-//         };
-//
-//         // Nếu loại là 1 (Khuyến mãi cho sản phẩm), lấy các sản phẩm đã chọn
-//         if ($scope.form.loai === 1) {
-//             // Kiểm tra nếu không có sản phẩm nào được chọn
-//             var selectedProducts = $scope.products.filter(product => product.selected);
-//             if (selectedProducts.length === 0) {
-//                 alert('Vui lòng chọn sản phẩm trong khuyến mãi.');
-//                 return;  // Dừng hàm nếu không có sản phẩm nào được chọn
-//             }
-//             angular.forEach(selectedProducts, function (product) {
-//                 requestData.idSanPhamList.push(product.id);  // Thêm ID sản phẩm vào danh sách
-//             });
-//         }
-//
-//         // Nếu loại là 2 (Khuyến mãi cho người dùng), lấy các người dùng đã chọn
-//         if ($scope.form.loai === 2) {
-//             // Kiểm tra nếu không có người dùng nào được chọn
-//             var selectedUsers = $scope.users.filter(user => user.selected);
-//             if (selectedUsers.length === 0) {
-//                 alert('Vui lòng chọn người dùng trong khuyến mãi.');
-//                 return;  // Dừng hàm nếu không có người dùng nào được chọn
-//             }
-//             angular.forEach(selectedUsers, function (user) {
-//                 requestData.idNguoiDungList.push(user.id);  // Thêm ID người dùng vào danh sách
-//             });
-//         }
-//
-//         // Lấy token từ localStorage
-//         var token = localStorage.getItem('token');
-//
-//         // Gửi dữ liệu đến API để lưu, kèm theo token trong headers
-//         $http.post('/khuyen-mai/create', requestData, {
-//             headers: {
-//                 'Authorization': 'Bearer ' + token
-//             }
-//         })
-//             .then(function (response) {
-//                 // Hiển thị thông báo thành công
-//                 alert('Khuyến mãi đã được lưu thành công!');
-//                 $('#addNewModal').modal('hide'); // Đóng modal sau khi lưu thành công
-//                 $scope.resetForm();
-//                 $scope.getKhuyenMaiList();// Reset form sau khi lưu thành công
-//             }, function (error) {
-//                 console.error('Có lỗi xảy ra khi lưu khuyến mãi:', error);
-//                 alert('Có lỗi xảy ra khi lưu khuyến mãi. Vui lòng thử lại!');
-//             });
-//     };
-//
-//
-//     $scope.products = [];
-//     $scope.users = [];
-//     $scope.selectAllProducts = false;  // Dùng để theo dõi trạng thái checkbox ở tiêu đề bảng sản phẩm
-//     $scope.selectAllUsers = false;  // Dùng để theo dõi trạng thái checkbox ở tiêu đề bảng người dùng
-//
-//
-//     $scope.loadProducts = function () {
-//         $http.get('/san-pham')  // Gọi API GET để lấy dữ liệu sản phẩm
-//             .then(function (response) {
-//                 // Cập nhật dữ liệu vào mảng products
-//                 $scope.products = response.data.data;
-//             }, function (error) {
-//                 console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
-//             });
-//     };
-//
-//     $scope.loadUsers = function () {
-//         $http.get('/user/list')  // Gọi API GET để lấy dữ liệu người dùng
-//             .then(function (response) {
-//                 // Cập nhật dữ liệu vào mảng users
-//                 $scope.users = response.data.data;
-//             }, function (error) {
-//                 console.error("Có lỗi xảy ra khi gọi API người dùng: ", error);
-//             });
-//     };
-//
-//
-//     $scope.toggleSelectAllProducts = function () {
-//         angular.forEach($scope.products, function (product) {
-//             product.selected = $scope.selectAllProducts;
-//         });
-//     };
-//
-//     $scope.toggleSelectAllUsers = function () {
-//         angular.forEach($scope.users, function (user) {
-//             user.selected = $scope.selectAllUsers;
-//         });
-//     };
-//
-//     $scope.delete = function (item) {
-//         // Xác nhận người dùng muốn xóa không
-//         if (confirm('Bạn có chắc chắn muốn xóa mục này?')) {
-//             // Gửi yêu cầu DELETE tới API
-//             $http.delete('/khuyen-mai/' + item.id)
-//                 .then(function (response) {
-//                     // Thông báo xóa thành công
-//                     alert('Khuyến mãi đã được xóa thành công!');
-//
-//                     // Loại bỏ mục bị xóa khỏi danh sách hiện tại
-//                     var index = $scope.items.indexOf(item);
-//                     if (index !== -1) {
-//                         $scope.items.splice(index, 1);
-//                     }
-//
-//                     // Gọi lại API để tải lại danh sách sau khi xóa
-//                     $scope.getKhuyenMaiList();
-//                 }, function (error) {
-//                     // Xử lý lỗi khi xóa không thành công
-//                     console.error('Có lỗi xảy ra khi xóa:', error);
-//                     alert('Có lỗi xảy ra khi xóa. Vui lòng thử lại!');
+//     // Hàm cập nhật trạng thái hóa đơn
+//     $scope.update2 = function (item) {
+//         swal({
+//             title: "Xác nhận",
+//             text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
+//             icon: "warning",
+//             buttons: true,
+//             dangerMode: true,
+//         }).then((willUpdate) => {
+//             if (willUpdate) {
+//                 item.trangThai = 2; // Cập nhật trạng thái
+//                 $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
+//                     $scope.initialize(); // Tải lại dữ liệu
+//                     swal("Success!", "Cập nhật thành công", "success");
+//                 }).catch(error => {
+//                     swal("Error!", "Cập nhật thất bại", "error");
+//                     console.log("Error: ", error);
 //                 });
-//         }
-//     };
-//
-//     $scope.loaiOptions = ["Sản phẩm", "Người dùng"];
-//     // detail or edit
-//     $scope.getKhuyenMaiDetail = function (id, isEditMode) {
-//         $http.get('/khuyen-mai/' + id)
-//             .then(function (response) {
-//                 var data = response.data.data;
-//                 $scope.detailForm = {
-//                     id: data.id,
-//                     ten: data.ten,
-//                     ma: data.ma,
-//                     moTa: data.moTa,
-//                     giaTri: data.giaTri,
-//                     ngayBatDau: data.ngayBatDau,
-//                     ngayKetThuc: data.ngayKetThuc,
-//                     loai: data.loai === 1 ? "Sản phẩm" : "Người dùng",
-//                 };
-//
-//                 if (isEditMode) {
-//                     // Tải sản phẩm và người dùng khi ở chế độ chỉnh sửa
-//                     if (data.loai === 1) {
-//
-//                         $scope.loadProducts().then(function() {
-//                             // Đánh dấu các sản phẩm đã được chọn
-//                             $scope.selectedProducts = data.sanPhamModels.map(function (sp) {
-//                                 let product = $scope.products.find(p => p.id === sp.id);
-//                                 if (product) {
-//                                     product.selected = true;
-//                                     console.log('Product selected:', product);
-//                                 } else {
-//                                     console.log('Product not found:', sp.id);
-//                                 }
-//                                 return { id: sp.id, selected: true };
-//                             });
-//                         });
-//                     }else {
-//
-//                         $scope.loadUsers().then(function () {
-//                             // Đánh dấu các người dùng đã được chọn
-//                             $scope.selectedUsers = data.userModels.map(function (nd) {
-//                                 let user = $scope.users.find(u => u.id === nd.id);
-//                                 if (user) {
-//                                     user.selected = true;
-//                                     console.log('User selected:', user);
-//                                 } else {
-//                                     console.log('User not found:', nd.id);
-//                                 }
-//                                 return {id: nd.id, selected: true};
-//                             });
-//                         });
-//
-//                     }
-//                 } else {
-//                     // Khi ở chế độ xem, chỉ giữ các giá trị hiện có
-//                     if (data.loai === 1) {
-//                         $scope.products = data.sanPhamModels;
-//                         $scope.users = [];
-//                     } else if (data.loai === 2) {
-//                         $scope.users = data.userModels;
-//                         $scope.products = [];
-//                     }
-//                 }
-//
-//                 $scope.isEditMode = isEditMode;
-//             })
-//             .catch(function (error) {
-//                 console.error('Error fetching khuyen mai details:', error);
-//             });
-//     };
-//
-//
-//     $scope.viewDetail = function (id) {
-//         $scope.isEditMode = false; // Set isEditMode to false
-//         $scope.getKhuyenMaiDetail(id, false);
-//         $('#viewDetailModal').modal('show'); // Open the modal
-//     };
-//     $scope.editDetail = function (id) {
-//         $scope.isEditMode = true; // Set isEditMode to true
-//         $scope.getKhuyenMaiDetail(id, true);
-//         $('#viewDetailModal').modal('show'); // Open the modal
-//     };
-//
-//     $scope.updateKhuyenMai = function () {
-//         // Kiểm tra nếu chưa chọn loai
-//         if (!$scope.detailForm.loai) {
-//             alert('Vui lòng chọn đối tượng khuyến mãi.');
-//             return;  // Dừng hàm nếu không chọn loại
-//         }
-//
-//         // Nếu bạn sử dụng Day.js để định dạng lại ngày tháng
-//         var ngayBatDau = dayjs($scope.detailForm.ngayBatDau).format('YYYY-MM-DDTHH:mm:ss');
-//         var ngayKetThuc = dayjs($scope.detailForm.ngayKetThuc).format('YYYY-MM-DDTHH:mm:ss');
-//
-//         // Tạo đối tượng request data để gửi lên API
-//         var requestData = {
-//             ma: $scope.detailForm.loai === 'Sản phẩm' ? '' : $scope.detailForm.ma,  // Nếu loai là Sản phẩm, không gửi mã
-//             ten: $scope.detailForm.loai === 'Người dùng' ? '' : $scope.detailForm.ten, // Nếu loai là Người dùng, không gửi tên
-//             moTa: $scope.detailForm.moTa,
-//             giaTri: $scope.detailForm.giaTri,
-//             ngayBatDau: ngayBatDau,
-//             ngayKetThuc: ngayKetThuc,
-//             loai: $scope.detailForm.loai === 'Sản phẩm' ? 1 : 2, // 1 là Sản phẩm, 2 là Người dùng
-//             idSanPhamList: [],
-//             idNguoiDungList: []
-//         };
-//
-//         // Nếu loại là 1 (Khuyến mãi cho sản phẩm), lấy các sản phẩm đã chọn
-//         if ($scope.detailForm.loai === 'Sản phẩm') {
-//             var selectedProducts = $scope.products.filter(product => product.selected);
-//             if (selectedProducts.length === 0) {
-//                 alert('Vui lòng chọn sản phẩm trong khuyến mãi.');
-//                 return;
+//             } else {
+//                 swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
 //             }
-//             angular.forEach(selectedProducts, function (product) {
-//                 requestData.idSanPhamList.push(product.id);
-//             });
-//         }
+//         });
+//     };
 //
-//         // Nếu loại là 2 (Khuyến mãi cho người dùng), lấy các người dùng đã chọn
-//         if ($scope.detailForm.loai === 'Người dùng') {
-//             var selectedUsers = $scope.users.filter(user => user.selected);
-//             if (selectedUsers.length === 0) {
-//                 alert('Vui lòng chọn người dùng trong khuyến mãi.');
-//                 return;  // Dừng hàm nếu không có người dùng nào được chọn
+//     $scope.update1 = function (item) {
+//         swal({
+//             title: "Xác nhận",
+//             text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
+//             icon: "warning",
+//             buttons: true,
+//             dangerMode: true,
+//         }).then((willUpdate) => {
+//             if (willUpdate) {
+//                 item.trangThai = 1; // Cập nhật trạng thái
+//                 $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
+//                     $scope.initialize(); // Tải lại dữ liệu
+//                     swal("Success!", "Cập nhật thành công", "success");
+//                 }).catch(error => {
+//                     swal("Error!", "Cập nhật thất bại", "error");
+//                     console.log("Error: ", error);
+//                 });
+//             } else {
+//                 swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
 //             }
-//             angular.forEach(selectedUsers, function (user) {
-//                 requestData.idNguoiDungList.push(user.id);  // Thêm ID người dùng vào danh sách
-//             });
-//         }
-//
-//         // Lấy token từ localStorage
-//         var token = localStorage.getItem('token');
-//
-//         // Gửi dữ liệu đến API để cập nhật khuyến mãi
-//         $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
-//             headers: {
-//                 'Authorization': 'Bearer ' + token
-//             }
-//         })
-//             .then(function (response) {
-//                 // Hiển thị thông báo thành công
-//                 alert('Khuyến mãi đã được cập nhật thành công!');
-//                 $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
-//                 $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
-//             }, function (error) {
-//                 console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
-//                 alert('Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!');
-//             });
+//         });
+//     };
+//     //////////
+//     $scope.edit = function (item) {
+//         // Chuyển timestamp thành Date object
+//         item.ngayCapNhat = new Date(item.ngayCapNhat);
+//         item.ngayTao = new Date(item.ngayTao);
+//         $scope.form = angular.copy(item);
 //     };
 //
 //
+//     $scope.selectInvoice = function (item) {
+//         console.log("Selected Invoice ID: ", item.id); // Thêm log này
+//         $rootScope.selectedID = item.id; // Lưu ID hóa đơn vào rootScope
+//         $rootScope.selectedMAHD = item.hoaDon.ma; // Lưu ID hóa đơn vào rootScope
+//         $location.path('/chitietdoitra'); // Chuyển hướng đến trang hdct
+//     };
 //
-//
+//     // Khởi tạo
+//     $scope.initialize();
 // });

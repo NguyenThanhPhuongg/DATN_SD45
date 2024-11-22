@@ -42,4 +42,10 @@ public class YeuCauDoiTraChiTietController {
     public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
         return ResponseEntity.ok(processor.delete(id));
     }
+
+    @GetMapping("/by-yeu-cau/{idDoiTra}")
+    public ResponseEntity<ServiceResult> getByYeuCauDoiTra(@PathVariable Long idDoiTra) {
+        return ResponseEntity.ok(processor.getByYeuCauDoiTra(idDoiTra));
+    }
+
 }
