@@ -29,27 +29,15 @@ function handleCheckboxClick(itemId, isChecked) {
 
 function handleCheckout() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
-    const alertBox = document.querySelector('.alert');
+
     if (selectedItems.length === 0) {
-        if (!alertBox) {
-            const newAlertBox = document.createElement('div');
-            newAlertBox.classList.add('alert', 'alert-warning', 'text-center');
-            newAlertBox.textContent = 'Không có sản phẩm nào được chọn!';
-            document.body.appendChild(newAlertBox);
-            setTimeout(() => {
-                newAlertBox.remove();
-            }, 3000);
-        } else {
-            alertBox.textContent = 'Không có sản phẩm nào được chọn!';
-            alertBox.classList.add('show');
-            setTimeout(() => {
-                alertBox.classList.remove('show');
-            }, 3000);
-        }
+        // Hiển thị thông báo lỗi bằng Toastr
+        toastr.warning('Không có sản phẩm nào được chọn!', 'Cảnh báo');
     } else {
         window.location.href = '/checkout';
     }
 }
+
 
 function updateTotalSection() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
@@ -103,32 +91,62 @@ function handleQuantityChange(itemId, isIncreasing) {
         .catch(error => console.error('Lỗi khi gọi API', error));
 }
 
-function handleDelete(itemId) {
-    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');
-    if (confirmDelete) {
-        // Gọi đến API để xóa sản phẩm
-        const token = localStorage.getItem('token');
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-
-        fetch(`/gio-hang-chi-tiet/${itemId}`, {
-            method: 'DELETE',
-            headers: headers
-        })
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === '200') {
-                    // Fetch lại dữ liệu giỏ hàng sau khi xóa thành công
-                    fetchCartData();
-                } else {
-                    console.error('Xóa sản phẩm thất bại', result.message);
-                }
-            })
-            .catch(error => console.error('Lỗi khi gọi API', error));
-    }
+function hienThiThongBao(message, success = true) {
+    const notification = document.getElementById('notification');
+    notification.innerText = message;
+    notification.style.backgroundColor = success ? 'rgba(0, 128, 0, 0.8)' : 'rgba(255, 0, 0, 0.8)';
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
 }
+
+function handleDelete(itemId) {
+    Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa sản phẩm này?',
+        text: 'Hành động này không thể hoàn tác!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            deleteItem(itemId);
+        }
+    });
+}
+
+function deleteItem(itemId) {
+    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+
+    fetch(`/gio-hang-chi-tiet/${itemId}`, {
+        method: 'DELETE',
+        headers: headers
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === '200') {
+                toastr.success('Sản phẩm đã được xóa thành công!', 'Thành công');
+                fetchCartData();
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            } else {
+                console.error('Xóa sản phẩm thất bại', result.message);
+                toastr.error('Xóa sản phẩm thất bại!', 'Lỗi');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi gọi API', error);
+            toastr.error('Có lỗi xảy ra khi gọi API.', 'Lỗi');
+        });
+}
+
 
 function renderCart(items) {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];

@@ -17,7 +17,6 @@
                     <th>Người đặt hàng</th>
                     <th>Ngày đặt hàng</th>
                     <th>Tổng tiền</th>
-                    <th>Điểm sử dụng</th>
                     <th>Chức năng</th>
                 </tr>
                 </thead>
@@ -28,7 +27,6 @@
                     <td>{{item.userModel.profile.hoVaTen}}</td>
                     <td>{{item.ngayDatHang}}</td>
                     <td>{{item.tongTien}}</td>
-                    <td>{{item.diemSuDung}}</td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <!-- Hiển thị button "Cập nhật trạng thái" (check) và "Hủy/Trả hóa đơn" (times) khi trangThai là 0, 1, 2, 3 -->
@@ -37,9 +35,16 @@
                                     ng-click="updateHoaDonStatus(item.id)">
                                 <i class="fas fa-check icon-check"></i>
                             </button>
+                            <!--                            <button class="btn btn-link" type="button"-->
+                            <!--                                    ng-if="item.trangThai === 0 || item.trangThai === 1 || item.trangThai === 2 || item.trangThai === 3"-->
+                            <!--                                    ng-click="updateHuyTraHoaDon(item.id)">-->
+                            <!--                                <i class="fas fa-times icon-close"></i>-->
+                            <!--                            </button>-->
                             <button class="btn btn-link" type="button"
                                     ng-if="item.trangThai === 0 || item.trangThai === 1 || item.trangThai === 2 || item.trangThai === 3"
-                                    ng-click="updateHuyTraHoaDon(item.id)">
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#lyDoHuy"
+                                    ng-click="openModal(item.id)">
                                 <i class="fas fa-times icon-close"></i>
                             </button>
                             <!-- Hiển thị các button còn lại (Info, List) luôn -->
@@ -108,18 +113,22 @@
                                 <input type="text" class="form-control" ng-model="form.diemSuDung" readonly>
                                 <label>Ngày đặt hàng</label>
                                 <input type="text" class="form-control" ng-model="form.ngayDatHang" readonly>
+                                <label>Ngày thanh toán</label>
+                                <div>
+                                    <input type="text" class="form-control" ng-model="form.ngayDatHang" readonly
+                                           ng-if="form.ngayThanhToan"/>
+                                    <span class="form-control" ng-if="!form.ngayThanhToan"
+                                          style="background-color: #f8f9fa; color: #6c757d; border: 1px solid #ced4da;">Chưa thanh toán</span>
+                                </div>
                                 <label>Người đặt hàng</label>
                                 <input type="text" class="form-control" ng-model="form.userModel.profile.hoVaTen"
                                        readonly>
-                                <label>Số điện thoại</label>
+                                <label>Số điện thoại người đặt hàng</label>
                                 <input type="text" class="form-control" ng-model="form.userModel.profile.phone"
                                        readonly>
-                                <label>Email</label>
+                                <label>Email người đặt hàng</label>
                                 <input type="text" class="form-control" ng-model="form.userModel.profile.email"
                                        readonly>
-                                <label>Địa chỉ người đặt hàng</label>
-                                <textarea type="text" class="form-control" ng-model="form.userModel.profile.diaChi"
-                                          readonly></textarea>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label>Địa chỉ giao hàng</label>
@@ -167,6 +176,7 @@
                                     <tr>
                                         <th>STT</th>
                                         <th>Mã</th>
+                                        <th>Ảnh</th>
                                         <th>Tên</th>
                                         <th>Size</th>
                                         <th>Màu sắc</th>
@@ -178,6 +188,10 @@
                                     <tr ng-repeat="detail in hoaDonChiTiets">
                                         <td>{{$index + 1}}</td>
                                         <td>{{detail.sanPhamChiTietModel.sanPhamModel.ma}}</td>
+                                        <td>
+                                            <img ng-src="/images/{{detail.sanPhamChiTietModel.sanPhamModel.anh}}" alt="Ảnh sản phẩm"
+                                                 style="width: 50px; height: 50px; object-fit: cover;"/>
+                                        </td>
                                         <td>{{detail.sanPhamChiTietModel.sanPhamModel.ten}}</td>
                                         <td>{{detail.sanPhamChiTietModel.size.ten}}</td>
                                         <td>{{detail.sanPhamChiTietModel.mauSac.ten}}</td>
@@ -205,6 +219,76 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận lý do hủy -->
+    <div class="modal fade" id="lyDoHuy" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lý do hủy hóa đơn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Các lý do hủy hóa đơn -->
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Sản phẩm khách đặt đã hết hàng hoặc không còn trong kho.">
+                        Sản phẩm này đã hết hàng trong kho.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Khách hàng cung cấp thông tin địa chỉ hoặc số điện thoại không chính xác, không thể liên hệ được.">
+                        Thông tin khách hàng cung cấp chưa chính xác.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Khách hàng chủ động yêu cầu hủy đơn.">
+                        Khách hàng chủ động yêu cầu hủy đơn.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Phát hiện dấu hiệu gian lận như thông tin không hợp lệ, tài khoản giả mạo.">
+                        Phát hiện dấu hiệu gian lận.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Khu vực giao hàng không nằm trong phạm vi phục vụ của cửa hàng.">
+                        Khu vực giao hàng không nằm trong phạm vi phục vụ của cửa hàng.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Lỗi hệ thống dẫn đến việc tạo đơn hàng không chính xác hoặc trùng lặp.">
+                        Lỗi hệ thống.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy"
+                               value="Khách hàng từ chối nhận hàng khi giao.">
+                        Khách hàng từ chối nhận hàng khi giao.
+                    </label>
+                    <br><br>
+                    <label>
+                        <input name="lydohuy" type="radio" ng-model="selectedLyDoHuy" value="Lý do khác.">
+                        Lý do khác.
+                    </label>
+                    <br><br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Đóng
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="updateCancelOrder()">
+                        <i class="fas fa-times icon-close"></i> Xác nhận
                     </button>
                 </div>
             </div>

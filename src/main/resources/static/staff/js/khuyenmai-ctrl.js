@@ -94,23 +94,60 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
     };
 
     $scope.saveKhuyenMai = function () {
-        // Kiểm tra nếu chưa chọn loai
+
         if (!$scope.form.loai) {
             toastr.error("Vui lòng chọn đối tượng khuyến mãi.", "Lỗi!");
-            return;  // Dừng hàm nếu không chọn loại
+            return;
         }
 
-        // Nếu bạn sử dụng Day.js
-        var ngayBatDau = dayjs($scope.form.ngayBatDau).format('YYYY-MM-DDTHH:mm:ss');
-        var ngayKetThuc = dayjs($scope.form.ngayKetThuc).format('YYYY-MM-DDTHH:mm:ss');
+
+        if (($scope.form.loai == 1) && !$scope.form.ten) {
+            toastr.error("Vui lòng nhập tên khuyến mãi.", "Lỗi!");
+            return;
+        }
+        if (($scope.form.loai == 2) && !$scope.form.ma) {
+            toastr.error("Vui lòng nhập mã khuyến mãi.", "Lỗi!");
+            return;
+        }
+
+
+        if (!$scope.form.moTa) {
+            toastr.error("Vui lòng nhập mô tả cho khuyến mãi.", "Lỗi!");
+            return;
+        }
+
+
+        if (!$scope.form.giaTri || $scope.form.giaTri <= 0) {
+            toastr.error("Vui lòng nhập giá trị khuyến mãi hợp lệ.", "Lỗi!");
+            return;
+        }
+
+
+        if (!$scope.form.ngayBatDau) {
+            toastr.error("Vui lòng chọn ngày bắt đầu.", "Lỗi!");
+            return;
+        }
+
+        if (!$scope.form.ngayKetThuc) {
+            toastr.error("Vui lòng chọn ngày kết thúc.", "Lỗi!");
+            return;
+        }
+
+        // Kiểm tra nếu ngày kết thúc phải lớn hơn ngày bắt đầu
+        var ngayBatDau = dayjs($scope.form.ngayBatDau);
+        var ngayKetThuc = dayjs($scope.form.ngayKetThuc);
+        if (ngayKetThuc.isBefore(ngayBatDau)) {
+            toastr.error("Ngày kết thúc phải lớn hơn ngày bắt đầu.", "Lỗi!");
+            return;
+        }
 
         var requestData = {
             ma: $scope.form.loai === 1 ? '' : $scope.form.ma,  // Nếu loai là 1 thì không gửi ma
             ten: $scope.form.loai === 2 ? '' : $scope.form.ten, // Nếu loai là 2 thì không gửi ten
             moTa: $scope.form.moTa,
             giaTri: $scope.form.giaTri,
-            ngayBatDau: ngayBatDau,
-            ngayKetThuc: ngayKetThuc,
+            ngayBatDau: ngayBatDau.format('YYYY-MM-DDTHH:mm:ss'),
+            ngayKetThuc: ngayKetThuc.format('YYYY-MM-DDTHH:mm:ss'),
             loai: $scope.form.loai,
             idSanPhamList: [],
             idNguoiDungList: []
@@ -122,10 +159,10 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             var selectedProducts = $scope.products.filter(product => product.selected);
             if (selectedProducts.length === 0) {
                 toastr.error("Vui lòng chọn sản phẩm trong khuyến mãi.", "Lỗi!");
-                return;  // Dừng hàm nếu không có sản phẩm nào được chọn
+                return;
             }
             angular.forEach(selectedProducts, function (product) {
-                requestData.idSanPhamList.push(product.id);  // Thêm ID sản phẩm vào danh sách
+                requestData.idSanPhamList.push(product.id);
             });
         }
 
@@ -135,14 +172,13 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             var selectedUsers = $scope.users.filter(user => user.selected);
             if (selectedUsers.length === 0) {
                 toastr.error("Vui lòng chọn người dùng trong khuyến mãi.", "Lỗi!");
-                return;  // Dừng hàm nếu không có người dùng nào được chọn
+                return;
             }
             angular.forEach(selectedUsers, function (user) {
-                requestData.idNguoiDungList.push(user.id);  // Thêm ID người dùng vào danh sách
+                requestData.idNguoiDungList.push(user.id);
             });
         }
 
-        // Hiển thị hộp thoại xác nhận trước khi lưu
         swal({
             title: "Xác nhận",
             text: "Bạn có chắc chắn muốn lưu khuyến mãi này không?",
@@ -152,20 +188,17 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         })
             .then((willSave) => {
                 if (willSave) {
-                    // Lấy token từ localStorage
                     var token = localStorage.getItem('token');
 
-                    // Gửi dữ liệu đến API để lưu, kèm theo token trong headers
                     $http.post('/khuyen-mai/create', requestData, {
                         headers: {
                             'Authorization': 'Bearer ' + token
                         }
                     })
                         .then(function (response) {
-                            // Hiển thị thông báo thành công
                             toastr.success("Khuyến mãi đã được lưu thành công!", "Thành công!");
                             $('#addNewModal').modal('hide'); // Đóng modal sau khi lưu thành công
-                            $scope.resetForm();
+                            // $scope.resetForm();
                             $scope.getKhuyenMaiList(); // Reset form sau khi lưu thành công
                         }, function (error) {
                             console.error('Có lỗi xảy ra khi lưu khuyến mãi:', error);
@@ -177,6 +210,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
                 }
             });
     };
+
 
 
     $scope.products = [];
