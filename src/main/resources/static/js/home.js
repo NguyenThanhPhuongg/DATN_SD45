@@ -144,7 +144,7 @@ $(document).ready(function () {
                             </div>
                         </div>
                     </div>
-                    <div class="mt-2">
+                    <div class=" price-and-name mt-2">
                         <p class="price" style="font-size: 20px">
                             <b>${new Intl.NumberFormat('vi-VN', {
                     style: 'currency',
