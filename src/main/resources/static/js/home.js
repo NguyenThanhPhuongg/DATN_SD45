@@ -90,6 +90,7 @@ $(document).ready(function () {
             productContainer.removeClass('fade-out').addClass('fade-in');
         }, 500); // Độ trễ phù hợp với thời gian của CSS fade-out
     }
+
 // Gọi hàm để hiển thị sản phẩm ngay khi trang tải
     $(document).ready(function () {
         fetchProducts(); // Hiển thị sản phẩm của trang đầu tiên
@@ -251,7 +252,7 @@ $(document).ready(function () {
                 }
 
                 // Hiển thị Toast
-                toast.toast({ delay: 3000 });
+                toast.toast({delay: 3000});
                 toast.toast('show');
             }
         });
@@ -552,6 +553,41 @@ $(document).ready(function () {
         }
 
         // Xử lý thêm sản phẩm vào giỏ hàng
+        function addToCart(productDetails, token, isBuyNow = false) {
+            $.ajax({
+                url: '/gio-hang-chi-tiet',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(productDetails),
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (response) {
+                    toastr.success('Sản phẩm đã được thêm vào giỏ hàng thành công!', 'Thành công');
+
+                    if (isBuyNow) {
+                        window.location.href = '/cart';
+                    } else {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 800);
+                    }
+                },
+                error: function (error) {
+                    console.error('Error adding product to cart:', error);
+                    toastr.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'Lỗi');
+                }
+            });
+        }
+
+        function validateProductDetails(productDetails) {
+            if (!productDetails.idSize || !productDetails.idMauSac || !productDetails.soLuong) {
+                toastr.warning('Vui lòng chọn màu sắc, kích thước và số lượng!', 'Lỗi');
+                return false;
+            }
+            return true;
+        }
+
         $('#addToCartButton').on('click', function () {
             if (!checkToken()) {
                 return;
@@ -559,8 +595,7 @@ $(document).ready(function () {
 
             const productDetails = getSelectedProductDetails();
 
-            if (!productDetails.idSize || !productDetails.idMauSac || !productDetails.soLuong) {
-                toastr.warning('Vui lòng chọn màu sắc, kích thước và số lượng!', 'Lỗi');
+            if (!validateProductDetails(productDetails)) {
                 return;
             }
 
@@ -576,30 +611,39 @@ $(document).ready(function () {
             }).then((result) => {
                 if (result.isConfirmed) {
                     const token = localStorage.getItem('token');
-
-                    $.ajax({
-                        url: '/gio-hang-chi-tiet',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(productDetails),
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        },
-                        success: function (response) {
-                            toastr.success('Sản phẩm đã được thêm vào giỏ hàng thành công!', 'Thành công');
-
-                            setTimeout(function () {
-                                location.reload();
-                            }, 800);
-                        },
-                        error: function (error) {
-                            console.error('Error adding product to cart:', error);
-                            toastr.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'Lỗi');
-                        }
-                    });
+                    addToCart(productDetails, token);
                 }
             });
         });
+
+        $('#buyButton').on('click', function () {
+            if (!checkToken()) {
+                return;
+            }
+
+            const productDetails = getSelectedProductDetails();
+
+            if (!validateProductDetails(productDetails)) {
+                return;
+            }
+
+            Swal.fire({
+                title: 'Xác nhận',
+                text: 'Bạn có chắc chắn muốn mua sản phẩm này?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true,
+                dangerMode: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const token = localStorage.getItem('token');
+                    addToCart(productDetails, token, true);
+                }
+            });
+        });
+
 
     });
 

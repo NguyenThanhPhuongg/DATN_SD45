@@ -11396,3 +11396,4 @@ input:checked + .slider:before {
     max-width: 100%; /* Biểu đồ không vượt quá cột */
     height: 400px; /* Đặt chiều cao cố định */
 }
+
