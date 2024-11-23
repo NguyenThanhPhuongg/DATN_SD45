@@ -13,7 +13,7 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.selectedImagesId = null;
 
     $scope.pager = {
-        page: 0, size: 5, items: [], count: 0, first: function () {
+        page: 0, size: 10, items: [], count: 0, first: function () {
             this.page = 0;
             this.updateItems();
         }, prev: function () {
@@ -40,7 +40,7 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         }
     };
     $scope.pager2 = {
-        page: 0, size: 5, items: [], count: 0, first: function () {
+        page: 0, size: 10, items: [], count: 0, first: function () {
             this.page = 0;
             this.updateItems();
         }, prev: function () {
@@ -101,20 +101,12 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         $scope.pager.updateItems();
     });
 
-    // $scope.updateStatus2 = function (item) {
-    //     $http.put('/san-pham/' + item.id + '/status?status=2').then(function (response) {
-    //         alert("Trạng thái sản phẩm đã được cập nhật thành công!");
-    //     }, function (error) {
-    //         alert("Đã xảy ra lỗi khi cập nhật trạng thái sản phẩm!");
-    //     });
-    // };
-
     $scope.updateStatus2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn Ẩn sản phẩm này không?",
+            text: "Bạn có chắc muốn ẩn sản phẩm này không?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
@@ -128,13 +120,13 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                 })
                     .then(function (response) {
                         $scope.initialize();
-                        swal("Success!", "Ẩn sản phẩm thành công", "success");
+                        toastr.success("Đã ẩn sản phẩm", "Thành công!");
                     }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
+                    toastr.error("Ẩn sản phẩm thất bại", "Lỗi!");
                 });
             } else {
-                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
+                toastr.info("Ẩn sản phẩm đã bị hủy", "Hủy ẩn!");
             }
         });
     };
@@ -142,9 +134,9 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.updateStatus1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn Ẩn sản phẩm này không?",
+            text: "Bạn có chắc muốn hiện lại sản phẩm này không?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
@@ -158,13 +150,13 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                 })
                     .then(function (response) {
                         $scope.initialize();
-                        swal("Success!", "Ẩn sản phẩm thành công", "success");
+                        toastr.success("Hiện sản phẩm thành công", "Thành công!");
                     }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Ẩn sản phẩm thất bại", "error");
+                    toastr.error("Hiện sản phẩm thất bại", "Lỗi!");
                 });
             } else {
-                swal("Hủy cập nhật", "Ẩn sản phẩm đã bị hủy", "error");
+                toastr.info("Hiện sản phẩm đã bị hủy", "Hủy ẩn!");
             }
         });
     };
@@ -214,9 +206,9 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn Update sản phẩm này không?",
+            text: "Bạn có chắc muốn cập nhật sản phẩm này không?",
             icon: "warning",
-            buttons: true,
+            buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
@@ -257,14 +249,14 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                     }
                 }).then(function (response) {
                     $scope.initialize();
-                    swal("Success!", "Update sản phẩm thành công", "success");
+                    toastr.success("Update sản phẩm thành công", "Thành công!");
                     $('#exampleModal').modal('hide');
                 }).catch(function (error) {
                     console.error("Cập nhật thất bại", error);
-                    swal("Error!", "Update sản phẩm thất bại", "error");
+                    toastr.error("Update sản phẩm thất bại", "Lỗi!");
                 });
             } else {
-                swal("Hủy cập nhật", "Update sản phẩm đã bị hủy", "error");
+                toastr.info("Update sản phẩm đã bị hủy", "Hủy cập nhật!");
             }
         });
     };
@@ -305,7 +297,25 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         $rootScope.selectedImagesTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $location.path('/hinhanh'); // Chuyển hướng đến trang sản phẩm chi tiết
     };
+
     $scope.initialize();
 
 
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
 });

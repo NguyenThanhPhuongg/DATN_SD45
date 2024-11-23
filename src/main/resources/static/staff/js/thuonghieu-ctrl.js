@@ -5,7 +5,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.searchText = ''; // Biến tìm kiếm
     $scope.pager = {
         page: 0,
-        size: 5,
+        size: 10,
         items: [],
         count: 0,
         first: function () {
@@ -100,118 +100,163 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
         $scope.form = angular.copy(item);
     };
 
-    $scope.validateForm = function (form, errorContainer) {
-        errorContainer.ten = !form.ten || form.ten.length < 1 || form.ten.length > 100;
-        errorContainer.moTa = !form.moTa || form.moTa.length < 1 || form.moTa.length > 100;
 
-        return !Object.values(errorContainer).includes(true);
-    };
+    $scope.validateForm = function (formAdd, errorContainer) {
 
-    $scope.update = function () {
-        $scope.error = {};
-        if (!$scope.validateForm($scope.form, $scope.error)) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
-            return;
+        var nameRegex = /^[0-9!@#$%^&*()_+~?"><,./\\]+$/;
+        if (!formAdd.ten || formAdd.ten.length < 5 || formAdd.ten.length > 100 || nameRegex.test(formAdd.ten)) {
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục phải từ 5-100 kí tự và chỉ chứa số và ký tự đặc biệt.", "Lỗi!");
+        } else {
+            errorContainer.ten = false;
         }
 
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật chất liệu này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                var item = angular.copy($scope.form);
-                var token = localStorage.getItem('token');
-                $http.put(`/rest/thuonghieu/${item.id}`, item,
-                    {
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        }
-                    }).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật chất liệu đã bị hủy", "error");
-            }
-        });
+        var descriptionSpecialCharsRegex = /^[!@#$%^&*()_+~?"><,./\\]+$/;
+        if (!formAdd.moTa || formAdd.moTa.length < 5 || formAdd.moTa.length > 300 || descriptionSpecialCharsRegex.test(formAdd.moTa)) {
+            errorContainer.moTa = true;
+            toastr.error("Mô tả danh mục phải từ 5-300 kí tự và chỉ chứa ký tự đặc biệt.", "Lỗi!");
+        } else {
+            errorContainer.moTa = false;
+        }
+
+        return !Object.values(errorContainer).includes(true);
     };
 
     $scope.create = function () {
         $scope.error1 = {};
         if (!$scope.validateForm($scope.formAdd, $scope.error1)) {
-            swal("Lỗi!", "Vui lòng kiểm tra các trường dữ liệu và đảm bảo chúng hợp lệ.", "error");
             return;
         }
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn thêm chất liệu này không?",
+            text: "Bạn có chắc muốn thêm danh mục này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
         }).then((willAdd) => {
             if (willAdd) {
-                var item = angular.copy($scope.formAdd);
-                item.trangThai = 1;
+                let item = angular.copy($scope.formAdd);
                 var token = localStorage.getItem('token');
-
-                $http.post(`/rest/thuonghieu`, item,
-                    {
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        }
+                item.trangThai = 1; // Thiết lập mặc định giá trị trangThai là 1
+                $http.post(`/rest/thuonghieu`, item, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
                     }
-                ).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
+                }).then(resp => {
+                    $scope.initialize();
                     $scope.resetAdd();
-                    swal("Success!", "Thêm mới thành công", "success");
+                    $('#addModal').modal('hide');
+                    toastr.success("Thêm mới thành công", "Thành công!");
                 }).catch(error => {
-                    swal("Error!", "Thêm mới thất bại", "error");
-                    console.log("Error: ", error);
+                    toastr.error("Thêm mới thất bại", "Lỗi!");
+                    console.error("Error: ", error);
                 });
-            } else {
-                swal("Hủy thêm danh mục", "Thêm chất liệu đã bị hủy", "error");
+            }
+        });
+    };
+
+    $scope.update = function () {
+        $scope.error = {};
+        if (!$scope.validateForm($scope.form, $scope.error)) {
+            return;
+        }
+
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật thương hiệu này không?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let item = angular.copy($scope.form);
+                var token = localStorage.getItem('token');
+                $http.put(`/rest/thuonghieu/${item.id}`, item, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    $('#exampleModal').modal('hide');
+                    toastr.success("Cập nhật thành công", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Cập nhật thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
+            }
+        });
+    };
+
+    $scope.updateTrangThaiTo1 = function (item) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 1;
+                var token = localStorage.getItem('token');
+                $http.put(`/rest/thuonghieu/${updatedItem.id}`, updatedItem, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
             }
         });
     };
 
     $scope.updateTrangThaiTo2 = function (item) {
-        let updatedItem = angular.copy(item);
-        updatedItem.trangThai = 2;
-        var token = localStorage.getItem('token');
-        $http.put(`/rest/thuonghieu/${updatedItem.id}`, updatedItem, {
-            headers: {
-                'Authorization': 'Bearer ' + token
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                let updatedItem = angular.copy(item);
+                updatedItem.trangThai = 2;
+                var token = localStorage.getItem('token');
+                $http.put(`/rest/thuonghieu/${updatedItem.id}`, updatedItem, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(resp => {
+                    $scope.initialize();
+                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                }).catch(error => {
+                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    console.error("Error: ", error);
+                });
             }
-        }).then(resp => {
-            $scope.initialize();
-            swal("Success!", "Đã cập nhật trạng thái thành 2", "success");
-        }).catch(error => {
-            swal("Error!", "Cập nhật trạng thái thất bại", "error");
-            console.log("Error: ", error);
         });
     };
 
-    $scope.updateTrangThaiTo1 = function (item) {
-        let updatedItem = angular.copy(item);
-        updatedItem.trangThai = 1;
-        var token = localStorage.getItem('token');
-        $http.put(`/rest/thuonghieu/${updatedItem.id}`, updatedItem, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(resp => {
-            $scope.initialize();
-            swal("Success!", "Đã cập nhật trạng thái thành 1", "success");
-        }).catch(error => {
-            swal("Error!", "Cập nhật trạng thái thất bại", "error");
-            console.log("Error: ", error);
-        });
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
     };
 });

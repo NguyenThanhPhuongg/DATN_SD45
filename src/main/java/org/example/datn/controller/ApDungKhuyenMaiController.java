@@ -23,4 +23,10 @@ public class ApDungKhuyenMaiController {
     public ResponseEntity<ServiceResult> change(@RequestParam Long idKhuyenMai, UserAuthentication ua) {
         return ResponseEntity.ok(processor.change(idKhuyenMai, ua));
     }
+
+    @GetMapping
+    public ResponseEntity<ServiceResult> getList() {
+        return ResponseEntity.ok(processor.getList());
+    }
+
 }

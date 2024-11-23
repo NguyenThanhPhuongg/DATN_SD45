@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Long> {
     List<GioHangChiTiet> findByIdGioHang(Long idGioHang);
 
-    Optional<GioHangChiTiet> findByIdGioHangAndIdSanPhamChiTiet(Long idGioHang, Long idSanPhamChiTiet);
+    Optional<GioHangChiTiet> findByIdGioHangAndIdSanPhamChiTietAndTrangThai(Long idGioHang, Long idSanPhamChiTiet, Integer trangThai);
 
     List<GioHangChiTiet> findByIdIn(List<Long> ids);
 

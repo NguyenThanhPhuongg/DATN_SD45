@@ -37,7 +37,7 @@ public class GioHangChiTietProcessor {
     private GioHangService gioHangService;
 
     @Autowired
-    private GioHangChiTietTranformer tranformer;
+    private GioHangChiTietTranformer gioHangChiTietTranformer;
 
     @Autowired
     private SanPhamChiTietService spctService;
@@ -53,9 +53,7 @@ public class GioHangChiTietProcessor {
     public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua) {
 
         var gioHang = gioHangService.findByIdNguoiDung(ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
-//        var gioHangChiTiet = new GioHangChiTiet();
-//        BeanUtils.copyProperties(request, gioHangChiTiet);
-//        gioHangChiTiet.setIdGioHang(gioHang.getId());
+        var sanPham = sanPhamService.findById(request.getIdSanPham()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var spct = spctService.findByIdSanPhamAndIdSizeAndIdMauSac(request.getIdSanPham(), request.getIdSize(), request.getIdMauSac())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var soLuongConLai = spct.getSoLuong();
@@ -63,7 +61,7 @@ public class GioHangChiTietProcessor {
             throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
         }
 
-        var gioHangChiTiet = service.findByIdGioHangAndIdSanPhamChiTiet(gioHang.getId(), spct.getId());
+        var gioHangChiTiet = service.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(gioHang.getId(), spct.getId(), StatusGioHang.CHUA_DAT_HANG.getValue());
 
         if (gioHangChiTiet.isPresent()) {
             var currentQuantity = gioHangChiTiet.get().getSoLuong();
@@ -79,7 +77,7 @@ public class GioHangChiTietProcessor {
             BeanUtils.copyProperties(request, ghct);
             ghct.setIdGioHang(gioHang.getId());
             ghct.setIdSanPhamChiTiet(spct.getId());
-            ghct.setGia(spct.getGia());
+            ghct.setGia(sanPham.getGia());
             ghct.setIdSanPhamChiTiet(spct.getId());
             ghct.setTrangThai(StatusGioHang.CHUA_DAT_HANG.getValue());
             service.save(ghct);

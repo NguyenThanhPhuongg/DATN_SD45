@@ -1,17 +1,22 @@
 package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
+import org.example.datn.entity.MauSac;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.entity.Size;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.DiaChiGiaoHangModel;
+import org.example.datn.model.response.HoaDonChiTietModel;
 import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.service.MauSacService;
 import org.example.datn.service.SanPhamChiTietService;
 import org.example.datn.service.SanPhamService;
 import org.example.datn.service.SizeService;
+import org.example.datn.transformer.HoaDonChiTietTransformer;
+import org.example.datn.transformer.SanPhamChiTietTransformer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +38,9 @@ public class SanPhamChiTietProcessor {
 
     @Autowired
     private MauSacService mauSacService;
+
+    @Autowired
+    SanPhamChiTietTransformer sanPhamChiTietTransformer;
 
     public ServiceResult getById(Long id) {
         var s = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết sản phẩm"));
@@ -97,4 +105,32 @@ public class SanPhamChiTietProcessor {
                 })
                 .orElseThrow(() -> new EntityNotFoundException("sanPhamChiTiet.not.found với ID: " + id));
     }
+
+    public ServiceResult getByIdSanPham(Long idSanPham) {
+        // Tìm các hóa đơn chi tiết dựa trên idHoaDon
+        List<SanPhamChiTiet> sanPhamChiTiets = service.findByIdSanPham(idSanPham);
+
+        // Kiểm tra nếu không có dữ liệu
+        if (sanPhamChiTiets == null || sanPhamChiTiets.isEmpty()) {
+            return new ServiceResult(null, SystemConstant.STATUS_FAIL, "Không tìm thấy hóa đơn chi tiết");
+        }
+
+        // Chuyển các hóa đơn chi tiết thành mô hình
+        List<SanPhamChiTietModel> models = sanPhamChiTiets.stream()
+                .map(sanPhamChiTiet -> {
+                    SanPhamChiTietModel model = sanPhamChiTietTransformer.toModel(sanPhamChiTiet);
+
+                    Size size = sizeService.findById(sanPhamChiTiet.getIdSize()).orElse(null);
+                    MauSac mauSac = mauSacService.findById(sanPhamChiTiet.getIdMauSac()).orElse(null);
+                    model.setSize(size);
+                    model.setMauSac(mauSac);
+
+                    return model;
+                })
+                .collect(Collectors.toList());
+
+        // Trả kết quả với danh sách hóa đơn chi tiết
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
 }

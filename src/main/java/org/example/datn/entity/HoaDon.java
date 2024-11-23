@@ -48,11 +48,6 @@ public class HoaDon extends CommonEntity{
     @Column(name = "trang_thai")
     private Integer trangThai;
 
-    @Column(name = "ngay_tao")
-    private LocalDateTime ngayTao;
-
-    @Column(name = "nguoiTao")
-    private Long nguoiTao;
-
-
+    @Column(name = "ly_do_huy")
+    private String lyDoHuy;
 }

@@ -85,27 +85,91 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
     };
     // Hàm thêm tài khoản
     $scope.addAccount = function () {
-        if ($scope.newAccount.password !== $scope.newAccount.retypePassword) {
-            alert('Mật khẩu không khớp!');
+        // Kiểm tra các trường không được trống
+        if (!$scope.newAccount.name || $scope.newAccount.name.trim() === "") {
+            toastr.error('Tên không được để trống.', 'Lỗi');
             return;
         }
 
-        $http.post('/register', $scope.newAccount)
-            .then(function (response) {
-                if (response.data && response.data.code === "200" && response.data.message === "Thành công") {
-                    alert('Đăng ký thành công!');
-                    fetchUsers(); // Cập nhật danh sách người dùng
-                    $('#addModal').modal('hide');
-                    $scope.newAccount = {}; // Reset form
-                } else {
-                    alert('Có lỗi xảy ra: ' + (response.data.message || 'Vui lòng kiểm tra thông tin nhập vào.'));
-                }
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi gọi API:', error);
-                alert('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.');
-            });
+        if (!$scope.newAccount.email || $scope.newAccount.email.trim() === "") {
+            toastr.error('Email không được để trống.', 'Lỗi');
+            return;
+        }
+
+        if (!$scope.newAccount.phone || $scope.newAccount.phone.trim() === "") {
+            toastr.error('Số điện thoại không được để trống.', 'Lỗi');
+            return;
+        }
+
+        if (!$scope.newAccount.password || $scope.newAccount.password.trim() === "") {
+            toastr.error('Mật khẩu không được để trống.', 'Lỗi');
+            return;
+        }
+
+        if (!$scope.newAccount.retypePassword || $scope.newAccount.retypePassword.trim() === "") {
+            toastr.error('Nhập lại mật khẩu không được để trống.', 'Lỗi');
+            return;
+        }
+
+        // Kiểm tra tính hợp lệ của các trường nhập liệu
+        if ($scope.newAccount.name.length > 50) {
+            toastr.error('Tên không hợp lệ. Vui lòng kiểm tra lại.', 'Lỗi');
+            return;
+        }
+
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test($scope.newAccount.email)) {
+            toastr.error('Email không hợp lệ. Vui lòng nhập lại.', 'Lỗi');
+            return;
+        }
+
+        const phonePattern = /^[0-9]{10,20}$/;
+        if (!phonePattern.test($scope.newAccount.phone)) {
+            toastr.error('Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.', 'Lỗi');
+            return;
+        }
+
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*([0-9]|[^0-9dA-Za-z])).{8,100}$/;
+        if (!passwordPattern.test($scope.newAccount.password)) {
+            toastr.error('Mật khẩu yếu. Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt.', 'Lỗi');
+            return;
+        }
+
+        if ($scope.newAccount.password !== $scope.newAccount.retypePassword) {
+            toastr.error('Mật khẩu không khớp. Vui lòng nhập lại mật khẩu.', 'Lỗi');
+            return;
+        }
+
+        // Xác nhận với SweetAlert (swal) trước khi gọi API
+        swal({
+            title: "Bạn có chắc chắn?",
+            text: "Bạn muốn thêm tài khoản này?",
+            icon: "warning",
+            buttons: ["Hủy", "Đồng ý"],
+            dangerMode: true,
+        }).then((willAdd) => {
+            if (willAdd) {
+                // Gọi API nếu người dùng xác nhận
+                $http.post('/register', $scope.newAccount)
+                    .then(function (response) {
+                        if (response.data && response.data.code === "200" && response.data.message === "Thành công") {
+                            toastr.success('Đăng ký thành công!', 'Thành công');
+                            fetchUsers(); // Cập nhật danh sách người dùng
+                            $('#addModal').modal('hide');
+                            $scope.newAccount = {}; // Reset form
+                        } else {
+                            toastr.error('Có lỗi xảy ra: ' + (response.data.message || 'Vui lòng kiểm tra thông tin nhập vào.'), 'Lỗi');
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('Lỗi khi gọi API:', error);
+                        toastr.error('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.', 'Lỗi');
+                    });
+            }
+        });
     };
+
+
 
     // Các hàm chi tiết, xóa người dùng
     $scope.detailUser = function (userId) {
@@ -126,43 +190,66 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
 
     // Hàm chuẩn bị modal để khóa người dùng
     $scope.prepareLockUser = function (user) {
-        $scope.selectedUser = user; // Lưu thông tin người dùng cần khóa
+        $scope.selectedUser = user;
         $scope.modalTitle = 'Xác nhận khóa người dùng';
         $scope.modalMessage = 'Bạn có chắc chắn muốn khóa người dùng này không?';
-        $scope.modalConfirmButton = 'Khóa';  // Tên nút là "Khóa"
-        $scope.modalAction = 'LOCKED';  // Lưu hành động sẽ thực hiện
-        $('#confirmModal').modal('show'); // Mở modal xác nhận
+        $scope.modalConfirmButton = 'Khóa';
+        $scope.modalAction = 'LOCKED';
+
+        // Sử dụng SweetAlert để xác nhận hành động
+        swal({
+            title: $scope.modalTitle,
+            text: $scope.modalMessage,
+            icon: "warning",
+            buttons: ["Hủy", $scope.modalConfirmButton],
+            dangerMode: true
+        }).then((willLock) => {
+            if (willLock) {
+                $scope.confirmAction(); // Gọi hàm confirmAction nếu người dùng chọn "Khóa"
+            }
+        });
     };
 
 // Hàm chuẩn bị modal để mở khóa người dùng
     $scope.prepareUnlockUser = function (user) {
-        $scope.selectedUser = user; // Lưu thông tin người dùng cần mở khóa
+        $scope.selectedUser = user;
         $scope.modalTitle = 'Xác nhận mở khóa người dùng';
         $scope.modalMessage = 'Bạn có chắc chắn muốn mở khóa người dùng này không?';
-        $scope.modalConfirmButton = 'Mở khóa';  // Tên nút là "Mở khóa"
-        $scope.modalAction = 'ACTIVE'; // Lưu hành động sẽ thực hiện
-        $('#confirmModal').modal('show'); // Mở modal xác nhận
+        $scope.modalConfirmButton = 'Mở khóa';
+        $scope.modalAction = 'ACTIVE';
+
+        // Sử dụng SweetAlert để xác nhận hành động
+        swal({
+            title: $scope.modalTitle,
+            text: $scope.modalMessage,
+            icon: "warning",
+            buttons: ["Hủy", $scope.modalConfirmButton],
+            dangerMode: true
+        }).then((willUnlock) => {
+            if (willUnlock) {
+                $scope.confirmAction(); // Gọi hàm confirmAction nếu người dùng chọn "Mở khóa"
+            }
+        });
     };
 
-
-    // Hàm xác nhận hành động khóa/mở khóa
+// Hàm xác nhận hành động khóa/mở khóa
     $scope.confirmAction = function () {
         if ($scope.selectedUser && $scope.modalAction) {
             const status = $scope.modalAction;
             $http.put(`/user/change-status/${$scope.selectedUser.id}?status=${status}`).then(function (response) {
                 if (response.data && response.data.code === "200") {
                     const action = (status === 'LOCKED') ? 'Khóa' : 'Mở khóa';
-                    alert(`${action} người dùng thành công!`);
+                    toastr.success(`${action} người dùng thành công!`, 'Thành công');
                     fetchUsers(); // Cập nhật lại danh sách người dùng
-                    $('#confirmModal').modal('hide'); // Đóng modal
                 } else {
-                    alert('Có lỗi xảy ra: ' + (response.data.message || 'Vui lòng kiểm tra lại.'));
+                    toastr.error('Có lỗi xảy ra: ' + (response.data.message || 'Vui lòng kiểm tra lại.'), 'Lỗi');
                 }
             }).catch(function (error) {
                 console.error('Lỗi khi gọi API:', error);
-                alert('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.');
+                toastr.error('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.', 'Lỗi');
             });
         }
     };
+
 
 });

@@ -3,6 +3,7 @@ package org.example.datn.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.constants.SystemConstant;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.response.SanPhamChiTietModel;
@@ -11,6 +12,7 @@ import org.example.datn.processor.SanPhamChiTietProcessor;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.service.SanPhamChiTietService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,4 +81,16 @@ public class SanPhamChiTietController {
     }
 
 
+    @GetMapping("/by-san-pham/{id}")
+    public ResponseEntity<ServiceResult> getBySanPhamId(@RequestParam Long idSanPham) {
+        // Gọi phương thức getByIdSanPham trong processor để lấy danh sách chi tiết sản phẩm
+        ServiceResult result = processor.getByIdSanPham(idSanPham);
+
+        // Trả về kết quả dưới dạng ResponseEntity
+        if (result.getCode() == SystemConstant.STATUS_FAIL) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+
+        return ResponseEntity.ok(result);
+    }
 }

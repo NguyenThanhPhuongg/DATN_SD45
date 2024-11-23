@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../css/category.css">
+    <link rel="stylesheet" href="/css/headerAll.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.js"></script>
+
+    <script src="/js/headerJs.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<div th:include="header-all::body"></div>
+
+<div class="container-fluid mt-5">
+    <div class="row">
+        <!-- Sidebar filter -->
+        <div class="col-md-3">
+            <div class="filter-box">
+                <h4>BỘ LỌC</h4>
+
+                <form>
+                    <!-- Kích thước -->
+<!--                    <div class="filter-group">-->
+<!--                        <h5>Kích thước</h5>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="sizeS">-->
+<!--                            <label class="form-check-label" for="sizeS">S</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="sizeM">-->
+<!--                            <label class="form-check-label" for="sizeM">M</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="sizeL">-->
+<!--                            <label class="form-check-label" for="sizeL">L</label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <!-- Màu sắc -->
+<!--                    <div class="filter-group">-->
+<!--                        <h5>Màu sắc</h5>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorWhite">-->
+<!--                            <label class="form-check-label" for="colorWhite">Trắng</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorRed">-->
+<!--                            <label class="form-check-label" for="colorRed">Đỏ</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorGray">-->
+<!--                            <label class="form-check-label" for="colorGray">Xám</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorBlack">-->
+<!--                            <label class="form-check-label" for="colorBlack">Đen</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorDarkBlue">-->
+<!--                            <label class="form-check-label" for="colorDarkBlue">Xanh đậm</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorBrown">-->
+<!--                            <label class="form-check-label" for="colorBrown">Nâu</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input class="form-check-input" type="checkbox" value="" id="colorBeige">-->
+<!--                            <label class="form-check-label" for="colorBeige">Be</label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <!-- Chất liệu -->
+                    <div class="filter-group">
+                        <h5>Chất liệu</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="materialLeather">
+                            <label class="form-check-label" for="materialLeather">Da</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="materialPaper">
+                            <label class="form-check-label" for="materialPaper">Giấy</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="materialCowLeather">
+                            <label class="form-check-label" for="materialCowLeather">Da bò</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="materialSyntheticLeather">
+                            <label class="form-check-label" for="materialSyntheticLeather">Da tổng hợp</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="materialFauxLeather">
+                            <label class="form-check-label" for="materialFauxLeather">Da nhân tạo</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="materialBuffaloLeather">
+                            <label class="form-check-label" for="materialBuffaloLeather">Da trâu</label>
+                        </div>
+                    </div>
+                    <!-- Thương hiệu -->
+                    <div class="filter-group">
+                        <h5>Thương hiệu</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="brandYSL">
+                            <label class="form-check-label" for="brandYSL">YSL</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="brandDior">
+                            <label class="form-check-label" for="brandDior">Dior</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="brandChanel">
+                            <label class="form-check-label" for="brandChanel">Chanel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="brandBurberry">
+                            <label class="form-check-label" for="brandBurberry">Burberry</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="brandGucci">
+                            <label class="form-check-label" for="brandGucci">Gucci</label>
+                        </div>
+                    </div>
+                    <!-- Giá -->
+                    <div class="filter-group">
+                        <h5>Khoảng giá</h5>
+                        <div class="d-flex">
+                            <div class="form-group me-2 flex-fill">
+                                <label for="minPrice">Từ:</label>
+                                <input type="number" id="minPrice" class="form-control" placeholder="VND" min="0"
+                                       step="10000">
+                            </div>
+                            <div class="form-group flex-fill">
+                                <label for="maxPrice">Đến:</label>
+                                <input type="number" id="maxPrice" class="form-control" placeholder="VND" min="0"
+                                       step="10000">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-outline-dark flex-fill mx-1">Lọc</button>
+                        <button type="reset" class="btn btn-outline-light flex-fill mx-1 text-black">Huỷ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- SẢN PHẨM-->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between">
+                <h4>ÁO MĂNG TÔ (6 sản phẩm)</h4>
+                <select class="form-select w-auto">
+                    <option>Mặc định</option>
+                    <option>Giá tăng dần</option>
+                    <option>Giá giảm dần</option>
+                </select>
+            </div>
+<!------------------------------------------------------>
+            <div id="searchResults" class="row mt-3">
+                <div class="col-md-3">
+                    <div class="card product-card">
+                        <img th:src="@{/images/mangto.png}" alt="">
+                        <div class="card-body">
+                            <div class="text-start">
+                                <h6 class="card-title ">Áo măng tô vải len</h6>
+                                <p class="price">5.888.888đ <span class="text-muted"><del>6.888.888đ</del></span></p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn btn-buy btn-dark w-75">Mua ngay</button>
+                                <i class="fa-regular fa-heart fa-xl heart-icon" title="Thêm vào yêu thích"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<!------------------------------------------------------------->
+<!--                PHÀN TRANG-->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <!-- First page button -->
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="First">
+                                <span aria-hidden="true">&laquo;|</span>
+                            </a>
+                        </li>
+
+                        <!-- Previous button -->
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- Page number buttons -->
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">5</a></li>
+                        <li class="page-item"><a class="page-link" href="#">6</a></li>
+                        <li class="page-item"><a class="page-link" href="#">7</a></li>
+                        <li class="page-item"><a class="page-link" href="#">8</a></li>
+                        <li class="page-item"><a class="page-link" href="#">9</a></li>
+
+                        <!-- Next button -->
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- Last page button -->
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Last">
+                                <span aria-hidden="true">|&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="footer::body"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
