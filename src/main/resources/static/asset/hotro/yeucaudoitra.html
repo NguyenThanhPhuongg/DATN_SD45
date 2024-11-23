@@ -19,7 +19,6 @@
                     <th>Mã hóa đơn</th>
                     <th>Người yêu cầu</th>
                     <th>Lý do</th>
-                    <th>Ghi chú</th>
                     <th>Chức năng</th>
                 </tr>
                 </thead>
@@ -29,7 +28,6 @@
                     <td>{{item.hoaDon.ma}}</td>
                     <td>{{item.user.profile.hoVaTen}}</td>
                     <td>{{item.lyDo}}</td>
-                    <td>{{item.ghiChu}}</td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button"
@@ -109,8 +107,8 @@
                                     <input type="text" class="form-control" ng-model="form.ngayYeuCau" readonly>
                                     <label>Lý do</label>
                                     <textarea type="text" class="form-control" ng-model="form.lyDo" readonly></textarea>
-                                    <label>Ghi chú</label>
-                                    <textarea type="text" class="form-control" ng-model="form.ghiChu" readonly></textarea>
+                                    <label ng-if="form.trangThai === 1 || form.trangThai === 2">Ghi chú</label>
+                                    <textarea ng-if="form.trangThai === 1 || form.trangThai === 2" type="text" class="form-control" ng-model="form.ghiChu" readonly></textarea>
                                     <label>Ngày yêu cầu</label>
                                     <input type="text" class="form-control" ng-model="form.ngayYeuCau" readonly>
                                 </div>

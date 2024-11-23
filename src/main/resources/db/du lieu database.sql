@@ -289,19 +289,23 @@ GO
 INSERT INTO yeu_cau_doi_tra (id_hoa_don, id_nguoi_dung, loai_yeu_cau, ly_do, trang_thai, ngay_yeu_cau, ngay_hoan_tat, ghi_chu, nguoi_tao, nguoi_cap_nhat, ngay_tao, ngay_cap_nhat)
 VALUES
 (1, 1, 'EXCHANGE', N'Sản phẩm lỗi, cần đổi mới', 0, GETDATE(), NULL, N'Đang chờ xử lý', 1, 1, GETDATE(), GETDATE()),
-(2, 2, 'EXCHANGE', N'Sản phẩm không đúng màu sắc', 0, GETDATE(), NULL, N'Đang xử lý', 2, 2, GETDATE(), GETDATE()),
+(2, 1, 'EXCHANGE', N'Sản phẩm không đúng màu sắc', 0, GETDATE(), NULL, N'Đang xử lý', 2, 2, GETDATE(), GETDATE()),
 (3, 1, 'RETURN', N'Sản phẩm không vừa size', 0, GETDATE(), NULL, N'Đã hoàn tất', 3, 3, GETDATE(), GETDATE()),
-(4, 3, 'RETURN', N'Sản phẩm bị hỏng trong quá trình giao hàng', 0, GETDATE(), NULL, N'Đang xử lý', 4, 4, GETDATE(), GETDATE()),
-(5, 2, 'EXCHANGE', N'Sản phẩm có lỗi nhỏ, muốn đổi sản phẩm khác', 0, GETDATE(), NULL, N'Chờ phê duyệt', 5, 5, GETDATE(), GETDATE());
+(4, 1, 'RETURN', N'Sản phẩm bị hỏng trong quá trình giao hàng', 0, GETDATE(), NULL, N'Đang xử lý', 4, 4, GETDATE(), GETDATE()),
+(5, 1, 'EXCHANGE', N'Sản phẩm có lỗi nhỏ, muốn đổi sản phẩm khác', 0, GETDATE(), NULL, N'Chờ phê duyệt', 5, 5, GETDATE(), GETDATE());
 
 INSERT INTO yeu_cau_doi_tra_chi_tiet (id_yeu_cau_doi_tra, id_san_pham_chi_tiet, so_luong, trang_thai, ngay_tao, ngay_cap_nhat, nguoi_tao, nguoi_cap_nhat)
 VALUES
-(1, 1, 1, 1, GETDATE(), GETDATE(), 1, 1),
-(2, 2, 1, 1, GETDATE(), GETDATE(), 1, 1),
-(3, 3, 1, 1, GETDATE(), GETDATE(), 1, 1),
-(4, 4, 1, 1, GETDATE(), GETDATE(), 1, 1),
-(5, 5, 1, 1, GETDATE(), GETDATE(), 1, 1);
+(1, 23, 1, 0, GETDATE(), GETDATE(), 1, 1),
+(2, 23, 1, 0, GETDATE(), GETDATE(), 1, 1),
+(3, 2, 1, 0, GETDATE(), GETDATE(), 1, 1),
+(4, 14, 1, 0, GETDATE(), GETDATE(), 1, 1),
+(5, 1, 1, 0, GETDATE(), GETDATE(), 1, 1);
 
+update yeu_cau_doi_tra_chi_tiet set trang_thai = 0
+select * from yeu_cau_doi_tra_chi_tiet
+select * from yeu_cau_doi_tra
+select * from san_pham_doi_tra
 select * from thong_tin_ca_nhan
 select * from gio_hang
 --select * from danh_muc 
@@ -311,11 +315,10 @@ select * from chat_lieu
 --select * from chuc_nang 
 --select * from nhom 
 --select * from nhom_chuc_nang 
---select * from san_pham 
 --select * from chi_tiet_san_pham 
 --select * from hinh_anh 
---select * from khuyen_mai 
---select * from ap_dung_khuyen_mai 
+select * from khuyen_mai 
+select * from ap_dung_khuyen_mai 
 select * from chi_tiet_hoa_don 
 select * from hoa_don 
 select * from nguoi_dung 

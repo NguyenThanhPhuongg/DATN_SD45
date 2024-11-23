@@ -117,6 +117,7 @@ public class YeuCauDoiTraProcessor {
             sanPhamDoiTra.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
             sanPhamDoiTra.setIdSPCT(chiTiet.getIdSPCT());
             sanPhamDoiTra.setSoLuong(chiTiet.getSoLuong());
+            sanPhamDoiTra.setLoai(yeuCauDoiTra.getLoai());
 
             sanPhamDoiTra.setNguoiCapNhat(ua.getPrincipal());
             sanPhamDoiTra.setNgayTao(LocalDateTime.now());
@@ -174,13 +175,14 @@ public class YeuCauDoiTraProcessor {
         if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XAC_NHAN.getValue()) {
             throw new IllegalArgumentException("Yêu cầu không thể hủy vì trạng thái không hợp lệ.");
         }
-
+        Integer newTrangThai = StatusYeuCauDoiTra.KHONG_XAC_NHAN.getValue();
         // Cập nhật thông tin yêu cầu đổi trả
-        yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.KHONG_XAC_NHAN.getValue()); // Đổi trạng thái
+        yeuCauDoiTra.setTrangThai(newTrangThai); // Đổi trạng thái
         yeuCauDoiTra.setGhiChu(request.getOrderInfo()); // Ghi chú từ request
         yeuCauDoiTra.setNgayCapNhat(LocalDateTime.now()); // Ngày cập nhật
         yeuCauDoiTra.setNgayHoanTat(LocalDateTime.now()); // Ngày hoàn tất
         yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal()); // Người cập nhật
+        updateYeuCauDoiTraChiTiet(id, newTrangThai);
 
         // Lưu lại yêu cầu đổi trả
         service.save(yeuCauDoiTra);

@@ -35,6 +35,9 @@ public class SanPhamDoiTra extends CommonEntity {
     @Column(name = "ly_do")
     private String lyDo;
 
+    @Column(name = "loai_yeu_cau")
+    private String loai;
+
     @Column(name = "trang_thai")
     private Integer trangThai;
 

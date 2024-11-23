@@ -120,7 +120,6 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$locat
             toastr.error("Bạn chưa nhập lý do hủy", "Lỗi!");
             return;
         }
-
         swal({
             title: "Xác nhận",
             text: "Bạn có chắc muốn hủy đơn hàng này?",
@@ -132,21 +131,17 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$locat
                 var cancelOrderRequest = {
                     orderInfo: $scope.selectedGhiChu
                 };
-
                 // Lấy token từ localStorage
-                var token = localStorage.getItem('token');  // Thay 'token' bằng tên bạn đã lưu trong localStorage
-
+                var token = localStorage.getItem('token');
                 // Gửi yêu cầu hủy đơn hàng
                 $http.post('/yeu-cau/cancel/' + $scope.idHuyTra, cancelOrderRequest, {
                     headers: {
-                        'Authorization': 'Bearer ' + token  // Thêm token vào header Authorization
+                        'Authorization': 'Bearer ' + token
                     }
                 })
                     .then(function (response) {
                         toastr.success("Hủy đơn hàng thành công", "Thành công!");
-                        // Đóng modal sau khi hủy thành công
                         $('#huyYeuCau').modal('hide');
-                        // Refresh danh sách hóa đơn nếu cần
                         $scope.initialize();
                     })
                     .catch(function (error) {
