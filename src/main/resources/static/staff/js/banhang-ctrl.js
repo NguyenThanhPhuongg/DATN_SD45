@@ -25,6 +25,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 if (!addedProductIds[product.bill].has(product.id)) {
                     $http.get(`/spct/${product.id}`).then(function (response) {
                         let newProduct = response.data.data;
+                        newProduct.soLuongMax = response.data.data.soLuong;
                         newProduct.soLuong = 1;
                         newProduct.image = response.data.data.sanPham.anh;
                         newProduct.tenSanPham = response.data.data.sanPham.ten;
@@ -59,7 +60,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     });
     if (localStorage.getItem('bills')) {
         $scope.bills = JSON.parse(localStorage.getItem('bills'));
-    }
+    };
     $scope.generateBillName = function (lastName) {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -103,6 +104,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             disabled: false,
             totalQuantity: 0,
             nameCustomer: "",
+            diemTichLuy: 0,
+            pointsToUse: 0,
             search: "",
             idCustomer: "",
             phoneCustomer: '',
@@ -128,6 +131,13 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     $scope.setActiveBill = function (index) {
         $scope.activeBill = index;
     };
+
+    $scope.getTotalAmount = function (bill, discountPercent) {
+        const discount = (100 - (discountPercent || 0)) / 100;
+        const totalAfterDiscount = bill.totalBill * discount;
+        const pointsDiscount = (bill.pointsToUse || 0) * 1000; // 1 điểm = 1000 VNĐ
+        return Math.max(totalAfterDiscount - pointsDiscount, 0); // Tổng tiền không âm
+    };
     $scope.removeProduct = function (bill, product) {
         const index = bill.items.findIndex(item => item.id === product.id);
         if (index !== -1) {
@@ -145,17 +155,30 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
     $scope.updateQuantity = function (bill, item) {
         item.soLuong = Number(item.soLuong);
-        if (isNaN(item.soLuong)) {
-            item.quantity = 50
+        if (item.soLuong == null || isNaN(item.soLuong)) {
+            item.soLuong = null;
         }
         item.total = item.soLuong * item.gia;
-        if (item.soLuong >= 50) {
-            item.soLuong = 50;
+        if (item.soLuong >= item.soLuongMax) {
+            item.soLuong = item.soLuongMax;
         }
-        if (item.soLuong < 1) {
-            item.soLuong = 1;
-        }
+
         $scope.updateTotalBill(bill);
+    };
+    $scope.updatePointsToUse = function (bill) {
+        // Xử lý giá trị null hoặc undefined
+        if (bill.pointsToUse == null || isNaN(bill.pointsToUse)) {
+            bill.pointsToUse = null; // Gán giá trị mặc định (hoặc xử lý theo logic của bạn)
+        }
+
+        // Ràng buộc giá trị trong khoảng hợp lệ
+        if (bill.pointsToUse > bill.diemTichLuy) {
+            bill.pointsToUse = bill.diemTichLuy;
+        } else if (bill.pointsToUse < 0) {
+            bill.pointsToUse = 0;
+        }
+
+        console.log(bill.pointsToUse);
     };
 
     $scope.updateTotalBill = function (bill) {
@@ -179,17 +202,26 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                             const cells = row.getElementsByTagName('td');
                             let rowContainsSearchText = false;
 
-                            for (let i = 0; i < cells.length; i++) {
-                                if (cells[i].textContent.toLowerCase().includes(filter)) {
-                                    rowContainsSearchText = true;
-                                    break;
+                            // for (let i = 0; i < cells.length; i++) {
+                            //     if (cells[i].textContent.toLowerCase().includes(filter)) {
+                            //         rowContainsSearchText = true;
+                            //         break;
+                            //     }
+                            // }
+                            //
+                            // if (rowContainsSearchText) {
+                            //     row.style.display = '';
+                            // } else {
+                            //     row.style.display = 'none';
+                            // }
+                            // Kiểm tra nếu hàng có ít nhất 2 cột
+                            if (cells.length > 1) {
+                                const targetCell = cells[1]; // Chỉ lấy cột thứ 2 (index 1)
+                                if (targetCell.textContent.toLowerCase().includes(filter)) {
+                                    row.style.display = ''; // Hiển thị hàng nếu khớp
+                                } else {
+                                    row.style.display = 'none'; // Ẩn hàng nếu không khớp
                                 }
-                            }
-
-                            if (rowContainsSearchText) {
-                                row.style.display = '';
-                            } else {
-                                row.style.display = 'none';
                             }
                         });
                     });
@@ -198,11 +230,12 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 const requests = productList.map(item =>
                     $http.get(`/san-pham/${item.id}`).then(detailResp => {
                         const productDetails = detailResp.data.data.listSanPhamChiTiet;
-
                         // Thêm thuộc tính `tenSanPham` vào từng mục trong `listSanPhamChiTiet`
                         productDetails.forEach(detail => {
                             detail.tenSanPham = item.ten;
                             detail.image = item.anh;
+                            detail.listMauSac = detailResp.data.data.listMauSac;
+                            detail.listSize = detailResp.data.data.listSize;
                         });
 
                         return productDetails;
@@ -250,7 +283,12 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 image: product.image,
                 gia: product.gia,
                 ghiChu: product.ghiChu,
-                soLuong: 1
+                soLuong: 1,
+                soLuongMax: product.soLuong,
+                idSize: product.idSize,
+                idMauSac: product.idMauSac,
+                listSize: product.listSize,
+                listMauSac: product.listMauSac
             });
         }
         $scope.updateTotalBill(bill);
@@ -263,7 +301,30 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }
         $http.post("/user/get-list", formData).then(resp => {
             if (resp.data.data.length === 1) {
-                bill.nameCustomer = resp.data.data[0].profile.hoVaTen
+                bill.nameCustomer = resp.data.data[0].profile.hoVaTen;
+                bill.idCustomer = resp.data.data[0].id;
+                let dataDiem = {
+                    idNguoiDung: bill.idCustomer,
+                    diem: 0
+                };
+                let params = new URLSearchParams();
+                for (let key in dataDiem) {
+                    params.append(key, dataDiem[key]);
+                }
+                $http({
+                    method: 'PUT',
+                    url: '/api/diem-tich-luy/update',
+                    data: params.toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(response => {
+                    if (response.status === 200) {
+                        console.log(response.data);
+                        bill.diemTichLuy = response.data.diem
+                    }
+
+                });
             } else if (resp.data.data.length === 0)  {
                 bill.nameCustomer = '';
                 $scope.onKeyDownName = function(bill) {
@@ -288,7 +349,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             }
         });
         if (bill.phoneCustomer === '' || bill.phoneCustomer === null || bill.phoneCustomer === undefined) {
-            inputElementName.value = '';
+            bill.nameCustomer = '';
         }
     };
     $scope.formatCurrency = function (amount) {
@@ -308,6 +369,28 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }
     };
     $scope.payBill = function (bill) {
+        // Quy tắc: mỗi 1000 VNĐ = 1 điểm
+        const pointsRate = 1 / 1000;
+        let dataDiem = {
+            idNguoiDung: bill.idCustomer,
+            diem: Math.floor(bill.totalBill * pointsRate)
+        };
+        let params = new URLSearchParams();
+        for (let key in dataDiem) {
+            params.append(key, dataDiem[key]);
+        }
+        $http({
+            method: 'PUT',
+            url: '/api/diem-tich-luy/update',
+            data: params.toString(),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(response => {
+            if (response.status === 200) {
+                console.log(response.data);
+            }
+        });
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
                 bill.codeBill = resp.data.ma;
@@ -315,13 +398,39 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 const billModal = new bootstrap.Modal(document.getElementById(`paymentModal-${bill.name}`), {
                     keyboard: false
                 });
+                let dataDiemUse = {
+                    idNguoiDung: bill.idCustomer,
+                    diemCanSuDung: bill.pointsToUse
+                };
+                let paramsUse = new URLSearchParams();
+                for (let key in dataDiemUse) {
+                    paramsUse.append(key, dataDiemUse[key]);
+                }
+                $http({
+                    method: 'PUT',
+                    url: '/api/diem-tich-luy/use-diem',
+                    data: paramsUse.toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(response => {
+                    if (response.status === 200) {
+                        console.log(response.data);
+                    }
+                });
                 billModal.show();
             }
         });
 
     };
-    $scope.clearBill = function (bill) {
+    $scope.clearBill = function (bill, index) {
         bill.disabled = true;
+
+        $scope.bills.splice(index, 1);
+        // Đặt lại hóa đơn đang hoạt động (activeBill)
+        if ($scope.activeBill >= $scope.bills.length) {
+            $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá
+        }
     };
     $scope.printBill = function (bill) {
         var innerContents = document.getElementById(`paymentModal-${bill.name}`).innerHTML;

@@ -63,6 +63,8 @@
                                 <th scope="col">#</th>
                                 <th scope="col" >Hình ảnh</th>
                                 <th scope="col">Sản phẩm</th>
+                                <th scope="col">Màu sắc</th>
+                                <th scope="col">Size</th>
                                 <th scope="col" style="width: 120px;">Số lượng</th>
                                 <th scope="col" class="text-end">Đơn giá (VNĐ)</th>
                                 <th scope="col"class="text-end">Thành tiền (VNĐ)</th>
@@ -74,12 +76,21 @@
                                 <th scope="row">{{$index + 1}}</th>
                                 <td><img ng-src="/images/{{item.image}}" alt="" width="50"></td>
                                 <td>
-                                    {{item.tenSanPham}} <br>
-                                    <small class="text-muted">{{item.ghiChu}}</small>
+                                    {{item.tenSanPham}}
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" ng-model="item.soLuong" min="1" max="50"
-                                           ng-init="item.soLuong = 1" ng-change="updateQuantity(bill, item)"/>
+                                    <div ng-repeat="color in item.listMauSac">
+                                        <span ng-if="item.idMauSac === color.id">{{color.ten}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div ng-repeat="size in item.listSize">
+                                        <span ng-if="item.idSize === size.id">{{size.ten}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" ng-model="item.soLuong" min="0" max="iem.soLuongMax"
+                                           ng-init="item.quantity = (item.quantity && item.quantity > 0) ? item.quantity : 1" ng-change="updateQuantity(bill, item)"/>
                                 </td>
                                 <td class="text-end">
                                     {{ formatCurrency(item.gia) }}
@@ -136,36 +147,78 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <select name="" ng-model="item.diemThuong" class="form-control mb-1 form-control-sm">
-                                                <option value="" selected>-- Chọn khuyễn mãi --</option>
-                                                <option ng-repeat="voucher in vouchers" ng-value="voucher.giaTri">{{ voucher.ten }}</option>
-                                            </select>
-                                            <span>Giảm {{ item.diemThuong }}%</span>
+                                            <div>
+                                                Điểm tích lũy hiện có:
+                                                <b>{{bill.diemTichLuy}}</b>
+                                            </div>
+                                            <small class="text-danger" ng-if="bill.pointsToUse > bill.diemTichLuy">
+                                                Điểm sử dụng không được vượt quá {{bill.diemTichLuy}}.
+                                            </small>
+                                            <div class="input-group mt-1">
+                                                <input type="number"
+                                                       min="0"
+                                                       max="{{bill.diemTichLuy}}"
+                                                       placeholder="Nhập số điểm sử dụng"
+                                                       ng-model="bill.pointsToUse"
+                                                       ng-change="updatePointsToUse(bill)"
+                                                       class="form-control form-control-sm" />
+                                                <button ng-click="bill.pointsToUse = bill.diemTichLuy"
+                                                        class="btn btn-sm btn-secondary"
+                                                        style="font-size: 13px;"
+                                                        type="button">
+                                                    Dùng hết
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
+
+                                    <tr>
+                                        <td>
+                                            <select name="" ng-model="item.diemThuong" class="form-control mb-1 form-control-sm">
+                                                <option value="" selected>-- Chọn khuyến mãi --</option>
+                                                <option ng-repeat="voucher in vouchers" ng-value="voucher.giaTri">{{ voucher.ten }}</option>
+                                            </select>
+                                            <span ng-if="item.diemThuong > 0">Giảm {{ item.diemThuong }}%</span>
+                                        </td>
+                                    </tr>
+
                                     <tr>
                                         <td>
                                             <div class="d-flex justify-content-between">
                                                 <div scope="row">Tổng tiền</div>
-                                                <div class="text-end ">{{formatCurrency(((100 - item.diemThuong)/100) * bill.totalBill)}} VNĐ</div>
+                                                <div class="text-end">
+                                                    {{
+                                                    formatCurrency(
+                                                    getTotalAmount(bill, bill.diemThuong)
+                                                    )
+                                                    }} VNĐ
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
+
                                     <tr>
                                         <td>
                                             <div class="input-group mb-1">
-                                                <input  type="text" ng-model="bill.moneyCustomer" id="moneyCustomerInput"
-                                                       class="form-control" currency-input placeholder="Nhập số tiền khách đưa"/>
-                                                <span class="input-group-text" style=" font-size: 11px;padding: 7px;" >VNĐ</span>
+                                                <input type="text" ng-model="bill.moneyCustomer" id="moneyCustomerInput"
+                                                       class="form-control" currency-input placeholder="Nhập số tiền khách đưa" />
+                                                <span class="input-group-text" style="font-size: 11px;padding: 7px;">VNĐ</span>
                                             </div>
-                                            <span ng-if="bill.moneyCustomer > 0" ng-class="{'text-danger' :  bill.moneyCustomer < bill.totalBill}">
-                                                {{ bill.moneyCustomer < bill.totalBill ? 'Còn thiếu:' : 'Trả lại:' }}
+                                            <span ng-if="bill.moneyCustomer > 0" ng-class="{'text-danger': bill.moneyCustomer < getTotalAmount(bill, item.diemThuong)}">
+                                                {{ bill.moneyCustomer < getTotalAmount(bill, item.diemThuong) ? 'Còn thiếu:' : 'Trả lại:' }}
                                                 <b class="return-money">
-                                                    {{ bill.moneyCustomer > 0 ? formatCurrency(bill.moneyCustomer - bill.totalBill) + ' VNĐ' : '0 VNĐ' }}
+                                                    {{
+                                                        formatCurrency(
+                                                            bill.moneyCustomer > getTotalAmount(bill, bill.diemThuong) ?
+                                                            bill.moneyCustomer - getTotalAmount(bill, bill.diemThuong) :
+                                                            getTotalAmount(bill, item.diemThuong) - bill.moneyCustomer
+                                                        )
+                                                    }} VNĐ
                                                 </b>
-                                            </span>
+        </span>
                                         </td>
                                     </tr>
+
                                     </tbody>
                                 </table>
                                 <div class="px-2 pb-2">
@@ -183,7 +236,7 @@
                                     <div class="text-start mt-2">
                                         <button ng-click="payBill(bill)" ng-disabled="bill.disabled || bill.moneyCustomer < bill.totalBill && bill.moneyCustomer > 0" class="btn btn-primary btn-block w-100">
                                             <img width="24" class="me-1" style="vertical-align: bottom;" src="/images/secure-payment.png" alt="">
-                                            {{ bill.disabled ? 'Đã thanh toán ' + formatCurrency(bill.totalBill) + ' VNĐ' : 'Thanh toán ' + formatCurrency(bill.totalBill) + ' VNĐ'}}
+                                            {{ bill.disabled ? 'Đã thanh toán ' + formatCurrency(getTotalAmount(bill, bill.diemThuong)) + ' VNĐ' : 'Thanh toán ' + formatCurrency(getTotalAmount(bill, item.diemThuong)) + ' VNĐ'}}
                                         </button>
                                     </div>
                                 </div>
@@ -204,14 +257,15 @@
                                 </svg>
                             </button>
                         </h5>
-                        <input type="text" placeholder="Tìm kiếm tên sản phẩm" id="searchProduct" class="form-control mb-3">
+                        <input type="text" placeholder="Tìm kiếm mã sản phẩm" id="searchProduct" class="form-control mb-3">
                         <div class="list-body">
                             <table class="table table-striped" style="font-size: 13px" id="tableproductlist">
                                 <thead>
                                 <tr>
                                     <th>STT</th>
-                                    <th>Hình ảnh</th>
-                                    <th>Tên sản phẩm</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Màu sắc</th>
+                                    <th>Size</th>
                                     <th>Số lượng</th>
                                     <th class="text-end">Giá (VNĐ)</th>
                                     <th class="text-center">Trạng thái</th>
@@ -221,11 +275,31 @@
                                 <tbody>
                                 <tr ng-repeat="product in listProduct | filter:searchFilter">
                                     <td>{{$index + 1}}</td>
-                                    <td><img  ng-src="/images/{{product.image}}" width="50" alt=""></td>
+
                                     <td>
-                                        {{product.tenSanPham}} <br>
-                                        <small class="text-muted">{{product.ghiChu}}</small>
+                                        <div class="d-flex">
+                                            <div style="width: 50px; flex-shrink: 0" class="me-2">
+                                                <img class=" w-100"  ng-src="/images/{{product.image}}" width="50" alt="">
+
+                                            </div>
+                                            <div class="">
+                                                {{product.tenSanPham}}  <br>
+                                                <small class="text-muted">MSP: <b>{{product.id}}</b></small>
+                                            </div>
+                                        </div>
+
                                     </td>
+                                    <td>
+                                        <div ng-repeat="color in product.listMauSac">
+                                            <span ng-if="product.idMauSac === color.id">{{color.ten}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div ng-repeat="size in product.listSize">
+                                            <span ng-if="product.idSize === size.id">{{size.ten}}</span>
+                                        </div>
+                                    </td>
+
                                     <td>{{product.soLuong}}</td>
                                     <td  class="text-end">{{formatCurrency(product.gia)}}</td>
                                     <td  class="text-center">
@@ -291,13 +365,13 @@
                                 </table>
                                 <div class="d-flex fw-bold justify-content-between">
                                     <div class="total-quantity">Tổng số lượng: {{bill.totalQuantity}}</div>
-                                    <div class="total-total">Tổng thanh toán: {{formatCurrency(bill.totalBill)}} VNĐ</div>
+                                    <div class="total-total">Tổng thanh toán: {{formatCurrency(getTotalAmount(bill, bill.diemThuong))}} VNĐ</div>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="button"  data-bs-dismiss="modal" ng-click="printBill(bill)" class="btn btn-primary btn-done-bill">In hóa đơn</button>
-                                <button type="button"  data-bs-dismiss="modal" ng-click="clearBill(bill)" class="btn btn-success btn-done-bill">Hoàn thành</button>
+                                <button type="button"  data-bs-dismiss="modal" ng-click="clearBill(bill, index)" class="btn btn-success btn-done-bill">Hoàn thành</button>
                             </div>
                         </div>
                     </div>
