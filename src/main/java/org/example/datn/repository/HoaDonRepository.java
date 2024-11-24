@@ -23,7 +23,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("SELECT h FROM HoaDon h WHERE h.idNguoiDung IN :idNguoiDung" +
             " AND (:trangThai IS NULL OR h.trangThai = :trangThai) " +
-            "ORDER BY h.ngayTao DESC")
+            "ORDER BY h.ngayCapNhat DESC")
     List<HoaDon> findByIdNguoiDungAndTrangThai(@Param("idNguoiDung") Long idNguoiDung,
                                                @Param("trangThai") Integer trangThai);
 

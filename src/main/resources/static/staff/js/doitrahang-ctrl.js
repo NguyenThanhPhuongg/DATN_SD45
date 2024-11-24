@@ -1,356 +1,203 @@
-app.controller("doitrahang-ctrl", function ($scope, $http, $rootScope, $location) {
+app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$location) {
+    const loai = $routeParams.loai;
+    const trangThai = $routeParams.trangThai;
+
+    // Khởi tạo dữ liệu
     $scope.items = [];
-    $scope.form = {};
+    $scope.searchText = "";
 
+    $scope.pager = {
+        page: 0, size: 10, items: [], count: 0, first: function () {
+            this.page = 0;
+            this.updateItems();
+        }, prev: function () {
+            if (this.page > 0) {
+                this.page--;
+                this.updateItems();
+            }
+        }, next: function () {
+            if (this.page < this.count - 1) {
+                this.page++;
+                this.updateItems();
+            }
+        }, last: function () {
+            this.page = this.count - 1;
+            this.updateItems();
+        }, updateItems: function () {
+            const filteredItems = $scope.items.filter(item => // Lọc theo từ khóa tìm kiếm
+                (!$scope.searchText || item.hoaDon.ma.toLowerCase().includes($scope.searchText.toLowerCase())));
 
-    $scope.selectedID = null;
-    $scope.selectedMAHD = null;
-    $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
-    $scope.searchText2 = '';
-    $scope.searchText3 = '';
-    $scope.searchText4 = '';
-    $scope.searchText5 = '';
-    $scope.searchText6 = '';
-    // Thêm searchText cho các trạng thái khác nếu cần
+            this.count = Math.ceil(filteredItems.length / this.size); // Tổng số trang
+            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size); // Dữ liệu của trang
+        }
+    };
 
+    // Hàm load dữ liệu từ API
     $scope.initialize = function () {
-        // Gọi API và kiểm tra dữ liệu
-        $http.get("/yeu-cau").then(resp => {
-            console.log("Dữ liệu từ API: ", resp.data); // Kiểm tra dữ liệu từ API
-            // Kiểm tra xem resp.data.data có phải là mảng không
-            if (Array.isArray(resp.data.data)) {
+        $http.get(`/yeu-cau/filter?loai=${loai}&trangThai=${trangThai}`).then(resp => {
+            if (resp.data && Array.isArray(resp.data.data)) {
                 $scope.items = resp.data.data.map(item => ({
-                    ...item,
-                    ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
-                    ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
+                    ...item, ngayTao: new Date(item.ngayTao), // Chuyển đổi định dạng ngày tháng
+                    ngayCapNhat: new Date(item.ngayCapNhat)
                 }));
-                $scope.pagerDH0.updateItems();
-                $scope.pagerDH1.updateItems();
-                $scope.pagerDH2.updateItems();
-                $scope.pagerTH0.updateItems();
-                $scope.pagerTH1.updateItems();
-                $scope.pagerTH2.updateItems();
+                $scope.pager.updateItems(); // Cập nhật phân trang
             } else {
-                console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
+                console.error("Dữ liệu API không hợp lệ.");
             }
         }).catch(error => {
-            console.error("Lỗi khi tải danh mục: ", error);
+            console.error("Lỗi khi tải dữ liệu từ API:", error);
         });
     };
 
-    $scope.pagerDH0 = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
-            this.page = 0;
-            this.updateItems();
-        },
-        prev: function () {
-            if (this.page > 0) {
-                this.page--;
-                this.updateItems();
-            }
-        },
-        next: function () {
-            if (this.page < this.count - 1) {
-                this.page++;
-                this.updateItems();
-            }
-        },
-        last: function () {
-            this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 0;
-                const loaiYeuCau = item.loai === 'EXCHANGE';
-                const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches && loaiYeuCau;
-            });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
-    };
-
-    $scope.pagerDH1 = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
-            this.page = 0;
-            this.updateItems();
-        },
-        prev: function () {
-            if (this.page > 0) {
-                this.page--;
-                this.updateItems();
-            }
-        },
-        next: function () {
-            if (this.page < this.count - 1) {
-                this.page++;
-                this.updateItems();
-            }
-        },
-        last: function () {
-            this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 1;
-                const loaiYeuCau = item.loai === 'EXCHANGE';
-                const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches && loaiYeuCau;
-            });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
-    };
-
-    $scope.pagerDH2 = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
-            this.page = 0;
-            this.updateItems();
-        },
-        prev: function () {
-            if (this.page > 0) {
-                this.page--;
-                this.updateItems();
-            }
-        },
-        next: function () {
-            if (this.page < this.count - 1) {
-                this.page++;
-                this.updateItems();
-            }
-        },
-        last: function () {
-            this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 2;
-                const loaiYeuCau = item.loai === 'EXCHANGE';
-                const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches && loaiYeuCau;
-            });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
-    };
-
-
-    $scope.pagerTH0 = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
-            this.page = 0;
-            this.updateItems();
-        },
-        prev: function () {
-            if (this.page > 0) {
-                this.page--;
-                this.updateItems();
-            }
-        },
-        next: function () {
-            if (this.page < this.count - 1) {
-                this.page++;
-                this.updateItems();
-            }
-        },
-        last: function () {
-            this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 0;
-                const loaiYeuCau = item.loai === 'RETURN';
-                const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches && loaiYeuCau;
-            });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
-    };
-
-    $scope.pagerTH1 = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
-            this.page = 0;
-            this.updateItems();
-        },
-        prev: function () {
-            if (this.page > 0) {
-                this.page--;
-                this.updateItems();
-            }
-        },
-        next: function () {
-            if (this.page < this.count - 1) {
-                this.page++;
-                this.updateItems();
-            }
-        },
-        last: function () {
-            this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 1;
-                const loaiYeuCau = item.loai === 'RETURN';
-                const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches && loaiYeuCau;
-            });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
-    };
-
-    $scope.pagerTH2 = {
-        page: 0,
-        size: 5,
-        items: [],
-        count: 0,
-        first: function () {
-            this.page = 0;
-            this.updateItems();
-        },
-        prev: function () {
-            if (this.page > 0) {
-                this.page--;
-                this.updateItems();
-            }
-        },
-        next: function () {
-            if (this.page < this.count - 1) {
-                this.page++;
-                this.updateItems();
-            }
-        },
-        last: function () {
-            this.page = this.count - 1;
-            this.updateItems();
-        },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const statusMatches = item.trangThai === 2;
-                const loaiYeuCau = item.loai === 'RETURN';
-                const idMatches = item.id.toString().includes($scope.searchText1);
-                return statusMatches && idMatches && loaiYeuCau;
-            });
-            this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-        }
-    };
-
-    // Theo dõi sự thay đổi trong ô tìm kiếm cho từng trạng thái
-    $scope.$watch('searchText1', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pagerDH0.updateItems();
-        }
-    });
-    $scope.$watch('searchText2', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pagerDH1.updateItems();
-        }
-    });
-    $scope.$watch('searchText3', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pagerTH0.updateItems();
-        }
-    });
-    $scope.$watch('searchText4', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pagerTH1.updateItems();
-        }
-    });
-    $scope.$watch('searchText5', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pagerTH2.updateItems();
-        }
-    });
-
-
-    // Hàm cập nhật trạng thái hóa đơn
-    $scope.update2 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 2; // Cập nhật trạng thái
-                $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-            }
-        });
-    };
-
-    $scope.update1 = function (item) {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                item.trangThai = 1; // Cập nhật trạng thái
-                $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
-                    $scope.initialize(); // Tải lại dữ liệu
-                    swal("Success!", "Cập nhật thành công", "success");
-                }).catch(error => {
-                    swal("Error!", "Cập nhật thất bại", "error");
-                    console.log("Error: ", error);
-                });
-            } else {
-                swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-            }
-        });
-    };
-    //////////
     $scope.edit = function (item) {
-        // Chuyển timestamp thành Date object
         item.ngayCapNhat = new Date(item.ngayCapNhat);
         item.ngayTao = new Date(item.ngayTao);
         $scope.form = angular.copy(item);
     };
 
+    // Gọi hàm khi controller được khởi tạo
+    $scope.initialize();
 
-    $scope.selectInvoice = function (item) {
-        console.log("Selected Invoice ID: ", item.id); // Thêm log này
-        $rootScope.selectedID = item.id; // Lưu ID hóa đơn vào rootScope
-        $rootScope.selectedMAHD = item.hoaDon.ma; // Lưu ID hóa đơn vào rootScope
-        $location.path('/chitietdoitra'); // Chuyển hướng đến trang hdct
+    $scope.yeuCauChiTietList = [];
+
+    // Hàm lấy danh sách chi tiết theo idDoiTra
+    $scope.loadChiTiet = function (idDoiTra) {
+        $http.get(`/yeu-cau-chi-tiet/by-yeu-cau/${idDoiTra}`).then(resp => {
+            $scope.yeuCauChiTietList = resp.data.data; // Gán danh sách vào scope
+            console.log("Chi tiết yêu cầu đổi trả:", $scope.yeuCauChiTietList);
+        }).catch(error => {
+            console.error("Lỗi khi tải dữ liệu chi tiết:", error);
+        });
     };
 
-    // Khởi tạo
-    $scope.initialize();
+    // Hàm cập nhật trạng thái yêu cầu
+
+    $scope.updateStatus = function (idDoiTra) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái đơn hàng này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                // Thực hiện cập nhật trạng thái hóa đơn nếu người dùng xác nhận
+                $http.put(`/yeu-cau/${idDoiTra}/update-status`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(function (response) {
+                    if (response.data.code === 200) {
+                        // Cập nhật lại trạng thái trong bảng
+                        const updatedItem = response.data.data;
+                        const index = $scope.items.findIndex(item => item.id === idDoiTra);
+                        if (index !== -1) {
+                            $scope.items[index] = updatedItem;
+                        }
+                    }
+                    toastr.success("Cập nhật trạng thái yêu cầu thành công", "Thành công!");
+                    $scope.initialize();
+                }).catch(function (error) {
+                    toastr.error("Có lỗi", "Lỗi!");
+                    console.error("Lỗi khi cập nhật trạng thái:", error);
+                    });
+            } else {
+                toastr.info("Hành động đã hủy", "Hủy!");
+            }
+        });
+    };
+
+    $scope.selectedGhiChu = '';  // Lý do hủy được chọn
+    $scope.idHuyTra = null;  // ID hóa đơn cần cập nhật
+
+    // Mở modal và lưu ID hóa đơn
+    $scope.openModal = function (idHuyTra) {
+        $scope.idHuyTra = idHuyTra; // Lưu ID hóa đơn
+    };
+
+    $scope.updateCancelOrder = function () {
+        if (!$scope.selectedGhiChu) {
+            toastr.error("Bạn chưa nhập lý do hủy", "Lỗi!");
+            return;
+        }
+
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn hủy đơn hàng này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                var cancelOrderRequest = {
+                    orderInfo: $scope.selectedGhiChu
+                };
+
+                // Lấy token từ localStorage
+                var token = localStorage.getItem('token');  // Thay 'token' bằng tên bạn đã lưu trong localStorage
+
+                // Gửi yêu cầu hủy đơn hàng
+                $http.post('/yeu-cau/cancel/' + $scope.idHuyTra, cancelOrderRequest, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token  // Thêm token vào header Authorization
+                    }
+                })
+                    .then(function (response) {
+                        toastr.success("Hủy đơn hàng thành công", "Thành công!");
+                        // Đóng modal sau khi hủy thành công
+                        $('#huyYeuCau').modal('hide');
+                        // Refresh danh sách hóa đơn nếu cần
+                        $scope.initialize();
+                    })
+                    .catch(function (error) {
+                        toastr.error("Có lỗi không thể hủy đơn hàng", "Lỗi!");
+                        console.error(error);
+                    });
+            } else {
+                toastr.info("Hành động đã hủy", "Hủy!");
+            }
+        });
+    };
+
+    // Tạo map để ánh xạ giá trị loai và trangThai sang tiêu đề
+    $scope.getTitle = function () {
+        if (loai === "EXCHANGE" && trangThai === "0") {
+            return "đổi hàng chờ xác nhận";
+        }
+        if (loai === "EXCHANGE" && trangThai === "1") {
+            return "đổi hàng đã xác nhận";
+        }
+        if (loai === "EXCHANGE" && trangThai === "2") {
+            return "đổi hàng không xác nhận";
+        }
+        if (loai === "REFUND" && trangThai === "0") {
+            return "hoàn hàng chờ xác nhận";
+        }
+        if (loai === "REFUND" && trangThai === "1") {
+            return "hoàn hàng đã xác nhận";
+        }
+        if (loai === "REFUND" && trangThai === "1") {
+            return "hoàn hàng không xác nhận";
+        }
+        return "Quản lý yêu cầu đổi hàng";
+    };
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Hiển thị ở góc trên bên phải
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000", // Thời gian thông báo tồn tại (ms)
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
 });

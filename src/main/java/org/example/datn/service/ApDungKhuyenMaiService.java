@@ -2,6 +2,7 @@ package org.example.datn.service;
 
 import feign.Param;
 import org.example.datn.entity.ApDungKhuyenMai;
+import org.example.datn.entity.ChatLieu;
 import org.example.datn.repository.ApDungKhuyenMaiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,4 +37,7 @@ public class ApDungKhuyenMaiService {
         return repo.findByIdKhuyenMaiAndIdNguoiDung(idKhuyenMai, idNguoiDung);
     }
 
+    public List<ApDungKhuyenMai> findAll() {
+        return repo.findAll();
+    }
 }

@@ -24,6 +24,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
     <style>
         td{
@@ -107,6 +108,31 @@
             overflow: auto;
             overflow-x: hidden
         }
+        .nav-cont{
+            //border-bottom: 1px solid #dee2e6;
+        }
+        .nav-tab-slide{
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+        }
+        .tabs-bill{
+            max-width: 100%;
+            overflow-y: hidden;
+            overflow-x: auto;
+            border-bottom: 0;
+        }
+        /* width */
+        .tabs-bill::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Track */
+        .tabs-bill::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            display: none;
+        }
+
         .tabs-bill li{
 
             position: relative;
@@ -115,9 +141,20 @@
             padding-right: 30px;
             color: #000;
             font-size: 14px;
+            position: relative;
         }
         .tabs-bill li button.active{
             font-weight: 500;
+        }
+        .tabs-bill li button.active:before{
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 9999;
+            width: 100%;
+            height: 1px;
+            background: #ffffff;
         }
         .tabs-bill li span{
             position: absolute;
@@ -129,9 +166,13 @@
         .tab-content-bill {
             padding: 20px 15px;
             border: 1px solid #dee2e6;
-            border-top: 0;
             border-radius: 0 0 5px 5px;
-
+            margin-top: -1px;
+        }
+        .nav-cont .btn:disabled,
+        .nav-cont .btn[disabled]{
+            visibility: hidden;
+            opacity: 0;
         }
         .tab-content-bill .form-control{
             font-size: 13px;
@@ -156,6 +197,7 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -183,6 +225,7 @@
 <script src="../staff/js/doitrachitiet-ctrl.js"></script>
 <script src="../staff/js/hinhanh-ctrl.js"></script>
 <script src="../staff/js/tongquan-ctrl.js"></script>
+<script src="../staff/js/danhsachspkm-ctrl.js"></script>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -15,4 +15,6 @@ public interface YeuCauDoiTraChiTietRepository extends JpaRepository<YeuCauDoiTr
 
     List<YeuCauDoiTraChiTiet> findByIdIn(List<Long> ids);
 
+    List<YeuCauDoiTraChiTiet> findByIdYeuCauDoiTra(Long idYeuCauDoiTra);
+
 }

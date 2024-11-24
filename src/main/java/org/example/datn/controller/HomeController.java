@@ -22,9 +22,9 @@ public class HomeController {
         return "customer/home/index";
     }
 
-    @GetMapping("/category")
+    @GetMapping("/tim-kiem")
     public String category() {
-        return "customer/category/category";
+        return "customer/filter/filter";
     }
     @GetMapping("/staff")
     public String staff(){

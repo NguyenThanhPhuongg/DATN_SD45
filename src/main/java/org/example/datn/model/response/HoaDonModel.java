@@ -31,6 +31,7 @@ public class HoaDonModel extends CommonModel {
     private BigDecimal tongTien;
     private Integer diemSuDung;
     private Integer trangThai;
+    private String lyDoHuy;
 
     private UserModel userModel;
     private DiaChiGiaoHangModel diaChiGiaoHangModel;

@@ -68,5 +68,15 @@ public class YeuCauDoiTraChiTietProcessor {
         return new ServiceResult("Sản phẩm đã được xóa thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    public ServiceResult getByYeuCauDoiTra(Long idDoiTra) {
+        List<YeuCauDoiTraChiTietModel> models = service.findByIdYeuCauDoiTra(idDoiTra).stream().map(sp -> {
+            YeuCauDoiTraChiTietModel model = new YeuCauDoiTraChiTietModel();
+            BeanUtils.copyProperties(sp, model);
+            model.setYeuCauDoiTra(yeuCauDoiTraService.findById(sp.getIdYeuCauDoiTra()).orElse(null));
+            model.setSanPhamChiTiet(sanPhamChiTietProcessor.findById(sp.getIdSPCT()));
+            return model;
+        }).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
 
 }

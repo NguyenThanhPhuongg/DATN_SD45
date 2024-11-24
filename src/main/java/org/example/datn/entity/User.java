@@ -47,6 +47,9 @@ public class User extends CommonEntity {
     @Column(name = "xac_thuc")
     private boolean xacThuc;
 
+//    @Column(name = "tich_diem")
+//    private Integer tichDiem;
+
     public boolean isNormalType() {
         return Objects.nonNull(type) && type == UserType.NORMAL;
     }

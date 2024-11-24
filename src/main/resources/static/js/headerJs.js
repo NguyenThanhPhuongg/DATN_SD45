@@ -126,5 +126,4 @@ function updateCartBadge(count) {
         cartBadge.textContent = count; // Cập nhật số lượng giỏ hàng
     }
 }
-
-
+//

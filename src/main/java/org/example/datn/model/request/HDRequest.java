@@ -15,5 +15,6 @@ public class HDRequest {
     private LocalDateTime ngayTao;
     private LocalDateTime ngayThanhToan;
     private Long nguoiTao;
+    private Integer diemSuDung;
     private List<HDCTRequest> items;
 }

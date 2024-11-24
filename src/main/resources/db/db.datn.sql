@@ -379,6 +379,7 @@ CREATE TABLE [hoa_don]
     [ngay_thanh_toan] DATETIME DEFAULT GETDATE(),
     [tong_tien] DECIMAL(10,2),
     [diem_su_dung] INT,
+    [ly_do_huy] NVARCHAR(300),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
@@ -663,6 +664,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+--drop table khuyen_mai
 CREATE TABLE [khuyen_mai]
 (
     [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED
@@ -682,6 +684,7 @@ CREATE TABLE [khuyen_mai]
     [nguoi_tao] BIGINT,
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
+
 GO
 
 --- ap dung khuyen mai
@@ -689,6 +692,8 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--drop table [ap_dung_khuyen_mai]
 CREATE TABLE [ap_dung_khuyen_mai]
 (
     [id] BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED
