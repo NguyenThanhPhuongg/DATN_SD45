@@ -453,7 +453,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             console.log("Chọn phương thức thanh toán: Tiền mặt");
             // Thực hiện các hành động khác nếu cần khi chọn Tiền mặt
         } else if (bill.payCustomer === 'bank') {
-            const AMOUNT = bill.totalBill;
+            const AMOUNT = $scope.getTotalAmount(bill);
             const DESCRIPTION = encodeURIComponent('Thanh toan QR tai quay');
             const ACCOUNT_NAME = encodeURIComponent('NGUYEN THI THANH PHUONG');
             let QR_URL = `https://img.vietqr.io/image/970422-3006200466-compact.png?amount=${AMOUNT}&addInfo=${DESCRIPTION}&accountName=${ACCOUNT_NAME}`;
@@ -470,6 +470,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
+                bill.disabled = true;
                 bill.codeBill = resp.data.ma;
                 bill.dateBill = resp.data.ngayThanhToan;
                 const billModal = new bootstrap.Modal(document.getElementById(`paymentModal-${bill.name}`), {
@@ -542,15 +543,14 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
     };
     $scope.clearBill = function (bill, index) {
-        bill.disabled = true;
-
         $scope.bills.splice(index, 1);
         // Đặt lại hóa đơn đang hoạt động (activeBill)
         if ($scope.activeBill >= $scope.bills.length) {
             $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá
         }
     };
-    $scope.printBill = function (bill) {
+    $scope.printBill = function (bill, index) {
+        $scope.clearBill(bill, index);
         var innerContents = document.getElementById(`paymentModal-${bill.name}`).innerHTML;
         var popupWinindow = window.open('', '_blank', 'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
         popupWinindow.document.open();
