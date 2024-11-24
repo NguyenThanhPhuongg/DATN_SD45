@@ -240,41 +240,45 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/khuyenmai/apdung.html",
             controller: "apdungkhuyenmai-ctrl.js"
         })
+        .when("/danhsachspkm", {
+            templateUrl: "asset/khuyenmai/danhsachspkm.html",
+            controller: "danhsachspkm-ctrl"
+        })
 
         /// Hỗ trợ
-        .when("/traloihotro", {
-            templateUrl: "asset/hotro/traloihotro.html",
-            controller: "traloihotro-ctrl"
+        // .when("/traloihotro", {
+        //     templateUrl: "asset/hotro/traloihotro.html",
+        //     controller: "traloihotro-ctrl"
+        // })
+        .when("/yeucaudoitra/:loai/:trangThai", {
+            templateUrl: "asset/hotro/yeucaudoitra.html",
+            controller: "yeucaudoitra-ctrl"
         })
-        .when("/doihangcho", {
-            templateUrl: "asset/hotro/doihangcho.html",
-            controller: "doitrahang-ctrl"
-        })
-        .when("/doihangthanhcong", {
-            templateUrl: "asset/hotro/doihangthanhcong.html",
-            controller: "doitrahang-ctrl"
-        })
-        .when("/doihanghuy", {
-            templateUrl: "asset/hotro/doihanghuy.html",
-            controller: "doitrahang-ctrl"
-        })
-
-        .when("/trahangcho", {
-            templateUrl: "asset/hotro/trahangcho.html",
-            controller: "doitrahang-ctrl"
-        })
-        .when("/trahangthanhcong", {
-            templateUrl: "asset/hotro/trahangthanhcong.html",
-            controller: "doitrahang-ctrl"
-        })
-        .when("/trahanghuy", {
-            templateUrl: "asset/hotro/trahanghuy.html",
-            controller: "doitrahang-ctrl"
-        })
-        .when("/chitietdoitra", {
-            templateUrl: "asset/hotro/chitietdoitra.html",
-            controller: "chitietdoitra-ctrl"
-        })
+        // .when("/doihangthanhcong", {
+        //     templateUrl: "asset/hotro/doihangthanhcong.html",
+        //     controller: "doitrahang-ctrl"
+        // })
+        // .when("/doihanghuy", {
+        //     templateUrl: "asset/hotro/doihanghuy.html",
+        //     controller: "doitrahang-ctrl"
+        // })
+        //
+        // .when("/trahangcho", {
+        //     templateUrl: "asset/hotro/trahangcho.html",
+        //     controller: "doitrahang-ctrl"
+        // })
+        // .when("/trahangthanhcong", {
+        //     templateUrl: "asset/hotro/trahangthanhcong.html",
+        //     controller: "doitrahang-ctrl"
+        // })
+        // .when("/trahanghuy", {
+        //     templateUrl: "asset/hotro/trahanghuy.html",
+        //     controller: "doitrahang-ctrl"
+        // })
+        // .when("/chitietdoitra", {
+        //     templateUrl: "asset/hotro/chitietdoitra.html",
+        //     controller: "chitietdoitra-ctrl"
+        // })
 
         /// BLog
         .when("/blog", {

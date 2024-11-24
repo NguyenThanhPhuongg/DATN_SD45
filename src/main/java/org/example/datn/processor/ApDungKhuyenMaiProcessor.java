@@ -1,5 +1,6 @@
 package org.example.datn.processor;
 
+import org.example.datn.constants.SystemConstant;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.ApDungKhuyenMaiRequest;
@@ -22,5 +23,7 @@ public class ApDungKhuyenMaiProcessor {
         service.save(a);
         return new ServiceResult();
     }
-
+    public ServiceResult getList() {
+        return new ServiceResult(service.findAll(), SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
 }

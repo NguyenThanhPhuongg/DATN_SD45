@@ -3,7 +3,10 @@ package org.example.datn.controller;
 import org.example.datn.entity.DanhMuc;
 import org.example.datn.entity.Size;
 import org.example.datn.entity.YeuCauDoiTra;
+import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
+import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.request.CancelOrderRequest;
 import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.model.response.YeuCauDoiTraModel;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/yeu-cau")
@@ -48,5 +52,22 @@ public class YeuCauDoiTraController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
         return ResponseEntity.ok(processor.delete(id));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ServiceResult> getByLoaiAndTrangThai(
+            @RequestParam String loai,
+            @RequestParam Integer trangThai) {
+        return ResponseEntity.ok(processor.getByLoaiAndTrangThai(loai, trangThai));
+    }
+    // API cập nhật trạng thái của yêu cầu đổi trả
+    @PutMapping("/{id}/update-status")
+    public ServiceResult updateStatus(@PathVariable("id") Long id, @RequestBody UserAuthentication ua) {
+        return processor.updateStatus(id, ua);
+    }
+
+    @PostMapping("/cancel/{id}")
+    public ResponseEntity<ServiceResult> cancelOrder(@PathVariable Long id, @RequestBody CancelOrderRequest request, UserAuthentication ua) throws IOException, InterruptedException {
+        return ResponseEntity.ok(processor.cancelOrder(id, request, ua));
     }
 }

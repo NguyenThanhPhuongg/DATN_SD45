@@ -15,4 +15,6 @@ public interface YeuCauDoiTraRepository extends JpaRepository<YeuCauDoiTra, Long
     List<YeuCauDoiTra> findByCateId(Long cid);
     List<YeuCauDoiTra> findByIdIn(List<Long> ids);
 
+    List<YeuCauDoiTra> findByLoaiAndTrangThai(String loai, Integer trangThai);
+
 }
