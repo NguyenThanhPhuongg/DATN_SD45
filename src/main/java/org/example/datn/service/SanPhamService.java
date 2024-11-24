@@ -40,4 +40,5 @@ public class SanPhamService {
     public List<SanPham> searchProductsByName(String ten) {
         return repo.findByTenContaining(ten);
     }
+
 }

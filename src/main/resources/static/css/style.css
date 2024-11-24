@@ -1438,6 +1438,56 @@ input[type="number"] {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Tăng độ rõ khi hover */
 }
 
+#paginationContainer {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#paginationContainer a {
+    color: #000000;
+    text-decoration: none;
+    margin: 0 5px;
+    padding: 8px 16px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+}
+
+#paginationContainer a:hover {
+    background-color: #000000;
+    color: white;
+}
+
+#paginationContainer .active {
+    background-color: #000000;
+    color: white;
+    border-color: #000000;
+}
+
+#paginationContainer .disabled {
+    color: #6c757d;
+    border-color: #6c757d;
+    pointer-events: none;
+}
+
+#paginationContainer .prev,
+#paginationContainer .next {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#paginationContainer .page-num {
+    cursor: pointer;
+}
+
+#paginationContainer .prev:hover,
+#paginationContainer .next:hover {
+    background-color: #000000;
+    color: white;
+}
+
+
 
 
 
