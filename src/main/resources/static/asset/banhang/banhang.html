@@ -13,28 +13,46 @@
         <h6 class="mt-3 pb-4 text-center text-muted">Hóa đơn trống!</h6>
     </div>
     <div class="" ng-if="bills.length > 0">
-        <nav>
-            <ul class="nav nav-tabs tabs-bill" id="nav-tab" role="tablist">
-                <li class="nav-item " ng-repeat="(index, bill) in bills" role="presentation">
-                    <button class="nav-link" ng-class="{'active': index === activeBill}"
-                            ng-click="setActiveBill(index)" data-bs-toggle="tab" data-bs-target="#bill{{bill.name}}"
-                            type="button"> Hóa đơn {{bill.name}}
-                    </button>
+        <nav class="d-flex position-relative nav-cont">
+            <button ng-if="bills.length >= 11"
+                    class="btn btn-sm  border-0 position-absolute  top-50 translate-middle-y z-999"
+                    ng-disabled="sliderPosition === 0"
+                    ng-click="prevTab()" style="z-index: 10;left: -30px">
+                <svg width="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+            </button>
+            <div class="nav-tab-slide">
+                <ul class="nav nav-tabs tabs-bill flex-nowrap" ng-style="{'transform': 'translateX(' + sliderOffset + 'px)'}" id="nav-tab" role="tablist">
+                    <li class="nav-item " ng-repeat="(index, bill) in bills" role="presentation">
+                        <button class="nav-link text-nowrap" ng-class="{'active': index === activeBill}"
+                                ng-click="setActiveBill(index)" data-bs-toggle="tab" data-bs-target="#bill{{bill.name}}"
+                                type="button"> Hóa đơn {{bill.name}}
+                        </button>
                         <span ng-click="removeBill(index)">
                         <svg width="14" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
                     </span>
-                </li>
-                <li>
-                    <button class="btn" ng-click="addBill()" >
-                        <svg style="vertical-align: sub;" xmlns="http://www.w3.org/2000/svg" width="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                    </button>
+                    </li>
+                    <li>
+                        <button class="btn" ng-click="addBill()" >
+                            <svg style="vertical-align: sub;" xmlns="http://www.w3.org/2000/svg" width="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </button>
 
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
+            <button ng-if="bills.length >= 11"
+                    class="btn btn-sm border-0 position-absolute top-50 translate-middle-y z-999"
+                    ng-disabled="sliderPosition === maxSliderPosition"
+                    ng-click="nextTab()" style="z-index: 10;right: -30px;">
+                <svg width="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+            </button>
         </nav>
         <div class="tab-content tab-content-bill" id="nav-tabContent">
             <div class="tab-pane fade" ng-repeat="(index, bill) in bills" ng-class="{'show active': index === activeBill}"
@@ -96,7 +114,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" ng-model="item.soLuong" min="0" max="iem.soLuongMax"
+                                    <input type="number" class="form-control" ng-model="item.soLuong" min="1" max="iem.soLuongMax"
                                            ng-init="item.quantity = (item.quantity && item.quantity > 0) ? item.quantity : 1" ng-change="updateQuantity(bill, item)"/>
                                 </td>
                                 <td class="text-end">
@@ -343,7 +361,7 @@
                                 <div class="bill-info-head" >
                                     <p class="mb-1"><b>Ngày mua:</b> <span>{{bill.dateBill}}</span></p>
                                     <p class="mb-1"><b>Nhân viên bán hàng:</b> <span>...</span></p>
-                                    <p class="mb-1"><b>Người mua:</b> <span>{{bill.nameCustomer}} (+{{ bill.billDiem }} điểm) </span></p>
+                                    <p class="mb-1"><b>Người mua:</b> <span>{{bill.nameCustomer || Ziaza}} </span></p>
                                     <p class="mb-1"><b>Đểm tích lũy sau khi hoàn thành hóa đơn:</b> <span>{{ bill.diemTichLuy }} điểm</span></p>
                                     <p><b>Số HĐ:</b> <span>{{bill.codeBill}}</span></p>
                                 </div>
