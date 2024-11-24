@@ -8,6 +8,25 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     $scope.listProductPromotion = [];
     $scope.vouchers = [];
     $scope.searchQuery = '';
+    $scope.sliderOffset = 0; // Vị trí dịch chuyển của slider
+    $scope.sliderPosition = 0; // Vị trí hiện tại
+    $scope.maxSliderPosition = 11;
+
+    $scope.prevTab = function () {
+        if ($scope.sliderPosition > 0) {
+            $scope.sliderPosition--;
+            $scope.sliderOffset += 150; // Mỗi lần trượt 150px (tùy chỉnh kích thước nút)
+            console.log($scope.sliderPosition)
+        }
+    };
+
+    $scope.nextTab = function () {
+        if ($scope.sliderPosition < $scope.maxSliderPosition) {
+            $scope.sliderPosition++;
+            $scope.sliderOffset -= 150; // Mỗi lần trượt 150px
+            console.log($scope.sliderPosition)
+        }
+    };
 
     $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
         .then(function (response) {
@@ -205,25 +224,27 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
     $scope.removeProduct = function (bill, product) {
         const index = bill.items.findIndex(item => item.id === product.id);
-        if (index !== -1) {
-            bill.items.splice(index, 1);
-            $scope.updateTotalBill(bill)
-        } else {
-            console.log("Sản phẩm không được tìm thấy trong mảng items.");
+        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này!')) {
+            if (index !== -1) {
+                bill.items.splice(index, 1);
+                $scope.updateTotalBill(bill)
+            } else {
+                console.log("Sản phẩm không được tìm thấy trong mảng items.");
+            }
         }
+
     };
 
 
     $scope.updateQuantity = function (bill, item) {
         item.soLuong = Number(item.soLuong);
         if (item.soLuong == null || isNaN(item.soLuong)) {
-            item.soLuong = null;
+            item.soLuong = 1;
         }
         item.total = item.soLuong * item.gia;
         if (item.soLuong >= item.soLuongMax) {
             item.soLuong = item.soLuongMax;
         }
-
         $scope.updateTotalBill(bill);
     };
     $scope.updatePointsToUse = function (bill) {
