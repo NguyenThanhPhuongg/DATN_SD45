@@ -349,9 +349,12 @@ SELECT * FROM [blog];
 SELECT * FROM [binh_luan];
 SELECT * FROM [rep_binh_luan];
 select * from nhom
+select * from chi_tiet_hoa_don 
+select * from hoa_don 
 
 update  danh_muc set ngay_tao = GETDATE() where id =1
 update  nguoi_dung set mat_khau = 'Chuchu11@' where id =1
+update  hoa_don  set id_phuong_thuc_van_chuyen = 1 where id = 12
 
 DELETE FROM hoa_don WHERE id = 6;
 

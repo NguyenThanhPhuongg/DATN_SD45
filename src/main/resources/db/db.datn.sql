@@ -798,6 +798,7 @@ CREATE TABLE [san_pham_doi_tra]
     [id_yeu_cau_doi_tra] BIGINT, 
     [so_luong] INT, 
     [ly_do] NVARCHAR(1000), 
+    [loai_yeu_cau] NVARCHAR(50),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
@@ -805,7 +806,6 @@ CREATE TABLE [san_pham_doi_tra]
     [nguoi_cap_nhat] BIGINT 
 ) ON [PRIMARY];
 GO
-
 
 --- Blog
 SET ANSI_NULLS ON
