@@ -17,4 +17,7 @@ public class HDRequest {
     private Long nguoiTao;
     private Integer diemSuDung;
     private List<HDCTRequest> items;
+    private Long idDiaChiGiaoHang;
+    private Long idPhuongThucVanChuyen;
+    private Long nguoiCapNhat;
 }

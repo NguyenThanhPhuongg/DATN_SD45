@@ -81,7 +81,6 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col" >Hình ảnh</th>
-                                    <th scope="col">Sản phẩm</th>
                                     <th scope="col">Màu sắc</th>
                                     <th scope="col">Size</th>
                                     <th scope="col" style="width: 120px;">Số lượng</th>
@@ -101,9 +100,6 @@
                                             </div>
                                             <div class="">{{item.tenSanPham}}</div>
                                         </div>
-                                    </td>
-                                    <td>
-
                                     </td>
                                     <td>
                                         <div ng-if="!item.color" ng-repeat="color in item.listMauSac">
@@ -194,17 +190,17 @@
                                                            min="0"
                                                            max="{{bill.diemTichLuy}}"
                                                            placeholder="Nhập số điểm sử dụng"
-                                                           ng-model="bill.pointsToUse"
+                                                           ng-model="bill.diemSuDung"
                                                            ng-change="updatePointsToUse(bill)"
                                                            class="form-control form-control-sm" />
-                                                    <button ng-click="bill.pointsToUse = bill.diemTichLuy"
+                                                    <button ng-click="bill.diemSuDung = bill.diemTichLuy"
                                                             class="btn btn-sm btn-secondary"
                                                             style="font-size: 13px;"
                                                             type="button">
                                                         Dùng hết
                                                     </button>
                                                 </div>
-                                                <div ng-if="bill.pointsToUse" class="mt-1">Giảm: <b>{{formatCurrency(bill.pointsToUse*10)}} VNĐ</b></div>
+                                                <div ng-if="bill.diemSuDung" class="mt-1">Giảm: <b>{{formatCurrency(bill.diemSuDung*10)}} VNĐ</b></div>
                                             </td>
                                         </tr>
 
