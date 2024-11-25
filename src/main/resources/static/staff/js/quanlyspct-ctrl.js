@@ -90,12 +90,12 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
             const detail = $scope.productDetails[i];
 
             // Kiểm tra giá trị có hợp lệ hay không (>= 50,000 và <= 100,000,000)
-            if (detail.gia < 50000 || detail.gia > 100000000) {
-                toastr.warning("Giá sản phẩm chi tiết phải nằm trong khoảng từ 50.000 đến 100.000.000!", "Lỗi!");
+            if (detail.gia < 0 || !detail.gia) {
+                toastr.warning("Chưa nhập giá sản phẩm hoặc giá sản phẩm phải lớn hơn 0", "Lỗi!");
                 return;
             }
-            if (detail.soLuong < 100 || detail.soLuong > 1000) {
-                toastr.warning("Số lượng sản phẩm chi tiết phải nằm trong khoảng từ 100 - 1000 sản phẩm!", "Lỗi!");
+            if (detail.soLuong < 0 || !detail.gia) {
+                toastr.warning("Chưa nhập số lượng sản phẩm hoặc giá sản phẩm phải lớn hơn 0", "Lỗi!");
                 return;
             }
         }
@@ -192,8 +192,8 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                 $scope.productDetails.push({
                     idSize: size.id,
                     idMauSac: color.id,
-                    soLuong: 100,
-                    gia: 100000,
+                    soLuong: "",
+                    gia: "",
                     ghiChu: '',
                     size: size,
                     mauSac: color

@@ -60,7 +60,7 @@ $(document).ready(function () {
             <div class="product" data-product-id="${product.id}">
                 <div class="image-wrapper">
                     <a href="/productDetail/${product.id}">
-                        <img style="width: 300px; height: auto;" src="/images/${product.anh}" alt="${product.ten}">
+                        <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
                     </a>
                     <div class="icon-heart">
                         <a href="#" class="add-to-wishlist">
@@ -136,7 +136,7 @@ $(document).ready(function () {
                 <div class="product" data-product-id="${product.id}">
                     <div class="image-wrapper">
                         <a href="/productDetail/${product.id}">
-                            <img style="width: 300px; height: auto;" src="/images/${product.anh}" alt="${product.ten}">
+                            <img style="width: 270px; height: 270px;" src="/images/${product.anh}" alt="${product.ten}">
                         </a>
                         <div class="icon-heart">
                             <div class="add-to-wishlist" data-product-id="${product.id}">

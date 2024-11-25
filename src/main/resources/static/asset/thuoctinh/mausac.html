@@ -46,16 +46,16 @@
                     <td>{{item.id}}</td>
                     <td>
                         <span ng-if="item.idCha === 1">Áo</span>
-                        <span ng-if="item.idCha === 3">Quần</span>
+                        <span ng-if="item.idCha === 2">Quần</span>
                         <span ng-if="item.idCha === 2">Giầy</span>
                     </td>
                     <td>{{item.ten}}</td>
                     <td>
                         <div class="badge"
-                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 2, 'bg-secondary': item.trangThai === 3}">
                             <span ng-if="item.trangThai === 1">Active</span>
-                            <span ng-if="item.trangThai === 3">Locked</span>
-                            <span ng-if="item.trangThai === 2">Khác</span>
+                            <span ng-if="item.trangThai === 2">Locked</span>
+                            <span ng-if="item.trangThai === 3">Khác</span>
                         </div>
                     </td>
                     <td>
@@ -124,17 +124,14 @@
                             <div class="col-md-6 mt-2">
                                 <label for="inputTen" class="form-label">Tên màu sắc</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
-                                <span class="text-danger"
-                                      ng-show="error.ten">Tên màu sắc phải từ 1 đến 100 ký tự.</span>
                             </div>
                             <div class="col-md-7 mt-2">
-                                <label for="inputIDCha" class="form-label">Màu sắc cha</label>
+                                <label for="inputIDCha" class="form-label">Loại</label>
                                 <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
                                     <option ng-value="1" selected>Áo</option>
                                     <option ng-value="2">Quần</option>
                                     <option ng-value="3">Giầy</option>
                                 </select>
-                                <span class="text-danger" ng-show="error.idCha">Phải chọn màu sắc cha.</span>
                             </div>
                             <div class="col-md-6 mt-2">
                                 <label for="inputNgayTao" class="form-label">Ngày tạo</label>
@@ -186,19 +183,17 @@
                     <div class="container-fluid px-4">
                         <div class="row">
                             <div class="col-md-12 mt-2">
-                                <label for="inputIDCha" class="form-label">Màu sắc cha</label>
+                                <label for="inputIDCha" class="form-label">Loại</label>
                                 <select class="form-select" aria-label="Default select example"
                                         ng-model="formAdd.idCha">
                                     <option value="1" selected>Áo</option>
                                     <option value="2">Quần</option>
                                     <option value="3">Giầy</option>
                                 </select>
-                                <span class="text-danger" ng-show="error1.idCha">Phải màu sắc mục cha.</span>
                             </div>
                             <div class="col-md-12 mt-2">
                                 <label for="inputTen" class="form-label">Tên màu sắc</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten">
-                                <span class="text-danger" ng-show="error1.ten">Tên màu sắc phải từ 1 đến 100 ký tự.</span>
                             </div>
                         </div>
                     </div>

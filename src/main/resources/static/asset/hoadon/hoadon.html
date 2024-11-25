@@ -25,8 +25,8 @@
                     <td>{{$index + 1}}</td>
                     <td>{{item.ma}}</td>
                     <td>{{item.userModel.profile.hoVaTen}}</td>
-                    <td>{{item.ngayDatHang}}</td>
-                    <td>{{item.tongTien}}</td>
+                    <td>{{item.ngayDatHang | date:'yyyy-MM-dd hh:mm a'}}</td>
+                    <td>{{item.tongTien || 0 | currency:'₫ '}}</td>
                     <td>
                         <div class="btn-group btn-group-xs">
                             <!-- Hiển thị button "Cập nhật trạng thái" (check) và "Hủy/Trả hóa đơn" (times) khi trangThai là 0, 1, 2, 3 -->

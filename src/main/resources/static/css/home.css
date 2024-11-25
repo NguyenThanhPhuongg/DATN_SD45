@@ -100,12 +100,12 @@
 }
 
 .product {
-    margin-bottom: 25px;
-    width: calc(25% - 25px); /* 5 products in a row, 20px gap */
+    margin-bottom: 20px;
+    width: calc(20% - 20px); /* 5 products in a row, 20px gap */
 }
 
 .spbc {
-    gap: 31px;
+    gap: 20px;
 }
 
 .sp-banchay .price {
@@ -237,7 +237,3 @@
     width: 100%;
     margin-bottom: 30px;
 }
-
-
-
-

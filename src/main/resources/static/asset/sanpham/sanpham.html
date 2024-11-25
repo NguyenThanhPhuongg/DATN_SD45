@@ -17,17 +17,17 @@
                 <div class="card p-3">
                     <div class="mb-3">
                         <label for="ten" class="form-label">Tên sản phẩm</label>
-                        <input type="text" id="ten" ng-model="form.ten" class="form-control" required placeholder="Nhập tên sản phẩm">
+                        <input type="text" id="ten" ng-model="form.ten" class="form-control" placeholder="Nhập tên sản phẩm">
                         <span class="text-danger" ng-if="errorMessages.ten">{{ errorMessages.ten }}</span>
                     </div>
                     <div class="mb-3">
                         <label for="moTa" class="form-label">Mô tả</label>
-                        <textarea id="moTa" ng-model="form.moTa" class="form-control" rows="3" required placeholder="Nhập mô tả sản phẩm"></textarea>
+                        <textarea id="moTa" ng-model="form.moTa" class="form-control" rows="3" placeholder="Nhập mô tả sản phẩm"></textarea>
                         <span class="text-danger" ng-if="errorMessages.ten">{{ errorMessages.moTa }}</span>
                     </div>
                     <div class="mb-3">
                         <label for="gia" class="form-label">Giá</label>
-                        <input type="text" id="gia" ng-model="form.gia" class="form-control" required
+                        <input type="text" id="gia" ng-model="form.gia" class="form-control"
                                placeholder="Nhập giá sản phẩm" format-number>
                         <span class="text-danger" ng-if="errorMessages.gia">{{ errorMessages.gia }}</span>
                     </div>

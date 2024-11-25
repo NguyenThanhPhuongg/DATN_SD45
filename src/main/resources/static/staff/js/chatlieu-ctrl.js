@@ -99,19 +99,29 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
         $scope.form = angular.copy(item);
     };
 
-    $scope.validateForm = function (formAdd, errorContainer) {
-
-        var nameRegex = /^[0-9!@#$%^&*()_+~?"><,./\\]+$/;
-        if (!formAdd.ten || formAdd.ten.length < 5 || formAdd.ten.length > 100 || nameRegex.test(formAdd.ten)) {
+    $scope.validateForm = function (form, errorContainer, isUpdate = false) {
+        // Kiểm tra tên
+        if (!form.ten) {
             errorContainer.ten = true;
-            toastr.error("Tên danh mục phải từ 5-100 kí tự và chỉ chứa số và ký tự đặc biệt.", "Lỗi!");
+            toastr.error("Tên không được để trống.", "Lỗi!");
+        } else if (form.ten.length < 2 || form.ten.length > 100) {
+            errorContainer.ten = true;
+            toastr.error("Tên phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+        } else if (
+            $scope.items.some(item =>
+                item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
+                (!isUpdate || item.id !== form.id) // Kiểm tra trùng tên với ID khác (trường hợp update)
+            )
+        ) {
+            errorContainer.ten = true;
+            toastr.error("Tên đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
         } else {
             errorContainer.ten = false;
         }
 
-        if (!formAdd.idCha) {
+        if (!form.idCha) {
             errorContainer.idCha = true;
-            toastr.error("Bạn chưa chọn danh mục cha.", "Lỗi!");
+            toastr.error("Bạn chưa chọn loại.", "Lỗi!");
         } else {
             errorContainer.idCha = false;
         }
@@ -121,7 +131,7 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
 
     $scope.create = function () {
         $scope.error1 = {};
-        if (!$scope.validateForm($scope.formAdd, $scope.error1)) {
+        if (!$scope.validateForm($scope.formAdd, $scope.error1,false)) {
             return;
         }
 
@@ -155,7 +165,7 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
 
     $scope.update = function () {
         $scope.error = {};
-        if (!$scope.validateForm($scope.form, $scope.error)) {
+        if (!$scope.validateForm($scope.form, $scope.error,true)) {
             return;
         }
 
