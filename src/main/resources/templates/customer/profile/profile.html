@@ -1554,6 +1554,35 @@
         }
     }
 
+    // Hàm để hiển thị ảnh đại diện khi người dùng chọn tệp và kiểm tra tệp ảnh hợp lệ
+    document.getElementById('profile-pic').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            // Kiểm tra loại tệp (mimetype)
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/svg+xml'];
+
+            // Nếu tệp không phải là ảnh, hiển thị thông báo lỗi
+            if (!validImageTypes.includes(file.type)) {
+                toastr.error('Vui lòng chọn một tệp ảnh hợp lệ (JPEG, PNG, GIF, BMP, WebP, SVG)', 'Lỗi');
+                // Xóa tệp đã chọn để người dùng có thể chọn lại
+                event.target.value = '';
+                return;
+            }
+
+            // Nếu tệp là ảnh, sử dụng FileReader để hiển thị ảnh đại diện
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                document.getElementById('profile-pic-img').src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+
     // Hàm để gán thông tin vào form hồ sơ cá nhân
     async function ganThongTinVaoForm() {
         const token = localStorage.getItem('token');
