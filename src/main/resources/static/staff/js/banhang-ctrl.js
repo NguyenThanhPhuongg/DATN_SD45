@@ -103,16 +103,28 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                     $scope.bills[billIndex].items.push(newProduct);
                 } else {
                     // Nếu đã tồn tại, cập nhật số lượng
-                    $scope.bills[billIndex].items[existingProductIndex].soLuong = newProduct.soLuong;
+                    const existingProduct = $scope.bills[billIndex].items[existingProductIndex];
+                    existingProduct.soLuong += product.quantity; // Tăng số lượng
+                    if (existingProduct.soLuong > existingProduct.soLuongMax) {
+                        existingProduct.soLuong = existingProduct.soLuongMax; // Đảm bảo không vượt quá số lượng tối đa
+                    }
                 }
-                $scope.updateTotalBill($scope.bills[billIndex])
+
+                // Cập nhật số lượng trong danh sách sản phẩm
+                const productInList = $scope.listProduct.find(p => p.id === newProduct.id);
+                if (productInList) {
+                    productInList.soLuong -= product.quantity; // Giảm số lượng sản phẩm trong danh sách
+                    if (productInList.soLuong < 0) {
+                        productInList.soLuong = 0; // Đảm bảo không âm
+                    }
+                }
+
+                $scope.updateTotalBill($scope.bills[billIndex]);
             }).catch(error => {
                 console.error(`Lỗi khi gọi API cho sản phẩm ID ${productId}:`, error);
             });
         }
-    };
-
-
+    }
 
 
     $scope.clearData = function () {
@@ -125,17 +137,52 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             $scope.vouchers = resp.data.data
         }
     });
+    $http.get('/san-pham').then(resp => {
+        if (resp.status === 200) {
+            const productList = resp.data.data; // Danh sách sản phẩm
+            const requests = productList.map(item =>
+                $http.get(`/san-pham/${item.id}`).then(detailResp => {
+                    const productDetails = detailResp.data.data.listSanPhamChiTiet;
+                    // Thêm thuộc tính `tenSanPham` vào từng mục trong `listSanPhamChiTiet`
+                    productDetails.forEach(detail => {
+                        detail.tenSanPham = item.ten;
+                        detail.image = item.anh;
+                        detail.listMauSac = detailResp.data.data.listMauSac;
+                        detail.listSize = detailResp.data.data.listSize;
+                    });
 
-    var unloadHandler = function (event) {
-        localStorage.setItem('bills', JSON.stringify($scope.bills))
-    };
-    window.addEventListener('beforeunload', unloadHandler);
-    $scope.$on('$destroy', function () {
-        window.removeEventListener('beforeunload', unloadHandler);
+                    return productDetails;
+                })
+            );
+
+            // Xử lý tất cả yêu cầu đồng thời với Promise.all
+            Promise.all(requests).then(allDetails => {
+                $scope.listProduct = allDetails.flat(); // Gộp tất cả chi tiết lại thành một mảng
+
+                console.log("Danh sách sản phẩm chi tiết với tên sản phẩm:", $scope.listProduct);
+                $scope.$apply(); // Đảm bảo giao diện được cập nhật
+            }).catch(error => {
+                console.error("Lỗi khi tải chi tiết sản phẩm:", error);
+            });
+        } else {
+            console.error("Không thể lấy danh sách sản phẩm:", resp);
+        }
+    }).catch(error => {
+        console.error("Lỗi khi gọi API sản phẩm:", error);
     });
-    if (localStorage.getItem('bills')) {
-        $scope.bills = JSON.parse(localStorage.getItem('bills'));
-    };
+
+    // lưu hóa đơn khi reload
+    // var unloadHandler = function (event) {
+    //     localStorage.setItem('bills', JSON.stringify($scope.bills))
+    // };
+    // window.addEventListener('beforeunload', unloadHandler);
+    // $scope.$on('$destroy', function () {
+    //     window.removeEventListener('beforeunload', unloadHandler);
+    // });
+    // if (localStorage.getItem('bills')) {
+    //     $scope.bills = JSON.parse(localStorage.getItem('bills'));
+    // };
+
     $scope.generateBillName = function (lastName) {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -184,14 +231,20 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             billDiem: 0,
             pointsToUse: 0,
             search: "",
-            idCustomer: "",
+            idCustomer: 0,
             phoneCustomer: '',
             moneyCustomer: 0,
+            trangThai: 7,
+            nguoiTao: 1,
+            diemSuDung: 0,
+            idDiaChiGiaoHang:0,
+            idPhuongThucVanChuyen:0,
+            nguoiCapNhat:0,
             payCustomer: 'money',
             payQRbank: null,
             codeBill: null,
             dateBill: null,
-            diemThuong: '',
+            diemThuong: 0,
             totalPricePromo: 0,
             items: []
         };
@@ -199,13 +252,32 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         $scope.activeBill = $scope.bills.length - 1;
     };
     $scope.removeBill = function (index) {
+        const billToRemove = $scope.bills[index];
+
+        // Khôi phục số lượng sản phẩm trong danh sách sản phẩm
+        if (billToRemove && billToRemove.items) {
+            billToRemove.items.forEach(product => {
+                const productInList = $scope.listProduct.find(p => p.id === product.id);
+                if (productInList) {
+                    productInList.soLuong += product.soLuong; // Cộng lại số lượng đã sử dụng
+                }
+            });
+        }
+
+        // Xóa hóa đơn
         $scope.bills.splice(index, 1);
 
         // Đặt lại hóa đơn đang hoạt động (activeBill)
         if ($scope.activeBill >= $scope.bills.length) {
             $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá
         }
+
+        // Đảm bảo activeBill không âm
+        if ($scope.activeBill < 0) {
+            $scope.activeBill = 0;
+        }
     };
+
     $scope.setActiveBill = function (index) {
         $scope.activeBill = index;
     };
@@ -219,48 +291,24 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         })
         const discount = (100 - (bill.diemThuong || 0)) / 100;
         const totalAfterDiscount = bill.totalBill * discount;
-        const pointsDiscount = (bill.pointsToUse || 0) * 10; // 1 điểm = 10 VNĐ
+        const pointsDiscount = (bill.diemSuDung || 0) * 10; // 1 điểm = 10 VNĐ
         return Math.max(totalAfterDiscount - pointsDiscount - bill.totalPricePromo, 0); // Tổng tiền không âm
     };
-    $scope.removeProduct = function (bill, product) {
-        const index = bill.items.findIndex(item => item.id === product.id);
-        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này!')) {
-            if (index !== -1) {
-                bill.items.splice(index, 1);
-                $scope.updateTotalBill(bill)
-            } else {
-                console.log("Sản phẩm không được tìm thấy trong mảng items.");
-            }
-        }
 
-    };
-
-
-    $scope.updateQuantity = function (bill, item) {
-        item.soLuong = Number(item.soLuong);
-        if (item.soLuong == null || isNaN(item.soLuong)) {
-            item.soLuong = 1;
-        }
-        item.total = item.soLuong * item.gia;
-        if (item.soLuong >= item.soLuongMax) {
-            item.soLuong = item.soLuongMax;
-        }
-        $scope.updateTotalBill(bill);
-    };
     $scope.updatePointsToUse = function (bill) {
         // Xử lý giá trị null hoặc undefined
-        if (bill.pointsToUse == null || isNaN(bill.pointsToUse)) {
-            bill.pointsToUse = null; // Gán giá trị mặc định (hoặc xử lý theo logic của bạn)
+        if (bill.diemSuDung == null || isNaN(bill.diemSuDung)) {
+            bill.diemSuDung = null; // Gán giá trị mặc định (hoặc xử lý theo logic của bạn)
         }
 
         // Ràng buộc giá trị trong khoảng hợp lệ
-        if (bill.pointsToUse > bill.diemTichLuy) {
-            bill.pointsToUse = bill.diemTichLuy;
-        } else if (bill.pointsToUse < 0) {
-            bill.pointsToUse = 0;
+        if (bill.diemSuDung > bill.diemTichLuy) {
+            bill.diemSuDung = bill.diemTichLuy;
+        } else if (bill.diemSuDung < 0) {
+            bill.diemSuDung = 0;
         }
 
-        console.log(bill.pointsToUse);
+        console.log(bill.diemSuDung);
     };
 
     $scope.updateTotalBill = function (bill) {
@@ -272,88 +320,27 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }, 0);
     };
     $scope.showListProduct = function () {
-        $http.get('/san-pham').then(resp => {
-            if (resp.status === 200) {
-                $scope.showPopUp = true;
-                setTimeout(() => {
-                    const searchInput = document.getElementById('searchProduct');
-                    searchInput.addEventListener('keyup', function() {
-                        const filter = this.value.toLowerCase();
-                        const rows = document.querySelectorAll('#tableproductlist tbody tr');
-                        rows.forEach(row => {
-                            const cells = row.getElementsByTagName('td');
-                            let rowContainsSearchText = false;
+        $scope.showPopUp = true;
+        setTimeout(() => {
+            const searchInput = document.getElementById('searchProduct');
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#tableproductlist tbody tr');
+                rows.forEach(row => {
+                    const cells = row.getElementsByTagName('td');
 
-                            // for (let i = 0; i < cells.length; i++) {
-                            //     if (cells[i].textContent.toLowerCase().includes(filter)) {
-                            //         rowContainsSearchText = true;
-                            //         break;
-                            //     }
-                            // }
-                            //
-                            // if (rowContainsSearchText) {
-                            //     row.style.display = '';
-                            // } else {
-                            //     row.style.display = 'none';
-                            // }
-                            // Kiểm tra nếu hàng có ít nhất 2 cột
-                            if (cells.length > 1) {
-                                const targetCell = cells[1]; // Chỉ lấy cột thứ 2 (index 1)
-                                if (targetCell.textContent.toLowerCase().includes(filter)) {
-                                    row.style.display = ''; // Hiển thị hàng nếu khớp
-                                } else {
-                                    row.style.display = 'none'; // Ẩn hàng nếu không khớp
-                                }
-                            }
-                        });
-                    });
-                }, 200);
-                const productList = resp.data.data; // Danh sách sản phẩm
-                const requests = productList.map(item =>
-                    $http.get(`/san-pham/${item.id}`).then(detailResp => {
-                        const productDetails = detailResp.data.data.listSanPhamChiTiet;
-                        // Thêm thuộc tính `tenSanPham` vào từng mục trong `listSanPhamChiTiet`
-                        productDetails.forEach(detail => {
-                            detail.tenSanPham = item.ten;
-                            detail.image = item.anh;
-                            detail.listMauSac = detailResp.data.data.listMauSac;
-                            detail.listSize = detailResp.data.data.listSize;
-                        });
-
-                        return productDetails;
-                    })
-                );
-
-                // Xử lý tất cả yêu cầu đồng thời với Promise.all
-                Promise.all(requests).then(allDetails => {
-                    $scope.listProduct = allDetails.flat(); // Gộp tất cả chi tiết lại thành một mảng
-
-                    console.log("Danh sách sản phẩm chi tiết với tên sản phẩm:", $scope.listProduct);
-                    $scope.$apply(); // Đảm bảo giao diện được cập nhật
-                }).catch(error => {
-                    console.error("Lỗi khi tải chi tiết sản phẩm:", error);
+                    if (cells.length > 1) {
+                        const targetCell = cells[1]; // Chỉ lấy cột thứ 2 (index 1)
+                        if (targetCell.textContent.toLowerCase().includes(filter)) {
+                            row.style.display = ''; // Hiển thị hàng nếu khớp
+                        } else {
+                            row.style.display = 'none'; // Ẩn hàng nếu không khớp
+                        }
+                    }
                 });
-            } else {
-                console.error("Không thể lấy danh sách sản phẩm:", resp);
-            }
-        }).catch(error => {
-            console.error("Lỗi khi gọi API sản phẩm:", error);
-        });
+            });
+        }, 200);
     };
-
-    $scope.searchFilter = function(product) {
-
-        if (!$scope.searchQuery) {
-            return true; // Trả về tất cả sản phẩm khi không có từ khóa tìm kiếm
-        }
-        // Kiểm tra nếu tên sản phẩm chứa từ khóa tìm kiếm
-        return product.tenSanPham.toLowerCase().includes($scope.searchQuery.toLowerCase());
-    };
-
-    $scope.closeProductList = function () {
-        $scope.showPopUp = false
-    };
-
     $scope.addProductToBill = function (bill, product) {
         const existingProduct = bill.items.find(item => item.id === product.id);
         const promoProduct = $scope.listProductPromotion.find(promo => promo.idSanPham === product.idSanPham);
@@ -378,9 +365,78 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 listMauSac: product.listMauSac
             });
         }
+        // Giảm số lượng sản phẩm trong danh sách sản phẩm
+        const productInList = $scope.listProduct.find(p => p.id === product.id);
+        if (productInList) {
+            productInList.soLuong--; // Giảm số lượng
+        }
         $scope.updateTotalBill(bill);
         $scope.showPopUp = false
     };
+    $scope.updateQuantity = function (bill, item) {
+        // Chuyển đổi số lượng thành kiểu số và kiểm tra giá trị hợp lệ
+        item.soLuong = Number(item.soLuong);
+        if (item.soLuong == null || isNaN(item.soLuong)) {
+            item.soLuong = 1;
+        }
+
+        // Tìm sản phẩm tương ứng trong danh sách
+        const productInList = $scope.listProduct.find(p => p.id === item.id);
+
+        if (productInList) {
+            // Tính số lượng còn lại trong danh sách sản phẩm
+            const remainingQuantity = item.soLuongMax - item.soLuong;
+
+            // Nếu số lượng vượt quá giới hạn, điều chỉnh về mức tối đa
+            if (item.soLuong > remainingQuantity) {
+                item.soLuong = remainingQuantity;
+            }
+
+            // Cập nhật số lượng trong danh sách sản phẩm
+            productInList.soLuong = item.soLuongMax - item.soLuong;
+        }
+
+        // Tính lại tổng tiền cho sản phẩm
+        item.total = item.soLuong * item.gia;
+
+        // Cập nhật tổng hóa đơn
+        $scope.updateTotalBill(bill);
+    };
+    $scope.removeProduct = function (bill, product) {
+        const index = bill.items.findIndex(item => item.id === product.id);
+        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này!')) {
+            if (index !== -1) {
+                // Khôi phục số lượng ban đầu trong danh sách sản phẩm
+                const productInList = $scope.listProduct.find(p => p.id === product.id);
+                if (productInList) {
+                    productInList.soLuong += product.soLuong; // Cộng lại số lượng đã sử dụng
+                }
+
+                // Xóa sản phẩm khỏi hóa đơn
+                bill.items.splice(index, 1);
+
+                // Cập nhật tổng hóa đơn
+                $scope.updateTotalBill(bill);
+            } else {
+                console.log("Sản phẩm không được tìm thấy trong mảng items.");
+            }
+        }
+    };
+
+    $scope.searchFilter = function(product) {
+
+        if (!$scope.searchQuery) {
+            return true; // Trả về tất cả sản phẩm khi không có từ khóa tìm kiếm
+        }
+        // Kiểm tra nếu tên sản phẩm chứa từ khóa tìm kiếm
+        return product.tenSanPham.toLowerCase().includes($scope.searchQuery.toLowerCase());
+    };
+
+    $scope.closeProductList = function () {
+        $scope.showPopUp = false
+    };
+
+
     $scope.onPhoneChange = function(bill) {
         let formData = {
             role: "CLIENT",
@@ -478,7 +534,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 });
                 let dataDiemUse = {
                     idNguoiDung: bill.idCustomer,
-                    diemCanSuDung: bill.pointsToUse
+                    diemCanSuDung: bill.diemSuDung
                 };
                 let paramsUse = new URLSearchParams();
                 for (let key in dataDiemUse) {

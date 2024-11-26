@@ -75,6 +75,12 @@ public class HDService {
         hoaDon.setNgayTao(LocalDateTime.now());
         hoaDon.setTrangThai(hdRequest.getTrangThai());
         hoaDon.setNgayThanhToan(LocalDateTime.now());
+        hoaDon.setNgayDatHang(LocalDateTime.now());
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
+        hoaDon.setIdDiaChiGiaoHang(hdRequest.getIdDiaChiGiaoHang());
+        hoaDon.setIdPhuongThucVanChuyen(hdRequest.getIdPhuongThucVanChuyen());
+        hoaDon.setNguoiCapNhat(hdRequest.getNguoiCapNhat());
+        hoaDon.setNguoiTao(hdRequest.getNguoiTao());
         HoaDon savedHoaDon = hoaDonRepository.save(hoaDon);
 
         // Tạo mã hóa đơn
@@ -88,6 +94,8 @@ public class HDService {
             chiTiet.setIdSanPhamChiTiet(hdctRequest.getId());
             chiTiet.setSoLuong(hdctRequest.getSoLuong());
             chiTiet.setNgayTao(LocalDateTime.now());
+            chiTiet.setNgayCapNhat(LocalDateTime.now());
+            chiTiet.setTrangThai(hdctRequest.getTrangThai());
 
             // Giảm số lượng tồn kho của sản phẩm
             SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(hdctRequest.getId())
