@@ -132,7 +132,6 @@
                             <th>Size</th>
                             <th>Màu Sắc</th>
                             <th>Số Lượng</th>
-                            <th>Giá</th>
                             <th>Ghi Chú</th>
                             <th>Thao Tác</th>
                         </tr>
@@ -145,7 +144,6 @@
                             <td>{{ detail.size.ten }}</td>
                             <td>{{ detail.mauSac.ten }}</td>
                             <td><input type="number" ng-model="detail.soLuong" class="form-control"></td>
-                            <td><input type="number" ng-model="detail.gia" class="form-control"></td>
                             <td><input type="text" ng-model="detail.ghiChu" class="form-control"></td>
                             <td>
                                 <button class="btn btn-sm btn-danger" ng-click="removeProductDetail(detail)">Xóa</button>

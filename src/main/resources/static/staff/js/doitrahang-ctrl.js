@@ -1,6 +1,7 @@
-app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$location) {
+app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $location) {
     const loai = $routeParams.loai;
     const trangThai = $routeParams.trangThai;
+    $scope.trangThai = ""; // Giá trị mặc định là tất cả trạng thái
 
     // Khởi tạo dữ liệu
     $scope.items = [];
@@ -24,17 +25,23 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$locat
             this.page = this.count - 1;
             this.updateItems();
         }, updateItems: function () {
-            const filteredItems = $scope.items.filter(item => // Lọc theo từ khóa tìm kiếm
-                (!$scope.searchText || item.hoaDon.ma.toLowerCase().includes($scope.searchText.toLowerCase())));
+            const filteredItems = $scope.items.filter(item => {
+                // Lọc theo từ khóa tìm kiếm
+                const matchesSearch = !$scope.searchText || item.hoaDon.ma.toLowerCase().includes($scope.searchText.toLowerCase());
+
+                // Lọc theo trạng thái
+                const matchesStatus = !$scope.trangThai || item.trangThai === parseInt($scope.trangThai);
+
+                return matchesSearch && matchesStatus;
+            });
 
             this.count = Math.ceil(filteredItems.length / this.size); // Tổng số trang
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size); // Dữ liệu của trang
         }
     };
 
-    // Hàm load dữ liệu từ API
     $scope.initialize = function () {
-        $http.get(`/yeu-cau/filter?loai=${loai}&trangThai=${trangThai}`).then(resp => {
+        $http.get(`/yeu-cau/doitra?loai=${loai}`).then(resp => {
             if (resp.data && Array.isArray(resp.data.data)) {
                 $scope.items = resp.data.data.map(item => ({
                     ...item, ngayTao: new Date(item.ngayTao), // Chuyển đổi định dạng ngày tháng
@@ -48,7 +55,6 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$locat
             console.error("Lỗi khi tải dữ liệu từ API:", error);
         });
     };
-
     $scope.edit = function (item) {
         item.ngayCapNhat = new Date(item.ngayCapNhat);
         item.ngayTao = new Date(item.ngayTao);
@@ -100,7 +106,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$locat
                 }).catch(function (error) {
                     toastr.error("Có lỗi", "Lỗi!");
                     console.error("Lỗi khi cập nhật trạng thái:", error);
-                    });
+                });
             } else {
                 toastr.info("Hành động đã hủy", "Hủy!");
             }
@@ -156,23 +162,11 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams,$locat
 
     // Tạo map để ánh xạ giá trị loai và trangThai sang tiêu đề
     $scope.getTitle = function () {
-        if (loai === "EXCHANGE" && trangThai === "0") {
-            return "đổi hàng chờ xác nhận";
+        if (loai === "DOI_HANG") {
+            return "đổi hàng";
         }
-        if (loai === "EXCHANGE" && trangThai === "1") {
-            return "đổi hàng đã xác nhận";
-        }
-        if (loai === "EXCHANGE" && trangThai === "2") {
-            return "đổi hàng không xác nhận";
-        }
-        if (loai === "REFUND" && trangThai === "0") {
-            return "hoàn hàng chờ xác nhận";
-        }
-        if (loai === "REFUND" && trangThai === "1") {
-            return "hoàn hàng đã xác nhận";
-        }
-        if (loai === "REFUND" && trangThai === "1") {
-            return "hoàn hàng không xác nhận";
+        if (loai === "TRA_HANG") {
+            return "hoàn hàng";
         }
         return "Quản lý yêu cầu đổi hàng";
     };

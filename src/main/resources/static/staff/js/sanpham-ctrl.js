@@ -40,6 +40,10 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
             $scope.filterColorsByIdCha(); // Nếu có logic riêng để lọc theo idCha
         });
 
+        $http.get("/san-pham").then(resp => {
+            $scope.sanpham = resp.data.data; // Lưu danh sách sản phẩm vào biến $scope.sanpham
+        });
+
         // Khởi tạo các biến cần thiết
         $scope.productDetails = []; // Khởi tạo mảng sản phẩm chi tiết
         $scope.form.anh = ""; // Đặt lại ảnh mặc định hoặc rỗng
@@ -75,7 +79,6 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                     idSize: size.id,
                     idMauSac: color.id,
                     soLuong: "",
-                    gia: "",
                     ghiChu: '',
                     size: size,
                     mauSac: color
@@ -192,7 +195,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                                 idSize: detail.size.id,
                                 idMauSac: detail.mauSac.id,
                                 soLuong: detail.soLuong,
-                                gia: detail.gia,
+                                gia: $scope.form.gia,
                                 ghiChu: detail.ghiChu,
                                 trangThai: 1,
                                 ngayTao: new Date().toISOString(),
@@ -328,18 +331,18 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
         if (!form.ten) {
             errorContainer.ten = true;
-            toastr.error("Tên thương hiệu không được để trống.", "Lỗi!");
+            toastr.error("Tên sản phẩm không được để trống.", "Lỗi!");
         } else if (form.ten.length < 2 || form.ten.length > 100) {
             errorContainer.ten = true;
-            toastr.error("Tên thương hiệu phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+            toastr.error("Tên sản phẩm phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
         } else if (
-            $scope.items.some(item =>
+            $scope.sanpham && $scope.sanpham.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
                 (!isUpdate || item.id !== form.id) // Kiểm tra trùng tên với ID khác (trường hợp update)
             )
         ) {
             errorContainer.ten = true;
-            toastr.error("Tên thương hiệu đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
+            toastr.error("Tên sản phẩm đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
         } else {
             errorContainer.ten = false;
         }
@@ -398,12 +401,6 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
         // Kiểm tra giá và số lượng của sản phẩm chi tiết
         for (let detail of $scope.productDetails) {
-            if (detail.gia <= 0 || !detail.gia) {
-                errorContainer.gia = true;
-                toastr.error("Giá của sản phẩm chi tiết phải lớn hơn 0.");
-            } else {
-                errorContainer.gia = false;
-            }
             if (detail.soLuong <= 0 || !detail.soLuong) {
                 errorContainer.soLuong = true;
                 toastr.error("Số lượng của sản phẩm chi tiết phải lớn hơn 0.");

@@ -6,6 +6,7 @@ import org.example.datn.entity.YeuCauDoiTra;
 import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.enums.LoaiYeuCau;
 import org.example.datn.model.request.CancelOrderRequest;
 import org.example.datn.model.request.DanhMucRequest;
 import org.example.datn.model.request.YeuCauDoiTraRequest;
@@ -57,9 +58,15 @@ public class YeuCauDoiTraController {
 
     @GetMapping("/filter")
     public ResponseEntity<ServiceResult> getByLoaiAndTrangThai(
-            @RequestParam String loai,
+            @RequestParam LoaiYeuCau loai,
             @RequestParam Integer trangThai) {
         return ResponseEntity.ok(processor.getByLoaiAndTrangThai(loai, trangThai));
+    }
+
+    @GetMapping("/doitra")
+    public ResponseEntity<ServiceResult> getByLoai(
+            @RequestParam LoaiYeuCau loai) {
+        return ResponseEntity.ok(processor.getByLoai(loai));
     }
     // API cập nhật trạng thái của yêu cầu đổi trả
     @PutMapping("/{id}/update-status")

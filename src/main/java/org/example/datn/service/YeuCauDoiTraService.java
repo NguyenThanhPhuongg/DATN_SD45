@@ -2,6 +2,7 @@ package org.example.datn.service;
 
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.YeuCauDoiTra;
+import org.example.datn.model.enums.LoaiYeuCau;
 import org.example.datn.repository.SanPhamRepository;
 import org.example.datn.repository.YeuCauDoiTraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,10 @@ public class YeuCauDoiTraService {
         repo.deleteById(id);
     }
 
-    public List<YeuCauDoiTra> findByLoaiAndTrangThai(String loai, Integer trangThai) {
+    public List<YeuCauDoiTra> findByLoaiAndTrangThai(LoaiYeuCau loai, Integer trangThai) {
         return repo.findByLoaiAndTrangThai(loai, trangThai);
+    }
+    public List<YeuCauDoiTra> findByLoai(LoaiYeuCau loai) {
+        return repo.findByLoai(loai);
     }
 }

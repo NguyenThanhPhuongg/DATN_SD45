@@ -9,8 +9,17 @@
         </div>
         <div class="card-body">
             <!-- Tìm kiếm -->
-            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3" ng-change="pager.updateItems()" />
-
+            <div class="d-flex align-items-center mb-3">
+                <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"
+                       ng-change="pager.updateItems()"/>
+                <select ng-model="trangThai" class="form-control me-2" ng-change="pager.updateItems()">
+                    <option value="">Tất cả yêu cầu</option>
+                    <option value="0">Chờ xử lý</option>
+                    <option value="1">Đang xử lý</option>
+                    <option value="2">Xác nhận</option>
+                    <option value="3">Không xác nhận</option>
+                </select>
+            </div>
             <!-- Bảng hiển thị -->
             <table class="table table-striped">
                 <thead>
@@ -19,6 +28,7 @@
                     <th>Mã hóa đơn</th>
                     <th>Người yêu cầu</th>
                     <th>Lý do</th>
+                    <th>Trạng thái</th>
                     <th>Chức năng</th>
                 </tr>
                 </thead>
@@ -29,9 +39,18 @@
                     <td>{{item.user.profile.hoVaTen}}</td>
                     <td>{{item.lyDo}}</td>
                     <td>
+                        <div class="badge"
+                             ng-class="{'bg-primary': item.trangThai === 0, 'bg-warning': item.trangThai === 1, 'bg-success': item.trangThai === 2, 'bg-danger': item.trangThai === 3}">
+                            <span ng-if="item.trangThai === 0">Pending</span>
+                            <span ng-if="item.trangThai === 1">In Progress</span>
+                            <span ng-if="item.trangThai === 2">Confirmed</span>
+                            <span ng-if="item.trangThai === 3">Rejected</span>
+                        </div>
+                    </td>
+                    <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button"
-                                    ng-if="item.trangThai === 0"
+                                    ng-if="item.trangThai === 0 || item.trangThai === 1"
                                     ng-click="updateStatus(item.id)">
                                 <i class="fas fa-check icon-check"></i>
                             </button>
@@ -45,7 +64,7 @@
                                 <i class="fas fa-list-alt"></i>
                             </button>
                             <button class="btn btn-link" type="button"
-                                    ng-if="item.trangThai === 0"
+                                    ng-if="item.trangThai === 1"
                                     data-bs-toggle="modal"
                                     data-bs-target="#huyYeuCau"
                                     ng-click="openModal(item.id)">
@@ -102,13 +121,14 @@
                                     <label>Mã hóa đơn</label>
                                     <input type="text" class="form-control" ng-model="form.hoaDon.ma" readonly>
                                     <label>Người yêu cầu</label>
-                                    <input type="text" class="form-control" ng-model="form.user.profile.hoVaTen" readonly>
+                                    <input type="text" class="form-control" ng-model="form.user.profile.hoVaTen"
+                                           readonly>
                                     <label>Ngày yêu cầu</label>
                                     <input type="text" class="form-control" ng-model="form.ngayYeuCau" readonly>
                                     <label>Lý do</label>
                                     <textarea type="text" class="form-control" ng-model="form.lyDo" readonly></textarea>
-                                    <label ng-if="form.trangThai === 1 || form.trangThai === 2">Ghi chú</label>
-                                    <textarea ng-if="form.trangThai === 1 || form.trangThai === 2" type="text" class="form-control" ng-model="form.ghiChu" readonly></textarea>
+                                    <label>Ghi chú</label>
+                                    <textarea type="text" class="form-control" ng-model="form.ghiChu" readonly></textarea>
                                     <label>Ngày yêu cầu</label>
                                     <input type="text" class="form-control" ng-model="form.ngayYeuCau" readonly>
                                 </div>
@@ -124,7 +144,8 @@
             </div>
         </div>
 
-        <div class="modal fade" id="sanPhamDoiTraChiTiet" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="sanPhamDoiTraChiTiet" tabindex="-1" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -176,10 +197,12 @@
                     <div class="modal-body">
                         <div class="container-fluid px-4">
                             <div class="form-floating">
-                                <textarea class="form-control" ng-model="selectedGhiChu" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                                <textarea class="form-control" ng-model="selectedGhiChu"
+                                          placeholder="Leave a comment here" id="floatingTextarea2"
+                                          style="height: 100px"></textarea>
                                 <label for="floatingTextarea2">Ghi chú</label>
                             </div>
-                    </div>
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times"></i> Đóng
@@ -188,9 +211,9 @@
                                 <i class="fas fa-times icon-close"></i> Xác nhận
                             </button>
                         </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
-</div>

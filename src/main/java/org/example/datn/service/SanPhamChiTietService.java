@@ -3,6 +3,7 @@ package org.example.datn.service;
 import lombok.RequiredArgsConstructor;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.entity.YeuCauDoiTraChiTiet;
 import org.example.datn.repository.SanPhamChiTietRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -106,5 +107,8 @@ public class SanPhamChiTietService {
 
     public List<SanPhamChiTiet> findByIdSanPham(Long idSanPham) {
         return repo.findByIdSanPham(idSanPham);
+    }
+    public void saveAll(List<SanPhamChiTiet> sanPhamChiTiets) {
+        repo.saveAll(sanPhamChiTiets);
     }
 }

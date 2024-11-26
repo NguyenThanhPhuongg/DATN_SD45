@@ -250,7 +250,7 @@ app.config(function ($routeProvider) {
         //     templateUrl: "asset/hotro/traloihotro.html",
         //     controller: "traloihotro-ctrl"
         // })
-        .when("/yeucaudoitra/:loai/:trangThai", {
+        .when("/yeucaudoitra/:loai", {
             templateUrl: "asset/hotro/yeucaudoitra.html",
             controller: "yeucaudoitra-ctrl"
         })

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -134,6 +135,8 @@ public class SanPhamProcessor {
         sanPham.setNguoiCapNhat(ua.getPrincipal());
         sanPham.setNgayCapNhat(LocalDateTime.now());
         service.save(sanPham);
+        updateGiaSPCT(sanPham.getId(), sanPham.getGia());
+
         return new ServiceResult("Sản phẩm đã được thêm thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
@@ -166,6 +169,7 @@ public class SanPhamProcessor {
         sanPham.setNguoiCapNhat(ua.getPrincipal());
         sanPham.setNgayCapNhat(LocalDateTime.now());
         service.update(sanPham);
+        updateGiaSPCT(sanPham.getId(), sanPham.getGia());
 
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
@@ -190,6 +194,8 @@ public class SanPhamProcessor {
 
         // Không thay đổi ảnh nếu không có ảnh mới
         service.update(sanPham);
+        updateGiaSPCT(sanPham.getId(), sanPham.getGia());
+
         return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
@@ -216,4 +222,9 @@ public class SanPhamProcessor {
         return new ServiceResult("Trạng thái sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    private void updateGiaSPCT(Long idSanPham, BigDecimal gia) {
+        var sanPhamChiTiet = sanPhamChiTietService.findByIdSanPham(idSanPham);
+        sanPhamChiTiet.forEach(e -> e.setGia(gia));
+        sanPhamChiTietService.saveAll(sanPhamChiTiet);
+    }
 }

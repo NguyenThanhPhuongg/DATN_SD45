@@ -4,6 +4,7 @@ import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.*;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.enums.LoaiYeuCau;
 import org.example.datn.model.enums.StatusHoaDon;
 import org.example.datn.model.enums.StatusYeuCauDoiTra;
 import org.example.datn.model.enums.TrangThaiDoiTra;
@@ -97,7 +98,7 @@ public class YeuCauDoiTraProcessor {
         return new ServiceResult("Sản phẩm đã được xóa thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult getByLoaiAndTrangThai(String loai, Integer trangThai) {
+    public ServiceResult getByLoaiAndTrangThai(LoaiYeuCau loai, Integer trangThai) {
         List<YeuCauDoiTraModel> models = service.findByLoaiAndTrangThai(loai, trangThai).stream().map(sp -> {
             YeuCauDoiTraModel model = new YeuCauDoiTraModel();
             BeanUtils.copyProperties(sp, model);
@@ -109,6 +110,17 @@ public class YeuCauDoiTraProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    public ServiceResult getByLoai(LoaiYeuCau loai) {
+        List<YeuCauDoiTraModel> models = service.findByLoai(loai).stream().map(sp -> {
+            YeuCauDoiTraModel model = new YeuCauDoiTraModel();
+            BeanUtils.copyProperties(sp, model);
+            model.setHoaDon(hoaDonService.findById(sp.getIdHoaDon()).orElse(null));
+            model.setUser(userProcessor.findById(sp.getIdNguoiDung()));
+            return model;
+        }).collect(Collectors.toList());
+
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
     private void updateYeuCauDoiTraChiTiet(Long idDoiTra, Integer trangThai) {
         var yeuCauDoiTraChiTiet = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(idDoiTra);
         yeuCauDoiTraChiTiet.forEach(e -> e.setTrangThai(trangThai));
@@ -151,6 +163,10 @@ public class YeuCauDoiTraProcessor {
             case 0:
                 newTrangThai = StatusYeuCauDoiTra.DANG_XU_LY.getValue();
                 break;
+            case 1:
+                newTrangThai = StatusYeuCauDoiTra.HOAN_THANH.getValue();
+                saveSanPhamDoiTraFromChiTiet(yeuCauDoiTra, ua); // Lưu thông tin vào bảng SanPhamDoiTra
+                break;
             default:
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
         }
@@ -160,14 +176,10 @@ public class YeuCauDoiTraProcessor {
         yeuCauDoiTra.setNgayCapNhat(LocalDateTime.now());
         yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal());
         yeuCauDoiTra.setNgayHoanTat(LocalDateTime.now());
-
         // Cập nhật trạng thái các chi tiết hóa đơn và lưu thông tin vào bảng SanPhamDoiTra
         updateYeuCauDoiTraChiTiet(id, newTrangThai); // Cập nhật trạng thái chi tiết
-        saveSanPhamDoiTraFromChiTiet(yeuCauDoiTra, ua); // Lưu thông tin vào bảng SanPhamDoiTra
-
         // Lưu hóa đơn
         service.save(yeuCauDoiTra);
-
         // Trả về kết quả thành công
         return new ServiceResult("Hóa đơn đã được cập nhật trạng thái thành công",
                 SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
@@ -181,7 +193,8 @@ public class YeuCauDoiTraProcessor {
                 .orElseThrow(() -> new EntityNotFoundException("Yêu cầu không tồn tại"));
 
         // Kiểm tra trạng thái
-        if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XU_LY.getValue()) {
+        if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XU_LY.getValue() &&
+                yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.DANG_XU_LY.getValue()) {
             throw new IllegalArgumentException("Yêu cầu không thể hủy vì trạng thái không hợp lệ.");
         }
         Integer newTrangThai = StatusYeuCauDoiTra.TU_CHOI.getValue();
