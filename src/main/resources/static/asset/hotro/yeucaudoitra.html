@@ -128,9 +128,17 @@
                                     <label>Lý do</label>
                                     <textarea type="text" class="form-control" ng-model="form.lyDo" readonly></textarea>
                                     <label>Ghi chú</label>
-                                    <textarea type="text" class="form-control" ng-model="form.ghiChu" readonly></textarea>
+                                    <textarea type="text" class="form-control" ng-model="form.ghiChu"
+                                              readonly></textarea>
                                     <label>Ngày yêu cầu</label>
                                     <input type="text" class="form-control" ng-model="form.ngayYeuCau" readonly>
+
+                                    <label>Video/Hình ảnh</label>
+                                    <div class="row">
+                                        <div class="col-md-3" ng-repeat="image in hinhanh">
+                                            <img ng-src="/{{image.anh}}" class="img-thumbnail" alt="Hình ảnh" ng-click="openImage(image.anh)" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -216,4 +224,23 @@
             </div>
 
         </div>
+
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imageModalLabel">Xem Hình Ảnh</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center justify-content-center align-content-center" >
+                        <img style="width: 400px; height: auto" ng-src="{{selectedImageUrl}}" class="img-fluid" alt="Hình ảnh chi tiết" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+</div>

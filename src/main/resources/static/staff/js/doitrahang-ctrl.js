@@ -5,6 +5,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
 
     // Khởi tạo dữ liệu
     $scope.items = [];
+    $scope.hinhanh = [];
     $scope.searchText = "";
 
     $scope.pager = {
@@ -59,6 +60,12 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
         item.ngayCapNhat = new Date(item.ngayCapNhat);
         item.ngayTao = new Date(item.ngayTao);
         $scope.form = angular.copy(item);
+        $http.get("/hinh-anh").then(resp => {
+            // Lọc hình ảnh theo id yêu cầu đổi hàng
+            $scope.hinhanh = resp.data.filter(image => image.idYeuCauDoiTra === item.id);
+        }).catch(error => {
+            console.error("Lỗi khi tải hình ảnh:", error);
+        });
     };
 
     // Gọi hàm khi controller được khởi tạo
@@ -170,6 +177,16 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
         }
         return "Quản lý yêu cầu đổi hàng";
     };
+
+    $scope.openImage = function (imageUrl) {
+        // Lưu URL của ảnh vào biến để hiển thị trong modal
+        $scope.selectedImageUrl = imageUrl;
+
+        // Mở modal để hiển thị ảnh phóng to
+        var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        imageModal.show();
+    };
+
 
     toastr.options = {
         "closeButton": true,
