@@ -41,11 +41,16 @@ public class HoaDonService {
     public Optional<HoaDon> findByMa(String ma) {
         return repo.findByMa(ma);
     }
+
     public List<HoaDon> finByTrangThai(Integer trangThai) {
         return repo.findByTrangThai(trangThai);
     }
 
     public List<HoaDon> findByIdNguoiDungAndTrangThai(Long idNguoiDung, Integer trangThai) {
         return repo.findByIdNguoiDungAndTrangThai(idNguoiDung, trangThai);
+    }
+
+    public List<HoaDon> getHoaDonsByIdNguoiDungAndTrangThaiDoiTraNotNull(Long idNguoiDung) {
+        return repo.findAllByIdNguoiDungAndTrangThaiDoiTraIsNotNull(idNguoiDung);
     }
 }

@@ -50,4 +50,7 @@ public class HoaDon extends CommonEntity{
 
     @Column(name = "ly_do_huy")
     private String lyDoHuy;
+
+    @Column(name = "trang_thai_doi_tra")
+    private Integer trangThaiDoiTra;
 }

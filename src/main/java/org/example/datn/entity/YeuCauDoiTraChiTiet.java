@@ -24,12 +24,12 @@ public class YeuCauDoiTraChiTiet extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "id_yeu_cau_doi_tra")
+    private Long idYeuCauDoiTra;
+
     @Column(name = "id_san_pham_chi_tiet")
     private Long idSPCT;
 
-    @Column(name = "id_yeu_cau_doi_tra")
-    private Long idYeuCauDoiTra;
-    
     @Column(name = "so_luong")
     private Integer soLuong;
 

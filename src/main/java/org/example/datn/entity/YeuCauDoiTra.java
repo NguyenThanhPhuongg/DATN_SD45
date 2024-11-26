@@ -3,6 +3,7 @@ package org.example.datn.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.model.enums.LoaiYeuCau;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -30,12 +31,13 @@ public class YeuCauDoiTra extends CommonEntity {
     @Column(name = "id_nguoi_dung")
     private Long idNguoiDung;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "loai_yeu_cau", length = 100)
-    private String loai;
+    private LoaiYeuCau loai;
 
     @Column(name = "ly_do", length = 500)
     private String lyDo;
-    
+
     @Column(name = "ghi_chu", length = 500)
     private String ghiChu;
 

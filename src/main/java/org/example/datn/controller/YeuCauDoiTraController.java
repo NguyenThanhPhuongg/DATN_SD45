@@ -8,6 +8,7 @@ import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.CancelOrderRequest;
 import org.example.datn.model.request.DanhMucRequest;
+import org.example.datn.model.request.YeuCauDoiTraRequest;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.model.response.YeuCauDoiTraModel;
 import org.example.datn.processor.SanPhamProcessor;
@@ -69,5 +70,10 @@ public class YeuCauDoiTraController {
     @PostMapping("/cancel/{id}")
     public ResponseEntity<ServiceResult> cancelOrder(@PathVariable Long id, @RequestBody CancelOrderRequest request, UserAuthentication ua) throws IOException, InterruptedException {
         return ResponseEntity.ok(processor.cancelOrder(id, request, ua));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ServiceResult> create(@RequestBody YeuCauDoiTraRequest request, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.create(request, ua));
     }
 }

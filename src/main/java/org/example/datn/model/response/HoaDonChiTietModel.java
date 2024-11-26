@@ -19,6 +19,7 @@ public class HoaDonChiTietModel {
     private Integer soLuong;
     private BigDecimal gia;
     private Integer trangThai;
+    private Integer trangThaiDoiTra;
 
     private HoaDonModel hoaDonModel;
     private SanPhamChiTietModel sanPhamChiTietModel;

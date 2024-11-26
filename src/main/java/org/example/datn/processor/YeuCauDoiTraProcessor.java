@@ -6,15 +6,19 @@ import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.StatusHoaDon;
 import org.example.datn.model.enums.StatusYeuCauDoiTra;
+import org.example.datn.model.enums.TrangThaiDoiTra;
 import org.example.datn.model.request.CancelOrderRequest;
 import org.example.datn.model.request.ThuongHieuRequest;
+import org.example.datn.model.request.YeuCauDoiTraRequest;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.model.response.YeuCauDoiTraModel;
 import org.example.datn.repository.SanPhamRepository;
 import org.example.datn.service.*;
+import org.example.datn.transformer.YeuCauDoiTraTransformer;
 import org.example.datn.utils.VNPayUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -48,6 +52,11 @@ public class YeuCauDoiTraProcessor {
     private UserService userService;
     @Autowired
     private UserProcessor userProcessor;
+    @Autowired
+    private YeuCauDoiTraTransformer yeuCauDoiTraTransformer;
+    @Autowired
+    private HoaDonChiTietService hoaDonChiTietService;
+
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
         var hoadon = hoaDonService.findById(sp.getIdHoaDon()).orElse(null);
@@ -76,7 +85,7 @@ public class YeuCauDoiTraProcessor {
         return new ServiceResult(yeuCauDoiTra, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
-    public ServiceResult update(Long id, YeuCauDoiTra request){
+    public ServiceResult update(Long id, YeuCauDoiTra request) {
         var p = service.findById(id).orElseThrow(() -> new EntityNotFoundException("yeuCau.not.found"));
         BeanUtils.copyProperties(request, p);
         service.save(p);
@@ -117,7 +126,7 @@ public class YeuCauDoiTraProcessor {
             sanPhamDoiTra.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
             sanPhamDoiTra.setIdSPCT(chiTiet.getIdSPCT());
             sanPhamDoiTra.setSoLuong(chiTiet.getSoLuong());
-            sanPhamDoiTra.setLoai(yeuCauDoiTra.getLoai());
+            sanPhamDoiTra.setLoai(String.valueOf(yeuCauDoiTra.getLoai()));
 
             sanPhamDoiTra.setNguoiCapNhat(ua.getPrincipal());
             sanPhamDoiTra.setNgayTao(LocalDateTime.now());
@@ -140,7 +149,7 @@ public class YeuCauDoiTraProcessor {
         Integer newTrangThai;
         switch (yeuCauDoiTra.getTrangThai()) {
             case 0:
-                newTrangThai = StatusYeuCauDoiTra.XAC_NHAN.getValue();
+                newTrangThai = StatusYeuCauDoiTra.DANG_XU_LY.getValue();
                 break;
             default:
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
@@ -154,7 +163,7 @@ public class YeuCauDoiTraProcessor {
 
         // Cập nhật trạng thái các chi tiết hóa đơn và lưu thông tin vào bảng SanPhamDoiTra
         updateYeuCauDoiTraChiTiet(id, newTrangThai); // Cập nhật trạng thái chi tiết
-        saveSanPhamDoiTraFromChiTiet(yeuCauDoiTra,ua); // Lưu thông tin vào bảng SanPhamDoiTra
+        saveSanPhamDoiTraFromChiTiet(yeuCauDoiTra, ua); // Lưu thông tin vào bảng SanPhamDoiTra
 
         // Lưu hóa đơn
         service.save(yeuCauDoiTra);
@@ -172,10 +181,10 @@ public class YeuCauDoiTraProcessor {
                 .orElseThrow(() -> new EntityNotFoundException("Yêu cầu không tồn tại"));
 
         // Kiểm tra trạng thái
-        if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XAC_NHAN.getValue()) {
+        if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XU_LY.getValue()) {
             throw new IllegalArgumentException("Yêu cầu không thể hủy vì trạng thái không hợp lệ.");
         }
-        Integer newTrangThai = StatusYeuCauDoiTra.KHONG_XAC_NHAN.getValue();
+        Integer newTrangThai = StatusYeuCauDoiTra.TU_CHOI.getValue();
         // Cập nhật thông tin yêu cầu đổi trả
         yeuCauDoiTra.setTrangThai(newTrangThai); // Đổi trạng thái
         yeuCauDoiTra.setGhiChu(request.getOrderInfo()); // Ghi chú từ request
@@ -190,7 +199,6 @@ public class YeuCauDoiTraProcessor {
         // Trả về kết quả thành công
         return new ServiceResult("Yêu cầu đã được cập nhật thành công.");
     }
-
 
 
 //    public ServiceResult updateTrangThai(Long id, Integer trangThai) {
@@ -209,4 +217,41 @@ public class YeuCauDoiTraProcessor {
 //        return new ServiceResult("Cập nhật trạng thái yêu cầu đổi trả thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
 //    }
 
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult create(YeuCauDoiTraRequest request, UserAuthentication ua) {
+        var yeuCauDoiTra = yeuCauDoiTraTransformer.toEntity(request);
+        yeuCauDoiTra.setIdNguoiDung(ua.getPrincipal());
+        yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.CHO_XU_LY.getValue());
+        yeuCauDoiTra.setNgayYeuCau(LocalDateTime.now());
+        yeuCauDoiTra.setNgayTao(LocalDateTime.now());
+        yeuCauDoiTra.setNgayCapNhat(LocalDateTime.now());
+        yeuCauDoiTra.setNguoiTao(ua.getPrincipal());
+        yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal());
+        service.save(yeuCauDoiTra);
+
+        for (Long idSPCT : request.getIdSanPhamChiTiets()) {
+            YeuCauDoiTraChiTiet yeuCauChiTiet = new YeuCauDoiTraChiTiet();
+            yeuCauChiTiet.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
+            yeuCauChiTiet.setIdSPCT(idSPCT);
+            yeuCauChiTiet.setSoLuong(1);
+            yeuCauChiTiet.setTrangThai(StatusYeuCauDoiTra.CHO_XU_LY.getValue());
+            yeuCauChiTiet.setNgayTao(LocalDateTime.now());
+            yeuCauChiTiet.setNgayCapNhat(LocalDateTime.now());
+            yeuCauChiTiet.setNguoiTao(ua.getPrincipal());
+            yeuCauChiTiet.setNguoiCapNhat(ua.getPrincipal());
+            yeuCauDoiTraChiTietService.save(yeuCauChiTiet);
+        }
+        var hoaDon = hoaDonService.findById(request.getIdHoaDon()).orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+        hoaDon.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue());
+        hoaDonService.save(hoaDon);
+        hoaDonChiTietService.saveAll(
+                hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(request.getIdHoaDon(), request.getIdSanPhamChiTiets())
+                        .stream()
+                        .peek(e -> e.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue()))
+                        .collect(Collectors.toList())
+        );
+
+        return new ServiceResult();
+
+    }
 }

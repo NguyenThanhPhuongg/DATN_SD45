@@ -34,4 +34,7 @@ public class HoaDonChiTiet extends CommonEntity{
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+
+    @Column(name = "trang_thai_doi_tra")
+    private Integer trangThaiDoiTra;
 }

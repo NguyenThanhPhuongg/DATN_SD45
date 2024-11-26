@@ -14,31 +14,37 @@ import java.util.Optional;
 public class HoaDonChiTietService {
     @Autowired
     HoaDonChiTietRepository repo;
+
     public List<HoaDonChiTiet> findAll() {
         return repo.findAll();
     }
 
-    public void save(HoaDonChiTiet hoaDonChiTiet){
+    public void save(HoaDonChiTiet hoaDonChiTiet) {
         repo.save(hoaDonChiTiet);
     }
 
-    public Optional<HoaDonChiTiet> findById(Long id){
+    public Optional<HoaDonChiTiet> findById(Long id) {
         return repo.findById(id);
     }
 
-    public void delete(HoaDonChiTiet hoaDonChiTiet){
+    public void delete(HoaDonChiTiet hoaDonChiTiet) {
         repo.delete(hoaDonChiTiet);
     }
 
-    public List<HoaDonChiTiet> findByIdHoaDonInAndTrangThai(List<Long> idHoaDons, Integer trangThai){
+    public List<HoaDonChiTiet> findByIdHoaDonInAndTrangThai(List<Long> idHoaDons, Integer trangThai) {
         return repo.findByIdHoaDonInAndTrangThai(idHoaDons, trangThai);
     }
 
-    public List<HoaDonChiTiet> findByIdHoaDon(Long idHoaDon){
+    public List<HoaDonChiTiet> findByIdHoaDon(Long idHoaDon) {
         return repo.findByIdHoaDon(idHoaDon);
     }
 
     public void saveAll(List<HoaDonChiTiet> hoaDonChiTietList) {
         repo.saveAll(hoaDonChiTietList);
     }
+
+    public List<HoaDonChiTiet> getHoaDonChiTietByHoaDonAndSanPhamChiTiet(Long idHoaDon, List<Long> idSanPhamChiTiets) {
+        return repo.findByIdHoaDonAndIdSanPhamChiTietIn(idHoaDon, idSanPhamChiTiets);
+    }
+
 }

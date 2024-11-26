@@ -99,5 +99,10 @@ public class HoaDonController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/get-doi-tra")
+    public ResponseEntity<ServiceResult> getDoiTra(UserAuthentication ua) {
+        return ResponseEntity.ok(processor.getHoaDonDoiTra(ua));
+    }
+
 
 }

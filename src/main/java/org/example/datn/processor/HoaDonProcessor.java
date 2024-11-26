@@ -424,6 +424,35 @@ public class HoaDonProcessor {
 
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
+    public ServiceResult getHoaDonDoiTra(UserAuthentication ua) {
+        List<HoaDon> hoaDons = service.getHoaDonsByIdNguoiDungAndTrangThaiDoiTraNotNull(ua.getPrincipal());
 
+        List<HoaDonModel> models = hoaDons.stream().map(hoaDon -> {
+            HoaDonModel model = hoaDonTransformer.toModel(hoaDon);
+
+            List<HoaDonChiTietModel> hoaDonChiTietModels = hoaDonChiTietService.findByIdHoaDon(hoaDon.getId()).stream()
+                    .map(hoaDonChiTiet -> {
+                        HoaDonChiTietModel hoaDonChiTietModel = hoaDonChiTietTransformer.toModel(hoaDonChiTiet);
+
+                        sanPhamChiTietService.findById(hoaDonChiTiet.getIdSanPhamChiTiet()).ifPresent(spct -> {
+                            SanPhamChiTietModel spctModel = sanPhamChiTietTransformer.toModel(spct);
+                            sanPhamService.findById(spct.getIdSanPham()).ifPresent(sanPham ->
+                                    spctModel.setSanPhamModel(sanPhamTransformer.toModel(sanPham))
+                            );
+                            sizeService.findById(spct.getIdSize()).ifPresent(spctModel::setSize);
+                            mauSacService.findById(spct.getIdMauSac()).ifPresent(spctModel::setMauSac);
+                            hoaDonChiTietModel.setSanPhamChiTietModel(spctModel);
+                        });
+
+                        return hoaDonChiTietModel;
+                    })
+                    .collect(Collectors.toList());
+
+            model.setHoaDonChiTietModels(hoaDonChiTietModels);
+            return model;
+        }).collect(Collectors.toList());
+
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
 
 }
