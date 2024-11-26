@@ -1285,6 +1285,86 @@
                 flex: 1 1 100%; /* Đảm bảo các ô sản phẩm chiếm toàn bộ chiều rộng trên màn hình nhỏ */
             }
         }
+        /* Khu vực chứa preview tệp */
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Mỗi phần tử preview */
+        .preview-item {
+            position: relative;  /* Cần thiết để định vị dấu "X" trong phần tử */
+            width: 150px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Hiệu ứng hover khi rê chuột vào phần tử */
+        .preview-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hình ảnh trong preview */
+        .preview-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;  /* Đảm bảo hình ảnh không bị méo và lấp đầy khu vực */
+        }
+
+        /* Tên tệp */
+        .preview-item p {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+            word-wrap: break-word;  /* Đảm bảo tên tệp không bị tràn ra ngoài */
+        }
+
+        /* Video */
+        .preview-item video {
+            width: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Thêm border cho video khi hover */
+        .preview-item video:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Nút xóa dấu X */
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);  /* Màu nền đỏ */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;  /* Đảm bảo dấu X luôn nằm trên ảnh */
+        }
+
+        /* Hiệu ứng hover khi rê chuột vào dấu X */
+        .close-btn:hover {
+            background-color: red;
+        }
+
+
 
 
     </style>
@@ -1551,6 +1631,15 @@
             <!-- Ghi chú thêm -->
             <label for="note">Ghi chú:</label>
             <textarea id="note" name="note" rows="4"></textarea>
+            <br/>
+
+            <!-- Thêm trường chọn tệp -->
+            <label for="files">Chọn tệp (Hình ảnh hoặc Video):</label>
+            <input type="file" id="files" name="files[]" accept="image/*,video/*" multiple>
+            <div id="file-preview" class="file-preview">
+                <!-- Preview sẽ hiển thị ở đây -->
+            </div>
+            <br/>
             <br/>
 
             <!-- Danh sách sản phẩm chi tiết để chọn -->
@@ -2854,12 +2943,88 @@
         }
     };
 
+    // Mảng chứa các tệp đã chọn
+    let selectedFiles = [];
+
+    // Lắng nghe sự kiện thay đổi tệp
+    document.getElementById('files').addEventListener('change', function(event) {
+        const files = event.target.files;
+        const previewContainer = document.getElementById('file-preview');
+        previewContainer.innerHTML = ''; // Xóa nội dung cũ trước khi thêm preview mới
+
+        // Thêm các tệp mới vào mảng
+        selectedFiles = Array.from(files);
+
+        // Duyệt qua các tệp đã chọn và tạo preview
+        selectedFiles.forEach((file, index) => {
+            const fileType = file.type.split('/')[0]; // Lấy loại tệp (image, video)
+
+            const previewItem = document.createElement('div');
+            previewItem.classList.add('preview-item');
+
+            // Tạo phần tử đóng dấu X
+            const closeBtn = document.createElement('span');
+            closeBtn.textContent = 'X';  // Dấu X
+            closeBtn.classList.add('close-btn');
+
+            // Xử lý sự kiện click để xóa ảnh/video khỏi preview và khỏi mảng selectedFiles
+            closeBtn.addEventListener('click', function() {
+                // Xóa tệp khỏi mảng
+                selectedFiles.splice(index, 1);
+
+                // Cập nhật lại input files
+                updateInputFiles();
+
+                // Xóa phần tử preview
+                previewContainer.removeChild(previewItem);
+            });
+
+            // Thêm nút "X" vào previewItem
+            previewItem.appendChild(closeBtn);
+
+            if (fileType === 'image') {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);  // Tạo URL tạm thời cho hình ảnh
+                img.alt = file.name;
+                previewItem.appendChild(img);
+            } else if (fileType === 'video') {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);  // Tạo URL tạm thời cho video
+                video.controls = true;  // Cho phép điều khiển video (play, pause)
+                previewItem.appendChild(video);
+            }
+
+            // Thêm tên tệp vào preview
+            const fileName = document.createElement('p');
+            fileName.textContent = file.name;
+            previewItem.appendChild(fileName);
+
+            // Thêm phần tử preview vào container
+            previewContainer.appendChild(previewItem);
+        });
+    });
+
+    // Hàm cập nhật lại input files từ mảng selectedFiles
+    function updateInputFiles() {
+        // Tạo đối tượng FileList mới từ mảng selectedFiles
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+
+        // Cập nhật lại thuộc tính input files
+        document.getElementById('files').files = dataTransfer.files;
+    }
+
+
+
     function submitReturnRequest() {
         // Lấy thông tin từ modal
         const selectedProducts = idSanPhamChiTiets;  // Mảng các ID sản phẩm được chọn
         const loai = document.getElementById('type').value;  // Lấy loại yêu cầu (Đổi hàng / Trả hàng)
         const reason = document.getElementById('reason').value;  // Lý do yêu cầu
         const note = document.getElementById('note').value;  // Ghi chú thêm
+        const files = document.getElementById('files').files;  // Lấy các tệp đã chọn
 
         // Kiểm tra các trường không được trống
         if (selectedProducts.length === 0) {
@@ -2895,6 +3060,15 @@
             return;
         }
 
+        // Tạo đối tượng FormData để gửi file cùng với các dữ liệu khác
+        const formData = new FormData();
+        formData.append('request', JSON.stringify(requestData));  // Thêm requestData vào FormData
+
+        // Thêm các file vào FormData
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);  // Thêm từng tệp vào FormData
+        }
+
         // Hiển thị hộp thoại xác nhận trước khi gửi yêu cầu
         Swal.fire({
             title: 'Bạn có chắc chắn?',
@@ -2911,10 +3085,9 @@
                 fetch('/yeu-cau/create', {  // Gọi tới endpoint /create
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`  // Thêm token vào header
                     },
-                    body: JSON.stringify(requestData)  // Chuyển đối tượng thành JSON
+                    body: formData  // Gửi FormData (bao gồm cả file và các dữ liệu khác)
                 })
                     .then(response => response.json())  // Chờ phản hồi từ server
                     .then(data => {
@@ -2939,7 +3112,6 @@
             }
         });
     }
-
 
 
 </script>

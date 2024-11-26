@@ -50,6 +50,7 @@ public class YeuCauDoiTraController {
         ServiceResult result = processor.update(id, request);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ServiceResult> delete(@PathVariable Long id) {
         return ResponseEntity.ok(processor.delete(id));
@@ -61,6 +62,7 @@ public class YeuCauDoiTraController {
             @RequestParam Integer trangThai) {
         return ResponseEntity.ok(processor.getByLoaiAndTrangThai(loai, trangThai));
     }
+
     // API cập nhật trạng thái của yêu cầu đổi trả
     @PutMapping("/{id}/update-status")
     public ServiceResult updateStatus(@PathVariable("id") Long id, @RequestBody UserAuthentication ua) {
@@ -73,7 +75,8 @@ public class YeuCauDoiTraController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ServiceResult> create(@RequestBody YeuCauDoiTraRequest request, UserAuthentication ua) {
-        return ResponseEntity.ok(processor.create(request, ua));
+    public ResponseEntity<ServiceResult> create(@RequestParam("request") String request,
+                                                @RequestParam("files") MultipartFile[] files, UserAuthentication ua) {
+        return ResponseEntity.ok(processor.create(request, files, ua));
     }
 }

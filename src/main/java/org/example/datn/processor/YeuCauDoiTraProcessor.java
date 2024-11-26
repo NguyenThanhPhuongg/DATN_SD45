@@ -1,5 +1,9 @@
 package org.example.datn.processor;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSerializer;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.*;
 import org.example.datn.model.ServiceResult;
@@ -8,6 +12,7 @@ import org.example.datn.model.enums.StatusHoaDon;
 import org.example.datn.model.enums.StatusYeuCauDoiTra;
 import org.example.datn.model.enums.TrangThaiDoiTra;
 import org.example.datn.model.request.CancelOrderRequest;
+import org.example.datn.model.request.ProfileRequest;
 import org.example.datn.model.request.ThuongHieuRequest;
 import org.example.datn.model.request.YeuCauDoiTraRequest;
 import org.example.datn.model.response.SanPhamModel;
@@ -28,7 +33,12 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,6 +66,10 @@ public class YeuCauDoiTraProcessor {
     private YeuCauDoiTraTransformer yeuCauDoiTraTransformer;
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
+    @Autowired
+    private HinhAnhService hinhAnhService;
+    @Autowired
+    private HinhAnhServices hinhAnhServices;
 
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
@@ -218,8 +232,17 @@ public class YeuCauDoiTraProcessor {
 //    }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult create(YeuCauDoiTraRequest request, UserAuthentication ua) {
-        var yeuCauDoiTra = yeuCauDoiTraTransformer.toEntity(request);
+    public ServiceResult create(String request, MultipartFile[] files, UserAuthentication ua) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+
+        JsonSerializer<LocalDate> serializer = (src, typeOfSrc, context) ->
+                context.serialize(src.format(formatter));
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, serializer)
+                .create();
+        YeuCauDoiTraRequest target = gson.fromJson(removeQuotesAndUnescape(request), YeuCauDoiTraRequest.class);
+        var yeuCauDoiTra = yeuCauDoiTraTransformer.toEntity(target);
         yeuCauDoiTra.setIdNguoiDung(ua.getPrincipal());
         yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.CHO_XU_LY.getValue());
         yeuCauDoiTra.setNgayYeuCau(LocalDateTime.now());
@@ -229,7 +252,21 @@ public class YeuCauDoiTraProcessor {
         yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal());
         service.save(yeuCauDoiTra);
 
-        for (Long idSPCT : request.getIdSanPhamChiTiets()) {
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                String fileName = saveImage(file);
+                HinhAnh hinhAnh = new HinhAnh();
+                hinhAnh.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
+                hinhAnh.setAnh(fileName);
+                hinhAnh.setNgayTao(LocalDateTime.now());
+                hinhAnh.setNgayCapNhat(LocalDateTime.now());
+                hinhAnh.setNguoiTao(ua.getPrincipal());
+                hinhAnh.setNguoiCapNhat(ua.getPrincipal());
+                hinhAnhServices.save(hinhAnh);
+            }
+        }
+
+        for (Long idSPCT : target.getIdSanPhamChiTiets()) {
             YeuCauDoiTraChiTiet yeuCauChiTiet = new YeuCauDoiTraChiTiet();
             yeuCauChiTiet.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
             yeuCauChiTiet.setIdSPCT(idSPCT);
@@ -241,11 +278,11 @@ public class YeuCauDoiTraProcessor {
             yeuCauChiTiet.setNguoiCapNhat(ua.getPrincipal());
             yeuCauDoiTraChiTietService.save(yeuCauChiTiet);
         }
-        var hoaDon = hoaDonService.findById(request.getIdHoaDon()).orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+        var hoaDon = hoaDonService.findById(target.getIdHoaDon()).orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
         hoaDon.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue());
         hoaDonService.save(hoaDon);
         hoaDonChiTietService.saveAll(
-                hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(request.getIdHoaDon(), request.getIdSanPhamChiTiets())
+                hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(target.getIdHoaDon(), target.getIdSanPhamChiTiets())
                         .stream()
                         .peek(e -> e.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue()))
                         .collect(Collectors.toList())
@@ -253,5 +290,35 @@ public class YeuCauDoiTraProcessor {
 
         return new ServiceResult();
 
+    }
+
+    private static final String UPLOAD_DIR = "images";
+
+    private String saveImage(MultipartFile image) {
+        String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        String imagePath = UPLOAD_DIR + File.separator + fileName;
+
+        try {
+            // Kiểm tra và tạo thư mục UPLOAD_DIR nếu nó chưa tồn tại
+            File uploadDir = new File(UPLOAD_DIR);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            // Lưu hình ảnh
+            byte[] bytes = image.getBytes();
+            Path path = Paths.get(imagePath);
+            Files.write(path, bytes);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Không thể lưu hình ảnh!");
+        }
+
+        return imagePath;
+    }
+
+    public String removeQuotesAndUnescape(String uncleanJson) {
+        String noQuotes = uncleanJson.replaceAll("^\"|\"$", "");
+        return StringEscapeUtils.unescapeJava(noQuotes);
     }
 }

@@ -16,4 +16,8 @@ public class HinhAnhServices {
         return hinhAnhRepository.findByIdSanPham(productId);
     }
 
+    public void save(HinhAnh hinhAnh) {
+        hinhAnhRepository.save(hinhAnh);
+    }
+
 }

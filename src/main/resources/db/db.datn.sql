@@ -728,6 +728,7 @@ CREATE TABLE [hinh_anh]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [id_san_pham] BIGINT,
+    [id_yeu_cau_doi_tra] BIGINT,
     [anh] NVARCHAR(255),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
