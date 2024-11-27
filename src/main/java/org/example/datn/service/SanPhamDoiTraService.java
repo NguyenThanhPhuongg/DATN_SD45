@@ -2,6 +2,7 @@ package org.example.datn.service;
 
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.DanhMuc;
+import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamDoiTra;
 import org.example.datn.repository.DanhMucRepository;
 import org.example.datn.repository.SanPhamDoiTraRepository;
@@ -13,28 +14,19 @@ import java.util.Optional;
 
 @Service
 public class SanPhamDoiTraService {
-//    @Autowired
-//    private DanhMucRepository repo;
-//
-//    public List<DanhMuc> getAll() {
-//        return repo.findAll();
-//    }
-//
-//    public void save(DanhMuc danhMuc) {
-//        repo.save(danhMuc);
-//    }
-//
-//    public Optional<DanhMuc> findById(Long id) {
-//        return repo.findById(id);
-//    }
-//
-//    public void delete(DanhMuc danhMuc) {
-//        repo.delete(danhMuc);
-//    }
-//
-//    public List<DanhMuc> getActive() {
-//        return repo.findByTrangThai(SystemConstant.ACTIVE);
-//    }
+    @Autowired
+    private SanPhamDoiTraRepository repo;
+    public List<SanPhamDoiTra> findAll() {
+        return repo.findAll();
+    }
+    public Optional<SanPhamDoiTra> findById(Long id) {
+        return repo.findById(id);
+    }
+
+    public void delete(SanPhamDoiTra danhMuc) {
+        repo.delete(danhMuc);
+    }
+
     @Autowired
     private SanPhamDoiTraRepository sanPhamDoiTraRepository;
 

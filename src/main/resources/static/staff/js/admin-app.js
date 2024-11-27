@@ -209,7 +209,10 @@ app.config(function ($routeProvider) {
             templateUrl: "asset/sanpham/hinhanhsp.html",
             controller: "hinhanh-ctrl"
         })
-
+        .when("/sanphamdoitra", {
+            templateUrl: "asset/sanpham/sanphamdoitra.html",
+            controller: "sanphamdoitra-ctrl"
+        })
 
         /// Bán tại quầy
         .when("/bhtq", {
