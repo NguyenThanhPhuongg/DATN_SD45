@@ -27,6 +27,7 @@ public class HoaDonModel extends CommonModel {
     private Long idPhuongThucVanChuyen;
     private String ma;
     private LocalDateTime ngayDatHang;
+    private LocalDateTime ngayGiaoHang;
     private LocalDateTime ngayThanhToan;
     private BigDecimal tongTien;
     private Integer diemSuDung;

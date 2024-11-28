@@ -232,6 +232,7 @@ public class HoaDonProcessor {
             case 3:
                 newTrangThai = StatusHoaDon.HOAN_THANH.getValue();
                 hoaDon.setNgayThanhToan(LocalDateTime.now());
+                hoaDon.setNgayGiaoHang(LocalDateTime.now());
                 break;
             default:
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");

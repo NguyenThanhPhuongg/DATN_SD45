@@ -376,6 +376,7 @@ CREATE TABLE [hoa_don]
     [id_dia_chi_giao_hang] BIGINT,
     [id_phuong_thuc_van_chuyen] BIGINT,
     [ngay_dat_hang] DATETIME DEFAULT GETDATE(),
+    [ngay_giao_hang] DATETIME,
     [ngay_thanh_toan] DATETIME DEFAULT GETDATE(),
     [tong_tien] DECIMAL(10,2),
     [diem_su_dung] INT,

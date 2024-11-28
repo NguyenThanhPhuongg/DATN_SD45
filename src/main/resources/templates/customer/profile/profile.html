@@ -1866,7 +1866,6 @@
     }
 
 
-
     // Định nghĩa các trạng thái và mô tả tương ứng
     const trangThaiMap = {
         0: 'CHỜ XÁC NHẬN',
@@ -1941,8 +1940,9 @@
                 orderActions.innerHTML = `
                 ${order.trangThai === 4 || order.trangThai === 5 ?
                     `<button class="buy-again" onclick='buyAgain(${JSON.stringify(order)})'>Mua lại</button>` : ''}
-                ${order.trangThai === 4 ?
+               ${order.trangThai === 4 && isReturnAllowed(order.ngayGiaoHang) ?
                     `<button class="request-return" onclick='requestReturn(${JSON.stringify(order)})'>Yêu cầu đổi trả</button>` : ''}
+
 
                ${order.trangThai === 5 ?
                     `<button class="cancel-details" onclick="showCancelDetailsModal(${order.id})">Xem chi tiết hủy đơn</button>`
@@ -1962,6 +1962,15 @@
         } else {
             orderContents.innerHTML = '<p>Không có đơn hàng nào.</p>'; // Display message if no orders
         }
+    }
+
+    // Hàm kiểm tra nếu yêu cầu đổi trả hợp lệ (trong vòng 15 ngày từ ngày đặt hàng)
+    function isReturnAllowed(ngayGiaoHang) {
+        const today = new Date();
+        const giaoHangDate = new Date(ngayGiaoHang);
+        const diffTime = today - giaoHangDate;
+        const diffDays = diffTime / (1000 * 3600 * 24);
+        return diffDays <= 15;
     }
 
     // Gọi dữ liệu đơn hàng khi tab "Tất cả" được kích hoạt lần đầu
@@ -2860,6 +2869,12 @@
     let idSanPhamChiTiets = [];  // Mảng lưu trữ id của các sản phẩm được chọn
 
     function requestReturn(order) {
+        console.log(order.trangThaiDoiTra);
+
+        if (order.trangThaiDoiTra === 0 || order.trangThaiDoiTra === 1) {
+            toastr.error('Bạn đã gửi 1 yêu cầu trớc đó rồi!', 'Lỗi');
+            return;
+        }
         // Hiển thị modal
         orderId = order.id;
         const modal = document.getElementById("request-return-modal");
@@ -3027,7 +3042,6 @@
         const note = document.getElementById('note').value;  // Ghi chú thêm
         const files = document.getElementById('files').files;  // Lấy các tệp đã chọn
 
-        // Kiểm tra các trường không được trống
         if (selectedProducts.length === 0) {
             toastr.error('Bạn phải chọn ít nhất một sản phẩm để gửi yêu cầu.', 'Lỗi');
             return;
@@ -3043,25 +3057,21 @@
             return;
         }
 
-        // Tạo đối tượng yêu cầu
         const requestData = {
-            idHoaDon: orderId,  // Đảm bảo orderId có giá trị hợp lệ trước khi gửi yêu cầu
+            idHoaDon: orderId,
             idSanPhamChiTiets: selectedProducts,
             loai: loai,
             lyDo: reason,
             ghiChu: note
         };
 
-        // Lấy token từ localStorage hoặc sessionStorage (hoặc cookie)
-        const token = localStorage.getItem('token'); // Giả sử bạn lưu token trong localStorage
+        const token = localStorage.getItem('token');
 
-        // Kiểm tra xem token có tồn tại không
         if (!token) {
             toastr.error('Bạn cần đăng nhập lại.', 'Lỗi');
             return;
         }
 
-        // Tạo đối tượng FormData để gửi file cùng với các dữ liệu khác
         const formData = new FormData();
         formData.append('request', JSON.stringify(requestData));  // Thêm requestData vào FormData
 
@@ -3070,35 +3080,31 @@
             formData.append('files', files[i]);  // Thêm từng tệp vào FormData
         }
 
-        // Hiển thị hộp thoại xác nhận trước khi gửi yêu cầu
         Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: "Bạn sẽ không thể thay đổi yêu cầu sau khi gửi.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#4CAF50',  // Màu xác nhận
-            cancelButtonColor: '#d33',  // Màu hủy
+            confirmButtonColor: '#4CAF50',
+            cancelButtonColor: '#d33',
             confirmButtonText: 'Có, gửi yêu cầu!',
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Gọi API nếu người dùng xác nhận
-                fetch('/yeu-cau/create', {  // Gọi tới endpoint /create
+                fetch('/yeu-cau/create', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`  // Thêm token vào header
+                        'Authorization': `Bearer ${token}`
                     },
-                    body: formData  // Gửi FormData (bao gồm cả file và các dữ liệu khác)
+                    body: formData
                 })
-                    .then(response => response.json())  // Chờ phản hồi từ server
+                    .then(response => response.json())
                     .then(data => {
-                        // Kiểm tra phản hồi từ API
                         if (data.code === "200") {
-                            // Nếu code là 200, hiển thị thông báo thành công
                             toastr.success(data.message, 'Thành công');
-                            closeRequestReturnModal();  // Đóng modal
+                            resetReturnRequestForm();
+                            closeRequestReturnModal();
                         } else {
-                            // Nếu có lỗi hoặc message khác, hiển thị thông báo lỗi
                             const errorMessage = data?.message || 'Đã có lỗi xảy ra';
                             toastr.error(errorMessage, 'Lỗi');
                         }
@@ -3108,12 +3114,32 @@
                         toastr.error('Có lỗi xảy ra khi gửi yêu cầu.', 'Lỗi');
                     });
             } else {
-                // Nếu người dùng hủy, không làm gì
                 toastr.info('Bạn đã hủy yêu cầu.', 'Thông báo');
             }
         });
     }
 
+    // Hàm reset cả form yêu cầu đổi trả
+    function resetReturnRequestForm() {
+        document.getElementById('type').value = '';  // Reset loại yêu cầu
+        document.getElementById('reason').value = '';  // Reset lý do
+        document.getElementById('note').value = '';  // Reset ghi chú
+        idSanPhamChiTiets = [];
+
+        resetFileSelection();
+    }
+
+    // Hàm reset các tệp và preview
+    function resetFileSelection() {
+        selectedFiles = [];
+
+        // Cập nhật lại input files
+        updateInputFiles();
+
+        // Xóa toàn bộ phần preview
+        const previewContainer = document.getElementById('file-preview');
+        previewContainer.innerHTML = '';
+    }
 
 </script>
 </body>
