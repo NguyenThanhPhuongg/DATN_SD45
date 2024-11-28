@@ -1828,29 +1828,32 @@
 
                 // Thêm các sản phẩm trong đơn hàng
                 order.hoaDonModel.hoaDonChiTietModels.forEach((hdct, index) => {
-                    const orderItem = document.createElement('div');
-                    orderItem.classList.add('order-item');
+                    // Kiểm tra trangThaiDoiTra khác null
+                    if (hdct.trangThaiDoiTra !== null) {
+                        const orderItem = document.createElement('div');
+                        orderItem.classList.add('order-item');
 
-                    const thanhTien = hdct.soLuong * hdct.gia;
-                    totalRefund += thanhTien;
-                    orderItem.innerHTML = `
-                    <h3>
-                        <img src="images/${hdct.sanPhamChiTietModel.sanPhamModel.anh}" alt="" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                        ${hdct.sanPhamChiTietModel.sanPhamModel.ten}
-                        <span class="status" style="float: right;">${trangThaiDoiTraMap[hdct.trangThaiDoiTra] || 'Không xác định'}</span>
-                    </h3>
-                    <div class="classification">
-                        <p>Phân loại hàng: màu ${hdct.sanPhamChiTietModel.mauSac.ten}, size ${hdct.sanPhamChiTietModel.size.ten}</p>
-                       <p class="price">${hdct.gia.toLocaleString('vi-VN')}₫</p>
-                    </div>
-                    <p>x${hdct.soLuong}</p>
-                `;
-                    orderDetails.appendChild(orderItem);
+                        const thanhTien = hdct.soLuong * hdct.gia;
+                        totalRefund += thanhTien;
+                        orderItem.innerHTML = `
+                        <h3>
+                            <img src="images/${hdct.sanPhamChiTietModel.sanPhamModel.anh}" alt="" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                            ${hdct.sanPhamChiTietModel.sanPhamModel.ten}
+                            <span class="status" style="float: right;">${trangThaiDoiTraMap[hdct.trangThaiDoiTra] || 'Không xác định'}</span>
+                        </h3>
+                        <div class="classification">
+                            <p>Phân loại hàng: màu ${hdct.sanPhamChiTietModel.mauSac.ten}, size ${hdct.sanPhamChiTietModel.size.ten}</p>
+                            <p class="price">${hdct.gia.toLocaleString('vi-VN')}₫</p>
+                        </div>
+                        <p>x${hdct.soLuong}</p>
+                    `;
+                        orderDetails.appendChild(orderItem);
 
-                    // Thêm dấu phân cách giữa các sản phẩm nếu không phải là sản phẩm cuối cùng
-                    if (index < order.hoaDonModel.hoaDonChiTietModels.length - 1) {
-                        const separator = document.createElement('hr');
-                        orderDetails.appendChild(separator);
+                        // Thêm dấu phân cách giữa các sản phẩm nếu không phải là sản phẩm cuối cùng
+                        if (index < order.hoaDonModel.hoaDonChiTietModels.length - 1) {
+                            const separator = document.createElement('hr');
+                            orderDetails.appendChild(separator);
+                        }
                     }
                 });
 
@@ -1874,7 +1877,6 @@
             orderContents.innerHTML = '<p>Không có đơn hàng nào.</p>';
         }
     }
-
 
     // Định nghĩa các trạng thái và mô tả tương ứng
     const trangThaiMap = {
