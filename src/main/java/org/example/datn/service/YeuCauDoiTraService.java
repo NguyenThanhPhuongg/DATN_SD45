@@ -46,4 +46,8 @@ public class YeuCauDoiTraService {
     public List<YeuCauDoiTra> findByLoai(LoaiYeuCau loai) {
         return repo.findByLoai(loai);
     }
+
+    public List<YeuCauDoiTra> findByIdNguoiDung(Long idNguoiDung){
+        return repo.findByIdNguoiDung(idNguoiDung);
+    }
 }

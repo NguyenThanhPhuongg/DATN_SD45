@@ -2,6 +2,7 @@ package org.example.datn.controller;
 
 import org.example.datn.entity.DanhMuc;
 import org.example.datn.entity.Size;
+import org.example.datn.entity.User;
 import org.example.datn.entity.YeuCauDoiTra;
 import org.example.datn.exception.DuplicatedException;
 import org.example.datn.model.ServiceResult;
@@ -85,5 +86,10 @@ public class YeuCauDoiTraController {
     public ResponseEntity<ServiceResult> create(@RequestParam("request") String request,
                                                 @RequestParam("files") MultipartFile[] files, UserAuthentication ua) {
         return ResponseEntity.ok(processor.create(request, files, ua));
+    }
+
+    @GetMapping("/get-list")
+    public ResponseEntity<ServiceResult> getList(UserAuthentication ua) {
+        return ResponseEntity.ok(processor.getList(ua));
     }
 }

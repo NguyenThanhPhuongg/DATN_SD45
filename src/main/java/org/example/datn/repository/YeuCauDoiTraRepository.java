@@ -19,4 +19,5 @@ public interface YeuCauDoiTraRepository extends JpaRepository<YeuCauDoiTra, Long
     List<YeuCauDoiTra> findByLoaiAndTrangThai(LoaiYeuCau loai, Integer trangThai);
     List<YeuCauDoiTra> findByLoai(LoaiYeuCau loai);
 
+    List<YeuCauDoiTra> findByIdNguoiDung(Long idNguoiDung);
 }

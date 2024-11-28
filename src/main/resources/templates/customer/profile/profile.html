@@ -1285,6 +1285,7 @@
                 flex: 1 1 100%; /* Đảm bảo các ô sản phẩm chiếm toàn bộ chiều rộng trên màn hình nhỏ */
             }
         }
+
         /* Khu vực chứa preview tệp */
         .file-preview {
             display: flex;
@@ -1295,7 +1296,7 @@
 
         /* Mỗi phần tử preview */
         .preview-item {
-            position: relative;  /* Cần thiết để định vị dấu "X" trong phần tử */
+            position: relative; /* Cần thiết để định vị dấu "X" trong phần tử */
             width: 150px;
             text-align: center;
             border: 1px solid #ddd;
@@ -1318,7 +1319,7 @@
             width: 100%;
             height: auto;
             border-radius: 8px;
-            object-fit: cover;  /* Đảm bảo hình ảnh không bị méo và lấp đầy khu vực */
+            object-fit: cover; /* Đảm bảo hình ảnh không bị méo và lấp đầy khu vực */
         }
 
         /* Tên tệp */
@@ -1326,7 +1327,7 @@
             margin-top: 10px;
             font-size: 14px;
             color: #333;
-            word-wrap: break-word;  /* Đảm bảo tên tệp không bị tràn ra ngoài */
+            word-wrap: break-word; /* Đảm bảo tên tệp không bị tràn ra ngoài */
         }
 
         /* Video */
@@ -1346,7 +1347,7 @@
             position: absolute;
             top: 5px;
             right: 5px;
-            background-color: rgba(255, 0, 0, 0.7);  /* Màu nền đỏ */
+            background-color: rgba(255, 0, 0, 0.7); /* Màu nền đỏ */
             color: white;
             border: none;
             border-radius: 50%;
@@ -1356,15 +1357,13 @@
             line-height: 20px;
             font-weight: bold;
             cursor: pointer;
-            z-index: 10;  /* Đảm bảo dấu X luôn nằm trên ảnh */
+            z-index: 10; /* Đảm bảo dấu X luôn nằm trên ảnh */
         }
 
         /* Hiệu ứng hover khi rê chuột vào dấu X */
         .close-btn:hover {
             background-color: red;
         }
-
-
 
 
     </style>
@@ -1768,10 +1767,9 @@
     // Hàm để lấy dữ liệu "Trả hàng/Hoàn tiền" từ API get-doi-tra
     async function fetchDoiTra() {
         const token = localStorage.getItem('token'); // Lấy token từ localStorage
-        const response = await fetch('/rest/hoadon/get-doi-tra', {
-            method: 'POST', // Sử dụng phương thức POST
+        const response = await fetch('/yeu-cau/get-list', { // Sử dụng phương thức GET và endpoint mới
+            method: 'GET', // Sử dụng phương thức GET
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
             }
         });
@@ -1781,7 +1779,7 @@
             order = result.data;
             displayDoiTra(result.data); // Hiển thị dữ liệu "Trả hàng/Hoàn tiền"
         } else {
-            console.error('Lỗi khi gọi API get-doi-tra.'); // Hiển thị lỗi nếu có
+            console.error('Lỗi khi gọi API get-list.'); // Hiển thị lỗi nếu có
         }
     }
 
@@ -1796,33 +1794,35 @@
     // Hàm hiển thị dữ liệu trả hàng/hoàn tiền
     function displayDoiTra(orderList) {
         const orderContents = document.getElementById('order-contents');
-        orderContents.innerHTML = ''; // Clear previous content
+        orderContents.innerHTML = ''; // Xóa nội dung trước đó
 
         if (orderList && orderList.length > 0) {
             orderList.forEach(order => {
-                // Create a container for the entire order
+                // Tạo container cho đơn hàng
                 const orderContainer = document.createElement('div');
-                orderContainer.classList.add('order-container'); // Class for styling the whole order
+                orderContainer.classList.add('order-container'); // Thêm class để tạo kiểu cho toàn bộ đơn hàng
 
-                // Create order header
+                // Tạo phần đầu đơn hàng
                 const orderHeader = document.createElement('div');
                 orderHeader.classList.add('order-header');
                 orderHeader.innerHTML = `
-                <h2>Mã đơn hàng: ${order.ma}</h2>
-                <span class="status">${trangThaiDoiTraMap[order.trangThaiDoiTra] || 'Không xác định'}</span>
+                <h2>Mã đơn hàng: ${order.hoaDonModel.ma}</h2>
+                <span class="status">${trangThaiDoiTraMap[order.hoaDonModel.trangThaiDoiTra] || 'Không xác định'}</span>
             `;
                 orderContainer.appendChild(orderHeader);
 
-                // Create order details
+                // Tạo chi tiết đơn hàng
                 const orderDetails = document.createElement('div');
                 orderDetails.classList.add('order-details');
+                let totalRefund = 0;
 
-                // Add order items
-                order.hoaDonChiTietModels.forEach((hdct, index) => {
+                // Thêm các sản phẩm trong đơn hàng
+                order.hoaDonModel.hoaDonChiTietModels.forEach((hdct, index) => {
                     const orderItem = document.createElement('div');
                     orderItem.classList.add('order-item');
 
                     const thanhTien = hdct.soLuong * hdct.gia;
+                    totalRefund += thanhTien;
                     orderItem.innerHTML = `
                     <h3>
                         <img src="images/${hdct.sanPhamChiTietModel.sanPhamModel.anh}" alt="" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
@@ -1831,38 +1831,40 @@
                     </h3>
                     <div class="classification">
                         <p>Phân loại hàng: màu ${hdct.sanPhamChiTietModel.mauSac.ten}, size ${hdct.sanPhamChiTietModel.size.ten}</p>
-                        <p class="price">₫${hdct.gia}</p>
+                       <p class="price">${hdct.gia.toLocaleString('vi-VN')}₫</p>
                     </div>
                     <p>x${hdct.soLuong}</p>
                 `;
                     orderDetails.appendChild(orderItem);
 
-                    if (index < order.hoaDonChiTietModels.length - 1) {
+                    // Thêm dấu phân cách giữa các sản phẩm nếu không phải là sản phẩm cuối cùng
+                    if (index < order.hoaDonModel.hoaDonChiTietModels.length - 1) {
                         const separator = document.createElement('hr');
                         orderDetails.appendChild(separator);
                     }
                 });
 
-                // Total amount
+                // Tổng tiền đơn hàng
                 const totalDiv = document.createElement('div');
                 totalDiv.classList.add('order-total');
-                totalDiv.innerHTML = `<strong>Tổng cộng: ₫${order.tongTien}</strong>`;
+                totalDiv.innerHTML = `<strong>Số tiền hoàn: ${totalRefund.toLocaleString('vi-VN')}₫</strong>`;  // Format refund total
                 orderContainer.appendChild(orderDetails);
-                // orderContainer.appendChild(totalDiv);
+                orderContainer.appendChild(totalDiv);
 
+                // Phần hành động (nếu có)
                 const orderActions = document.createElement('div');
                 orderActions.classList.add('order-actions');
-
                 orderActions.innerHTML = '';
-
                 orderContainer.appendChild(orderActions);
 
+                // Thêm đơn hàng vào danh sách đơn hàng
                 orderContents.appendChild(orderContainer);
             });
         } else {
             orderContents.innerHTML = '<p>Không có đơn hàng nào.</p>';
         }
     }
+
 
 
     // Định nghĩa các trạng thái và mô tả tương ứng
@@ -1914,7 +1916,7 @@
                     </h3>
                     <div class="classification">
                         <p>Phân loại hàng: màu ${hdct.sanPhamChiTietModel.mauSac.ten}, size ${hdct.sanPhamChiTietModel.size.ten}</p>
-                        <p class="price">₫${hdct.gia}</p>
+                        <p class="price">${hdct.gia.toLocaleString('vi-VN')}₫</p>
                     </div>
                     <p>x${hdct.soLuong}</p>
                 `;
@@ -1928,7 +1930,7 @@
 
                 const totalDiv = document.createElement('div');
                 totalDiv.classList.add('order-total');
-                totalDiv.innerHTML = `<strong>Tổng cộng: ₫${order.tongTien}</strong>`;
+                totalDiv.innerHTML = `<strong>Tổng cộng: ${order.tongTien.toLocaleString('vi-VN')}₫</strong>`;
                 orderContainer.appendChild(orderDetails);
                 orderContainer.appendChild(totalDiv);
 
@@ -2875,7 +2877,7 @@
         order.hoaDonChiTietModels.forEach(item => {
             const productItem = document.createElement('div');
             productItem.classList.add('product-item');
-            productItem.setAttribute('id', `product-${item.id}`); // Thêm ID cho mỗi sản phẩm để dễ dàng thao tác
+            productItem.setAttribute('id', `product-${item.idSanPhamChiTiet}`); // Thêm ID cho mỗi sản phẩm để dễ dàng thao tác
 
             // Lấy size và màu rồi chuyển sang chữ thường
             const size = item.sanPhamChiTietModel.size.ten.toLowerCase();
@@ -2895,7 +2897,7 @@
         `;
 
             // Thêm sự kiện chọn sản phẩm
-            productItem.addEventListener('click', () => toggleSelection(item.id, productItem));
+            productItem.addEventListener('click', () => toggleSelection(item.idSanPhamChiTiet, productItem));
 
             container.appendChild(productItem);
         });
@@ -2947,7 +2949,7 @@
     let selectedFiles = [];
 
     // Lắng nghe sự kiện thay đổi tệp
-    document.getElementById('files').addEventListener('change', function(event) {
+    document.getElementById('files').addEventListener('change', function (event) {
         const files = event.target.files;
         const previewContainer = document.getElementById('file-preview');
         previewContainer.innerHTML = ''; // Xóa nội dung cũ trước khi thêm preview mới
@@ -2968,7 +2970,7 @@
             closeBtn.classList.add('close-btn');
 
             // Xử lý sự kiện click để xóa ảnh/video khỏi preview và khỏi mảng selectedFiles
-            closeBtn.addEventListener('click', function() {
+            closeBtn.addEventListener('click', function () {
                 // Xóa tệp khỏi mảng
                 selectedFiles.splice(index, 1);
 
@@ -3015,7 +3017,6 @@
         // Cập nhật lại thuộc tính input files
         document.getElementById('files').files = dataTransfer.files;
     }
-
 
 
     function submitReturnRequest() {

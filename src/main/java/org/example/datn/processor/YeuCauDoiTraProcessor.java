@@ -16,8 +16,10 @@ import org.example.datn.model.request.CancelOrderRequest;
 import org.example.datn.model.request.ProfileRequest;
 import org.example.datn.model.request.ThuongHieuRequest;
 import org.example.datn.model.request.YeuCauDoiTraRequest;
+import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.model.response.YeuCauDoiTraModel;
+import org.example.datn.model.response.YeuCauDoiTraResponse;
 import org.example.datn.repository.SanPhamRepository;
 import org.example.datn.service.*;
 import org.example.datn.transformer.YeuCauDoiTraTransformer;
@@ -135,6 +137,7 @@ public class YeuCauDoiTraProcessor {
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
+
     private void updateYeuCauDoiTraChiTiet(Long idDoiTra, Integer trangThai) {
         var yeuCauDoiTraChiTiet = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(idDoiTra);
         yeuCauDoiTraChiTiet.forEach(e -> e.setTrangThai(trangThai));
@@ -334,4 +337,19 @@ public class YeuCauDoiTraProcessor {
         String noQuotes = uncleanJson.replaceAll("^\"|\"$", "");
         return StringEscapeUtils.unescapeJava(noQuotes);
     }
+
+    public ServiceResult getList(UserAuthentication ua) {
+        List<YeuCauDoiTraResponse> models = service.findByIdNguoiDung(ua.getPrincipal()).stream()
+                .sorted((y1, y2) -> y2.getNgayTao().compareTo(y1.getNgayTao()))
+                .map(sp -> {
+                    YeuCauDoiTraResponse model = yeuCauDoiTraTransformer.toResponse(sp);
+                    model.setHoaDonModel(hoaDonProcessor.getModelById(sp.getIdHoaDon()));
+                    return model;
+                })
+                .collect(Collectors.toList());
+
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+
 }
