@@ -24,4 +24,14 @@ public interface ProfileTransformer {
     ProfileModel toModel(Profile profile);
 
     Profile toEntity(ProfileRequest request, Long id);
+
+    default Profile toEntity(Long userId, String name, String email) {
+        Profile profile = new Profile();
+        profile.setUserId(userId);
+        profile.setHoVaTen(name);
+        profile.setEmail(email);
+        return profile;
+    }
+
+
 }

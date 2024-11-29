@@ -1,4 +1,29 @@
 $(document).ready(function() {
+
+    $('#togglePassword').click(function() {
+        const passwordField = $('[name="customer[password]"]');
+
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            $(this).removeClass('bi-eye-slash').addClass('bi-eye');
+        } else {
+            passwordField.attr('type', 'password');  // Ẩn mật khẩu
+            $(this).removeClass('bi-eye').addClass('bi-eye-slash');
+        }
+    });
+
+    $('#toggleRepassword').click(function() {
+        const rePasswordField = $('[name="customer[retypePassword]"]');
+
+        if (rePasswordField.attr('type') === 'password') {
+            rePasswordField.attr('type', 'text');
+            $(this).removeClass('bi-eye-slash').addClass('bi-eye');
+        } else {
+            rePasswordField.attr('type', 'password');
+            $(this).removeClass('bi-eye').addClass('bi-eye-slash');
+        }
+    });
+
     // Xử lý khi nhấn vào nút Đăng ký
     $('#registerButton').click(function(event) {
         event.preventDefault(); // Ngừng hành động mặc định của nút
@@ -38,8 +63,7 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(registerData),
             success: function(response) {
-                $('#message').html('<div class="alert alert-success">Đăng ký thành công!</div>');
-                hideMessageAfterDelay();
+                toastr.success('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.', 'Thành công');
                 setTimeout(function() {
                     window.location.href = '/v1/auth/login';
                 }, 500);
@@ -48,9 +72,7 @@ $(document).ready(function() {
                 const errorMsg = jqXHR.responseJSON && jqXHR.responseJSON.message
                     ? jqXHR.responseJSON.message
                     : 'Thông tin đăng ký không hợp lệ!';
-
-                $('#message').html(`<div class="alert alert-danger">${errorMsg}</div>`);
-                hideMessageAfterDelay();
+                toastr.error(errorMsg, 'Lỗi');
             }
         });
     }

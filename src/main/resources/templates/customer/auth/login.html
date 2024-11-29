@@ -23,6 +23,11 @@
     <script src="/js/headerJs.js"></script>
     <link rel="stylesheet" href="/css/login.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Thêm Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+
+    <!-- Thêm Toastr JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/js/login.js"></script>
 </head>
 <body>
@@ -33,17 +38,21 @@
         <div class="register-form__wrapper">
             <h2>Đăng nhập</h2>
             <div class="social_form">
-                <a href="">
-                    <img src="/images/logos_facebook.svg" alt=""> Continue with Facebook
+                <a href="#" id="fb-login-button">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" width="30" height="30">
+                    Continue with Facebook
                 </a>
                 <a href="">
                     <img src="/images/flat-color-icons_google.svg" alt=""> Continue with Google
                 </a>
             </div>
             <div class="or_span"><span>or</span></div>
-            <form method="post" action="/account" id="create_customer" accept-charset="UTF-8">
-                <input type="text" id="username" name="customer[username]" placeholder="Username" class="form-field" required>
-                <input type="password" id="password" name="customer[password]" placeholder="Password" class="form-field" required>
+            <form method="post" action="/account" id="create_customer" accept-charset="UTF-8" autocomplete="on">
+                <input type="text" id="username" name="customer[username]" placeholder="Username" class="form-field" autocomplete="username" required>
+                <div class="password-wrapper position-relative">
+                    <input type="password" id="password" name="customer[password]" placeholder="Password" class="form-field" required>
+                    <span id="togglePassword" class="bi bi-eye-slash position-absolute" style="right: 10px; top: 45%; transform: translateY(-50%); cursor: pointer;"></span>
+                </div>
                 <div class="mb-15 form_text">
                     <div class="check_custom">
                         <input type="checkbox" id="remember" class="styled-checkbox">
@@ -51,12 +60,10 @@
                     </div>
                     <a href="/v1/auth/forgot-password">Quên mật khẩu?</a>
                 </div>
-                <button type="button" id="loginButton" class="button button--primary">
-                    Login
-                </button>
+
+                <button type="button" id="loginButton" class="button button--primary">Đăng nhập</button>
                 <div id="message"></div>
             </form>
-
         </div>
         <div class="register-form__wrapper">
             <h2>Quyền  lợi thành viên</h2>

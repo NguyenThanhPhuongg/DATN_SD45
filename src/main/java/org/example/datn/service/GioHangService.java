@@ -24,5 +24,14 @@ public class GioHangService {
         return repo.findByIdNguoiDung(idNguoiDung);
     }
 
+    public void createCartForUser(Long idNguoiDung) {
+        var gh = repo.findByIdNguoiDung(idNguoiDung);
+        if (gh.isPresent()) {
+            return;
+        }
+        GioHang gioHang = new GioHang();
+        gioHang.setIdNguoiDung(idNguoiDung);
+        repo.save(gioHang);
+    }
 
 }
