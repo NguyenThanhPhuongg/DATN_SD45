@@ -155,8 +155,8 @@ public class NhomProcessor {
     }
 
 
-    public ServiceResult changeStatus(Long id, Integer trangThai) {
-        var group = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nhóm"));
+    public ServiceResult changeStatus(Long id, Integer trangThai) throws NotFoundEntityException {
+        var group = service.findById(id).orElseThrow(() -> NotFoundEntityException.of("Nhóm không tồn tại"));
         group.setTrangThai(trangThai);
         service.save(group);
         return new ServiceResult();

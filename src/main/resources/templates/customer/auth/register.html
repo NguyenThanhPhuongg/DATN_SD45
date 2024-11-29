@@ -24,6 +24,12 @@
 
     <link rel="stylesheet" href="/css/login.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Thêm Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+
+    <!-- Thêm Toastr JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script src="/js/register.js"></script>
 </head>
 <body>
@@ -45,9 +51,14 @@
                 <input type="text" name="customer[name]" placeholder="Họ và tên" class="form-field" required>
                 <input type="email" name="customer[email]" placeholder="Email" class="form-field" required>
                 <input type="text" name="customer[phone]" placeholder="Số điện thoại" class="form-field" required>
-                <input type="password" name="customer[password]" placeholder="Mật khẩu" class="form-field" required>
-                <input type="password" name="customer[retypePassword]" placeholder="Nhập lại mật khẩu"
-                       class="form-field" required>
+                <div class="password-wrapper position-relative">
+                    <input type="password" name="customer[password]" placeholder="Mật khẩu" class="form-field" required>
+                    <span id="togglePassword" class="bi bi-eye-slash position-absolute" style="right: 10px; top: 45%; transform: translateY(-50%); cursor: pointer;"></span>
+                </div>
+                <div class="password-wrapper position-relative">
+                    <input type="password" name="customer[retypePassword]" placeholder="Nhập lại mật khẩu" class="form-field" required>
+                    <span id="toggleRepassword" class="bi bi-eye-slash position-absolute" style="right: 10px; top: 45%; transform: translateY(-50%); cursor: pointer;"></span>
+                </div>
                 <input type="date" name="customer[ngaySinh]" placeholder="Ngày sinh" class="form-field" required>
                 <div class="register-form__description">
                     Bằng việc tạo tài khoản bạn có thể mua sắm nhanh hơn, theo dõi trạng thái đơn hàng, và theo dõi đơn

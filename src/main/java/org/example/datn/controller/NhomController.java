@@ -38,7 +38,7 @@ public class NhomController {
     }
 
     @PutMapping("/change-status/{id}")
-    public ServiceResult update(@PathVariable Long id, @RequestParam Integer trangThai) {
+    public ServiceResult update(@PathVariable Long id, @RequestParam Integer trangThai) throws NotFoundEntityException {
         return processor.changeStatus(id, trangThai);
     }
 

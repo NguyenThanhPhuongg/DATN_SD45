@@ -932,6 +932,24 @@ header {
 .header_menu a:hover {
     color: #007bff; /* Màu khi hover */
 }
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 40px; /* Đảm bảo ô input có đủ không gian bên phải cho biểu tượng mắt */
+}
+
+#togglePassword, #toggleRepassword {
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+}
+
+#togglePassword:hover, #toggleRepassword:hover {
+    color: #333;
+}
 
 
 
