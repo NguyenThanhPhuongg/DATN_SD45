@@ -47,4 +47,7 @@ public class HoaDonChiTietService {
         return repo.findByIdHoaDonAndIdSanPhamChiTietIn(idHoaDon, idSanPhamChiTiets);
     }
 
+    public Optional<HoaDonChiTiet> getHoaDonChiTietByHoaDonAndSanPhamChiTiet(Long idHoaDon, Long idSanPhamChiTiet) {
+        return repo.findByIdHoaDonAndIdSanPhamChiTiet(idHoaDon, idSanPhamChiTiet);
+    }
 }

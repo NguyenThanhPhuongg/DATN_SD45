@@ -390,6 +390,7 @@ CREATE TABLE [hoa_don]
 ) ON [PRIMARY];
 GO
 
+
 --- chi tiet hoa don
 
 SET ANSI_NULLS ON

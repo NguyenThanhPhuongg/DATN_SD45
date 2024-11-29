@@ -144,11 +144,291 @@ public class YeuCauDoiTraProcessor {
         yeuCauDoiTraChiTietService.saveAll(yeuCauDoiTraChiTiet);
     }
 
-    private void saveSanPhamDoiTraFromChiTiet(YeuCauDoiTra yeuCauDoiTra, UserAuthentication ua) {
-        List<YeuCauDoiTraChiTiet> yeuCauDoiTraChiTiets = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(yeuCauDoiTra.getId());
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult cancelOrder(Long id, CancelOrderRequest request, UserAuthentication ua) throws IOException, InterruptedException {
+        // Tìm yêu cầu đổi trả theo ID
+        YeuCauDoiTra yeuCauDoiTra = service.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Yêu cầu đổi trả không tồn tại với ID: " + id));
 
-        // Duyệt qua từng chi tiết yêu cầu đổi trả
-        yeuCauDoiTraChiTiets.forEach(chiTiet -> {
+        // Kiểm tra trạng thái hợp lệ trước khi hủy
+        if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XU_LY.getValue() &&
+                yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.DANG_XU_LY.getValue()) {
+            throw new IllegalArgumentException("Không thể hủy yêu cầu vì trạng thái hiện tại không hợp lệ.");
+        }
+
+        // Xác định trạng thái hủy
+        Integer newTrangThai = StatusYeuCauDoiTra.TU_CHOI.getValue();
+
+        // Cập nhật yêu cầu đổi trả
+        yeuCauDoiTra.setTrangThai(newTrangThai);
+        yeuCauDoiTra.setGhiChu(request.getOrderInfo());
+        yeuCauDoiTra.setNgayCapNhat(LocalDateTime.now());
+        yeuCauDoiTra.setNgayHoanTat(LocalDateTime.now());
+        yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal());
+        service.save(yeuCauDoiTra);
+
+        List<YeuCauDoiTraChiTiet> chiTietList = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(id);
+        if (chiTietList == null || chiTietList.isEmpty()) {
+            throw new IllegalStateException("Không tìm thấy chi tiết nào cho yêu cầu đổi trả với ID: " + id);
+        }
+
+        // Lấy danh sách ID sản phẩm chi tiết từ danh sách chi tiết
+        List<Long> idSanPhamChiTiets = chiTietList.stream()
+                .map(YeuCauDoiTraChiTiet::getIdSPCT)
+                .collect(Collectors.toList());
+
+        // Cập nhật trạng thái chi tiết yêu cầu đổi trả
+        updateYeuCauDoiTraChiTiet(id, newTrangThai);
+
+        // Lấy ID hóa đơn từ yêu cầu đổi trả
+        Long idHoaDon = yeuCauDoiTra.getIdHoaDon();
+
+        // Cập nhật trạng thái đổi trả trong hóa đơn và hóa đơn chi tiết
+        updateTrangThaiDoiTraInHoaDon(idHoaDon, newTrangThai, idSanPhamChiTiets);
+
+        return new ServiceResult("Yêu cầu đổi trả đã được hủy thành công.");
+    }
+
+    private void updateTrangThaiDoiTraInHoaDon(Long idHoaDon, Integer trangThai, List<Long> idSanPhamChiTiets) {
+        // Lấy hóa đơn dựa trên ID
+        HoaDon hoaDon = hoaDonService.findById(idHoaDon)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại với ID: " + idHoaDon));
+
+        // Cập nhật trạng thái đổi trả cho hóa đơn
+        hoaDon.setTrangThaiDoiTra(trangThai);
+        hoaDonService.save(hoaDon);
+
+        // Lấy danh sách chi tiết hóa đơn dựa vào idHoaDon và idSanPhamChiTiets
+        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(idHoaDon, idSanPhamChiTiets);
+
+        // Cập nhật trạng thái đổi trả cho từng chi tiết hóa đơn
+        for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
+            hoaDonChiTiet.setTrangThaiDoiTra(trangThai);
+            hoaDonChiTietService.save(hoaDonChiTiet);
+        }
+    }
+
+    private void updateTrangThaiDoiTraHDCT(Long idHoaDon, Integer trangThai, List<Long> idSanPhamChiTiets) {
+        // Lấy hóa đơn dựa trên ID
+        HoaDon hoaDon = hoaDonService.findById(idHoaDon)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại với ID: " + idHoaDon));
+
+        // Lấy danh sách chi tiết hóa đơn dựa vào idHoaDon và idSanPhamChiTiets
+        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(idHoaDon, idSanPhamChiTiets);
+
+        // Cập nhật trạng thái đổi trả cho từng chi tiết hóa đơn
+        for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
+            hoaDonChiTiet.setTrangThaiDoiTra(trangThai);
+            hoaDonChiTietService.save(hoaDonChiTiet);
+        }
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult updateStatusYeuCauChiTietHoanThanh(Long id, UserAuthentication ua) {
+        // Tìm hóa đơn theo ID
+        YeuCauDoiTraChiTiet yeuCauDoiTraChiTiet = yeuCauDoiTraChiTietService.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+        // Xác định trạng thái mới dựa trên trạng thái hiện tại
+        Integer newTrangThai;
+        switch (yeuCauDoiTraChiTiet.getTrangThai()) {
+            case 0:
+                newTrangThai = StatusYeuCauDoiTra.DANG_XU_LY.getValue();
+                break;
+            case 1:
+                newTrangThai = StatusYeuCauDoiTra.HOAN_THANH.getValue();
+                break;
+            default:
+                throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
+        }
+
+        // Cập nhật trạng thái hóa đơn
+        yeuCauDoiTraChiTiet.setTrangThai(newTrangThai);
+        yeuCauDoiTraChiTiet.setNgayCapNhat(LocalDateTime.now());
+        yeuCauDoiTraChiTiet.setNguoiCapNhat(ua.getPrincipal());
+        yeuCauDoiTraChiTietService.save(yeuCauDoiTraChiTiet);
+
+        // Tìm yêu cầu đổi trả để lấy ID hóa đơn
+        YeuCauDoiTra yeuCauDoiTra = service.findById(yeuCauDoiTraChiTiet.getIdYeuCauDoiTra())
+                .orElseThrow(() -> new EntityNotFoundException("Yêu cầu đổi trả không tồn tại"));
+
+        Long idHoaDon = yeuCauDoiTra.getIdHoaDon(); // Lấy idHóaDon từ yêu cầu đổi trả
+        if (idHoaDon == null) {
+            throw new IllegalStateException("Hóa đơn không tồn tại cho yêu cầu đổi trả.");
+        }
+
+        Long idSanPhamChiTiet = yeuCauDoiTraChiTiet.getIdSPCT();
+        if (idSanPhamChiTiet == null) {
+            throw new IllegalStateException("Yêu cầu đổi trả không có sản phẩm chi tiết.");
+        }
+
+        // Tìm hóa đơn chi tiết theo hóa đơn và sản phẩm chi tiết
+        HoaDonChiTiet hoaDonChiTiet = hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(
+                        idHoaDon, idSanPhamChiTiet)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn chi tiết không tồn tại"));
+
+        // Cập nhật trạng thái đổi trả của hóa đơn chi tiết
+        hoaDonChiTiet.setTrangThaiDoiTra(newTrangThai);
+        hoaDonChiTietService.save(hoaDonChiTiet);
+
+        return new ServiceResult("Hóa đơn đã được cập nhật trạng thái thành công",
+                SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult updateStatusYeuCauChiTietHuy(Long id, UserAuthentication ua) {
+        // Tìm hóa đơn theo ID
+        YeuCauDoiTraChiTiet yeuCauDoiTraChiTiet = yeuCauDoiTraChiTietService.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+        // Xác định trạng thái mới dựa trên trạng thái hiện tại
+        Integer newTrangThai;
+        switch (yeuCauDoiTraChiTiet.getTrangThai()) {
+            case 0:
+                newTrangThai = StatusYeuCauDoiTra.DANG_XU_LY.getValue();
+                break;
+            case 1:
+                newTrangThai = StatusYeuCauDoiTra.TU_CHOI.getValue();
+                break;
+            default:
+                throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
+        }
+
+        // Cập nhật trạng thái hóa đơn
+        yeuCauDoiTraChiTiet.setTrangThai(newTrangThai);
+        yeuCauDoiTraChiTiet.setNgayCapNhat(LocalDateTime.now());
+        yeuCauDoiTraChiTiet.setNguoiCapNhat(ua.getPrincipal());
+        yeuCauDoiTraChiTietService.save(yeuCauDoiTraChiTiet);
+
+        // Tìm yêu cầu đổi trả để lấy ID hóa đơn
+        YeuCauDoiTra yeuCauDoiTra = service.findById(yeuCauDoiTraChiTiet.getIdYeuCauDoiTra())
+                .orElseThrow(() -> new EntityNotFoundException("Yêu cầu đổi trả không tồn tại"));
+
+        Long idHoaDon = yeuCauDoiTra.getIdHoaDon(); // Lấy idHóaDon từ yêu cầu đổi trả
+        if (idHoaDon == null) {
+            throw new IllegalStateException("Hóa đơn không tồn tại cho yêu cầu đổi trả.");
+        }
+
+        Long idSanPhamChiTiet = yeuCauDoiTraChiTiet.getIdSPCT();
+        if (idSanPhamChiTiet == null) {
+            throw new IllegalStateException("Yêu cầu đổi trả không có sản phẩm chi tiết.");
+        }
+
+        // Tìm hóa đơn chi tiết theo hóa đơn và sản phẩm chi tiết
+        HoaDonChiTiet hoaDonChiTiet = hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(
+                        idHoaDon, idSanPhamChiTiet)
+                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn chi tiết không tồn tại"));
+
+        // Cập nhật trạng thái đổi trả của hóa đơn chi tiết
+        hoaDonChiTiet.setTrangThaiDoiTra(newTrangThai);
+        hoaDonChiTietService.save(hoaDonChiTiet);
+
+        return new ServiceResult("Hóa đơn đã được cập nhật trạng thái thành công",
+                SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult updateStatus(Long id, UserAuthentication ua) {
+        YeuCauDoiTra yeuCauDoiTra = service.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Yêu cầu đổi trả không tồn tại"));
+
+        Integer trangThaiYeuCau = yeuCauDoiTra.getTrangThai();
+
+        List<YeuCauDoiTraChiTiet> chiTietList = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(id);
+        if (chiTietList == null || chiTietList.isEmpty()) {
+            throw new IllegalStateException("Không tìm thấy chi tiết nào cho yêu cầu đổi trả với ID: " + id);
+        }
+
+        List<Long> idSanPhamChiTiets = chiTietList.stream()
+                .map(YeuCauDoiTraChiTiet::getIdSPCT)
+                .collect(Collectors.toList());
+
+        if (trangThaiYeuCau == 0) {
+            yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.DANG_XU_LY.getValue()); // Trạng thái đang xử lý
+            updateYeuCauDoiTraChiTiet(id, StatusYeuCauDoiTra.DANG_XU_LY.getValue()); // Cập nhật trạng thái chi tiết
+
+            Long idHoaDon = yeuCauDoiTra.getIdHoaDon();
+            HoaDon hoaDon = hoaDonService.findById(idHoaDon)
+                    .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+
+            hoaDon.setTrangThaiDoiTra(StatusYeuCauDoiTra.DANG_XU_LY.getValue()); // Trạng thái đổi trả của hóa đơn
+            hoaDonService.save(hoaDon);
+
+            updateTrangThaiDoiTraHDCT(idHoaDon, StatusYeuCauDoiTra.DANG_XU_LY.getValue(), idSanPhamChiTiets);
+            service.save(yeuCauDoiTra);
+
+            return new ServiceResult("Cập nhật trạng thái yêu cầu thành công",
+                    SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+        }
+
+        if (trangThaiYeuCau == 1) {
+            boolean hasPendingOrRejected = false;  // Kiểm tra có chi tiết bị từ chối hoặc đang xử lý
+            boolean allDone = true;  // Kiểm tra tất cả các yêu cầu chi tiết có trạng thái 3
+
+            for (YeuCauDoiTraChiTiet chiTiet : chiTietList) {
+                if (chiTiet.getTrangThai() == 1 || chiTiet.getTrangThai() == 0) {
+                    hasPendingOrRejected = true;
+                    break;
+                }
+                if (chiTiet.getTrangThai() != 3) {
+                    allDone = false;
+                }
+            }
+
+            if (hasPendingOrRejected) {
+                return new ServiceResult("Không thể cập nhật trạng thái do có yêu cầu chi tiết chưa hoàn thành hoặc bị từ chối",
+                        SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
+            }
+
+            if (allDone) {
+                yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.TU_CHOI.getValue()); // Hoàn tất
+                Long idHoaDon = yeuCauDoiTra.getIdHoaDon();
+                HoaDon hoaDon = hoaDonService.findById(idHoaDon)
+                        .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+                hoaDon.setTrangThaiDoiTra(StatusYeuCauDoiTra.TU_CHOI.getValue());
+
+                updateYeuCauDoiTraChiTiet(id, StatusYeuCauDoiTra.TU_CHOI.getValue());
+
+                updateTrangThaiDoiTraInHoaDon(idHoaDon, StatusYeuCauDoiTra.TU_CHOI.getValue(), idSanPhamChiTiets);
+                hoaDonService.save(hoaDon);
+            }
+
+            else {
+                boolean hasRejected = chiTietList.stream()
+                        .anyMatch(chiTiet -> chiTiet.getTrangThai() == 2);
+                if (hasRejected) {
+                    yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.HOAN_THANH.getValue()); // Từ chối
+                    Long idHoaDon = yeuCauDoiTra.getIdHoaDon();
+                    HoaDon hoaDon = hoaDonService.findById(idHoaDon)
+                            .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+                    hoaDon.setTrangThaiDoiTra(StatusYeuCauDoiTra.HOAN_THANH.getValue());
+
+                    // Lọc chi tiết yêu cầu có trangThai = 2 và thuộc yêu cầu đổi trả hiện tại
+                    List<YeuCauDoiTraChiTiet> rejectedChiTietList = chiTietList.stream()
+                            .filter(chiTiet -> chiTiet.getTrangThai() == 2 && chiTiet.getIdYeuCauDoiTra().equals(id)) // Chỉ lấy chi tiết của yêu cầu này
+                            .collect(Collectors.toList());
+
+                    // Duyệt qua các chi tiết bị từ chối và lưu sản phẩm đổi trả
+                    rejectedChiTietList.forEach(chiTiet -> {
+                        saveSanPhamDoiTraFromChiTiet(yeuCauDoiTra, ua, chiTiet); // Lưu sản phẩm đổi trả từ chi tiết yêu cầu
+                    });
+
+                    hoaDonService.save(hoaDon);
+                }
+            }
+
+            service.save(yeuCauDoiTra);
+            return new ServiceResult("Cập nhật trạng thái yêu cầu thành công",
+                    SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+        }
+
+        return new ServiceResult("Trạng thái yêu cầu không hợp lệ",
+                SystemConstant.STATUS_FAIL, SystemConstant.CODE_400);
+    }
+
+    private void saveSanPhamDoiTraFromChiTiet(YeuCauDoiTra yeuCauDoiTra, UserAuthentication ua, YeuCauDoiTraChiTiet chiTiet) {
+        // Kiểm tra xem chi tiết có trạng thái = 2 (từ chối) hay không
+        if (chiTiet.getTrangThai() == 2) {
             SanPhamDoiTra sanPhamDoiTra = new SanPhamDoiTra();
 
             // Lấy thông tin từ chi tiết yêu cầu đổi trả và lưu vào bảng SanPhamDoiTra
@@ -157,95 +437,17 @@ public class YeuCauDoiTraProcessor {
             sanPhamDoiTra.setSoLuong(chiTiet.getSoLuong());
             sanPhamDoiTra.setLoai(String.valueOf(yeuCauDoiTra.getLoai()));
 
+            // Lấy thông tin người tạo và người cập nhật từ UserAuthentication
             sanPhamDoiTra.setNguoiCapNhat(ua.getPrincipal());
             sanPhamDoiTra.setNgayTao(LocalDateTime.now());
             sanPhamDoiTra.setNgayCapNhat(LocalDateTime.now());
             sanPhamDoiTra.setNguoiTao(ua.getPrincipal());
-            sanPhamDoiTra.setTrangThai(0);
+            sanPhamDoiTra.setTrangThai(0);  // Trạng thái mặc định là 0 (chưa xử lý)
 
-            // Lưu vào bảng SanPhamDoiTra
-            sanPhamDoiTraService.save(sanPhamDoiTra); // Giả sử có service sanPhamDoiTraService
-        });
-    }
-
-    @Transactional(rollbackOn = Exception.class)
-    public ServiceResult updateStatus(Long id, UserAuthentication ua) {
-        // Tìm hóa đơn theo ID
-        YeuCauDoiTra yeuCauDoiTra = service.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
-
-        // Xác định trạng thái mới dựa trên trạng thái hiện tại
-        Integer newTrangThai;
-        switch (yeuCauDoiTra.getTrangThai()) {
-            case 0:
-                newTrangThai = StatusYeuCauDoiTra.DANG_XU_LY.getValue();
-                break;
-            case 1:
-                newTrangThai = StatusYeuCauDoiTra.HOAN_THANH.getValue();
-                saveSanPhamDoiTraFromChiTiet(yeuCauDoiTra, ua); // Lưu thông tin vào bảng SanPhamDoiTra
-                break;
-            default:
-                throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
+            // Lưu vào bảng SanPhamDoiTra thông qua service
+            sanPhamDoiTraService.save(sanPhamDoiTra);  // Giả sử có service sanPhamDoiTraService
         }
-
-        // Cập nhật trạng thái hóa đơn
-        yeuCauDoiTra.setTrangThai(newTrangThai);
-        yeuCauDoiTra.setNgayCapNhat(LocalDateTime.now());
-        yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal());
-        yeuCauDoiTra.setNgayHoanTat(LocalDateTime.now());
-        // Cập nhật trạng thái các chi tiết hóa đơn và lưu thông tin vào bảng SanPhamDoiTra
-        updateYeuCauDoiTraChiTiet(id, newTrangThai); // Cập nhật trạng thái chi tiết
-        // Lưu hóa đơn
-        service.save(yeuCauDoiTra);
-        // Trả về kết quả thành công
-        return new ServiceResult("Hóa đơn đã được cập nhật trạng thái thành công",
-                SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
-
-
-    @Transactional(rollbackOn = Exception.class)
-    public ServiceResult cancelOrder(Long id, CancelOrderRequest request, UserAuthentication ua) throws IOException, InterruptedException {
-        // Tìm yêu cầu đổi trả theo ID
-        YeuCauDoiTra yeuCauDoiTra = service.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Yêu cầu không tồn tại"));
-
-        // Kiểm tra trạng thái
-        if (yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.CHO_XU_LY.getValue() &&
-                yeuCauDoiTra.getTrangThai() != StatusYeuCauDoiTra.DANG_XU_LY.getValue()) {
-            throw new IllegalArgumentException("Yêu cầu không thể hủy vì trạng thái không hợp lệ.");
-        }
-        Integer newTrangThai = StatusYeuCauDoiTra.TU_CHOI.getValue();
-        // Cập nhật thông tin yêu cầu đổi trả
-        yeuCauDoiTra.setTrangThai(newTrangThai); // Đổi trạng thái
-        yeuCauDoiTra.setGhiChu(request.getOrderInfo()); // Ghi chú từ request
-        yeuCauDoiTra.setNgayCapNhat(LocalDateTime.now()); // Ngày cập nhật
-        yeuCauDoiTra.setNgayHoanTat(LocalDateTime.now()); // Ngày hoàn tất
-        yeuCauDoiTra.setNguoiCapNhat(ua.getPrincipal()); // Người cập nhật
-        updateYeuCauDoiTraChiTiet(id, newTrangThai);
-
-        // Lưu lại yêu cầu đổi trả
-        service.save(yeuCauDoiTra);
-
-        // Trả về kết quả thành công
-        return new ServiceResult("Yêu cầu đã được cập nhật thành công.");
-    }
-
-
-//    public ServiceResult updateTrangThai(Long id, Integer trangThai) {
-//        // Tìm yêu cầu đổi trả
-//        var yeuCauDoiTra = service.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Yêu cầu đổi trả không tìm thấy"));
-//
-//        // Cập nhật trạng thái cho yêu cầu đổi trả
-//        yeuCauDoiTra.setTrangThai(trangThai);
-//        service.save(yeuCauDoiTra);
-//
-//        // Cập nhật trạng thái cho các chi tiết của yêu cầu đổi trả
-//        updateYeuCauDoiTraChiTiet(id, trangThai);
-//
-//        // Trả về kết quả thành công
-//        return new ServiceResult("Cập nhật trạng thái yêu cầu đổi trả thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
-//    }
 
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult create(String request, MultipartFile[] files, UserAuthentication ua) {
