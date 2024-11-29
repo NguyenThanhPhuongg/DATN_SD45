@@ -163,6 +163,7 @@ public class UserProcessor {
         var processor = provider.getProcessor(type);
 
         var userModel = processor.auth(input);
+        gioHangService.createCartForUser(userModel.getId());
 
         var token = type == UserType.NORMAL ?
                 makeJwt(userModel, rememberMe) :

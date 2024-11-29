@@ -1,5 +1,6 @@
 package org.example.datn.transformer;
 
+import org.example.datn.entity.Profile;
 import org.example.datn.entity.User;
 import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
@@ -18,6 +19,10 @@ import org.springframework.stereotype.Service;
 @Mapper(componentModel = "spring")
 @Component
 public interface UserTransformer {
+
+    default String mapIdSociety(UserType type, String id){
+        return id + "_" + type;
+    }
 
 //    @Mapping(target = "status", expression = "java(UserStatus.ACTIVE)")
 //    @Mapping(target = "ngayTao", expression = "java(DateTimeUtils.now())")

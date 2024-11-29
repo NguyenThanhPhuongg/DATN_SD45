@@ -1,5 +1,65 @@
 $(document).ready(function () {
 
+    // Khởi tạo Facebook SDK
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '919233929793599',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v12.0'
+        });
+    };
+
+    (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk.js';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+// Xử lý sự kiện đăng nhập Facebook khi nhấn nút
+    $('#fb-login-button').click(function() {
+        FB.login(function(response) {
+            if (response.authResponse) {
+                // Đăng nhập thành công, lấy access token từ Facebook
+                const accessToken = response.authResponse.accessToken;
+
+                // Gửi token lên server để xử lý đăng nhập
+                authByFacebook(accessToken);
+            } else {
+                console.log('User cancelled login or did not fully authorize.');
+            }
+        }, { scope: 'email' }); // Quyền yêu cầu access email của người dùng
+    });
+
+// Hàm gửi access_token lên server để xử lý đăng nhập
+    function authByFacebook(accessToken) {
+        $.ajax({
+            url: '/auth/facebook',
+            method: 'GET',
+            data: {
+                access_token: accessToken
+            },
+            success: function(response) {
+                console.log('Login Success:', response);
+                // Lưu token vào localStorage
+                localStorage.setItem('token', response.token);
+
+                toastr.success('Đăng nhập thành công!', 'Thành công');
+
+                setTimeout(function () {
+                    window.location.href = '/';
+                }, 500);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Login Error:', jqXHR.responseJSON ? jqXHR.responseJSON.message : errorThrown);
+                toastr.error('Đăng nhập thất bại!', 'Lỗi');
+            }
+        });
+    }
+
+
     $('#togglePassword').click(function() {
         const passwordField = $('#password');
         if (passwordField.attr('type') === 'password') {

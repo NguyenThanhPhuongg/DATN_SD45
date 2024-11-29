@@ -2,11 +2,13 @@ package org.example.datn.processor.auth;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.Profile;
 import org.example.datn.entity.User;
 import org.example.datn.exception.CommonException;
 import org.example.datn.exception.NotSupportedException;
 import org.example.datn.model.enums.UserRoles;
+import org.example.datn.model.enums.UserStatus;
 import org.example.datn.model.enums.UserType;
 import org.example.datn.model.response.UserModel;
 import org.example.datn.service.ProfileService;
@@ -53,17 +55,17 @@ public abstract class AbstractAuthenticationChannelProcessor implements Authenti
 
     protected User createUserAndProfileIfNotExists(String username, Function<User, Profile> transformer) {
         var user = userService.findByUserName(username)
-                .orElseGet(() -> userTransformer.toActiveEntity(username, type, UserRoles.USER));
+                .orElseGet(() -> userTransformer.toActiveEntity(username, type, UserRoles.CLIENT));
 
         if (isNotExistsInDb(user)) {
             var profile = transformer.apply(user);
             if (!isEmpty(profile.getEmail())) {
                 user.setXacThuc(true);
             }
-
+            user.setStatus(UserStatus.ACTIVE);
             var userSaved = userService.saveEntity(user);
 
-            profile.setId(userSaved.getId());
+            profile.setUserId(userSaved.getId());
             profileService.save(profile);
         }
         return user;
