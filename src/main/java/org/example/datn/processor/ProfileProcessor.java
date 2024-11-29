@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.enums.UserType;
 import org.example.datn.model.request.ProfileRequest;
 import org.example.datn.service.ProfileService;
 import org.example.datn.service.UserService;
@@ -88,8 +89,8 @@ public class ProfileProcessor {
         // Lưu lại profile
         profileService.save(profile);
 
-        // Nếu email đã thay đổi, cập nhật tên đăng nhập của user
-        if (!user.getUserName().equals(profile.getEmail())) {
+        // Nếu email thay đổi và không phải là người dùng FB, cập nhật userName
+        if (!user.getUserName().equals(profile.getEmail()) && user.getType() != UserType.FB) {
             user.setUserName(profile.getEmail());
             userService.save(user);
         }

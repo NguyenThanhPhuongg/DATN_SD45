@@ -17,6 +17,7 @@ import org.example.datn.transformer.ProfileTransformer;
 import org.example.datn.transformer.UserTransformer;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -63,9 +64,11 @@ public abstract class AbstractAuthenticationChannelProcessor implements Authenti
                 user.setXacThuc(true);
             }
             user.setStatus(UserStatus.ACTIVE);
+            user.setNgayTao(LocalDateTime.now());
             var userSaved = userService.saveEntity(user);
 
             profile.setUserId(userSaved.getId());
+            profile.setNgayTao(LocalDateTime.now());
             profileService.save(profile);
         }
         return user;
