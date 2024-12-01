@@ -13,28 +13,23 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
     // Khởi tạo dữ liệu
     $scope.initialize = function () {
-        // Lấy danh sách danh mục với trangThai = 1
         $http.get("/rest/danhmuc").then(resp => {
             $scope.danhmuc = resp.data.data.filter(item => item.trangThai === 1);
         });
 
-        // Lấy danh sách thương hiệu với trangThai = 1
         $http.get("/rest/thuonghieu").then(resp => {
             $scope.thuonghieu = resp.data.data.filter(item => item.trangThai === 1);
         });
 
-        // Lấy danh sách chất liệu với trangThai = 1
         $http.get("/chat-lieu/get-list").then(resp => {
             $scope.chatlieu = resp.data.data.filter(item => item.trangThai === 1);
         });
 
-        // Lấy danh sách size với trangThai = 1
         $http.get("/size/get-list").then(resp => {
             $scope.size = resp.data.data.filter(item => item.trangThai === 1);
             $scope.filterSizesByIdCha(); // Nếu có logic riêng để lọc theo idCha
         });
 
-        // Lấy danh sách màu sắc với trangThai = 1
         $http.get("/mau-sac/get-list").then(resp => {
             $scope.mausac = resp.data.data.filter(item => item.trangThai === 1);
             $scope.filterColorsByIdCha(); // Nếu có logic riêng để lọc theo idCha
@@ -44,7 +39,6 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
             $scope.sanpham = resp.data.data; // Lưu danh sách sản phẩm vào biến $scope.sanpham
         });
 
-        // Khởi tạo các biến cần thiết
         $scope.productDetails = []; // Khởi tạo mảng sản phẩm chi tiết
         $scope.form.anh = ""; // Đặt lại ảnh mặc định hoặc rỗng
     };
@@ -99,6 +93,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         $scope.form = {}; // Đặt lại form về trạng thái ban đầu
         $scope.form.anh = ""; // Đặt lại ảnh về mặc định
         $scope.errorMessage = ""; // Xóa bỏ thông báo lỗi
+        $scope.initialize();
         $scope.clearImagePreview();
     };
 
@@ -332,9 +327,12 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         if (!form.ten) {
             errorContainer.ten = true;
             toastr.error("Tên sản phẩm không được để trống.", "Lỗi!");
-        } else if (form.ten.length < 2 || form.ten.length > 100) {
+        } else if (form.ten.length > 200) {
             errorContainer.ten = true;
-            toastr.error("Tên sản phẩm phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+            toastr.error("Tên sản phẩm không quá 200 ký tự", "Lỗi!");
+        } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.sanpham && $scope.sanpham.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -349,10 +347,20 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
         if (!form.moTa) {
             errorContainer.moTa = true;
-            toastr.error("Mô tả thương hiệu không được để trống.", "Lỗi!");
-        } else if (form.moTa.length < 5 || form.moTa.length > 300) {
+            toastr.error("Mô tả sản phẩm không được để trống.", "Lỗi!");
+        } else if (form.moTa.length > 2000) {
             errorContainer.moTa = true;
-            toastr.error("Mô tả thương hiệu phải từ 5 ký tự đến 300 ký tự", "Lỗi!");
+            toastr.error("Mô tả sản phẩm tối đa 1000 ký tự", "Lỗi!");
+        } else {
+            errorContainer.moTa = false;
+        }
+
+        if (!form.xuatXu) {
+            errorContainer.moTa = true;
+            toastr.error("Xuất xứ sản phẩm không được để trống.", "Lỗi!");
+        } else if (form.moTa.length > 200) {
+            errorContainer.moTa = true;
+            toastr.error("Xuất xứ sản phẩm không quá 200 ký tự", "Lỗi!");
         } else {
             errorContainer.moTa = false;
         }
@@ -388,6 +396,9 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         if (!form.anh) {
             errorContainer.anh = true;
             toastr.error("Bạn chưa chọn ảnh sản phẩm.", "Lỗi!");
+        } else if (form.anh.size > 5 * 1024 * 1024) { // Kích thước ảnh lớn hơn 5MB
+            errorContainer.anh = true;
+            toastr.error("Kích thước ảnh không được vượt quá 5MB.", "Lỗi!");
         } else {
             errorContainer.anh = false;
         }
@@ -411,11 +422,15 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
 
         const input = document.getElementById('profileImage3');
         if (!input.files || input.files.length === 0) {
-            toastr.error("Bạn chưa chọn ảnh sản phẩm.", "Lỗi!");
-            error.images = true;
-        }else {
+            toastr.error("Bạn chưa chọn ảnh cho chi tiết sản phẩm.", "Lỗi!");
+            errorContainer.images = true;
+        } else if (input.files[0].size > 5 * 1024 * 1024) { // Kích thước ảnh lớn hơn 5MB
+            toastr.error("Kích thước ảnh không được vượt quá 5MB.", "Lỗi!");
+            errorContainer.images = true;
+        } else {
             errorContainer.images = false;
         }
+
 
         return !Object.values(errorContainer).includes(true);
 

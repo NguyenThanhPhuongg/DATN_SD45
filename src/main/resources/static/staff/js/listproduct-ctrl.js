@@ -1,4 +1,4 @@
-app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
+app.controller("listproduct-ctrl", function ($scope, $http, $rootScope, $location) {
     $scope.items = [];
     $scope.form = {};
     $scope.filters = {};  // Đối tượng lưu giá trị bộ lọc riêng
@@ -200,8 +200,9 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
     };
 
     $scope.updateProduct = function () {
-        if (!$scope.validateFields()) {
-            return; // Stop if validation fails
+        $scope.error = {};
+        if (!$scope.validateForm($scope.form, $scope.error, true)) {
+            return;
         }
 
         swal({
@@ -234,12 +235,8 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 1);
-                // formData.append("ngayCapNhat", now);
-                // formData.append("nguoiCapNhat", 1);
-
                 formData.append("ma", $scope.form.ma);
-                // formData.append("ngayTao", now);
-                // formData.append("nguoiTao", $scope.form.nguoiTao);
+
                 const token = localStorage.getItem('token');
 
                 $http.put(`/san-pham/${$scope.form.id}`, formData, {
@@ -261,33 +258,104 @@ app.controller("spct-ctrl", function ($scope, $http, $rootScope, $location) {
         });
     };
 
+    $scope.validateForm = function (form, errorContainer, isUpdate = false) {
 
-    $scope.validateFields = function () {
-        let isValid = true;
-        $scope.errorMessages = {};
-
-        if (!$scope.form.ten || $scope.form.ten.length < 5 || $scope.form.ten.length > 300) {
-            $scope.errorMessages.ten = "Tên sản phẩm phải có từ 5 đến 300 ký tự.";
-            isValid = false;
+        // Kiểm tra tên sản phẩm
+        if (!form.ten) {
+            errorContainer.ten = true;
+            toastr.error("Tên sản phẩm không được để trống.", "Lỗi!");
+        } else if (form.ten.length > 200) {
+            errorContainer.ten = true;
+            toastr.error("Tên sản phẩm không quá 200 ký tự", "Lỗi!");
+        } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục không được chứa ký tự đặc biệt.", "Lỗi!");
+        } else if (
+            $scope.items && $scope.items.some(item =>
+                item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
+                (!isUpdate || (isUpdate && item.id !== form.id)) // Kiểm tra trùng tên với ID khác (trường hợp update)
+            )
+        ) {
+            errorContainer.ten = true;
+            toastr.error("Tên sản phẩm đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
+        } else {
+            errorContainer.ten = false;
         }
 
-        if (!$scope.form.moTa || $scope.form.moTa.length < 5 || $scope.form.moTa.length > 300) {
-            $scope.errorMessages.moTa = "Mô tả phải có từ 5 đến 300 ký tự.";
-            isValid = false;
+        // Kiểm tra mô tả sản phẩm
+        if (!form.moTa) {
+            errorContainer.moTa = true;
+            toastr.error("Mô tả sản phẩm không được để trống.", "Lỗi!");
+        } else if (form.moTa.length > 2000) {
+            errorContainer.moTa = true;
+            toastr.error("Mô tả sản phẩm tối đa 2000 ký tự", "Lỗi!");
+        } else {
+            errorContainer.moTa = false;
         }
 
-        if (!$scope.form.gia || $scope.form.gia < 100000 || $scope.form.gia > 100000000) {
-            $scope.errorMessages.gia = "Giá phải lớn hơn 100,000 và nhỏ hơn 100,000,000.";
-            isValid = false;
+        // Kiểm tra xuất xứ sản phẩm
+        if (!form.xuatXu) {
+            errorContainer.xuatXu = true;
+            toastr.error("Xuất xứ sản phẩm không được để trống.", "Lỗi!");
+        } else if (form.xuatXu.length > 200) {
+            errorContainer.xuatXu = true;
+            toastr.error("Xuất xứ sản phẩm không quá 200 ký tự", "Lỗi!");
+        } else {
+            errorContainer.xuatXu = false;
         }
 
-        return isValid;
+        // Kiểm tra giá sản phẩm
+        if (!$scope.form.gia || $scope.form.gia <= 0) {
+            errorContainer.gia = true;
+            toastr.error("Giá sản phẩm phải lớn hơn 0.", "Lỗi!");
+        } else {
+            errorContainer.gia = false;
+        }
+
+        // Kiểm tra danh mục
+        if (!form.idDanhMuc) {
+            errorContainer.idDanhMuc = true;
+            toastr.error("Bạn chưa chọn danh mục.", "Lỗi!");
+        } else {
+            errorContainer.idDanhMuc = false;
+        }
+
+        // Kiểm tra thương hiệu
+        if (!form.idThuongHieu) {
+            errorContainer.idThuongHieu = true;
+            toastr.error("Bạn chưa chọn thương hiệu.", "Lỗi!");
+        } else {
+            errorContainer.idThuongHieu = false;
+        }
+
+        // Kiểm tra chất liệu
+        if (!form.idChatLieu) {
+            errorContainer.idChatLieu = true;
+            toastr.error("Bạn chưa chọn chất liệu.", "Lỗi!");
+        } else {
+            errorContainer.idChatLieu = false;
+        }
+
+        // Kiểm tra ảnh sản phẩm
+        if (!form.anh) {
+            errorContainer.anh = true;
+            toastr.error("Bạn chưa chọn ảnh sản phẩm.", "Lỗi!");
+        } else if (form.anh.size > 5 * 1024 * 1024) { // Kích thước ảnh lớn hơn 5MB
+            errorContainer.anh = true;
+            toastr.error("Kích thước ảnh không được vượt quá 5MB.", "Lỗi!");
+        } else {
+            errorContainer.anh = false;
+        }
+
+        // Trả về true nếu không có lỗi, false nếu có lỗi
+        return !Object.values(errorContainer).includes(true);
     };
 
     $scope.selectProduct = function (item) {
         console.log("Selected Product ID: ", item.id); // Log để kiểm tra
         $rootScope.selectedProductId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $rootScope.selectedProductTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        $rootScope.selectedProductGia = item.gia; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $location.path('/spct'); // Chuyển hướng đến trang sản phẩm chi tiết
     };
 

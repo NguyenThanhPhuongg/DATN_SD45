@@ -377,3 +377,8 @@ VALUES
 (3,'mangto.png',1, '2024-10-20', '2024-10-20', 1, 1),
 (3,'avatar.png',1, '2024-10-20', '2024-10-20', 1, 1)
 
+ALTER TABLE mau_sac
+DROP COLUMN id_danh_muc_cha;
+
+ALTER TABLE thuong_hieu
+ALTER COLUMN ten NVARCHAR(250);

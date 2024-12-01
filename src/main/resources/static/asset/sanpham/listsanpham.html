@@ -35,12 +35,6 @@
                     <option value="" selected>Thương hiệu</option>
                     <option ng-repeat="c in thuonghieu" ng-value="c.id">{{c.ten}}</option>
                 </select>
-                <select class="form-select" ng-model="filters.xuatXu">
-                    <option value="" selected>Xuất xứ</option>
-                    <option value="Anh">Anh</option>
-                    <option value="Mĩ">Mĩ</option>
-                    <option value="Trung Quốc">Trung Quốc</option>
-                </select>
             </div>
             <table class="table table-striped">
                 <thead>
@@ -153,7 +147,7 @@
                                 <label>Tên sản phẩm</label>
                                 <input type="text" class="form-control" ng-model="form.ten">
                                 <label>Giá sản phẩm</label>
-                                <input type="number" class="form-control" ng-model="form.gia">
+                                <input format-number type="text" class="form-control" ng-model="form.gia">
                                 <label>Mô tả sản phẩm</label>
                                 <textarea class="form-control" ng-model="form.moTa"></textarea>
                                 <label>Thương hiệu sản phẩm</label>
@@ -169,12 +163,7 @@
                                     <option ng-repeat="c in chatlieu" ng-value="c.id">{{c.ten}}</option>
                                 </select>
                                 <label>Xuất xứ</label>
-                                <select class="form-select" ng-model="form.xuatXu">
-                                    <option value="" disabled selected>Xuất xứ sản phẩm</option>
-                                    <option value="Anh" ng-selected="form.xuatXu === 'Anh'">Anh</option>
-                                    <option value="Mĩ" ng-selected="form.xuatXu === 'Mĩ'">Mĩ</option>
-                                    <option value="Trung Quốc" ng-selected="form.xuatXu === 'Trung Quốc'">Trung Quốc</option>
-                                </select>
+                                <input type="text" class="form-control" ng-model="form.xuatXu">
                             </div>
                         </div>
                     </div>

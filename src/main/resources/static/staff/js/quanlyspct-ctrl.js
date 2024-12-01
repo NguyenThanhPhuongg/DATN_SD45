@@ -15,8 +15,11 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.filteredColors = [];
     $scope.selectedProductId = null;
     $scope.selectedProductTen = null;
+    $scope.selectedProductGia = null;
+
     $scope.selectedProductId = $rootScope.selectedProductId; // Lấy ID sản phẩm từ rootScope
     $scope.selectedProductTen = $rootScope.selectedProductTen; // Lấy ID sản phẩm từ rootScope
+    $scope.selectedProductGia = $rootScope.selectedProductGia; // Lấy ID sản phẩm từ rootScope
     $scope.pager = {
         page: 0, size: 10, items: [], count: 0, first: function () {
             this.page = 0;
@@ -90,12 +93,8 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
             const detail = $scope.productDetails[i];
 
             // Kiểm tra giá trị có hợp lệ hay không (>= 50,000 và <= 100,000,000)
-            if (detail.gia < 0 || !detail.gia) {
-                toastr.warning("Chưa nhập giá sản phẩm hoặc giá sản phẩm phải lớn hơn 0", "Lỗi!");
-                return;
-            }
-            if (detail.soLuong < 0 || !detail.gia) {
-                toastr.warning("Chưa nhập số lượng sản phẩm hoặc giá sản phẩm phải lớn hơn 0", "Lỗi!");
+            if (detail.soLuong < 0 || !detail.soLuong) {
+                toastr.warning("Chưa nhập số lượng sản phẩm và số lượng phải lớn hơn 0", "Lỗi!");
                 return;
             }
         }
@@ -111,6 +110,9 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
             if (willAdd) {
                 // Tạo một danh sách sản phẩm chi tiết từ mảng productDetails
                 const addDetailsPromises = $scope.productDetails.map(detail => {
+                    // Gán giá sản phẩm cho sản phẩm chi tiết
+                    detail.gia = $scope.selectedProductGia;  // Gán giá của sản phẩm chính
+
                     // Kiểm tra xem sản phẩm chi tiết đã tồn tại trong danh sách hay chưa
                     const existingDetailIndex = $scope.items.findIndex(item =>
                         item.idSize === detail.idSize && item.idMauSac === detail.idMauSac && item.idSanPham === $scope.selectedProductId
@@ -122,32 +124,30 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                         // Nếu đã tồn tại, cập nhật thông tin sản phẩm chi tiết
                         const existingDetail = $scope.items[existingDetailIndex];
                         existingDetail.soLuong = detail.soLuong;
-                        existingDetail.gia = detail.gia;
+                        existingDetail.gia = detail.gia;  // Cập nhật giá mới
                         existingDetail.ghiChu = detail.ghiChu;
 
                         // Gọi API để cập nhật sản phẩm chi tiết
-                        return $http.put(`/spct/${existingDetail.id}`, existingDetail,
-                            {
-                                headers: {
-                                    'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
-                                }
-                            }); // Sử dụng ID của sản phẩm chi tiết để cập nhật
+                        return $http.put(`/spct/${existingDetail.id}`, existingDetail, {
+                            headers: {
+                                'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                            }
+                        });
                     } else {
                         // Nếu không tồn tại, tạo một sản phẩm chi tiết mới
                         return $http.post("/spct", {
-                                idSanPham: $scope.selectedProductId,
-                                idSize: detail.idSize,
-                                idMauSac: detail.idMauSac,
-                                soLuong: detail.soLuong,
-                                gia: detail.gia,
-                                ghiChu: detail.ghiChu,
-                                trangThai: 1,
-                            },
-                            {
-                                headers: {
-                                    'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
-                                }
-                            });
+                            idSanPham: $scope.selectedProductId,
+                            idSize: detail.idSize,
+                            idMauSac: detail.idMauSac,
+                            soLuong: detail.soLuong,
+                            gia: detail.gia,  // Gán giá vào sản phẩm chi tiết mới
+                            ghiChu: detail.ghiChu,
+                            trangThai: 1,
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${token}` // Thêm token vào header cho yêu cầu chi tiết sản phẩm
+                            }
+                        });
                     }
                 });
 
@@ -155,7 +155,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                 Promise.all(addDetailsPromises).then(() => {
                     $scope.initialize();  // Cập nhật lại dữ liệu
                     $('#addModal').modal('hide');
-                    toastr.success("hêm hoặc cập nhật sản phẩm chi tiết thành công!", "Thành công");
+                    toastr.success("Thêm hoặc cập nhật sản phẩm chi tiết thành công!", "Thành công");
                 }).catch(error => {
                     console.error("Lỗi khi thêm hoặc cập nhật chi tiết sản phẩm:", error);
                     toastr.error("Có lỗi xảy ra khi thêm hoặc cập nhật chi tiết sản phẩm!", "Lỗi");
@@ -213,29 +213,15 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.update = function () {
         $scope.error = {
             soLuong: false,
-            gia: false,
-            ghiChu: false
         };
 
         // Kiểm tra các trường dữ liệu
         let isValid = true;
 
-        if (!$scope.form.gia || $scope.form.gia < 100000 || $scope.form.gia > 100000000) {
-            $scope.error.gia = true;
-            isValid = false;
-            toastr.error("Giá sản phẩm phải từ 10.000 đến 100.000.000.", "Lỗi!");
-        }
-
-        if (!$scope.form.soLuong || $scope.form.soLuong < 100 || $scope.form.soLuong > 10000) {
+        if (!$scope.form.soLuong || $scope.form.soLuong < 0) {
             $scope.error.soLuong = true;
             isValid = false;
-            toastr.error("Số lượng sản phẩm phải từ 1 đến 1.000 sản phẩm.", "Lỗi!");
-        }
-
-        if (!$scope.form.ghiChu || $scope.form.ghiChu.length < 5 || $scope.form.ghiChu.length > 300) {
-            $scope.error.ghiChu = true;
-            isValid = false;
-            toastr.error("Ghi chú phải từ 5 - 10 ký tự.", "Lỗi!");
+            toastr.warning("Chưa nhập số lượng sản phẩm và số lượng phải lớn hơn 0", "Lỗi!");
         }
 
         // Nếu dữ liệu không hợp lệ, hiển thị thông báo và không thực hiện thêm
@@ -252,9 +238,14 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
         }).then((willUpdate) => {
             if (willUpdate) {
                 var item = angular.copy($scope.form);
+
+                // Gán giá sản phẩm từ selectedProductGia vào item
+                item.gia = $scope.selectedProductGia;  // Gán giá của sản phẩm chính vào sản phẩm chi tiết
+
                 // Lấy token từ localStorage
                 const token = localStorage.getItem('token'); // Thay 'authToken' bằng khóa token thực tế của bạn
 
+                // Thực hiện PUT request để cập nhật sản phẩm chi tiết
                 $http.put(`/spct/${item.id}`, item, {
                     headers: {
                         'Authorization': `Bearer ${token}` // Thêm token vào header Authorization
@@ -264,7 +255,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                     toastr.success("Cập nhật thành công", "Thành công!");
                     $('#exampleModal').modal('hide');
                 }).catch(error => {
-                    toastr.error("Cập nhật thất bại", "Thành công!");
+                    toastr.error("Cập nhật thất bại", "Thất bại!");
                     console.log("Error: ", error);
                 });
             } else {

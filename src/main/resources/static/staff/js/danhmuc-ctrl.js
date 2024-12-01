@@ -69,14 +69,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
     $scope.initialize();
 
     $scope.reset = function () {
-        const currentId = $scope.form.id;
-        $scope.form = {
-            ten: '',
-            moTa: '',
-            trangThai: 1,
-            id: currentId,
-            idCha: 1
-        };
+        $scope.form.ten = '';
     };
 
     $scope.resetAdd = function () {
@@ -94,9 +87,12 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         if (!form.ten) {
             errorContainer.ten = true;
             toastr.error("Tên danh mục không được để trống.", "Lỗi!");
-        } else if (form.ten.length < 2 || form.ten.length > 100) {
+        } else if (form.ten.length > 200) {
             errorContainer.ten = true;
-            toastr.error("Tên danh mục phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+            toastr.error("Tên danh mục không quá 200 ký tự", "Lỗi!");
+        } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.items.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -113,9 +109,9 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         if (!form.moTa) {
             errorContainer.moTa = true;
             toastr.error("Mô tả danh mục không được để trống.", "Lỗi!");
-        } else if (form.moTa.length < 5 || form.moTa.length > 300) {
+        } else if (form.moTa.length > 1000) {
             errorContainer.moTa = true;
-            toastr.error("Mô tả danh mục phải từ 5 ký tự đến 300 ký tự", "Lỗi!");
+            toastr.error("Mô tả danh mục không quá 1000 ký tự", "Lỗi!");
         } else {
             errorContainer.moTa = false;
         }
@@ -123,7 +119,7 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         // Kiểm tra danh mục cha
         if (!form.idCha) {
             errorContainer.idCha = true;
-            toastr.error("Bạn chưa chọn danh mục cha.", "Lỗi!");
+            toastr.error("Bạn chưa chọn danh mục dành cho.", "Lỗi!");
         } else {
             errorContainer.idCha = false;
         }

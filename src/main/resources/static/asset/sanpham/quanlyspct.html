@@ -28,7 +28,7 @@
                     <th>Size</th>
                     <th>Màu sắc</th>
                     <th>Số lượng</th>
-                    <th>Giá</th>
+<!--                    <th>Giá</th>-->
                     <th>Ghi chú</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
@@ -40,7 +40,7 @@
                     <td>{{item.size.ten}}</td>
                     <td>{{item.mauSac.ten}}</td>
                     <td>{{item.soLuong}}</td>
-                    <td>{{item.gia}}</td>
+<!--                    <td>{{item.gia}}</td>-->
                     <td>{{item.ghiChu}}</td>
                     <td>
                         <div class="badge"
@@ -137,10 +137,10 @@
                                     <label for="inputID" class="form-label">ID</label>
                                     <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
                                 </div>
-                                <div class="col-md-12 mt-2">
-                                    <label for="inputID" class="form-label">Giá sản phẩm</label>
-                                    <input type="number" class="form-control" ng-model="form.gia">
-                                </div>
+<!--                                <div class="col-md-12 mt-2">-->
+<!--                                    <label for="inputID" class="form-label">Giá sản phẩm</label>-->
+<!--                                    <input type="number" class="form-control" ng-model="form.gia">-->
+<!--                                </div>-->
                                 <div class="col-md-12 mt-2">
                                     <label for="inputID" class="form-label">Số lượng sản phẩm</label>
                                     <input type="number" class="form-control" ng-model="form.soLuong">
@@ -201,6 +201,17 @@
                             <div class="col-md-12 mt-2">
 
                                 <div class="col-md-12 mt-3 d-flex align-items-center">
+                                    <label class="form-label me-2">Chọn màu sắc cho</label>
+                                    <div class="form-check d-flex flex-wrap">
+                                        <div class="form-check d-flex me-3 mb-2" ng-repeat="color in filteredColors">
+                                            <input type="checkbox" class="form-check-input" ng-model="color.selected"
+                                                   ng-change="filterColorsAndSizes()">
+                                            <label class="form-check-label ms-2">{{color.ten}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 mt-3 d-flex align-items-center">
                                     <label class="form-label me-2">Chọn size cho</label>
                                     <select ng-model="selectedSizeIdCha" ng-change="filterSizesByIdCha()" class="form-control me-3"
                                             style="width: 150px;">
@@ -217,25 +228,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-md-12 mt-3 d-flex align-items-center">
-                                    <label class="form-label me-2">Chọn màu sắc cho</label>
-                                    <select ng-model="selectedColorIdCha" ng-change="filterColorsByIdCha()" class="form-control me-3"
-                                            style="width: 150px;">
-                                        <option value="">Tất cả</option>
-                                        <option value="1">Áo</option>
-                                        <option value="2">Quần</option>
-                                        <option value="3">Khác</option>
-                                    </select>
-                                    <div class="form-check d-flex flex-wrap">
-                                        <div class="form-check d-flex me-3 mb-2" ng-repeat="color in filteredColors">
-                                            <input type="checkbox" class="form-check-input" ng-model="color.selected"
-                                                   ng-change="filterColorsAndSizes()">
-                                            <label class="form-check-label ms-2">{{color.ten}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!-- Bảng hiển thị các tổ hợp sản phẩm chi tiết -->
                                 <div class="mb-3 mt-3">
                                     <label>Danh sách sản phẩm chi tiết</label>
@@ -245,7 +237,7 @@
                                             <th>Size</th>
                                             <th>Màu Sắc</th>
                                             <th>Số Lượng</th>
-                                            <th>Giá</th>
+<!--                                            <th>Giá</th>-->
                                             <th>Ghi Chú</th>
                                             <th>Thao Tác</th> <!-- Thêm cột thao tác -->
                                         </tr>
@@ -255,7 +247,7 @@
                                             <td>{{ detail.size.ten }}</td>
                                             <td>{{ detail.mauSac.ten }}</td>
                                             <td><input type="number" ng-model="detail.soLuong" class="form-control"></td>
-                                            <td><input type="number" ng-model="detail.gia" class="form-control"></td>
+<!--                                            <td><input type="number" ng-model="detail.gia" class="form-control"></td>-->
                                             <td><input type="text" ng-model="detail.ghiChu" class="form-control"></td>
                                             <td>
                                                 <button class="btn btn-danger" ng-click="removeProductDetail(detail)">Xóa</button>

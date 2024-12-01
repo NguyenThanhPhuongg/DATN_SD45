@@ -79,12 +79,7 @@ app.controller("size-ctrl", function ($scope, $http) {
     $scope.initialize();
 
     $scope.reset = function () {
-        const currentId = $scope.form.id;
-        $scope.form = {
-            ten: '',
-            id: currentId,
-            idCha: 1,
-        };
+        $scope.form.ten = ''
     };
 
     $scope.resetAdd = function () {
@@ -103,9 +98,12 @@ app.controller("size-ctrl", function ($scope, $http) {
         if (!form.ten) {
             errorContainer.ten = true;
             toastr.error("Tên không được để trống.", "Lỗi!");
-        } else if (form.ten.length < 2 || form.ten.length > 100) {
+        } else if (form.ten.length > 100) {
             errorContainer.ten = true;
-            toastr.error("Tên phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+            toastr.error("Tên size không lớn quá 100 ký tự", "Lỗi!");
+        } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.items.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -130,7 +128,7 @@ app.controller("size-ctrl", function ($scope, $http) {
 
     $scope.create = function () {
         $scope.error1 = {};
-        if (!$scope.validateForm($scope.formAdd, $scope.error1,false)) {
+        if (!$scope.validateForm($scope.formAdd, $scope.error1, false)) {
             return;
         }
 
@@ -164,7 +162,7 @@ app.controller("size-ctrl", function ($scope, $http) {
 
     $scope.update = function () {
         $scope.error = {};
-        if (!$scope.validateForm($scope.form, $scope.error,true)) {
+        if (!$scope.validateForm($scope.form, $scope.error, true)) {
             return;
         }
 

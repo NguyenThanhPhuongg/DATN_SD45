@@ -191,11 +191,11 @@ app.config(function ($routeProvider) {
         /// sản phâm
         .when("/listsanpham", {
             templateUrl: "asset/sanpham/listsanpham.html",
-            controller: "spct-ctrl"
+            controller: "listproduct-ctrl"
         })
         .when("/listsanphaman", {
             templateUrl: "asset/sanpham/listsanphaman.html",
-            controller: "spct-ctrl"
+            controller: "listproduct-ctrl"
         })
         .when("/spct", { // Thêm :id để nhận ID sản phẩm từ URL
             templateUrl: "asset/sanpham/quanlyspct.html",
