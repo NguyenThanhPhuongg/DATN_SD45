@@ -97,24 +97,37 @@
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" ng-model="newAccount.email"
-                                       required>
+                                <input type="email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required"
+                                       id="email" ng-model="newAccount.email" required="" autocomplete="username">
+
                             </div>
                             <div class="mb-3">
-                                <label for="phone" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phone" ng-model="newAccount.phone" required>
+                                <label for="phoneAdd" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="phoneAdd" ng-model="newAccount.phone" required>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 position-relative">
                                 <label for="password" class="form-label">Mật khẩu</label>
-                                <input type="password" class="form-control" id="password" ng-model="newAccount.password"
-                                       required>
+                                <input type="{{isPasswordVisible ? 'text' : 'password'}}" class="form-control"
+                                       id="password" ng-model="newAccount.password" required autocomplete="new-password">
+                                <span id="togglePassword" class="bi"
+                                      ng-class="{'bi-eye': isPasswordVisible, 'bi-eye-slash': !isPasswordVisible}"
+                                      class="position-absolute"
+                                      style="right: 10px; top: 73%; transform: translateY(-50%); cursor: pointer;"
+                                      ng-click="togglePasswordVisibility()"></span>
                             </div>
-                            <div class="mb-3">
+
+                            <div class="mb-3 position-relative">
                                 <label for="retypePassword" class="form-label">Nhập lại mật khẩu</label>
-                                <input type="password" class="form-control" id="retypePassword"
-                                       ng-model="newAccount.retypePassword" required>
+                                <input type="{{isRepasswordVisible ? 'text' : 'password'}}" class="form-control"
+                                       id="retypePassword" ng-model="newAccount.retypePassword" required>
+                                <span id="toggleRepassword" class="bi"
+                                      ng-class="{'bi-eye': isRepasswordVisible, 'bi-eye-slash': !isRepasswordVisible}"
+                                      class="position-absolute"
+                                      style="right: 10px; top: 73%; transform: translateY(-50%); cursor: pointer;"
+                                      ng-click="toggleRepasswordVisibility()"></span>
                             </div>
-<!--                            <div class="mb-3">-->
+
+                            <!--                            <div class="mb-3">-->
 <!--                                <label for="ngaySinh" class="form-label">Ngày sinh</label>-->
 <!--                                <input type="date" class="form-control" id="ngaySinh" ng-model="newAccount.ngaySinh"-->
 <!--                                       required>-->
@@ -142,7 +155,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="detailModalLabel">Chi tiết người dùng</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close close-button" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -159,14 +172,14 @@
                                        ng-model="selectedUser.profile.hoVaTen" readonly>
                             </div>
                             <div class="form-group">
-                                <label for="phone">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phone" ng-model="selectedUser.profile.phone"
+                                <label for="phoneDetail">Số điện thoại</label>
+                                <input type="text" class="form-control" id="phoneDetail" ng-model="selectedUser.profile.phone"
                                        readonly>
                             </div>
                             <div class="form-group">
                                 <label for="ngaySinh">Ngày sinh</label>
                                 <input type="text" class="form-control" id="ngaySinh"
-                                       ng-model="selectedUser.profile.ngaySinh | date:'dd/MM/yyyy'" readonly>
+                                       ng-bind="selectedUser.profile.ngaySinh | date:'dd/MM/yyyy'" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="gioiTinh">Giới tính</label>
@@ -186,7 +199,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-secondary close-detail" data-dismiss="modal">Đóng</button>
                     </div>
                 </div>
             </div>

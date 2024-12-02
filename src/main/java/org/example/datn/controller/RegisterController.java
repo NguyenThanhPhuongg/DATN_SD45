@@ -24,7 +24,7 @@ public class RegisterController {
     UserProcessor processor;
 
     @PostMapping
-    public ServiceResult register(@Valid @RequestBody RegisterModel model) throws InputInvalidException, DuplicatedException {
+    public ServiceResult register(@Valid @RequestBody RegisterModel model) throws DuplicatedException {
         return processor.register(model);
     }
 

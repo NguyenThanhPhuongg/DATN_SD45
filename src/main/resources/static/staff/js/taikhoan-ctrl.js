@@ -1,4 +1,18 @@
 app.controller('taikhoan-ctrl', function ($scope, $http) {
+    $scope.isPasswordVisible = false;  // Biến điều khiển hiển thị mật khẩu
+    $scope.isRepasswordVisible = false; // Biến điều khiển hiển thị mật khẩu nhập lại
+
+// Hàm chuyển đổi trạng thái hiển thị mật khẩu chính
+    $scope.togglePasswordVisibility = function() {
+        $scope.isPasswordVisible = !$scope.isPasswordVisible; // Thay đổi trạng thái
+    };
+
+// Hàm chuyển đổi trạng thái hiển thị mật khẩu nhập lại
+    $scope.toggleRepasswordVisibility = function() {
+        $scope.isRepasswordVisible = !$scope.isRepasswordVisible; // Thay đổi trạng thái
+    };
+
+
     // Biến để lưu danh sách người dùng
     $scope.employees = [];
 
@@ -70,13 +84,13 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
     fetchUsers();
 
     // Khi thay đổi vai trò, gọi lại API để lấy dữ liệu mới
-    $scope.$watch('selectedRole', function() {
+    $scope.$watch('selectedRole', function () {
         $scope.pager.page = 0; // Reset về trang đầu tiên
         fetchUsers();
     });
 
     // Khi thay đổi từ khóa tìm kiếm, gọi lại API để lọc theo từ khóa
-    $scope.$watch('searchText', function() {
+    $scope.$watch('searchText', function () {
         $scope.pager.page = 0; // Reset về trang đầu tiên
         fetchUsers();
     });
@@ -152,23 +166,26 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
                 // Gọi API nếu người dùng xác nhận
                 $http.post('/register', $scope.newAccount)
                     .then(function (response) {
-                        if (response.data && response.data.code === "200" && response.data.message === "Thành công") {
+                        if (response.data && response.data.code === "200") {
                             toastr.success('Đăng ký thành công!', 'Thành công');
                             fetchUsers(); // Cập nhật danh sách người dùng
                             $('#addModal').modal('hide');
                             $scope.newAccount = {}; // Reset form
-                        } else {
-                            toastr.error('Có lỗi xảy ra: ' + (response.data.message || 'Vui lòng kiểm tra thông tin nhập vào.'), 'Lỗi');
                         }
                     })
                     .catch(function (error) {
-                        console.error('Lỗi khi gọi API:', error);
-                        toastr.error('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.', 'Lỗi');
+                        if (error.status === 409){
+                            console.log(error);
+                            toastr.error(error.data.message, 'Lỗi');
+                        }else {
+                            console.error('Lỗi khi gọi API:', error);
+                            toastr.error('Có lỗi xảy ra khi gọi API. Vui lòng kiểm tra console.', 'Lỗi');
+                        }
                     });
             }
         });
-    };
 
+    };
 
 
     // Các hàm chi tiết, xóa người dùng
@@ -250,6 +267,13 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
             });
         }
     };
+
+    document.querySelector('.close-detail').addEventListener('click', function () {
+        $('#detailModal').modal('hide');
+    });
+    document.querySelector('.close-button').addEventListener('click', function () {
+        $('#detailModal').modal('hide');
+    });
 
 
 });

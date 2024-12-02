@@ -25,6 +25,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <!-- Thêm Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 
     <style>
         td{
@@ -181,6 +184,35 @@
             opacity: 0.6;
             pointer-events: none;
         }
+        .position-relative {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding-right: 35px; /* Dành không gian cho biểu tượng mắt */
+        }
+
+        /* Tạo hiệu ứng cho biểu tượng mắt */
+        .bi-eye, .bi-eye-slash {
+            font-size: 1.2em;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .bi-eye:hover, .bi-eye-slash:hover {
+            transform: scale(1.2); /* Phóng to biểu tượng khi hover */
+            color: #888; /* Thay đổi màu sắc khi hover */
+        }
+
+        #togglePassword, #toggleRepassword {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+
     </style>
     <link rel="stylesheet" href="../staff/css/group.css">
 </head>
