@@ -136,7 +136,8 @@
                                     <label>Video/Hình ảnh</label>
                                     <div class="row">
                                         <div class="col-md-3" ng-repeat="image in hinhanh">
-                                            <img ng-src="/{{image.anh}}" class="img-thumbnail" alt="Hình ảnh" ng-click="openImage(image.anh)" />
+                                            <img ng-src="/{{image.anh}}" class="img-thumbnail" alt="Hình ảnh"
+                                                 ng-click="openImage(image.anh)"/>
                                         </div>
                                     </div>
                                 </div>
@@ -171,6 +172,8 @@
                                     <th>Màu sắc</th>
                                     <th>Size</th>
                                     <th>Số lượng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Chức năng</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -181,6 +184,27 @@
                                     <td>{{chiTiet.sanPhamChiTiet.mauSac.ten}}</td>
                                     <td>{{chiTiet.sanPhamChiTiet.size.ten}}</td>
                                     <td>{{chiTiet.soLuong}}</td>
+                                    <td>
+                                        <div class="badge"
+                                             ng-class="{'bg-primary': chiTiet.trangThai === 0, 'bg-warning': chiTiet.trangThai === 1, 'bg-success': chiTiet.trangThai === 2, 'bg-danger': chiTiet.trangThai === 3}">
+                                            <span ng-if="chiTiet.trangThai === 0">Pending</span>
+                                            <span ng-if="chiTiet.trangThai === 1">In Progress</span>
+                                            <span ng-if="chiTiet.trangThai === 2">Confirmed</span>
+                                            <span ng-if="chiTiet.trangThai === 3">Rejected</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-link" type="button"
+                                                ng-if="chiTiet.trangThai === 1"
+                                                ng-click="updateChiTietStatusHoanThanh(chiTiet)">
+                                            <i class="fas fa-check icon-check"></i>
+                                        </button>
+                                        <button class="btn btn-link" type="button"
+                                                ng-if="chiTiet.trangThai === 1"
+                                                ng-click="updateChiTietStatusHuy(chiTiet)">
+                                            <i class="fas fa-times icon-close"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -232,8 +256,9 @@
                         <h5 class="modal-title" id="imageModalLabel">Xem Hình Ảnh</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-center justify-content-center align-content-center" >
-                        <img style="width: 400px; height: auto" ng-src="{{selectedImageUrl}}" class="img-fluid" alt="Hình ảnh chi tiết" />
+                    <div class="modal-body text-center justify-content-center align-content-center">
+                        <img style="width: 400px; height: auto" ng-src="{{selectedImageUrl}}" class="img-fluid"
+                             alt="Hình ảnh chi tiết"/>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>

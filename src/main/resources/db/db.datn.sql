@@ -390,6 +390,7 @@ CREATE TABLE [hoa_don]
 ) ON [PRIMARY];
 GO
 
+
 --- chi tiet hoa don
 
 SET ANSI_NULLS ON
@@ -491,7 +492,7 @@ CREATE TABLE [mau_sac]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [ten] NVARCHAR(100),
-    [id_danh_muc_cha] BIGINT,
+    --[id_danh_muc_cha] BIGINT,
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
@@ -512,7 +513,7 @@ CREATE TABLE [chat_lieu]
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
     [ten] NVARCHAR(100),
-    [id_danh_muc_cha] BIGINT,
+    --[id_danh_muc_cha] BIGINT,
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
@@ -585,8 +586,8 @@ CREATE TABLE [thuong_hieu]
     (
         [id] ASC
     ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
-    [ten] NVARCHAR(100),
-    [mo_ta] NVARCHAR(250),
+    [ten] NVARCHAR(250),
+    [mo_ta] NVARCHAR(1000),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),

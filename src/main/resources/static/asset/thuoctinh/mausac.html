@@ -22,19 +22,19 @@
         <div class="card-body">
             <div class="d-flex align-items-center mb-3">
                 <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
-                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">
-                    <option value="">Tất cả màu sắc</option>
-                    <option value="1">Áo</option>
-                    <option value="2">Giầy</option>
-                    <option value="3">Quần</option>
-                </select>
+<!--                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">-->
+<!--                    <option value="">Tất cả màu sắc</option>-->
+<!--                    <option value="1">Áo</option>-->
+<!--                    <option value="2">Giầy</option>-->
+<!--                    <option value="3">Quần</option>-->
+<!--                </select>-->
             </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>STT</th>
                     <th>ID</th>
-                    <th>Màu sắc cha</th>
+<!--                    <th>Màu sắc cha</th>-->
                     <th>Tên</th>
                     <th>Trạng thái</th>
                     <th>Chức năng</th>
@@ -44,11 +44,11 @@
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>{{item.id}}</td>
-                    <td>
-                        <span ng-if="item.idCha === 1">Áo</span>
-                        <span ng-if="item.idCha === 2">Quần</span>
-                        <span ng-if="item.idCha === 2">Giầy</span>
-                    </td>
+<!--                    <td>-->
+<!--                        <span ng-if="item.idCha === 1">Áo</span>-->
+<!--                        <span ng-if="item.idCha === 2">Quần</span>-->
+<!--                        <span ng-if="item.idCha === 2">Giầy</span>-->
+<!--                    </td>-->
                     <td>{{item.ten}}</td>
                     <td>
                         <div class="badge"
@@ -125,14 +125,14 @@
                                 <label for="inputTen" class="form-label">Tên màu sắc</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
                             </div>
-                            <div class="col-md-7 mt-2">
-                                <label for="inputIDCha" class="form-label">Loại</label>
-                                <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
-                                    <option ng-value="1" selected>Áo</option>
-                                    <option ng-value="2">Quần</option>
-                                    <option ng-value="3">Giầy</option>
-                                </select>
-                            </div>
+<!--                            <div class="col-md-7 mt-2">-->
+<!--                                <label for="inputIDCha" class="form-label">Loại</label>-->
+<!--                                <select class="form-select" aria-label="Default select example" ng-model="form.idCha">-->
+<!--                                    <option ng-value="1" selected>Áo</option>-->
+<!--                                    <option ng-value="2">Quần</option>-->
+<!--                                    <option ng-value="3">Giầy</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
                             <div class="col-md-6 mt-2">
                                 <label for="inputNgayTao" class="form-label">Ngày tạo</label>
                                 <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
@@ -182,15 +182,15 @@
                 <div class="modal-body">
                     <div class="container-fluid px-4">
                         <div class="row">
-                            <div class="col-md-12 mt-2">
-                                <label for="inputIDCha" class="form-label">Loại</label>
-                                <select class="form-select" aria-label="Default select example"
-                                        ng-model="formAdd.idCha">
-                                    <option value="1" selected>Áo</option>
-                                    <option value="2">Quần</option>
-                                    <option value="3">Giầy</option>
-                                </select>
-                            </div>
+<!--                            <div class="col-md-12 mt-2">-->
+<!--                                <label for="inputIDCha" class="form-label">Loại</label>-->
+<!--                                <select class="form-select" aria-label="Default select example"-->
+<!--                                        ng-model="formAdd.idCha">-->
+<!--                                    <option value="1" selected>Áo</option>-->
+<!--                                    <option value="2">Quần</option>-->
+<!--                                    <option value="3">Giầy</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
                             <div class="col-md-12 mt-2">
                                 <label for="inputTen" class="form-label">Tên màu sắc</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten">

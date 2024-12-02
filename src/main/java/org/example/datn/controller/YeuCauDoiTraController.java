@@ -92,4 +92,17 @@ public class YeuCauDoiTraController {
     public ResponseEntity<ServiceResult> getList(UserAuthentication ua) {
         return ResponseEntity.ok(processor.getList(ua));
     }
+
+    @PutMapping("/chi-tiet-hoan-thanh/{id}")
+    public ResponseEntity<ServiceResult> updateStatusYeuCauChiTietHoanThang(
+            @PathVariable("id") Long id,
+            UserAuthentication ua) {
+        return ResponseEntity.ok(processor.updateStatusYeuCauChiTietHoanThanh(id, ua));
+    }
+    @PutMapping("/chi-tiet-tu-choi/{id}")
+    public ResponseEntity<ServiceResult> updateStatusYeuCauChiTietTuChoi(
+            @PathVariable("id") Long id,
+            UserAuthentication ua) {
+        return ResponseEntity.ok(processor.updateStatusYeuCauChiTietHuy(id, ua));
+    }
 }

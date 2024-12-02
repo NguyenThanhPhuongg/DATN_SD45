@@ -33,8 +33,8 @@ app.controller("mausac-ctrl", function ($scope, $http) {
             const filteredItems = $scope.items.filter(item => {
                 const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
                     item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
-                const matchesIdCha = !$scope.selectedIdCha || item.idCha === Number($scope.selectedIdCha);
-                return matchesSearch && matchesIdCha;
+                // const matchesIdCha = !$scope.selectedIdCha || item.idCha === Number($scope.selectedIdCha);
+                return matchesSearch;
             });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
@@ -69,23 +69,18 @@ app.controller("mausac-ctrl", function ($scope, $http) {
         }
     });
 
-    $scope.$watch('selectedIdCha', function (newValue, oldValue) {
-        if (newValue !== oldValue) {
-            $scope.pager.updateItems();
-        }
-    });
+    // $scope.$watch('selectedIdCha', function (newValue, oldValue) {
+    //     if (newValue !== oldValue) {
+    //         $scope.pager.updateItems();
+    //     }
+    // });
 
 
     // Khởi tạo dữ liệu khi controller được tải
     $scope.initialize();
 
     $scope.reset = function () {
-        const currentId = $scope.form.id;
-        $scope.form = {
-            ten: '',
-            id: currentId,
-            idCha: 1,
-        };
+        $scope.form.ten = ''
     };
 
     $scope.resetAdd = function () {
@@ -104,9 +99,12 @@ app.controller("mausac-ctrl", function ($scope, $http) {
         if (!form.ten) {
             errorContainer.ten = true;
             toastr.error("Tên không được để trống.", "Lỗi!");
-        } else if (form.ten.length < 2 || form.ten.length > 100) {
+        } else if (form.ten.length > 100) {
             errorContainer.ten = true;
-            toastr.error("Tên phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+            toastr.error("Tên màu sắc không quá 100 ký tự", "Lỗi!");
+        } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.items.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -119,19 +117,19 @@ app.controller("mausac-ctrl", function ($scope, $http) {
             errorContainer.ten = false;
         }
 
-        if (!form.idCha) {
-            errorContainer.idCha = true;
-            toastr.error("Bạn chưa chọn loại.", "Lỗi!");
-        } else {
-            errorContainer.idCha = false;
-        }
+        // if (!form.idCha) {
+        //     errorContainer.idCha = true;
+        //     toastr.error("Bạn chưa chọn loại.", "Lỗi!");
+        // } else {
+        //     errorContainer.idCha = false;
+        // }
 
         return !Object.values(errorContainer).includes(true);
     };
 
     $scope.create = function () {
         $scope.error1 = {};
-        if (!$scope.validateForm($scope.formAdd, $scope.error1,false)) {
+        if (!$scope.validateForm($scope.formAdd, $scope.error1, false)) {
             return;
         }
 
@@ -165,7 +163,7 @@ app.controller("mausac-ctrl", function ($scope, $http) {
 
     $scope.update = function () {
         $scope.error = {};
-        if (!$scope.validateForm($scope.form, $scope.error,true)) {
+        if (!$scope.validateForm($scope.form, $scope.error, true)) {
             return;
         }
 

@@ -303,8 +303,16 @@ VALUES
 (5, 1, 1, 0, GETDATE(), GETDATE(), 1, 1);
 
 update yeu_cau_doi_tra_chi_tiet set trang_thai = 0
+
 select * from yeu_cau_doi_tra_chi_tiet
 select * from yeu_cau_doi_tra
+select * from chi_tiet_hoa_don 
+select * from hoa_don                   
+
+
+
+
+
 select * from san_pham_doi_tra
 select * from thong_tin_ca_nhan
 select * from gio_hang
@@ -369,3 +377,8 @@ VALUES
 (3,'mangto.png',1, '2024-10-20', '2024-10-20', 1, 1),
 (3,'avatar.png',1, '2024-10-20', '2024-10-20', 1, 1)
 
+ALTER TABLE mau_sac
+DROP COLUMN id_danh_muc_cha;
+
+ALTER TABLE thuong_hieu
+ALTER COLUMN ten NVARCHAR(250);

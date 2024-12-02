@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Long> {
@@ -22,4 +23,6 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
     List<HoaDonChiTiet> findByIdHoaDon(Long idHoaDon);
 
     List<HoaDonChiTiet> findByIdHoaDonAndIdSanPhamChiTietIn(Long idHoaDon, List<Long> idSanPhamChiTiets);
+
+    Optional<HoaDonChiTiet> findByIdHoaDonAndIdSanPhamChiTiet(Long idHoaDon, Long idSanPhamChiTiet);
 }

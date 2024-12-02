@@ -206,4 +206,77 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
         "hideMethod": "fadeOut"
     };
 
+    $scope.updateChiTietStatusHoanThanh = function (chiTiet) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái chi tiết này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                // Lấy token từ localStorage
+                const token = localStorage.getItem("token");
+
+                if (!token) {
+                    toastr.error("Vui lòng đăng nhập để thực hiện hành động này", "Lỗi!");
+                    return;
+                }
+
+                // Thực hiện gọi API cập nhật trạng thái
+                $http({
+                    method: 'PUT',
+                    url: `/yeu-cau/chi-tiet-hoan-thanh/${chiTiet.id}`,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(function (response) {
+                    // Cập nhật trạng thái trực tiếp trên giao diện
+                    $scope.initialize();
+                    toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
+                }).catch(function (error) {
+                    toastr.error("Có lỗi xảy ra", "Lỗi!");
+                    console.error("Lỗi khi cập nhật trạng thái chi tiết:", error);
+                });
+            }
+        });
+    };
+    $scope.updateChiTietStatusHuy = function (chiTiet) {
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật trạng thái chi tiết này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                // Lấy token từ localStorage
+                const token = localStorage.getItem("token");
+
+                if (!token) {
+                    toastr.error("Vui lòng đăng nhập để thực hiện hành động này", "Lỗi!");
+                    return;
+                }
+
+                // Thực hiện gọi API cập nhật trạng thái
+                $http({
+                    method: 'PUT',
+                    url: `/yeu-cau/chi-tiet-tu-choi/${chiTiet.id}`,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(function (response) {
+                    // Cập nhật trạng thái trực tiếp trên giao diện
+                    $scope.initialize();
+                    toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
+                }).catch(function (error) {
+                    toastr.error("Có lỗi xảy ra", "Lỗi!");
+                    console.error("Lỗi khi cập nhật trạng thái chi tiết:", error);
+                });
+            }
+        });
+    };
+
+    // Hàm để xử lý từ chối yêu cầu chi tiết
+
 });

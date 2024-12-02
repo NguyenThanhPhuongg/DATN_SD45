@@ -106,9 +106,12 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
         if (!form.ten) {
             errorContainer.ten = true;
             toastr.error("Tên thương hiệu không được để trống.", "Lỗi!");
-        } else if (form.ten.length < 2 || form.ten.length > 100) {
+        } else if (form.ten.length > 250) {
             errorContainer.ten = true;
-            toastr.error("Tên thương hiệu phải từ 2 ký tự đến 100 ký tự", "Lỗi!");
+            toastr.error("Tên thương hiệu tối đa 250 ký tự", "Lỗi!");
+        } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
+            errorContainer.ten = true;
+            toastr.error("Tên danh mục không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.items.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -125,9 +128,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
         if (!form.moTa) {
             errorContainer.moTa = true;
             toastr.error("Mô tả thương hiệu không được để trống.", "Lỗi!");
-        } else if (form.moTa.length < 5 || form.moTa.length > 300) {
+        } else if (form.moTa.length > 1000) {
             errorContainer.moTa = true;
-            toastr.error("Mô tả thương hiệu phải từ 5 ký tự đến 300 ký tự", "Lỗi!");
+            toastr.error("Mô tả thương hiệu tối đa 1000 ký tự", "Lỗi!");
         } else {
             errorContainer.moTa = false;
         }
@@ -137,7 +140,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
 
     $scope.create = function () {
         $scope.error1 = {};
-        if (!$scope.validateForm($scope.formAdd, $scope.error1,false)) {
+        if (!$scope.validateForm($scope.formAdd, $scope.error1, false)) {
             return;
         }
 
@@ -171,7 +174,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
 
     $scope.update = function () {
         $scope.error = {};
-        if (!$scope.validateForm($scope.form, $scope.error,true)) {
+        if (!$scope.validateForm($scope.form, $scope.error, true)) {
             return;
         }
 
