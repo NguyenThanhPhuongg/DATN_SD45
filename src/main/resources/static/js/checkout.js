@@ -191,11 +191,10 @@ async function addNewAddress() {
             toastr.error('Lỗi khi thêm địa chỉ mới.', 'Lỗi');
         }
     } else {
-       // Nếu người dùng hủy, thông báo với toastr
+        // Nếu người dùng hủy, thông báo với toastr
         toastr.info('Bạn đã hủy thao tác thêm địa chỉ.', 'Thông báo');
     }
 }
-
 
 
 function handleConfirmButton() {
@@ -653,6 +652,14 @@ async function placeOrder() {
     const idDiaChiGiaoHang = addressDataId;
     const idPhuongThucVanChuyen = phuongThucVanChuyenId;
 
+    if (!idDiaChiGiaoHang) {
+        toastr.warning('Vui lòng chọn địa chỉ giao hàng.', 'Cảnh báo');
+        return;
+    }
+    if (!idPhuongThucVanChuyen) {
+        toastr.warning('Vui lòng chọn phương thức vận chuyển.', 'Cảnh báo');
+        return;
+    }
     // Kiểm tra phương thức thanh toán
     if (!phuongThucThanhToanId) {
         toastr.warning('Vui lòng chọn phương thức thanh toán.', 'Cảnh báo');

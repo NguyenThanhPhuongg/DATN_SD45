@@ -2354,17 +2354,21 @@
             const response = await fetch(`/dia-chi/${diaChiIdToHandle}`, {
                 method: 'DELETE'
             });
-            if (response.ok) {
+
+            if (response.code === '200') {
                 toastr.success('Địa chỉ đã được xóa thành công!', 'Thành công');
-                hienThiDanhSachDiaChi(); // Cập nhật lại danh sách địa chỉ sau khi xóa thành công
-            } else if (response.status === 500) {
-                toastr.error('Không thể xóa địa chỉ mặc định.', 'Lỗi');
+                hienThiDanhSachDiaChi();
             } else {
-                toastr.error('Lỗi khi xóa địa chỉ, vui lòng kiểm tra lại!', 'Lỗi');
+                const errorData = await response.json();
+                const errorMessage = errorData.message || 'Lỗi khi xóa địa chỉ, vui lòng kiểm tra lại!';
+
+                toastr.error(errorMessage, 'Lỗi');
             }
+
             diaChiIdToHandle = null; // Reset biến lưu trữ ID
         }
     }
+
 
     // Hàm để thiết lập địa chỉ mặc định
     async function thietLapMacDinh() {

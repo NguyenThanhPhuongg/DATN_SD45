@@ -62,7 +62,7 @@ public class DiaChiGiaoHangProcessor {
     public ServiceResult deleteById(Long id) throws AccessDeniedException {
         var entity = service.findById(id).orElseThrow(() -> new EntityNotFoundException("diaChiGiaoHang.not.found"));
         if (entity.getTrangThai().equals(SystemConstant.DEFAULT)){
-            throw AccessDeniedException.of("Địa chỉ mặc định không được phép xóa!");
+            throw AccessDeniedException.of("diaChiGiaoHang.default.not.delete");
         }
         service.delete(entity);
         return new ServiceResult();
