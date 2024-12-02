@@ -711,7 +711,7 @@ async function placeOrder() {
                 if (selectedVoucherValue != null && selectedVoucherValue !== 0) {
                     await applyVoucher();
                 }
-                // window.location.href = '/bill';
+                window.location.href = '/bill';
             } else if (typeof result.data === 'string') {
                 // Chuyển hướng tới VNPay link
                 window.location.href = result.data;
