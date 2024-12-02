@@ -21,5 +21,6 @@ public class YeuCauDoiTraRequest {
     private LoaiYeuCau loai;
     private String lyDo;
     private String ghiChu;
+    private String thongTinChuyenKhoan;
 
 }

@@ -575,7 +575,11 @@ $(document).ready(function () {
                 },
                 error: function (error) {
                     console.error('Error adding product to cart:', error);
-                    toastr.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'Lỗi');
+                    if (error.responseJSON.code === '400' ){
+                        toastr.error(error.responseJSON.message, 'Lỗi');
+                    }else {
+                        toastr.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.', 'Lỗi');
+                    }
                 }
             });
         }

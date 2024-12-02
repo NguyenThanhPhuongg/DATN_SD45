@@ -5,6 +5,7 @@ import org.example.datn.entity.Size;
 import org.example.datn.entity.User;
 import org.example.datn.entity.YeuCauDoiTra;
 import org.example.datn.exception.DuplicatedException;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.LoaiYeuCau;
@@ -84,7 +85,7 @@ public class YeuCauDoiTraController {
 
     @PostMapping("/create")
     public ResponseEntity<ServiceResult> create(@RequestParam("request") String request,
-                                                @RequestParam("files") MultipartFile[] files, UserAuthentication ua) {
+                                                @RequestParam("files") MultipartFile[] files, UserAuthentication ua) throws NotFoundEntityException {
         return ResponseEntity.ok(processor.create(request, files, ua));
     }
 
