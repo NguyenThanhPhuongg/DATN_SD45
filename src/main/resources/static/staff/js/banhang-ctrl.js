@@ -46,7 +46,23 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
         });
 
-
+    $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
+        .then(function (response) {
+            let arrKm = response.data.data;
+            $http.get('/ap-dung-khuyen-mai')
+                .then(function (res) {
+                    $scope.listProductPromotion = res.data.data;
+                    $scope.listProductPromotion.forEach(function (product) {
+                        const khuyenMai = arrKm.find(km => km.id === product.idKhuyenMai);
+                        product.tenKhuyenMai = khuyenMai ? khuyenMai.ten : "Không có tên khuyến mãi";
+                    });
+                    console.log($scope.listProductPromotion)
+                }, function (error) {
+                    console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
+                });
+        }, function (error) {
+            console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
+        });
 
 
     // Thiết lập Firebase
@@ -235,7 +251,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             phoneCustomer: '',
             moneyCustomer: 0,
             trangThai: 7,
-            nguoiTao: 1,
+            nguoiTao: parseFloat(document.getElementById("nameAdmin").getAttribute('data-id')) || 0,
+            tenNguoiTao: document.getElementById("nameAdmin").textContent || 'Admin',
             diemSuDung: 0,
             idDiaChiGiaoHang:0,
             idPhuongThucVanChuyen:0,
@@ -308,7 +325,6 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             bill.diemSuDung = 0;
         }
 
-        console.log(bill.diemSuDung);
     };
 
     $scope.updateTotalBill = function (bill) {
@@ -375,24 +391,18 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
     $scope.updateQuantity = function (bill, item) {
         // Chuyển đổi số lượng thành kiểu số và kiểm tra giá trị hợp lệ
+
         item.soLuong = Number(item.soLuong);
         if (item.soLuong == null || isNaN(item.soLuong)) {
             item.soLuong = 1;
         }
 
-        // Tìm sản phẩm tương ứng trong danh sách
         const productInList = $scope.listProduct.find(p => p.id === item.id);
 
         if (productInList) {
-            // Tính số lượng còn lại trong danh sách sản phẩm
-            const remainingQuantity = item.soLuongMax - item.soLuong;
-
-            // Nếu số lượng vượt quá giới hạn, điều chỉnh về mức tối đa
-            if (item.soLuong > remainingQuantity) {
-                item.soLuong = remainingQuantity;
+            if (item.soLuong > item.soLuongMax) {
+                item.soLuong = item.soLuongMax;
             }
-
-            // Cập nhật số lượng trong danh sách sản phẩm
             productInList.soLuong = item.soLuongMax - item.soLuong;
         }
 
@@ -520,10 +530,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         return Math.floor(bill.totalBillLast / 1000); // Tính điểm tích lũy
     };
     $scope.payBill = function (bill) {
-
         bill.totalBillLast = $scope.getTotalAmount(bill)
         bill.billDiem = Math.floor(bill.totalBillLast / 1000)
-
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
                 bill.disabled = true;

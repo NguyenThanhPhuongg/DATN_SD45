@@ -4,6 +4,7 @@ import org.example.datn.entity.DiemTichLuy;
 import org.example.datn.entity.HoaDon;
 import org.example.datn.entity.HoaDonChiTiet;
 import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.HDRequest;
 import org.example.datn.repository.DiemTichLuyRepository;
 import org.example.datn.repository.HoaDonChiTietRepository;
@@ -87,7 +88,7 @@ public class HDService {
         String maHoaDon = "HD" + String.format("%07d", savedHoaDon.getId());
         savedHoaDon.setMa(maHoaDon);
 
-        // Lưu chi tiết hóa đơn và cập nhật số lượng sản phẩm
+        // Lưu chi tiết hóa đơn và cập nhật số lnguoi_taoượng sản phẩm
         List<HoaDonChiTiet> chiTietList = hdRequest.getItems().stream().map(hdctRequest -> {
             HoaDonChiTiet chiTiet = new HoaDonChiTiet();
             chiTiet.setIdHoaDon(savedHoaDon.getId());
@@ -95,7 +96,9 @@ public class HDService {
             chiTiet.setSoLuong(hdctRequest.getSoLuong());
             chiTiet.setNgayTao(LocalDateTime.now());
             chiTiet.setNgayCapNhat(LocalDateTime.now());
-            chiTiet.setTrangThai(hdctRequest.getTrangThai());
+            chiTiet.setNguoiTao(hdRequest.getNguoiTao());
+            chiTiet.setTrangThai(hdRequest.getTrangThai());
+            chiTiet.setGia(hdctRequest.getGia());
 
             // Giảm số lượng tồn kho của sản phẩm
             SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(hdctRequest.getId())

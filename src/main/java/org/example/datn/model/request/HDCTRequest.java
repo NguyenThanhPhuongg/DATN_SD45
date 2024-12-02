@@ -13,5 +13,7 @@ public class HDCTRequest {
     private Integer soLuong;
     private BigDecimal gia;
     private Integer trangThai;
+    private LocalDateTime ngayCapNhat;
+    private Long nguoiTao;
     private LocalDateTime ngayTao;
 }
