@@ -1,9 +1,11 @@
 package org.example.datn.processor;
 
+import io.swagger.models.auth.In;
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.GioHangChiTiet;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.exception.InputInvalidException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.StatusGioHang;
@@ -275,9 +277,13 @@ public class GioHangChiTietProcessor {
         return model;
     }
 
-
-    public ServiceResult changeSoLuong(Long id, Integer soLuong, UserAuthentication ua) {
-        var g = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
+    @Transactional(rollbackOn = Exception.class)
+    public ServiceResult changeSoLuong(Long id, Integer soLuong, UserAuthentication ua) throws InputInvalidException {
+        var g = service.findById(id).orElseThrow(() -> new EntityNotFoundException("gioHangChiTiet.not.found"));
+        var spct = spctService.findById(g.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("sanPhamChiTiet.not.found"));
+        if (soLuong > spct.getSoLuong()) {
+            throw InputInvalidException.of("quantity.not.enough");
+        }
         g.setSoLuong(soLuong);
         g.setNguoiCapNhat(ua.getPrincipal());
         service.save(g);

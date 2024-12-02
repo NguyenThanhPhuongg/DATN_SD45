@@ -3,6 +3,7 @@ package org.example.datn.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.exception.InputInvalidException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.GioHangChiTietRequest;
@@ -49,7 +50,7 @@ public class GioHangChiTietController {
     }
 
     @PutMapping("/change/{id}")
-    public ResponseEntity<ServiceResult> changeSoLuong(@PathVariable Long id, @RequestBody Integer soLuong, UserAuthentication ua) {
+    public ResponseEntity<ServiceResult> changeSoLuong(@PathVariable Long id, @RequestBody Integer soLuong, UserAuthentication ua) throws InputInvalidException {
         return ResponseEntity.ok(processor.changeSoLuong(id, soLuong, ua));
     }
 

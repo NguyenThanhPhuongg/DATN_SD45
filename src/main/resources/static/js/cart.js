@@ -54,7 +54,6 @@ function handleCheckout() {
 }
 
 
-
 function updateTotalSection() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
     const productItems = document.querySelectorAll('.product-item');
@@ -101,10 +100,14 @@ function handleQuantityChange(itemId, isIncreasing) {
                 productItem.querySelector('.total').textContent = `₫${total}`;
                 updateTotalSection();
             } else {
-                console.error('Cập nhật số lượng thất bại', result.message);
+                toastr.error(result.message || 'Cập nhật số lượng thất bại!', 'Lỗi');
             }
         })
-        .catch(error => console.error('Lỗi khi gọi API', error));
+        .catch(error => {
+            // Hiển thị lỗi nếu có lỗi trong quá trình gọi API
+            toastr.error('Lỗi khi gọi API', 'Lỗi');
+            console.error('Lỗi khi gọi API', error);
+        });
 }
 
 function hienThiThongBao(message, success = true) {
@@ -149,7 +152,7 @@ function deleteItem(itemId) {
             if (result.code === '200') {
                 toastr.success('Sản phẩm đã được xóa thành công!', 'Thành công');
                 fetchCartData();
-                setTimeout(function() {
+                setTimeout(function () {
                     location.reload();
                 }, 500);
             } else {
