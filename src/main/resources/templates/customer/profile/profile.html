@@ -1641,6 +1641,9 @@
             <label for="note">Ghi chú:</label>
             <textarea id="note" name="note" rows="4"></textarea>
             <br/>
+            <label for="bank-info">Thông tin chuyển khoản:</label>
+            <textarea id="bank-info" name="bank-info" rows="4" placeholder="Nhập thông tin chuyển khoản (tên tài khoản, số tài khoản, ngân hàng, v.v.)" required></textarea>
+            <br/>
 
             <!-- Thêm trường chọn tệp -->
             <label for="files">Chọn tệp (Hình ảnh hoặc Video):</label>
@@ -1952,7 +1955,7 @@
                 orderActions.innerHTML = `
                 ${order.trangThai === 4 || order.trangThai === 5 ?
                     `<button class="buy-again" onclick='buyAgain(${JSON.stringify(order)})'>Mua lại</button>` : ''}
-               ${order.trangThai === 4 && isReturnAllowed(order.ngayGiaoHang) ?
+               ${order.trangThai === 4 && isReturnAllowed(order.ngayGiaoHang) && order.trangThaiDoiTra !== 2 ?
                     `<button class="request-return" onclick='requestReturn(${JSON.stringify(order)})'>Yêu cầu đổi trả</button>` : ''}
 
 
@@ -3056,6 +3059,7 @@
         const loai = document.getElementById('type').value;  // Lấy loại yêu cầu (Đổi hàng / Trả hàng)
         const reason = document.getElementById('reason').value;  // Lý do yêu cầu
         const note = document.getElementById('note').value;  // Ghi chú thêm
+        const bankInfo = document.getElementById('bank-info').value;  // Ghi chú thêm
         const files = document.getElementById('files').files;  // Lấy các tệp đã chọn
 
         if (selectedProducts.length === 0) {
@@ -3072,13 +3076,18 @@
             toastr.error('Bạn phải nhập lý do yêu cầu.', 'Lỗi');
             return;
         }
+        if (!bankInfo) {
+            toastr.error('Bạn phải nhập thông thi chuyển khoản.', 'Lỗi');
+            return;
+        }
 
         const requestData = {
             idHoaDon: orderId,
             idSanPhamChiTiets: selectedProducts,
             loai: loai,
             lyDo: reason,
-            ghiChu: note
+            ghiChu: note,
+            thongTinChuyenKhoan: bankInfo
         };
 
         const token = localStorage.getItem('token');

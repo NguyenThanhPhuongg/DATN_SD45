@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializer;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.*;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.LoaiYeuCau;
@@ -450,7 +451,7 @@ public class YeuCauDoiTraProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult create(String request, MultipartFile[] files, UserAuthentication ua) {
+    public ServiceResult create(String request, MultipartFile[] files, UserAuthentication ua) throws NotFoundEntityException {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
         JsonSerializer<LocalDate> serializer = (src, typeOfSrc, context) ->
@@ -485,10 +486,16 @@ public class YeuCauDoiTraProcessor {
         }
 
         for (Long idSPCT : target.getIdSanPhamChiTiets()) {
+
             YeuCauDoiTraChiTiet yeuCauChiTiet = new YeuCauDoiTraChiTiet();
             yeuCauChiTiet.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
             yeuCauChiTiet.setIdSPCT(idSPCT);
-            yeuCauChiTiet.setSoLuong(1);
+            List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(target.getIdHoaDon(), List.of(idSPCT));
+            if (hoaDonChiTiets.isEmpty()) {
+                throw NotFoundEntityException.of("Sản phẩm chi tiết không tồn tại trong hóa đơn");
+            }
+            HoaDonChiTiet hoaDonChiTiet = hoaDonChiTiets.get(0);
+            yeuCauChiTiet.setSoLuong(hoaDonChiTiet.getSoLuong()); // lấy số lượng từ hoaDonChiTiet
             yeuCauChiTiet.setTrangThai(StatusYeuCauDoiTra.CHO_XU_LY.getValue());
             yeuCauChiTiet.setNgayTao(LocalDateTime.now());
             yeuCauChiTiet.setNgayCapNhat(LocalDateTime.now());

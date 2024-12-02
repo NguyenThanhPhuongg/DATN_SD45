@@ -24,6 +24,7 @@ public class YeuCauDoiTraModel extends CommonModel {
      String loai;
      String lyDo;
      String ghiChu;
+     String thongTinChuyenKhoan;
      Integer trangThai;
      LocalDateTime ngayYeuCau;
      LocalDateTime ngayHoanTat;
