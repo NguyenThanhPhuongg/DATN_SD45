@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
-    $('#togglePassword').click(function() {
+    $('#togglePassword').click(function () {
         const passwordField = $('[name="customer[password]"]');
 
         if (passwordField.attr('type') === 'password') {
@@ -12,7 +12,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#toggleRepassword').click(function() {
+    $('#toggleRepassword').click(function () {
         const rePasswordField = $('[name="customer[retypePassword]"]');
 
         if (rePasswordField.attr('type') === 'password') {
@@ -25,14 +25,14 @@ $(document).ready(function() {
     });
 
     // Xử lý khi nhấn vào nút Đăng ký
-    $('#registerButton').click(function(event) {
+    $('#registerButton').click(function (event) {
         event.preventDefault(); // Ngừng hành động mặc định của nút
 
         handleRegister();  // Gọi hàm đăng ký
     });
 
     // Xử lý khi nhấn Enter trong form
-    $('#create_customer input').keypress(function(event) {
+    $('#create_customer input').keypress(function (event) {
         if (event.which === 13) { // Kiểm tra nếu phím Enter (key code 13) được nhấn
             event.preventDefault();  // Ngừng hành động mặc định (nếu có)
             handleRegister();  // Gọi hàm đăng ký
@@ -45,6 +45,38 @@ $(document).ready(function() {
 
         if (!form.checkValidity()) {
             form.reportValidity();  // Hiển thị thông báo lỗi nếu form không hợp lệ
+            return;
+        }
+        const name = $('input[name="customer[name]"]').val().trim();
+
+        // Kiểm tra trường "name": không được rỗng, có thể chứa dấu cách nhưng không được chỉ có dấu cách
+        const nameRegex = /^[\p{L}0-9 ]+$/u;
+        if (name.length === 0) {
+            toastr.error('Tên không được để trống.', 'Lỗi');
+            return;
+        }
+        if (!nameRegex.test(name)) {
+            toastr.error('Tên không được chứa ký tự đặc biệt ngoài dấu cách.', 'Lỗi');
+            return;
+        }
+        if (name === '') {
+            toastr.error('Tên không được chỉ có dấu cách.', 'Lỗi');
+            return;
+        }
+
+        // Kiểm tra ngày sinh không được quá ngày hiện tại
+        const ngaySinh = $('input[name="customer[ngaySinh]"]').val().trim();
+        const today = new Date();
+        const birthDate = new Date(ngaySinh);
+
+        // So sánh ngày sinh với ngày hiện tại
+        if (isNaN(birthDate.getTime())) {
+            toastr.error('Ngày sinh không hợp lệ.', 'Lỗi');
+            return;
+        }
+
+        if (birthDate > today) {
+            toastr.error('Ngày sinh không được quá ngày hiện tại.', 'Lỗi');
             return;
         }
 
@@ -62,13 +94,13 @@ $(document).ready(function() {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(registerData),
-            success: function(response) {
+            success: function (response) {
                 toastr.success('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.', 'Thành công');
-                setTimeout(function() {
+                setTimeout(function () {
                     window.location.href = '/v1/auth/login';
                 }, 500);
             },
-            error: function(jqXHR) {
+            error: function (jqXHR) {
                 const errorMsg = jqXHR.responseJSON && jqXHR.responseJSON.message
                     ? jqXHR.responseJSON.message
                     : 'Thông tin đăng ký không hợp lệ!';
@@ -79,8 +111,8 @@ $(document).ready(function() {
 
     // Hàm ẩn thông báo sau khi delay
     function hideMessageAfterDelay() {
-        setTimeout(function() {
-            $('#message').fadeOut('slow', function() {
+        setTimeout(function () {
+            $('#message').fadeOut('slow', function () {
                 $(this).empty().show();
             });
         }, 2000);
