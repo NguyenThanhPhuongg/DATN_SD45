@@ -2,6 +2,8 @@ package org.example.datn.controller;
 
 import org.example.datn.entity.DanhMuc;
 import org.example.datn.exception.DuplicatedException;
+import org.example.datn.exception.InputInvalidException;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.CancelOrderRequest;
@@ -43,7 +45,7 @@ public class HoaDonController {
 
     // Thêm mới hóa đơn
     @PostMapping
-    public ResponseEntity<ServiceResult> add(@RequestBody HoaDonRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<ServiceResult> add(@RequestBody HoaDonRequest request, HttpServletRequest httpServletRequest) throws InputInvalidException, NotFoundEntityException {
         // Giả sử UserAuthentication được đặt trong request bởi middleware
         UserAuthentication ua = (UserAuthentication) httpServletRequest.getAttribute("userAuth");
 
@@ -53,7 +55,7 @@ public class HoaDonController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) {
+    public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) throws InputInvalidException, NotFoundEntityException {
         return ResponseEntity.ok(processor.save(request, ua));
     }
 //    @PutMapping("/{id}")

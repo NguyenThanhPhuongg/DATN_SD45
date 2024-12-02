@@ -141,7 +141,7 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult save(HoaDonRequest request, UserAuthentication ua) {
+    public ServiceResult save(HoaDonRequest request, UserAuthentication ua) throws NotFoundEntityException, InputInvalidException {
         HoaDon hoaDon = new HoaDon();
         hoaDon.setIdNguoiDung(ua.getPrincipal());
         hoaDon.setIdDiaChiGiaoHang(request.getIdDiaChiGiaoHang());
@@ -156,7 +156,7 @@ public class HoaDonProcessor {
         service.save(hoaDon);
 
         var phuongThucThanhToan = phuongThucThanhToanService.findById(request.getIdPhuongThucThanhToan())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phương thức thanh toán"));
+                .orElseThrow(() -> new EntityNotFoundException("phuongThucThanhToan.not.found"));
 
         var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
         BigDecimal tongTien = BigDecimal.ZERO;
@@ -176,13 +176,22 @@ public class HoaDonProcessor {
             hoaDonChiTietService.save(hdct);
             ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
             gioHangChiTietService.save(ghct);
+
+            var sanPhamChiTiet = sanPhamChiTietService.findById(ghct.getIdSanPhamChiTiet()).orElseThrow(() -> NotFoundEntityException.of("sanPhamChiTiet.not.found"));
+            Integer soLuongMua = ghct.getSoLuong();
+            Integer soLuongConLai = sanPhamChiTiet.getSoLuong() - soLuongMua;
+            if (soLuongConLai < 0) {
+                throw InputInvalidException.of("quantity.not.enough");
+            }
+            sanPhamChiTiet.setSoLuong(soLuongConLai);
+            sanPhamChiTietService.save(sanPhamChiTiet);
         }
 
         if (request.getGiaTriVoucher() != null) {
             tongTien = tongTien.subtract(request.getGiaTriVoucher());
         }
 
-        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phương thức vận chuyển"));
+        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen()).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
         tongTien = tongTien.add(phuongThucVanChuyen.getPhiVanChuyen());
 
         hoaDon.setTongTien(tongTien);

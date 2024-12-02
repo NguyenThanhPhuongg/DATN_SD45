@@ -71,7 +71,7 @@ public class GioHangChiTietProcessor {
             gioHangChiTiet.get().setNgayCapNhat(LocalDateTime.now());
             service.save(gioHangChiTiet.get());
 
-            spct.setSoLuong(soLuongConLai - request.getSoLuong());
+//            spct.setSoLuong(soLuongConLai - request.getSoLuong());
         } else {
             GioHangChiTiet ghct = new GioHangChiTiet();
             BeanUtils.copyProperties(request, ghct);
@@ -81,9 +81,9 @@ public class GioHangChiTietProcessor {
             ghct.setIdSanPhamChiTiet(spct.getId());
             ghct.setTrangThai(StatusGioHang.CHUA_DAT_HANG.getValue());
             service.save(ghct);
-            spct.setSoLuong(soLuongConLai - request.getSoLuong());
+//            spct.setSoLuong(soLuongConLai - request.getSoLuong());
         }
-        spctService.save(spct);
+//        spctService.save(spct);
         return new ServiceResult();
     }
 
