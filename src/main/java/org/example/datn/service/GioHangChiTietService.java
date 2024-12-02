@@ -26,6 +26,9 @@ public class GioHangChiTietService {
     public void deleteById(Long id) {
         repo.deleteById(id);
     }
+    public void delete(GioHangChiTiet gioHangChiTiet) {
+        repo.delete(gioHangChiTiet);
+    }
 
     public List<GioHangChiTiet> findByIdGioHang(Long idGioHang){
         return repo.findByIdGioHang(idGioHang);

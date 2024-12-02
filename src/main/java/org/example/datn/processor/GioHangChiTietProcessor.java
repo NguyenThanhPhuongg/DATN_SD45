@@ -6,6 +6,7 @@ import org.example.datn.entity.GioHangChiTiet;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.exception.InputInvalidException;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.StatusGioHang;
@@ -113,17 +114,9 @@ public class GioHangChiTietProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult delete(Long id, UserAuthentication ua) {
-        var gioHangChiTiet = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết giỏ hàng"));
-
-        var spct = spctService.findById(gioHangChiTiet.getIdSanPhamChiTiet()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin chi tiết sản phẩm"));
-
-        var newQuantity = spct.getSoLuong() + gioHangChiTiet.getSoLuong();
-        spct.setSoLuong(newQuantity);
-        spct.setNguoiCapNhat(ua.getPrincipal());
-        spctService.save(spct);
-
-        service.deleteById(id);
+    public ServiceResult delete(Long id, UserAuthentication ua) throws NotFoundEntityException {
+        var gioHangChiTiet = service.findById(id).orElseThrow(() -> NotFoundEntityException.of("gioHangChiTiet.not.found"));
+        service.delete(gioHangChiTiet);
 
         return new ServiceResult();
     }

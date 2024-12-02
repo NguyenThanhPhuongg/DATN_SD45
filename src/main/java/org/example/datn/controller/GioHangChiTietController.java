@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.exception.InputInvalidException;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.GioHangChiTietRequest;
@@ -35,7 +36,7 @@ public class GioHangChiTietController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceResult> deleteGioHangChiTiet(@PathVariable Long id, UserAuthentication ua) {
+    public ResponseEntity<ServiceResult> deleteGioHangChiTiet(@PathVariable Long id, UserAuthentication ua) throws NotFoundEntityException {
         return ResponseEntity.ok(processor.delete(id, ua));
     }
 
