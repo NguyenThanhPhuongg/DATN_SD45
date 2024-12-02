@@ -698,9 +698,9 @@ async function placeOrder() {
             body: JSON.stringify(request),
         });
 
-        if (!response.ok) {
-            throw new Error('Lưu đơn hàng không thành công.');
-        }
+        // if (!response.ok) {
+        //     throw new Error('Lưu đơn hàng không thành công.');
+        // }
 
         const result = await response.json();
 
@@ -708,8 +708,10 @@ async function placeOrder() {
             if (result.data === null) {
                 // Đặt hàng thành công và chuyển hướng đến /bill
                 toastr.success('Đặt hàng thành công!', 'Thành công');
-                await applyVoucher();
-                window.location.href = '/bill';
+                if (selectedVoucherValue != null && selectedVoucherValue !== 0) {
+                    await applyVoucher();
+                }
+                // window.location.href = '/bill';
             } else if (typeof result.data === 'string') {
                 // Chuyển hướng tới VNPay link
                 window.location.href = result.data;
@@ -736,14 +738,15 @@ async function applyVoucher() {
             }
         });
 
-        if (!response.ok) {
-            throw new Error('Áp dụng khuyến mãi không thành công.');
-        }
-
         const result = await response.json();
-        console.log('Voucher applied successfully:', result);
 
-        toastr.success('Khuyến mãi đã được áp dụng thành công!', 'Thành công');
+        if (result.code === '200') {
+            console.log('Voucher applied successfully:', result);
+            toastr.success('Khuyến mãi đã được áp dụng thành công!', 'Thành công');
+        } else {
+            console.error('Error applying voucher:', result.message || 'Không rõ lỗi');
+            toastr.error(`Có lỗi xảy ra: ${result.message || 'áp dụng khuyến mãi thất bại'}`, 'Lỗi');
+        }
 
     } catch (error) {
         console.error('Error applying voucher:', error);

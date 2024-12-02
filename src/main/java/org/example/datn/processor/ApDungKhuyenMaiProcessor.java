@@ -1,6 +1,7 @@
 package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.ApDungKhuyenMaiRequest;
@@ -17,8 +18,8 @@ public class ApDungKhuyenMaiProcessor {
     private ApDungKhuyenMaiService service;
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult change(Long idKhuyenMai, UserAuthentication ua) {
-        var a = service.findByIdKhuyenMaiAndIdNguoiDung(idKhuyenMai, ua.getPrincipal()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy áp dụng khuyến mãi!"));
+    public ServiceResult change(Long idKhuyenMai, UserAuthentication ua) throws NotFoundEntityException {
+        var a = service.findByIdKhuyenMaiAndIdNguoiDung(idKhuyenMai, ua.getPrincipal()).orElseThrow(() -> NotFoundEntityException.of("apDungKhuyenMai.not.found"));
         a.setDaSuDung(true);
         service.save(a);
         return new ServiceResult();

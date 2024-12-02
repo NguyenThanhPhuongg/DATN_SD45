@@ -3,6 +3,7 @@ package org.example.datn.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.ApDungKhuyenMaiRequest;
@@ -20,7 +21,7 @@ public class ApDungKhuyenMaiController {
     ApDungKhuyenMaiProcessor processor;
 
     @PutMapping("/change")
-    public ResponseEntity<ServiceResult> change(@RequestParam Long idKhuyenMai, UserAuthentication ua) {
+    public ResponseEntity<ServiceResult> change(@RequestParam Long idKhuyenMai, UserAuthentication ua) throws NotFoundEntityException {
         return ResponseEntity.ok(processor.change(idKhuyenMai, ua));
     }
 
