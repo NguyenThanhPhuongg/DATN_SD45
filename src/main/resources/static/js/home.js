@@ -2,7 +2,7 @@ $(document).ready(function () {
     // Hàm để lấy danh sách sản phẩm
     let currentPage = 0; // Chỉ số trang hiện tại
     const totalProducts = 11; // Tổng số sản phẩm
-    const productsPerPage = 5; // Số sản phẩm mỗi trang
+    const productsPerPage = 10; // Số sản phẩm mỗi trang
     const totalPages = Math.ceil(totalProducts / productsPerPage); // Số trang cần hiển thị
 
     let allProducts = []; // Mảng lưu tất cả các sản phẩm

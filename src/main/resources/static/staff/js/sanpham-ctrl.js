@@ -356,13 +356,13 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         }
 
         if (!form.xuatXu) {
-            errorContainer.moTa = true;
+            errorContainer.xuatXu = true;
             toastr.error("Xuất xứ sản phẩm không được để trống.", "Lỗi!");
-        } else if (form.moTa.length > 200) {
-            errorContainer.moTa = true;
+        } else if (form.xuatXu.length > 200) {
+            errorContainer.xuatXu = true;
             toastr.error("Xuất xứ sản phẩm không quá 200 ký tự", "Lỗi!");
         } else {
-            errorContainer.moTa = false;
+            errorContainer.xuatXu = false;
         }
 
         if (!$scope.form.gia || $scope.form.gia < 0) {
