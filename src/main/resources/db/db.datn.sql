@@ -765,6 +765,8 @@ CREATE TABLE [yeu_cau_doi_tra]
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
 ) ON [PRIMARY];
 GO
+ALTER TABLE yeu_cau_doi_tra
+    ADD COLUMN thong_tin_chuyen_khoan NVARCHAR(500);
 
 --- Chi tiet Yeu cau doi tra
 SET ANSI_NULLS ON

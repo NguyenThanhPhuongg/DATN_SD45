@@ -65,6 +65,10 @@ public class UserAuthentication implements Authentication {
         return userId;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     @Override
     public boolean isAuthenticated() {
         return Objects.nonNull(userName);

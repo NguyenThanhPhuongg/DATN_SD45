@@ -98,7 +98,7 @@
                                             <div class="" style="width: 50px;margin-right: 10px;flex-shrink: 0">
                                                 <img ng-src="/images/{{item.image}}" alt="" class="w-100">
                                             </div>
-                                            <div class="">{{item.tenSanPham}}</div>
+                                            <div class="text-wrap">{{item.tenSanPham}}</div>
                                         </div>
                                     </td>
                                     <td>
@@ -118,7 +118,8 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" ng-model="item.soLuong" min="1" max="iem.soLuongMax"
+                                        <input type="number" class="form-control" ng-model="item.soLuong" min="1"
+                                               max="item.soLuongMax"
                                                ng-init="item.quantity = (item.quantity && item.quantity > 0) ? item.quantity : 1" ng-change="updateQuantity(bill, item)"/>
                                     </td>
                                     <td class="text-end">
@@ -366,7 +367,7 @@
                                 <h6 class="mb-2"><b>Thông tin hóa đơn</b></h6>
                                 <div class="bill-info-head" >
                                     <p class="mb-1"><b>Ngày mua:</b> <span>{{bill.dateBill}}</span></p>
-                                    <p class="mb-1"><b>Nhân viên bán hàng:</b> <span>...</span></p>
+                                    <p class="mb-1"><b>Nhân viên bán hàng:</b> <span>{{bill.tenNguoiTao}}</span></p>
                                     <p class="mb-1"><b>Người mua:</b> <span>{{bill.nameCustomer || Ziaza}} </span></p>
                                     <p class="mb-1"><b>Đểm tích lũy sau khi hoàn thành hóa đơn:</b> <span>{{ bill.diemTichLuy }} điểm</span></p>
                                     <p><b>Số HĐ:</b> <span>{{bill.codeBill}}</span></p>

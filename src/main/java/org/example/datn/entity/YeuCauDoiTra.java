@@ -41,6 +41,12 @@ public class YeuCauDoiTra extends CommonEntity {
     @Column(name = "ghi_chu", length = 500)
     private String ghiChu;
 
+    @Column(name = "thong_tin_chuyen_khoan")
+    private String thongTinChuyenKhoan;
+
+    @Column(name = "thong_tin_mat_hang_muon_doi")
+    private String thongTinMatHangMuonDoi;
+
     @Column(name = "trang_thai")
     private Integer trangThai;
 

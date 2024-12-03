@@ -45,7 +45,7 @@ public class HoaDonController {
 
     // Thêm mới hóa đơn
     @PostMapping
-    public ResponseEntity<ServiceResult> add(@RequestBody HoaDonRequest request, HttpServletRequest httpServletRequest) throws InputInvalidException, NotFoundEntityException {
+    public ResponseEntity<ServiceResult> add(@RequestBody HoaDonRequest request, HttpServletRequest httpServletRequest) throws InputInvalidException, NotFoundEntityException, IOException {
         // Giả sử UserAuthentication được đặt trong request bởi middleware
         UserAuthentication ua = (UserAuthentication) httpServletRequest.getAttribute("userAuth");
 
@@ -55,7 +55,7 @@ public class HoaDonController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) throws InputInvalidException, NotFoundEntityException {
+    public ResponseEntity<ServiceResult> save(@RequestBody HoaDonRequest request, UserAuthentication ua) throws InputInvalidException, NotFoundEntityException, IOException {
         return ResponseEntity.ok(processor.save(request, ua));
     }
 //    @PutMapping("/{id}")

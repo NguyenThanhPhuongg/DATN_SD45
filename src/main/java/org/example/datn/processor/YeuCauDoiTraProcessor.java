@@ -6,22 +6,22 @@ import com.google.gson.JsonSerializer;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.*;
+import org.example.datn.exception.InputInvalidException;
+import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.enums.LoaiYeuCau;
 import org.example.datn.model.enums.StatusHoaDon;
 import org.example.datn.model.enums.StatusYeuCauDoiTra;
 import org.example.datn.model.enums.TrangThaiDoiTra;
-import org.example.datn.model.request.CancelOrderRequest;
-import org.example.datn.model.request.ProfileRequest;
-import org.example.datn.model.request.ThuongHieuRequest;
-import org.example.datn.model.request.YeuCauDoiTraRequest;
+import org.example.datn.model.request.*;
 import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.model.response.YeuCauDoiTraModel;
 import org.example.datn.model.response.YeuCauDoiTraResponse;
 import org.example.datn.repository.SanPhamRepository;
 import org.example.datn.service.*;
+import org.example.datn.transformer.YeuCauDoiTraChiTietTransformer;
 import org.example.datn.transformer.YeuCauDoiTraTransformer;
 import org.example.datn.utils.VNPayUtil;
 import org.springframework.beans.BeanUtils;
@@ -73,6 +73,8 @@ public class YeuCauDoiTraProcessor {
     private HinhAnhService hinhAnhService;
     @Autowired
     private HinhAnhServices hinhAnhServices;
+    @Autowired
+    private YeuCauDoiTraChiTietTransformer yeuCauDoiTraChiTietTransformer;
 
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
@@ -391,9 +393,7 @@ public class YeuCauDoiTraProcessor {
 
                 updateTrangThaiDoiTraInHoaDon(idHoaDon, StatusYeuCauDoiTra.TU_CHOI.getValue(), idSanPhamChiTiets);
                 hoaDonService.save(hoaDon);
-            }
-
-            else {
+            } else {
                 boolean hasRejected = chiTietList.stream()
                         .anyMatch(chiTiet -> chiTiet.getTrangThai() == 2);
                 if (hasRejected) {
@@ -450,7 +450,7 @@ public class YeuCauDoiTraProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult create(String request, MultipartFile[] files, UserAuthentication ua) {
+    public ServiceResult create(String request, MultipartFile[] files, UserAuthentication ua) throws NotFoundEntityException, InputInvalidException {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
         JsonSerializer<LocalDate> serializer = (src, typeOfSrc, context) ->
@@ -460,7 +460,7 @@ public class YeuCauDoiTraProcessor {
                 .registerTypeAdapter(LocalDate.class, serializer)
                 .create();
         YeuCauDoiTraRequest target = gson.fromJson(removeQuotesAndUnescape(request), YeuCauDoiTraRequest.class);
-        var yeuCauDoiTra = yeuCauDoiTraTransformer.toEntity(target);
+        YeuCauDoiTra yeuCauDoiTra = yeuCauDoiTraTransformer.toEntity(target);
         yeuCauDoiTra.setIdNguoiDung(ua.getPrincipal());
         yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.CHO_XU_LY.getValue());
         yeuCauDoiTra.setNgayYeuCau(LocalDateTime.now());
@@ -484,11 +484,25 @@ public class YeuCauDoiTraProcessor {
             }
         }
 
-        for (Long idSPCT : target.getIdSanPhamChiTiets()) {
+        for (SanPhamDoiTraRequest sanPhamRequest : target.getSanPhamChiTiets()) {
+            Long idSPCT = sanPhamRequest.getIdSanPhamChiTiet();
+            Integer soLuong = sanPhamRequest.getSoLuong();
+
             YeuCauDoiTraChiTiet yeuCauChiTiet = new YeuCauDoiTraChiTiet();
             yeuCauChiTiet.setIdYeuCauDoiTra(yeuCauDoiTra.getId());
             yeuCauChiTiet.setIdSPCT(idSPCT);
-            yeuCauChiTiet.setSoLuong(1);
+
+            List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(target.getIdHoaDon(), List.of(idSPCT));
+            if (hoaDonChiTiets.isEmpty()) {
+                throw NotFoundEntityException.of("Sản phẩm chi tiết không tồn tại trong hóa đơn");
+            }
+            HoaDonChiTiet hoaDonChiTiet = hoaDonChiTiets.get(0);
+
+            if (soLuong > hoaDonChiTiet.getSoLuong()) {
+                throw InputInvalidException.of("Số lượng đổi/trả không hợp lệ");
+            }
+
+            yeuCauChiTiet.setSoLuong(soLuong); // Cập nhật số lượng muốn đổi trả
             yeuCauChiTiet.setTrangThai(StatusYeuCauDoiTra.CHO_XU_LY.getValue());
             yeuCauChiTiet.setNgayTao(LocalDateTime.now());
             yeuCauChiTiet.setNgayCapNhat(LocalDateTime.now());
@@ -496,15 +510,19 @@ public class YeuCauDoiTraProcessor {
             yeuCauChiTiet.setNguoiCapNhat(ua.getPrincipal());
             yeuCauDoiTraChiTietService.save(yeuCauChiTiet);
         }
-        var hoaDon = hoaDonService.findById(target.getIdHoaDon()).orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
+        HoaDon hoaDon = hoaDonService.findById(target.getIdHoaDon()).orElseThrow(() -> NotFoundEntityException.of("Hóa đơn không tồn tại"));
         hoaDon.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue());
         hoaDonService.save(hoaDon);
         hoaDonChiTietService.saveAll(
-                hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(target.getIdHoaDon(), target.getIdSanPhamChiTiets())
+                hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(target.getIdHoaDon(),
+                                target.getSanPhamChiTiets().stream()
+                                        .map(SanPhamDoiTraRequest::getIdSanPhamChiTiet)
+                                        .collect(Collectors.toList()))
                         .stream()
                         .peek(e -> e.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue()))
                         .collect(Collectors.toList())
         );
+
 
         return new ServiceResult();
 
@@ -546,6 +564,8 @@ public class YeuCauDoiTraProcessor {
                 .map(sp -> {
                     YeuCauDoiTraResponse model = yeuCauDoiTraTransformer.toResponse(sp);
                     model.setHoaDonModel(hoaDonProcessor.getModelById(sp.getIdHoaDon()));
+                    var yeuCauDoiTraChiTietModels = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(sp.getId()).stream().map(yeuCauDoiTraChiTietTransformer::toModel).collect(Collectors.toList());
+                    model.setYeuCauDoiTraChiTietModel(yeuCauDoiTraChiTietModels);
                     return model;
                 })
                 .collect(Collectors.toList());

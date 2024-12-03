@@ -91,6 +91,8 @@ public class HoaDonProcessor {
     private MauSacService mauSacService;
     @Autowired
     private SizeService sizeService;
+    @Autowired
+    private EmailService emailService;
 
     public ServiceResult getAll() {
         var list = service.getAll();
@@ -160,6 +162,7 @@ public class HoaDonProcessor {
 
         var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
         BigDecimal tongTien = BigDecimal.ZERO;
+        List<HoaDonChiTietDTO> hoaDonChiTietDTOList = new ArrayList<>();
         for (GioHangChiTiet ghct : gioHangChiTiet) {
             HoaDonChiTiet hdct = new HoaDonChiTiet();
             hdct.setIdHoaDon(hoaDon.getId());
@@ -178,6 +181,11 @@ public class HoaDonProcessor {
             gioHangChiTietService.save(ghct);
 
             var sanPhamChiTiet = sanPhamChiTietService.findById(ghct.getIdSanPhamChiTiet()).orElseThrow(() -> NotFoundEntityException.of("sanPhamChiTiet.not.found"));
+            var sanPham = sanPhamService.findById(sanPhamChiTiet.getIdSanPham()).orElseThrow(() -> NotFoundEntityException.of("sanPham.not.found"));
+            var size = sizeService.findById(sanPhamChiTiet.getIdSize()).orElseThrow(() -> NotFoundEntityException.of("size.not.found"));
+            var mauSac = mauSacService.findById(sanPhamChiTiet.getIdMauSac()).orElseThrow(() -> NotFoundEntityException.of("mauSac.not.found"));
+            HoaDonChiTietDTO hdctDTO = new HoaDonChiTietDTO(sanPham.getTen(), sanPham.getAnh(), size.getTen(), mauSac.getTen(),hdct.getSoLuong(), sanPham.getGia());  // Tạo DTO từ HoaDonChiTiet và SanPhamChiTiet
+            hoaDonChiTietDTOList.add(hdctDTO);
             Integer soLuongMua = ghct.getSoLuong();
             Integer soLuongConLai = sanPhamChiTiet.getSoLuong() - soLuongMua;
             if (soLuongConLai < 0) {
@@ -207,8 +215,10 @@ public class HoaDonProcessor {
             HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String ipAddress = VNPayUtil.getIpAddress(httpRequest);
             String vnPayResponse = paymentService.createVnPayPayment(hoaDon, "NCB", ipAddress);
+            emailService.sendOrderSuccessfully(ua.getEmail(), ua.getName(), hoaDonChiTietDTOList, tongTien, hoaDon.getNgayDatHang());
             return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
         }
+        emailService.sendOrderSuccessfully(ua.getEmail(), ua.getName(), hoaDonChiTietDTOList, tongTien, hoaDon.getNgayDatHang());
         return new ServiceResult();
     }
 
