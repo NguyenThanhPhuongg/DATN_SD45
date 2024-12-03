@@ -232,7 +232,6 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     }
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
-                    $scope.initialize();
                     toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");
@@ -267,7 +266,6 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     }
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
-                    $scope.initialize();
                     toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");

@@ -100,12 +100,12 @@ public class SanPhamDoiTraProcessor {
     }
 
     private void passSanPhamDoitra(SanPhamDoiTra sanPhamDoiTra) {
-        List<YeuCauDoiTraChiTiet> yeuCauDoiTraChiTiets = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(sanPhamDoiTra.getId());
-        yeuCauDoiTraChiTiets.forEach(hoaDonChiTiet -> {
-            hoaDonChiTiet.setTrangThai(SanPhamDoiTraStatus.HOAN_TAC.getValue());
-            Optional<SanPhamChiTiet> sanPhamChiTietOpt = sanPhamChiTietService.findById(hoaDonChiTiet.getIdYeuCauDoiTra());
+        List<YeuCauDoiTraChiTiet> yeuCauDoiTraChiTiets = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(sanPhamDoiTra.getIdYeuCauDoiTra());
+        yeuCauDoiTraChiTiets.forEach(yeuCauDoiTraChiTiet -> {
+            yeuCauDoiTraChiTiet.setTrangThai(SanPhamDoiTraStatus.HOAN_TAC.getValue());
+            Optional<SanPhamChiTiet> sanPhamChiTietOpt = sanPhamChiTietService.findById(yeuCauDoiTraChiTiet.getIdSPCT());
             sanPhamChiTietOpt.ifPresent(sanPhamChiTiet -> {
-                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + hoaDonChiTiet.getSoLuong());
+                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + yeuCauDoiTraChiTiet.getSoLuong());
                 sanPhamChiTietService.save(sanPhamChiTiet);
             });
         });

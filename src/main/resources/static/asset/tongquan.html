@@ -124,6 +124,8 @@
                     </div>
                 </div>
             </div>
+            <br>
+            <button class="btn btn-outline-primary" ng-click="exportExcel()">Xuất Báo Cáo</button>
 
             <div class="row mt-5">
                 <!-- Bảng 1 -->
@@ -189,22 +191,22 @@
             <div class="row">
                 <!-- Chọn khoảng thời gian -->
                 <div class="col-md-4">
-                    <div class="card shadow-lg" style="max-height: 400px; min-height: 400px; ">
+                    <div class="card shadow-lg" style="max-height: 430px; min-height: 400px; ">
                         <div class="card-body">
                             <h5 class="card-title">Chọn Khoảng Thời Gian</h5>
                             <div class="btn-group w-100 d-flex flex-wrap row" role="group">
-                                <button class="btn btn-outline-primary col-md-6 mb-2"
-                                        ng-click="selectTimeFrame('today')">Hôm nay
-                                </button>
-                                <button class="btn btn-outline-primary col-md-6 mb-2"
-                                        ng-click="selectTimeFrame('week')">Tuần
-                                </button>
-                                <button class="btn btn-outline-primary mb-2 col-md-6"
-                                        ng-click="selectTimeFrame('month')">Tháng
-                                </button>
-                                <button class="btn btn-outline-primary mb-2 col-md-6"
-                                        ng-click="selectTimeFrame('year')">Năm
-                                </button>
+<!--                                <button class="btn btn-outline-primary col-md-6 mb-2"-->
+<!--                                        ng-click="selectTimeFrame('today')">Hôm nay-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-outline-primary col-md-6 mb-2"-->
+<!--                                        ng-click="selectTimeFrame('week')">Tuần-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-outline-primary mb-2 col-md-6"-->
+<!--                                        ng-click="selectTimeFrame('month')">Tháng-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-outline-primary mb-2 col-md-6"-->
+<!--                                        ng-click="selectTimeFrame('year')">Năm-->
+<!--                                </button>-->
                                 <button class="btn btn-outline-primary mb-2 col-md-6" ng-click="selectTimeFrame('all')">
                                     Tất cả
                                 </button>
@@ -224,7 +226,7 @@
                             </div>
 
                             <div class="mt-4">
-                                <h3>{{ doanhThu | currency }}</h3>
+                                <h3>{{ doanhThu || 0 | currency:'₫ ' }}</h3>
                                 <p class="text-muted">Tổng doanh thu cho khoảng thời gian đã chọn</p>
                             </div>
                         </div>
@@ -248,22 +250,22 @@
             <div class="row">
                 <!-- Chọn khoảng thời gian -->
                 <div class="col-md-4">
-                    <div class="card shadow-lg" style="max-height: 400px; min-height: 400px; ">
+                    <div class="card shadow-lg" style="max-height: 430px; min-height: 400px; ">
                         <div class="card-body">
                             <h5 class="card-title">Chọn Khoảng Thời Gian</h5>
                             <div class="btn-group w-100 d-flex flex-wrap row" role="group">
-                                <button class="btn btn-outline-primary col-md-6 mb-2"
-                                        ng-click="selectTimeFrame1('today')">Hôm nay
-                                </button>
-                                <button class="btn btn-outline-primary col-md-6 mb-2"
-                                        ng-click="selectTimeFrame1('week')">Tuần
-                                </button>
-                                <button class="btn btn-outline-primary mb-2 col-md-6"
-                                        ng-click="selectTimeFrame1('month')">Tháng
-                                </button>
-                                <button class="btn btn-outline-primary mb-2 col-md-6"
-                                        ng-click="selectTimeFrame1('year')">Năm
-                                </button>
+<!--                                <button class="btn btn-outline-primary col-md-6 mb-2"-->
+<!--                                        ng-click="selectTimeFrame1('today')">Hôm nay-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-outline-primary col-md-6 mb-2"-->
+<!--                                        ng-click="selectTimeFrame1('week')">Tuần-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-outline-primary mb-2 col-md-6"-->
+<!--                                        ng-click="selectTimeFrame1('month')">Tháng-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-outline-primary mb-2 col-md-6"-->
+<!--                                        ng-click="selectTimeFrame1('year')">Năm-->
+<!--                                </button>-->
                                 <button class="btn btn-outline-primary mb-2 col-md-6"
                                         ng-click="selectTimeFrame1('all')">
                                     Tất cả

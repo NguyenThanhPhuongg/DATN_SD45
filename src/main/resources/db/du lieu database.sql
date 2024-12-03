@@ -166,13 +166,13 @@ VALUES
 (N'Vải dạ', 1, 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
-INSERT INTO [mau_sac] ([ten], [id_danh_muc_cha], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
+INSERT INTO [mau_sac] ([ten], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
 VALUES 
-(N'Đỏ', 1, 1, GETDATE(), GETDATE(), 1, 1),
-(N'Xanh', 1, 1, GETDATE(), GETDATE(), 1, 1),
-(N'Đen', 1, 1, GETDATE(), GETDATE(), 1, 1),
-(N'Trắng', 1, 1, GETDATE(), GETDATE(), 1, 1),
-(N'Xám', 1, 1, GETDATE(), GETDATE(), 1, 1);
+(N'Đỏ', 1, GETDATE(), GETDATE(), 1, 1),
+(N'Xanh', 1, GETDATE(), GETDATE(), 1, 1),
+(N'Đen', 1,  GETDATE(), GETDATE(), 1, 1),
+(N'Trắng', 1, GETDATE(), GETDATE(), 1, 1),
+(N'Xám', 1, GETDATE(), GETDATE(), 1, 1);
 GO
 
 INSERT INTO [size] ([ten], [id_danh_muc_cha], [trang_thai], [ngay_tao], [ngay_cap_nhat], [nguoi_tao], [nguoi_cap_nhat])
@@ -364,7 +364,7 @@ update  danh_muc set ngay_tao = GETDATE() where id =1
 update  nguoi_dung set mat_khau = 'Chuchu11@' where id =1
 update  hoa_don  set id_phuong_thuc_van_chuyen = 1 where id = 12
 
-DELETE FROM hoa_don WHERE id = 10;
+DELETE FROM chi_tiet_hoa_don WHERE id = 29;
 
 SELECT * FROM chi_tiet_hoa_don  WHERE id_hoa_don=1
 
@@ -382,3 +382,32 @@ DROP COLUMN id_danh_muc_cha;
 
 ALTER TABLE thuong_hieu
 ALTER COLUMN ten NVARCHAR(250);
+
+
+SET IDENTITY_INSERT [nguoi_dung] ON;
+INSERT INTO [nguoi_dung] 
+([id], [ten_dang_nhap], [mat_khau], [vaitro], [loai], [xac_thuc], [trang_thai], [ngay_tao], [ngay_cap_nhat])
+VALUES 
+(0, N'ZiazaStore', HASHBYTES('SHA2_256', N'ziazavn@store.gmail.com'), N'USER', N'NORMAL', 1, N'ACTIVE', GETDATE(), GETDATE());
+GO
+SET IDENTITY_INSERT [nguoi_dung] OFF;
+--------------------------------------
+SET IDENTITY_INSERT [dia_chi_giao_hang] ON;
+INSERT INTO [dia_chi_giao_hang] ([id], [id_nguoi_dung], [ho_va_ten], [sdt], [dia_chi], [thanh_pho], [quoc_gia], [trang_thai], [ngay_tao], [ngay_cap_nhat])
+VALUES 
+(0, 0, N'ZiazaStore', N'0123456789', N'Số 1, Đường ABC, Quận 1', N'Hà Nội', N'Việt Nam', 1, GETDATE(), GETDATE())
+GO
+SET IDENTITY_INSERT [dia_chi_giao_hang] OFF;
+--------------------------------------------
+SET IDENTITY_INSERT [phuong_thuc_van_chuyen] ON;
+INSERT INTO [phuong_thuc_van_chuyen] ([id], [ten], [mo_ta], [phi_van_chuyen], [loai], [ghi_chu], [thoi_gian_giao_hang], [trang_thai], [ngay_tao], [ngay_cap_nhat])
+VALUES 
+(0, N'Bán hàng tại quầy', N'Bán hàng tại quầy.', 0, 1, N'Bán hàng tại quầy.', N'Bán hàng tại quầy.', 1, GETDATE(), GETDATE())
+GO
+SET IDENTITY_INSERT [phuong_thuc_van_chuyen] OFF;
+--------------------------------------------
+SET IDENTITY_INSERT [thong_tin_ca_nhan] ON;
+INSERT INTO [thong_tin_ca_nhan] ([id], [id_nguoi_dung], [ho_va_ten], [sdt], [avatar], [dia_chi], [gioi_tinh], [ngay_sinh], [cccd], [email], [ngay_tao], [ngay_cap_nhat])
+VALUES 
+(0,0, N'ZiazaStore', N'0123456789', N'avatar1.jpg', N'Số 1, Đường ABC, Quận 1', N'NAM', '1990-01-01', N'123456789', N'nguyenvana@example.com', GETDATE(), GETDATE())
+SET IDENTITY_INSERT [thong_tin_ca_nhan] OFF;

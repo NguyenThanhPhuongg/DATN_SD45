@@ -343,7 +343,7 @@ public class YeuCauDoiTraProcessor {
                 .map(YeuCauDoiTraChiTiet::getIdSPCT)
                 .collect(Collectors.toList());
 
-        if (trangThaiYeuCau == 0) {
+        if (trangThaiYeuCau == StatusYeuCauDoiTra.CHO_XU_LY.getValue()) {
             yeuCauDoiTra.setTrangThai(StatusYeuCauDoiTra.DANG_XU_LY.getValue()); // Trạng thái đang xử lý
             updateYeuCauDoiTraChiTiet(id, StatusYeuCauDoiTra.DANG_XU_LY.getValue()); // Cập nhật trạng thái chi tiết
 
@@ -361,7 +361,7 @@ public class YeuCauDoiTraProcessor {
                     SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
         }
 
-        if (trangThaiYeuCau == 1) {
+        if (trangThaiYeuCau == StatusYeuCauDoiTra.DANG_XU_LY.getValue()) {
             boolean hasPendingOrRejected = false;  // Kiểm tra có chi tiết bị từ chối hoặc đang xử lý
             boolean allDone = true;  // Kiểm tra tất cả các yêu cầu chi tiết có trạng thái 3
 

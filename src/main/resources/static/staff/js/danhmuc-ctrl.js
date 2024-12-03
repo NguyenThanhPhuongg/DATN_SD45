@@ -4,7 +4,8 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
     $scope.formAdd = {};
     $scope.searchText = ''; // Biến tìm kiếm
     $scope.selectedIdCha = null;
-
+    $scope.danhMucChildren = []; // Danh mục con của danh mục cha được chọn
+    $scope.selectedDanhMuc = null; // Danh mục hiện tại
     $scope.pager = {
         page: 0,
         size: 10, // Giá trị mặc định
@@ -45,12 +46,17 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
     // Khởi tạo và tải dữ liệu
     $scope.initialize = function () {
         $http.get("/rest/danhmuc").then(resp => {
+            console.log("Dữ liệu từ API:", resp.data);  // Kiểm tra dữ liệu trả về từ API
             if (Array.isArray(resp.data.data)) {
                 $scope.items = resp.data.data.map(item => ({
                     ...item,
                     ngayTao: new Date(item.ngayTao),
                     ngayCapNhat: new Date(item.ngayCapNhat)
                 }));
+                $scope.danhMucRoot = $scope.items.filter(function (dm) {
+                    return dm.idCha === null;
+                });
+
                 $scope.pager.updateItems();
             } else {
                 console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
@@ -58,7 +64,30 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         }).catch(error => {
             console.error("Lỗi khi tải danh mục: ", error);
         });
+
     };
+
+    $scope.loadDanhMucCon = function(idCha) {
+        console.log("ID Cha đã chọn:", idCha);
+
+        if (idCha) {
+            // Nếu chọn một danh mục cha, gửi yêu cầu lấy tất cả danh mục từ API
+            $http.get('/rest/danhmuc').then(function(response) {
+                // Sau khi lấy danh mục, lọc danh mục con tương ứng với idCha
+                $scope.danhMucChildren = response.data.data.filter(function(dm) {
+                    return dm.idCha === Number(idCha);  // Lọc theo idCha
+                });
+                console.log("Danh mục con:", $scope.danhMucChildren);  // Hiển thị danh sách danh mục con
+            }).catch(function(error) {
+                console.error("Lỗi khi tải danh mục con:", error);
+                toastr.error("Lỗi khi tải danh mục con.", "Lỗi!");
+            });
+        } else {
+            // Nếu không chọn danh mục cha (tạo danh mục gốc), danh mục con sẽ rỗng
+            $scope.danhMucChildren = [];
+        }
+    };
+
 
     // Theo dõi thay đổi trong ô tìm kiếm và idCha được chọn
     $scope.$watchGroup(['searchText', 'selectedIdCha'], function () {
@@ -116,13 +145,6 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
             errorContainer.moTa = false;
         }
 
-        // Kiểm tra danh mục cha
-        if (!form.idCha) {
-            errorContainer.idCha = true;
-            toastr.error("Bạn chưa chọn danh mục dành cho.", "Lỗi!");
-        } else {
-            errorContainer.idCha = false;
-        }
 
         return !Object.values(errorContainer).includes(true);
     };
@@ -132,6 +154,12 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         $scope.error1 = {};
         if (!$scope.validateForm($scope.formAdd, $scope.error1, false)) { // false: Không phải cập nhật
             return;
+        }
+
+        // Kiểm tra và gán giá trị idCha và idCon
+        if (!$scope.formAdd.idCon) {
+            // Nếu không chọn danh mục con, gán idCha làm idCon
+            $scope.formAdd.idCon = $scope.formAdd.idCha;
         }
 
         swal({
@@ -145,6 +173,8 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
                 let item = angular.copy($scope.formAdd);
                 var token = localStorage.getItem('token');
                 item.trangThai = 1; // Thiết lập mặc định giá trị trangThai là 1
+
+                // Gửi yêu cầu POST lên server để thêm danh mục
                 $http.post(`/rest/danhmuc`, item, {
                     headers: {
                         'Authorization': 'Bearer ' + token
@@ -266,5 +296,13 @@ app.controller("danhmuc-ctrl", function ($scope, $http) {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
+
+    // Hàm để xử lý từ chối yêu cầu chi tiết
+    $scope.getTenDanhMuc = function (idCha) {
+        if (!$scope.items) return "Không xác định"; // Tránh lỗi nếu danh sách chưa tải xong
+        const danhMucCha = $scope.items.find(danhMuc => danhMuc.id === idCha);
+        return danhMucCha ? danhMucCha.ten : "Không xác định";
+    };
+
 
 });

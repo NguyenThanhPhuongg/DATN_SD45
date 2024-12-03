@@ -22,12 +22,12 @@
         <div class="card-body">
             <div class="d-flex align-items-center mb-3">
                 <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
-                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">
-                    <option value="">Tất cả sản phẩm</option>
-                    <option value="1">Nam</option>
-                    <option value="2">Nữ</option>
-                    <option value="3">Khác</option>
-                </select>
+                <!--                <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">-->
+                <!--                    <option value="">Tất cả sản phẩm</option>-->
+                <!--                    <option value="1">Nam</option>-->
+                <!--                    <option value="2">Nữ</option>-->
+                <!--                    <option value="3">Khác</option>-->
+                <!--                </select>-->
             </div>
             <table class="table table-striped">
                 <thead>
@@ -44,12 +44,8 @@
                 <tr ng-repeat="item in pager.items | filter: searchText">
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>
-                        <div class="badge"
-                             ng-class="{'bg-success': item.idCha === 1, 'bg-danger': item.idCha === 2, 'bg-secondary': item.idCha === 3}">
-                            <span ng-if="item.idCha === 1">Nam</span>
-                            <span ng-if="item.idCha === 2">Nữ</span>
-                            <span ng-if="item.idCha === 3">Khác</span>
-                        </div>
+                        <span ng-if="!item.idCha">Không có</span> <!-- Nếu không có danh mục cha -->
+                        <span ng-if="item.idCha">{{getTenDanhMuc(item.idCha)}}</span> <!-- Lấy tên danh mục cha -->
                     </td>
                     <td>{{item.ten}}</td>
                     <td>{{item.moTa}}</td>
@@ -133,6 +129,7 @@
                                     <option ng-value="3">KHÁC</option>
                                 </select>
                             </div>
+
                             <div class="col-md-6 mt-2">
                                 <label for="inputTen" class="form-label">Tên danh mục</label>
                                 <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
@@ -191,22 +188,41 @@
                 <div class="modal-body">
                     <div class="container-fluid px-4">
                         <div class="row">
+                            <!-- Chọn danh mục cha -->
                             <div class="col-md-6 mt-2">
-                                <label for="inputIDCha" class="form-label">Dành cho</label>
-                                <select class="form-select" aria-label="Default select example" ng-model="formAdd.idCha">
-                                    <option value="1" selected>NAM</option>
-                                    <option value="2">NỮ</option>
-                                    <option value="3">KHÁC</option>
+                                <label for="inputIDCha" class="form-label">Danh mục cha</label>
+                                <select class="form-select" id="inputIDCha" ng-model="formAdd.idCha" ng-change="loadDanhMucCon(formAdd.idCha)">
+                                    <option value="">Không có (Danh mục gốc)</option>
+                                    <option ng-repeat="danhMuc in danhMucRoot" value="{{danhMuc.id}}">
+                                        {{danhMuc.ten}}
+                                    </option>
                                 </select>
                             </div>
+
+                            <!-- Danh mục con -->
+                            <div class="col-md-6 mt-2" ng-if="danhMucChildren.length > 0">
+                                <label for="inputDanhMucCon" class="form-label">Danh mục con</label>
+                                <select class="form-select" id="inputDanhMucCon" ng-model="formAdd.idCha" >
+                                    <option value="">Chọn danh mục con</option>
+                                    <option ng-repeat="danhMuc in danhMucChildren" value="{{danhMuc.id}}">
+                                        {{danhMuc.ten}}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Tên danh mục -->
                             <div class="col-md-6 mt-2">
                                 <label for="inputTen" class="form-label">Tên danh mục</label>
-                                <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten">
+                                <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten"
+                                       placeholder="Nhập tên danh mục" required>
                             </div>
+
+                            <!-- Mô tả -->
                             <div class="col-md-12 mt-3">
                                 <label for="inputMoTa" class="form-label">Mô tả</label>
-                                <textarea class="form-control" placeholder="Mô tả tại đây" ng-model="formAdd.moTa"
-                                          id="floatingTextarea2" style="height: 100px"></textarea>
+                                <textarea class="form-control" id="inputMoTa" placeholder="Nhập mô tả"
+                                          ng-model="formAdd.moTa"
+                                          style="height: 100px"></textarea>
                             </div>
                         </div>
                     </div>
@@ -220,7 +236,6 @@
                             <i class="fas fa-redo"></i> Reset
                         </button>
                     </div>
-                    <br><br>
                 </div>
             </div>
         </div>

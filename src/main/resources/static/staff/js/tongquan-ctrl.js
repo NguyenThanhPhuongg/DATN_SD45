@@ -66,7 +66,8 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
                                 $scope.topSanPhamBanChay = Object.entries(productQuantityMap)
                                     .map(([productId, totalQuantity]) => {
                                         const sanPham = allSanPham.find(sp => sp.id === parseInt(productId));
-                                        return { productId, totalQuantity, tenSanPham: sanPham ? sanPham.ten : 'N/A', maSanPham: sanPham ? sanPham.ma : 'N/A' };
+                                        return { productId, totalQuantity, tenSanPham: sanPham ? sanPham.ten : 'N/A', maSanPham: sanPham ? sanPham.ma : 'N/A'
+                                            , giaSanPham: sanPham ? sanPham.gia : 'N/A'};
                                     })
                                     .sort((a, b) => b.totalQuantity - a.totalQuantity)
                                     .slice(0, 10);
@@ -259,7 +260,8 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
                                     productId,
                                     productName: product ? product.ten : 'Không tìm thấy tên sản phẩm',
                                     productMa: product ? product.ma : 'Không tìm thấy tên mã phẩm',
-                                    totalQuantity
+                                    totalQuantity,
+                                    productGia: product ? product.gia : 'Không tìm thấy tên mã phẩm',
                                 };
                             });
 
@@ -802,6 +804,50 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
             .catch(function (error) {
                 console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
             });
+    };
+
+    $scope.exportExcel = function () {
+        // Sheet 1: Dữ liệu doanh thu và đơn hàng
+        const data1 = [
+            { Loại: 'Đơn Hàng Đã Giao', Số_Lượng: $scope.donHangNgay },
+            { Loại: 'Đơn Hàng Chờ', Số_Lượng: $scope.donHangCho },
+            { Loại: 'Đơn Hàng Hủy', Số_Lượng: $scope.donHangHuy },
+            {
+                Loại: 'Doanh Thu',
+                Tổng: $scope.doanhThuNgay.toLocaleString('vi-VN') + ' đ' // Định dạng với dấu chấm và thêm "đ"
+            },
+        ];
+
+        // Sheet 2: Top 10 Sản Phẩm Bán Chạy
+        const data2 = $scope.topSanPhamBanChay.map((sp, index) => ({
+            STT: index + 1,
+            Tên_Sản_Phẩm: sp.tenSanPham,
+            Mã_Sản_Phẩm: sp.maSanPham,
+            Số_Lượng_Bán: sp.totalQuantity,
+            Giá_Bán: sp.giaSanPham.toLocaleString('vi-VN') + ' đ',
+
+        }));
+        const data3 = $scope.allSanPhamWithTotalQuantity.map((sp, index) => ({
+            STT: index + 1,
+            Tên_Sản_Phẩm: sp.productName,
+            Mã_Sản_Phẩm: sp.productMa,
+            Số_Lượng_Còn: sp.totalQuantity,
+            Giá_Bán: sp.productGia.toLocaleString('vi-VN') + ' đ',
+        }));
+
+        // Tạo workbook và các sheet
+        const worksheet1 = XLSX.utils.json_to_sheet(data1); // Sheet Doanh Thu
+        const worksheet2 = XLSX.utils.json_to_sheet(data2); // Sheet Top Sản Phẩm
+        const worksheet3 = XLSX.utils.json_to_sheet(data3); // Sheet Top Sản Phẩm
+
+        // Tạo workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet1, 'Báo Cáo Doanh Thu');
+        XLSX.utils.book_append_sheet(workbook, worksheet2, 'Sản Phẩm Bán');
+        XLSX.utils.book_append_sheet(workbook, worksheet3, 'Sản Phẩm Còn');
+
+        // Xuất file Excel
+        XLSX.writeFile(workbook, `bao_cao_doanh_thu_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
 });
