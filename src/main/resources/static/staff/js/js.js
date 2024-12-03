@@ -105,3 +105,30 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    async function fetchUserData() {
+        try {
+            var token = localStorage.getItem('token');
+            const response = await fetch('user/get', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById("nameAdmin").textContent = data.data.profile.hoVaTen
+                document.getElementById("nameAdmin").setAttribute('data-id', data.data.id)
+            } else {
+                console.error('Lỗi khi lấy dữ liệu người dùng');
+            }
+        } catch (error) {
+            console.error('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    fetchUserData();
+});
+
