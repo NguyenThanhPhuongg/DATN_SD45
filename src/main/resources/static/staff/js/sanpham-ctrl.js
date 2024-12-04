@@ -14,7 +14,11 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
     // Khởi tạo dữ liệu
     $scope.initialize = function () {
         $http.get("/rest/danhmuc").then(resp => {
-            $scope.danhmuc = resp.data.data.filter(item => item.trangThai === 1);
+            $scope.danhmuc = resp.data.data;
+            $scope.danhMucRoot = $scope.danhmuc.filter(dm => !dm.idCha); // Lọc danh mục cha cấp 1
+            $scope.danhMucChildren = []; // Reset danh mục con
+            $scope.danhMucConCon = []; // Reset danh mục con con
+            $scope.danhMucConConCon = []; // Reset danh mục con con con
         });
 
         $http.get("/rest/thuonghieu").then(resp => {
@@ -43,6 +47,20 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         $scope.form.anh = ""; // Đặt lại ảnh mặc định hoặc rỗng
     };
 
+    $scope.loadDanhMucCon = function (idCha, level) {
+        const danhMucCha = $scope.danhmuc.filter(dm => dm.idCha === Number(idCha));
+
+        if (level === 1) {
+            $scope.danhMucChildren = danhMucCha;
+            $scope.danhMucConCon = []; // Reset cấp 3
+            $scope.danhMucConConCon = []; // Reset cấp 4
+        } else if (level === 2) {
+            $scope.danhMucConCon = danhMucCha;
+            $scope.danhMucConConCon = []; // Reset cấp 4
+        } else if (level === 3) {
+            $scope.danhMucConConCon = danhMucCha;
+        }
+    };
 
     $scope.initialize();
 
@@ -164,7 +182,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                 formData.append("xuatXu", $scope.form.xuatXu);
                 formData.append("moTa", $scope.form.moTa);
                 formData.append("gia", $scope.form.gia);
-                formData.append("idDanhMuc", $scope.form.idDanhMuc);
+                formData.append("idDanhMuc", $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha);
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 1);
@@ -372,11 +390,18 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
             errorContainer.gia = false;
         }
 
-        if (!form.idDanhMuc) {
-            errorContainer.idDanhMuc = true;
+        // if (!form.idDanhMuc) {
+        //     errorContainer.idDanhMuc = true;
+        //     toastr.error("Bạn chưa chọn danh mục.", "Lỗi!");
+        // } else {
+        //     errorContainer.idDanhMuc = false;
+        // }
+
+        if (!$scope.selectedDanhMucConCon) {
+            errorContainer.selectedDanhMucConCon = true;
             toastr.error("Bạn chưa chọn danh mục.", "Lỗi!");
         } else {
-            errorContainer.idDanhMuc = false;
+            errorContainer.selectedDanhMucConCon = false;
         }
 
         if (!form.idThuongHieu) {

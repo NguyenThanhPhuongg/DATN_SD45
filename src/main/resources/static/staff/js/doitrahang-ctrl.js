@@ -222,7 +222,6 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     toastr.error("Vui lòng đăng nhập để thực hiện hành động này", "Lỗi!");
                     return;
                 }
-
                 // Thực hiện gọi API cập nhật trạng thái
                 $http({
                     method: 'PUT',
@@ -233,6 +232,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
                     toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
+                    $scope.initialize();
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");
                     console.error("Lỗi khi cập nhật trạng thái chi tiết:", error);
@@ -266,6 +266,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     }
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
+                    $('#sanPhamDoiTraChiTiet').modal('hide');
                     toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");

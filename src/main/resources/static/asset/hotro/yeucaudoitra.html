@@ -64,7 +64,7 @@
                                 <i class="fas fa-list-alt"></i>
                             </button>
                             <button class="btn btn-link" type="button"
-                                    ng-if="item.trangThai === 1"
+                                    ng-if="item.trangThai === 0 || item.trangThai === 1"
                                     data-bs-toggle="modal"
                                     data-bs-target="#huyYeuCau"
                                     ng-click="openModal(item.id)">

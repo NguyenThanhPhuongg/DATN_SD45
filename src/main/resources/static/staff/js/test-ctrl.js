@@ -1,356 +1,160 @@
-// app.controller("doitrahang-ctrl", function ($scope, $http, $rootScope, $location) {
-//     $scope.items = [];
-//     $scope.form = {};
-//
-//
-//     $scope.selectedID = null;
-//     $scope.selectedMAHD = null;
-//     $scope.searchText1 = ''; // Tìm kiếm cho trạng thái 1
-//     $scope.searchText2 = '';
-//     $scope.searchText3 = '';
-//     $scope.searchText4 = '';
-//     $scope.searchText5 = '';
-//     $scope.searchText6 = '';
-//     // Thêm searchText cho các trạng thái khác nếu cần
-//
-//     $scope.initialize = function () {
-//         // Gọi API và kiểm tra dữ liệu
-//         $http.get("/yeu-cau").then(resp => {
-//             console.log("Dữ liệu từ API: ", resp.data); // Kiểm tra dữ liệu từ API
-//             // Kiểm tra xem resp.data.data có phải là mảng không
-//             if (Array.isArray(resp.data.data)) {
-//                 $scope.items = resp.data.data.map(item => ({
-//                     ...item,
-//                     ngayTao: new Date(item.ngayTao), // Chuyển đổi ngày
-//                     ngayCapNhat: new Date(item.ngayCapNhat) // Chuyển đổi ngày
-//                 }));
-//                 $scope.pagerDH0.updateItems();
-//                 $scope.pagerDH1.updateItems();
-//                 $scope.pagerDH2.updateItems();
-//                 $scope.pagerTH0.updateItems();
-//                 $scope.pagerTH1.updateItems();
-//                 $scope.pagerTH2.updateItems();
-//             } else {
-//                 console.error("API không trả về một mảng. Kiểm tra cấu trúc dữ liệu.");
-//             }
-//         }).catch(error => {
-//             console.error("Lỗi khi tải danh mục: ", error);
-//         });
-//     };
-//
-//     $scope.pagerDH0 = {
-//         page: 0,
-//         size: 5,
-//         items: [],
-//         count: 0,
-//         first: function () {
-//             this.page = 0;
-//             this.updateItems();
-//         },
-//         prev: function () {
-//             if (this.page > 0) {
-//                 this.page--;
-//                 this.updateItems();
-//             }
-//         },
-//         next: function () {
-//             if (this.page < this.count - 1) {
-//                 this.page++;
-//                 this.updateItems();
-//             }
-//         },
-//         last: function () {
-//             this.page = this.count - 1;
-//             this.updateItems();
-//         },
-//         updateItems: function () {
-//             const filteredItems = $scope.items.filter(item => {
-//                 const statusMatches = item.trangThai === 0;
-//                 const loaiYeuCau = item.loai === 'EXCHANGE';
-//                 const idMatches = item.id.toString().includes($scope.searchText1);
-//                 return statusMatches && idMatches && loaiYeuCau;
-//             });
-//             this.count = Math.ceil(filteredItems.length / this.size);
-//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-//         }
-//     };
-//
-//     $scope.pagerDH1 = {
-//         page: 0,
-//         size: 5,
-//         items: [],
-//         count: 0,
-//         first: function () {
-//             this.page = 0;
-//             this.updateItems();
-//         },
-//         prev: function () {
-//             if (this.page > 0) {
-//                 this.page--;
-//                 this.updateItems();
-//             }
-//         },
-//         next: function () {
-//             if (this.page < this.count - 1) {
-//                 this.page++;
-//                 this.updateItems();
-//             }
-//         },
-//         last: function () {
-//             this.page = this.count - 1;
-//             this.updateItems();
-//         },
-//         updateItems: function () {
-//             const filteredItems = $scope.items.filter(item => {
-//                 const statusMatches = item.trangThai === 1;
-//                 const loaiYeuCau = item.loai === 'EXCHANGE';
-//                 const idMatches = item.id.toString().includes($scope.searchText1);
-//                 return statusMatches && idMatches && loaiYeuCau;
-//             });
-//             this.count = Math.ceil(filteredItems.length / this.size);
-//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-//         }
-//     };
-//
-//     $scope.pagerDH2 = {
-//         page: 0,
-//         size: 5,
-//         items: [],
-//         count: 0,
-//         first: function () {
-//             this.page = 0;
-//             this.updateItems();
-//         },
-//         prev: function () {
-//             if (this.page > 0) {
-//                 this.page--;
-//                 this.updateItems();
-//             }
-//         },
-//         next: function () {
-//             if (this.page < this.count - 1) {
-//                 this.page++;
-//                 this.updateItems();
-//             }
-//         },
-//         last: function () {
-//             this.page = this.count - 1;
-//             this.updateItems();
-//         },
-//         updateItems: function () {
-//             const filteredItems = $scope.items.filter(item => {
-//                 const statusMatches = item.trangThai === 2;
-//                 const loaiYeuCau = item.loai === 'EXCHANGE';
-//                 const idMatches = item.id.toString().includes($scope.searchText1);
-//                 return statusMatches && idMatches && loaiYeuCau;
-//             });
-//             this.count = Math.ceil(filteredItems.length / this.size);
-//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-//         }
-//     };
-//
-//
-//     $scope.pagerTH0 = {
-//         page: 0,
-//         size: 5,
-//         items: [],
-//         count: 0,
-//         first: function () {
-//             this.page = 0;
-//             this.updateItems();
-//         },
-//         prev: function () {
-//             if (this.page > 0) {
-//                 this.page--;
-//                 this.updateItems();
-//             }
-//         },
-//         next: function () {
-//             if (this.page < this.count - 1) {
-//                 this.page++;
-//                 this.updateItems();
-//             }
-//         },
-//         last: function () {
-//             this.page = this.count - 1;
-//             this.updateItems();
-//         },
-//         updateItems: function () {
-//             const filteredItems = $scope.items.filter(item => {
-//                 const statusMatches = item.trangThai === 0;
-//                 const loaiYeuCau = item.loai === 'RETURN';
-//                 const idMatches = item.id.toString().includes($scope.searchText1);
-//                 return statusMatches && idMatches && loaiYeuCau;
-//             });
-//             this.count = Math.ceil(filteredItems.length / this.size);
-//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-//         }
-//     };
-//
-//     $scope.pagerTH1 = {
-//         page: 0,
-//         size: 5,
-//         items: [],
-//         count: 0,
-//         first: function () {
-//             this.page = 0;
-//             this.updateItems();
-//         },
-//         prev: function () {
-//             if (this.page > 0) {
-//                 this.page--;
-//                 this.updateItems();
-//             }
-//         },
-//         next: function () {
-//             if (this.page < this.count - 1) {
-//                 this.page++;
-//                 this.updateItems();
-//             }
-//         },
-//         last: function () {
-//             this.page = this.count - 1;
-//             this.updateItems();
-//         },
-//         updateItems: function () {
-//             const filteredItems = $scope.items.filter(item => {
-//                 const statusMatches = item.trangThai === 1;
-//                 const loaiYeuCau = item.loai === 'RETURN';
-//                 const idMatches = item.id.toString().includes($scope.searchText1);
-//                 return statusMatches && idMatches && loaiYeuCau;
-//             });
-//             this.count = Math.ceil(filteredItems.length / this.size);
-//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-//         }
-//     };
-//
-//     $scope.pagerTH2 = {
-//         page: 0,
-//         size: 5,
-//         items: [],
-//         count: 0,
-//         first: function () {
-//             this.page = 0;
-//             this.updateItems();
-//         },
-//         prev: function () {
-//             if (this.page > 0) {
-//                 this.page--;
-//                 this.updateItems();
-//             }
-//         },
-//         next: function () {
-//             if (this.page < this.count - 1) {
-//                 this.page++;
-//                 this.updateItems();
-//             }
-//         },
-//         last: function () {
-//             this.page = this.count - 1;
-//             this.updateItems();
-//         },
-//         updateItems: function () {
-//             const filteredItems = $scope.items.filter(item => {
-//                 const statusMatches = item.trangThai === 2;
-//                 const loaiYeuCau = item.loai === 'RETURN';
-//                 const idMatches = item.id.toString().includes($scope.searchText1);
-//                 return statusMatches && idMatches && loaiYeuCau;
-//             });
-//             this.count = Math.ceil(filteredItems.length / this.size);
-//             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
-//         }
-//     };
-//
-//     // Theo dõi sự thay đổi trong ô tìm kiếm cho từng trạng thái
-//     $scope.$watch('searchText1', function (newValue, oldValue) {
-//         if (newValue !== oldValue) {
-//             $scope.pagerDH0.updateItems();
-//         }
-//     });
-//     $scope.$watch('searchText2', function (newValue, oldValue) {
-//         if (newValue !== oldValue) {
-//             $scope.pagerDH1.updateItems();
-//         }
-//     });
-//     $scope.$watch('searchText3', function (newValue, oldValue) {
-//         if (newValue !== oldValue) {
-//             $scope.pagerTH0.updateItems();
-//         }
-//     });
-//     $scope.$watch('searchText4', function (newValue, oldValue) {
-//         if (newValue !== oldValue) {
-//             $scope.pagerTH1.updateItems();
-//         }
-//     });
-//     $scope.$watch('searchText5', function (newValue, oldValue) {
-//         if (newValue !== oldValue) {
-//             $scope.pagerTH2.updateItems();
-//         }
-//     });
-//
-//
-//     // Hàm cập nhật trạng thái hóa đơn
-//     $scope.update2 = function (item) {
-//         swal({
-//             title: "Xác nhận",
-//             text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-//             icon: "warning",
-//             buttons: true,
-//             dangerMode: true,
-//         }).then((willUpdate) => {
-//             if (willUpdate) {
-//                 item.trangThai = 2; // Cập nhật trạng thái
-//                 $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
-//                     $scope.initialize(); // Tải lại dữ liệu
-//                     swal("Success!", "Cập nhật thành công", "success");
-//                 }).catch(error => {
-//                     swal("Error!", "Cập nhật thất bại", "error");
-//                     console.log("Error: ", error);
-//                 });
-//             } else {
-//                 swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-//             }
-//         });
-//     };
-//
-//     $scope.update1 = function (item) {
-//         swal({
-//             title: "Xác nhận",
-//             text: "Bạn có chắc muốn cập nhật trạng thái hóa đơn này không?",
-//             icon: "warning",
-//             buttons: true,
-//             dangerMode: true,
-//         }).then((willUpdate) => {
-//             if (willUpdate) {
-//                 item.trangThai = 1; // Cập nhật trạng thái
-//                 $http.put(`/yeu-cau/${item.id}`, item).then(resp => {
-//                     $scope.initialize(); // Tải lại dữ liệu
-//                     swal("Success!", "Cập nhật thành công", "success");
-//                 }).catch(error => {
-//                     swal("Error!", "Cập nhật thất bại", "error");
-//                     console.log("Error: ", error);
-//                 });
-//             } else {
-//                 swal("Hủy cập nhật", "Cập nhật trạng thái hóa đơn đã bị hủy", "error");
-//             }
-//         });
-//     };
-//     //////////
-//     $scope.edit = function (item) {
-//         // Chuyển timestamp thành Date object
-//         item.ngayCapNhat = new Date(item.ngayCapNhat);
-//         item.ngayTao = new Date(item.ngayTao);
-//         $scope.form = angular.copy(item);
-//     };
-//
-//
-//     $scope.selectInvoice = function (item) {
-//         console.log("Selected Invoice ID: ", item.id); // Thêm log này
-//         $rootScope.selectedID = item.id; // Lưu ID hóa đơn vào rootScope
-//         $rootScope.selectedMAHD = item.hoaDon.ma; // Lưu ID hóa đơn vào rootScope
-//         $location.path('/chitietdoitra'); // Chuyển hướng đến trang hdct
-//     };
-//
-//     // Khởi tạo
-//     $scope.initialize();
-// });
+app.controller('test-ctrl', function ($scope, $http) {
+    $scope.items = []; // Danh sách danh mục
+    $scope.formAdd = {}; // Biến lưu thông tin khi thêm danh mục
+    $scope.formEdit = {}; // Biến lưu thông tin khi chỉnh sửa danh mục
+    $scope.danhMucRoot = []; // Danh mục gốc (danh mục cha cấp 1)
+    $scope.danhMucChildren = []; // Danh mục con của danh mục cha đang chọn
+    $scope.danhMucConCon = []; // Danh mục con của danh mục con
+    $scope.danhMucConConCon = []; // Danh mục con của danh mục con của danh mục con
+
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token');
+    const headers = {
+        headers: {Authorization: `Bearer ${token}`}
+    };
+
+    // Load danh sách danh mục từ server
+    $scope.load = function () {
+        $http.get('/rest/danhmuc', headers).then((resp) => {
+            $scope.items = resp.data.data;
+            $scope.danhMucRoot = $scope.items.filter(dm => !dm.idCha); // Lọc danh mục cha cấp 1
+            $scope.danhMucChildren = []; // Reset danh mục con
+            $scope.danhMucConCon = []; // Reset danh mục con con
+            $scope.danhMucConConCon = []; // Reset danh mục con con con
+        }).catch((err) => {
+            console.error(err);
+            alert('Lỗi khi tải danh mục!');
+        });
+    };
+
+    // Lấy các danh mục con của một danh mục
+    $scope.loadDanhMucCon = function (idCha, level) {
+        const danhMucCha = $scope.items.filter(dm => dm.idCha === Number(idCha));
+
+        if (level === 1) {
+            $scope.danhMucChildren = danhMucCha;
+            $scope.danhMucConCon = []; // Reset cấp 3
+            $scope.danhMucConConCon = []; // Reset cấp 4
+        } else if (level === 2) {
+            $scope.danhMucConCon = danhMucCha;
+            $scope.danhMucConConCon = []; // Reset cấp 4
+        } else if (level === 3) {
+            $scope.danhMucConConCon = danhMucCha;
+        }
+    };
+
+    // Thêm danh mục mới
+    $scope.create = function () {
+        const item = angular.copy($scope.formAdd);
+        item.idCha = $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha; // Gán idCha tương ứng
+        item.trangThai = 1; // Mặc định trạng thái là hoạt động
+
+        $http.post('/rest/danhmuc', item, headers).then((resp) => {
+            $scope.items.push(resp.data.data); // Thêm vào danh sách
+            $scope.resetFormAdd(); // Reset form
+            $scope.load(); // Reload danh sách
+            alert('Thêm mới thành công!');
+        }).catch((err) => {
+            console.error(err);
+            alert('Thêm mới thất bại!');
+        });
+    };
+
+    // $scope.edit = function (id) {
+    //     const danhMuc = $scope.items.find(item => item.id === id);
+    //     $scope.formEdit = angular.copy(danhMuc);
+    // };
+    //
+    // // Cập nhật danh mục
+    // $scope.update = function () {
+    //     const updatedDanhMuc = angular.copy($scope.formEdit);
+    //     updatedDanhMuc.idCha = $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha; // Gán idCha tương ứng
+    //
+    //     $http.put('/rest/danhmuc/' + updatedDanhMuc.id, updatedDanhMuc, headers).then((resp) => {
+    //         alert('Cập nhật danh mục thành công');
+    //         $scope.load(); // Reload lại danh sách danh mục
+    //         $('#editModal').modal('hide'); // Đóng modal
+    //     }).catch((err) => {
+    //         console.error(err);
+    //         alert('Lỗi khi cập nhật danh mục!');
+    //     });
+    // };
+    //
+    // // Reset form edit
+    // $scope.resetFormEdit = function () {
+    //     $scope.formEdit = {};
+    //     $scope.selectedDanhMucCha = '';
+    //     $scope.selectedDanhMucCon = '';
+    //     $scope.selectedDanhMucConCon = '';
+    //     $scope.selectedDanhMucConConCon = '';
+    // };
+
+    // Reset form thêm danh mục
+    $scope.resetFormAdd = function () {
+        $scope.formAdd = {
+            ten: '',
+            moTa: '',
+            idCha: '',
+        };
+    };
+
+    $scope.getTenDanhMuc = function (idCha) {
+        const danhMucCha = $scope.items.find(item => item.id === idCha);
+        return danhMucCha ? danhMucCha.ten : 'Không có danh mục cha'; // Trả về tên danh mục hoặc 'Không có danh mục cha' nếu không tìm thấy
+    };
+
+    // Chỉnh sửa danh mục
+    // Phương thức edit
+    $scope.edit = function (id) {
+        const item = $scope.items.find(item => item.id === id);
+        if (item) {
+            $scope.formEdit = angular.copy(item);
+
+            // Gán selectedDanhMucCha là idCha của danh mục con
+            $scope.selectedDanhMucCha = item.idCha;
+
+            // Load danh mục con dựa trên selectedDanhMucCha
+            if ($scope.selectedDanhMucCha) {
+                $scope.loadDanhMucCon($scope.selectedDanhMucCha, 1);  // Tải danh mục con cấp 1
+            }
+
+            // Nếu có danh mục con, gán selectedDanhMucCon là id của danh mục con hiện tại
+            if ($scope.formEdit.idCha) {
+                $scope.selectedDanhMucCon = item.idCha;  // Chọn đúng danh mục con
+            }
+        }
+    };
+
+    // Cập nhật danh mục
+    $scope.update = function () {
+        const item = angular.copy($scope.formEdit);
+        item.idCha = $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha; // Gán idCha tương ứng
+
+        $http.put('/rest/danhmuc/' + item.id, item, headers).then((resp) => {
+            // Cập nhật vào danh sách sau khi update thành công
+            const index = $scope.items.findIndex(dm => dm.id === item.id);
+            if (index !== -1) {
+                $scope.items[index] = resp.data.data; // Cập nhật danh mục mới
+            }
+            alert('Cập nhật thành công!');
+            $scope.load(); // Reload danh sách
+            $scope.resetFormEdit(); // Reset form chỉnh sửa
+        }).catch((err) => {
+            console.error(err);
+            alert('Cập nhật thất bại!');
+        });
+    };
+
+    // Reset form chỉnh sửa
+    $scope.resetFormEdit = function () {
+        $scope.formEdit = {
+            ten: '',
+            moTa: '',
+            idCha: '',
+        };
+    };
+
+
+    // Khởi chạy
+    $scope.load();
+});

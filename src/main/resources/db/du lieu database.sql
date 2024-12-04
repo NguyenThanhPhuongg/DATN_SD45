@@ -411,3 +411,5 @@ INSERT INTO [thong_tin_ca_nhan] ([id], [id_nguoi_dung], [ho_va_ten], [sdt], [ava
 VALUES 
 (0,0, N'ZiazaStore', N'0123456789', N'avatar1.jpg', N'Số 1, Đường ABC, Quận 1', N'NAM', '1990-01-01', N'123456789', N'nguyenvana@example.com', GETDATE(), GETDATE())
 SET IDENTITY_INSERT [thong_tin_ca_nhan] OFF;
+
+select * from danh_muc 

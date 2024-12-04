@@ -152,9 +152,9 @@ app.controller("mausac-ctrl", function ($scope, $http) {
                     $scope.initialize();
                     $scope.resetAdd();
                     $('#addModal').modal('hide');
-                    toastr.success("Thêm mới thành công", "Thành công!");
+                    toastr.success("Thêm mới màu sắc thành công", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Thêm mới thất bại", "Lỗi!");
+                    toastr.error("Thêm mới màu sắc thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -184,9 +184,9 @@ app.controller("mausac-ctrl", function ($scope, $http) {
                 }).then(resp => {
                     $scope.initialize();
                     $('#exampleModal').modal('hide');
-                    toastr.success("Cập nhật thành công", "Thành công!");
+                    toastr.success("Cập nhật màu sắc thành công", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật thất bại", "Lỗi!");
+                    toastr.error("Cập nhật màu sắc thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -196,7 +196,7 @@ app.controller("mausac-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
+            text: "Bạn có chắc muốn cập nhật trạng thái màu sắc này sang Active?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -211,7 +211,7 @@ app.controller("mausac-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
+                    toastr.success("Đã cập nhật trạng thái màu sắc này sang Active", "Thành công!");
                 }).catch(error => {
                     toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
                     console.error("Error: ", error);
@@ -223,7 +223,7 @@ app.controller("mausac-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            text: "Bạn có chắc muốn cập nhật trạng thái màu sắc này sang Locked?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -238,7 +238,7 @@ app.controller("mausac-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                    toastr.success("Đã cập nhật trạng thái màu sắc này sang Locked", "Thành công!");
                 }).catch(error => {
                     toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
                     console.error("Error: ", error);

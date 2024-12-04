@@ -51,10 +51,10 @@
                     <td>{{item.moTa}}</td>
                     <td>
                         <div class="badge"
-                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 3, 'bg-secondary': item.trangThai === 2}">
+                             ng-class="{'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 2, 'bg-secondary': item.trangThai === 3}">
                             <span ng-if="item.trangThai === 1">Active</span>
-                            <span ng-if="item.trangThai === 3">Locked</span>
-                            <span ng-if="item.trangThai === 2">Khác</span>
+                            <span ng-if="item.trangThai === 2">Locked</span>
+                            <span ng-if="item.trangThai === 3">Khác</span>
                         </div>
                     </td>
                     <td>
@@ -63,7 +63,7 @@
                                 <i class="fas fa-check icon-check"></i>
                             </button>
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal" ng-click="edit(item)">
+                                    data-bs-target="#editModal" ng-click="edit(item.id)">
                                 <i class="fas fa-info-circle"></i>
                             </button>
                             <button class="btn btn-link" type="button" ng-click="updateTrangThaiTo2(item)">
@@ -107,135 +107,147 @@
         </div>
     </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Thông tin danh mục sản phẩm</h5>
+                    <h5 class="modal-title" id="addModalLabel">Thêm Danh Mục Mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="container-fluid px-4">
-                        <div class="row">
-                            <div class="col-md-6 mt-2">
-                                <label for="inputID" class="form-label">ID</label>
-                                <input type="text" class="form-control" id="inputID" ng-model="form.id" readonly>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label for="inputIDCha" class="form-label">Dành cho</label>
-                                <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
-                                    <option ng-value="1" selected>NAM</option>
-                                    <option ng-value="2">NỮ</option>
-                                    <option ng-value="3">KHÁC</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mt-2">
-                                <label for="inputTen" class="form-label">Tên danh mục</label>
-                                <input type="text" class="form-control" id="inputTen" ng-model="form.ten">
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <label for="inputMoTa" class="form-label">Mô tả</label>
-                                <textarea class="form-control" placeholder="Mô tả tại đây" ng-model="form.moTa"
-                                          id="floatingTextarea2" style="height: 100px"></textarea>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label for="inputNgayTao" class="form-label">Ngày tạo</label>
-                                <input type="date" class="form-control" id="inputNgayTao" ng-model="form.ngayTao"
-                                       readonly>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label for="inputNgayCapNhat" class="form-label">Ngày cập nhật</label>
-                                <input type="date" class="form-control" id="inputNgayCapNhat"
-                                       ng-model="form.ngayCapNhat" readonly>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label for="inputNguoiTao" class="form-label">Người tạo</label>
-                                <input type="text" class="form-control" id="inputNguoiTao" ng-model="form.nguoiTao"
-                                       readonly>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label for="inputNguoiCapNhat" class="form-label">Người cập nhật</label>
-                                <input type="text" class="form-control" id="inputNguoiCapNhat"
-                                       ng-model="form.nguoiCapNhat" readonly>
-                            </div>
+                    <form>
+                        <!-- Trường Tên Danh Mục -->
+                        <div class="mb-3">
+                            <label for="tenDanhMuc" class="form-label">Tên Danh Mục</label>
+                            <input type="text" class="form-control" id="tenDanhMuc" ng-model="formAdd.ten"
+                                   placeholder="Nhập tên danh mục" required>
                         </div>
-                    </div>
+
+                        <!-- Trường Mô Tả -->
+                        <div class="mb-3">
+                            <label for="moTaDanhMuc" class="form-label">Mô Tả</label>
+                            <textarea class="form-control" id="moTaDanhMuc" ng-model="formAdd.moTa"
+                                      placeholder="Nhập mô tả danh mục" required></textarea>
+                        </div>
+
+                        <!-- Danh mục cha -->
+                        <div class="mb-3">
+                            <label for="danhMucCha" class="form-label">Danh Mục Cha</label>
+                            <select class="form-select" id="danhMucCha" ng-model="selectedDanhMucCha"
+                                    ng-change="loadDanhMucCon(selectedDanhMucCha, 1)">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucRoot" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <!-- Select danh mục con của danh mục cha -->
+                        <div class="mb-3" ng-show="selectedDanhMucCha && selectedDanhMucCha !== ''">
+                            <label for="danhMucCon" class="form-label">Danh Mục Con</label>
+                            <select class="form-select" id="danhMucCon" ng-model="selectedDanhMucCon"
+                                    ng-change="loadDanhMucCon(selectedDanhMucCon, 2)">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucChildren" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <!-- Select danh mục con của danh mục con -->
+                        <div class="mb-3" ng-show="selectedDanhMucCon && selectedDanhMucCon !== ''">
+                            <label for="danhMucConCon" class="form-label">Danh Mục Con Của Danh Mục Con</label>
+                            <select class="form-select" id="danhMucConCon" ng-model="selectedDanhMucConCon">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucConCon" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <!-- Select danh mục con của danh mục con của danh mục con -->
+                        <div class="mb-3" ng-show="selectedDanhMucConCon && selectedDanhMucConCon !== ''">
+                            <label for="danhMucConConCon" class="form-label">Danh Mục Con Của Danh Mục Con Của Danh Mục
+                                Con</label>
+                            <select class="form-select" id="danhMucConConCon" ng-model="selectedDanhMucConConCon">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucConConCon" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <div class="card-footer text-center mt-4">
-                        <button type="button" class="btn btn-warning me-2" ng-click="update()">
-                            <i class="fas fa-edit"></i> Sửa
-                        </button>
-                        <button type="button" class="btn btn-secondary" ng-click="reset()">
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                    </div>
-                    <br><br>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" ng-click="create()">Lưu</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!--    //// thêm -->
-    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Modal Sửa Danh Mục -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel1">Thêm mới danh mục sản phẩm</h5>
+                    <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa Danh Mục</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="container-fluid px-4">
-                        <div class="row">
-                            <!-- Chọn danh mục cha -->
-                            <div class="col-md-6 mt-2">
-                                <label for="inputIDCha" class="form-label">Danh mục cha</label>
-                                <select class="form-select" id="inputIDCha" ng-model="formAdd.idCha" ng-change="loadDanhMucCon(formAdd.idCha)">
-                                    <option value="">Không có (Danh mục gốc)</option>
-                                    <option ng-repeat="danhMuc in danhMucRoot" value="{{danhMuc.id}}">
-                                        {{danhMuc.ten}}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Danh mục con -->
-                            <div class="col-md-6 mt-2" ng-if="danhMucChildren.length > 0">
-                                <label for="inputDanhMucCon" class="form-label">Danh mục con</label>
-                                <select class="form-select" id="inputDanhMucCon" ng-model="formAdd.idCha" >
-                                    <option value="">Chọn danh mục con</option>
-                                    <option ng-repeat="danhMuc in danhMucChildren" value="{{danhMuc.id}}">
-                                        {{danhMuc.ten}}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Tên danh mục -->
-                            <div class="col-md-6 mt-2">
-                                <label for="inputTen" class="form-label">Tên danh mục</label>
-                                <input type="text" class="form-control" id="inputTen" ng-model="formAdd.ten"
-                                       placeholder="Nhập tên danh mục" required>
-                            </div>
-
-                            <!-- Mô tả -->
-                            <div class="col-md-12 mt-3">
-                                <label for="inputMoTa" class="form-label">Mô tả</label>
-                                <textarea class="form-control" id="inputMoTa" placeholder="Nhập mô tả"
-                                          ng-model="formAdd.moTa"
-                                          style="height: 100px"></textarea>
-                            </div>
+                    <form>
+                        <!-- Trường Tên Danh Mục -->
+                        <div class="mb-3">
+                            <label for="tenDanhMucEdit" class="form-label">Tên Danh Mục</label>
+                            <input type="text" class="form-control" id="tenDanhMucEdit" ng-model="formEdit.ten"
+                                   placeholder="Nhập tên danh mục" required>
                         </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="card-footer text-center mt-4">
-                        <button type="button" class="btn btn-warning me-2" ng-click="create()">
-                            <i class="fas fa-edit"></i> Thêm
-                        </button>
-                        <button type="button" class="btn btn-secondary" ng-click="resetAdd()">
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                    </div>
+
+                        <!-- Trường Mô Tả -->
+                        <div class="mb-3">
+                            <label for="moTaDanhMucEdit" class="form-label">Mô Tả</label>
+                            <textarea class="form-control" id="moTaDanhMucEdit" ng-model="formEdit.moTa"
+                                      placeholder="Nhập mô tả danh mục" required></textarea>
+                        </div>
+
+                        <!-- Trường Danh Mục Cha -->
+                        <!-- Dropdown chọn Danh Mục Cha -->
+                        <div class="mb-3">
+                            <label for="danhMucCha" class="form-label">Danh Mục Cha</label>
+                            <select class="form-select" id="danhMucCha" ng-model="selectedDanhMucCha"
+                                    ng-change="loadDanhMucCon(selectedDanhMucCha, 1)">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucRoot" value="{{dm.id}}"
+                                        ng-selected="dm.id === formEdit.idCha">{{dm.ten}}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Dropdown chọn Danh Mục Con -->
+                        <div class="mb-3">
+                            <label for="danhMucCon" class="form-label">Danh Mục Con</label>
+                            <select class="form-select" id="danhMucCon" ng-model="selectedDanhMucCon">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucChildren" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+
+                        <!-- Select danh mục con của danh mục con -->
+                        <div class="mb-3" ng-show="selectedDanhMucCon && selectedDanhMucCon !== ''">
+                            <label for="danhMucConConEdit" class="form-label">Danh Mục Con Của Danh Mục Con</label>
+                            <select class="form-select" id="danhMucConConEdit" ng-model="selectedDanhMucConCon">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucConCon" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <!-- Select danh mục con của danh mục con của danh mục con -->
+                        <div class="mb-3" ng-show="selectedDanhMucConCon && selectedDanhMucConCon !== ''">
+                            <label for="danhMucConConConEdit" class="form-label">Danh Mục Con Của Danh Mục Con Của Danh
+                                Mục Con</label>
+                            <select class="form-select" id="danhMucConConConEdit" ng-model="selectedDanhMucConConCon">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucConConCon" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-primary" ng-click="update()">Cập Nhật</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

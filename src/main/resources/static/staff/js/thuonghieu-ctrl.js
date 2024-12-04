@@ -72,25 +72,13 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.initialize();
 
     $scope.reset = function () {
-        // Giữ nguyên giá trị của id nếu có
-        const currentId = $scope.form.id; // Lưu trữ giá trị ID hiện tại
-        const ngayTao = $scope.form.ngayTao; // Lưu trữ giá trị ID hiện tại
-
-        // Thiết lập lại các trường khác
-        $scope.form = {
-            nguoiTao: 1, // Mặc định người tạo là 'Admin'
-            nguoiCapNhat: 1, // Mặc định người cập nhật là 'Admin'
-            ngayTao: ngayTao, // Ngày tạo sẽ là thời gian hiện tại
-            ngayCapNhat: new Date(), // Ngày cập nhật sẽ là thời gian hiện tại
-            ten: '', // Đặt mặc định cho tên
-            moTa: '', // Đặt mặc định cho mô tả
-            trangThai: 1, // Đặt mặc định cho trạng thái là true
-            id: currentId, // Giữ nguyên giá trị ID
-        };
+        $scope.form.ten = '';
+        $scope.form.moTa = '';
     };
 
     $scope.resetAdd = function () {
-        $scope.formAdd = {};
+        $scope.formAdd.ten = '';
+        $scope.formAdd.moTa = '';
     };
 
     $scope.edit = function (item) {
@@ -146,7 +134,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn thêm danh mục này không?",
+            text: "Bạn có chắc muốn thêm thương hiệu này không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -163,9 +151,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
                     $scope.initialize();
                     $scope.resetAdd();
                     $('#addModal').modal('hide');
-                    toastr.success("Thêm mới thành công", "Thành công!");
+                    toastr.success("Thêm mới thương hiệu thành công", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Thêm mới thất bại", "Lỗi!");
+                    toastr.error("Thêm mới thương hiệu thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -195,9 +183,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
                 }).then(resp => {
                     $scope.initialize();
                     $('#exampleModal').modal('hide');
-                    toastr.success("Cập nhật thành công", "Thành công!");
+                    toastr.success("Cập thương hiệu nhật thành công", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật thất bại", "Lỗi!");
+                    toastr.error("Cập nhật thương hiệu thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -207,7 +195,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
+            text: "Bạn có chắc muốn cập nhật thương hiệu này sang Active?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -222,9 +210,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
+                    toastr.success("Đã cập nhật thương hiệu này sang Active", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Cập nhật thương hiệu thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -234,7 +222,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            text: "Bạn có chắc muốn cập nhật thương hiệu này sang Locked?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -249,9 +237,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                    toastr.success("Đã cập nhật trạng thái thương hiệu này sang Locked", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Cập nhật trạng thái thương hiệu thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }

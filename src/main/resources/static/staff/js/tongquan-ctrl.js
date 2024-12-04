@@ -808,6 +808,8 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
 
     $scope.exportExcel = function () {
         // Sheet 1: Dữ liệu doanh thu và đơn hàng
+        const currentDateTime = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+
         const data1 = [
             { Loại: 'Đơn Hàng Đã Giao', Số_Lượng: $scope.donHangNgay },
             { Loại: 'Đơn Hàng Chờ', Số_Lượng: $scope.donHangCho },
@@ -816,6 +818,8 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
                 Loại: 'Doanh Thu',
                 Tổng: $scope.doanhThuNgay.toLocaleString('vi-VN') + ' đ' // Định dạng với dấu chấm và thêm "đ"
             },
+            { Loại: '', },
+            { Loại: 'Thời gian xuất', currentDateTime },
         ];
 
         // Sheet 2: Top 10 Sản Phẩm Bán Chạy
@@ -825,7 +829,6 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
             Mã_Sản_Phẩm: sp.maSanPham,
             Số_Lượng_Bán: sp.totalQuantity,
             Giá_Bán: sp.giaSanPham.toLocaleString('vi-VN') + ' đ',
-
         }));
         const data3 = $scope.allSanPhamWithTotalQuantity.map((sp, index) => ({
             STT: index + 1,
@@ -847,7 +850,7 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
         XLSX.utils.book_append_sheet(workbook, worksheet3, 'Sản Phẩm Còn');
 
         // Xuất file Excel
-        XLSX.writeFile(workbook, `bao_cao_doanh_thu_${new Date().toISOString().split('T')[0]}.xlsx`);
+        XLSX.writeFile(workbook, `bao_cao_doanh_thu_${currentDateTime}.xlsx`);
     };
 
 });

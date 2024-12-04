@@ -21,25 +21,49 @@
                         <label for="moTa" class="form-label">Mô tả</label>
                         <textarea id="moTa" ng-model="form.moTa" class="form-control" rows="3" placeholder="Nhập mô tả sản phẩm"></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="gia" class="form-label">Giá</label>
-                        <input type="text" id="gia" ng-model="form.gia" class="form-control"
-                               placeholder="Nhập giá sản phẩm" format-number>
-                    </div>
                     <div class="row gx-3">
                         <div class="col-md-6">
+                            <label for="gia" class="form-label">Giá</label>
+                            <input type="text" id="gia" ng-model="form.gia" class="form-control"
+                                   placeholder="Nhập giá sản phẩm" format-number>
+                        </div>
+                        <div class="col-md-6">
                             <label for="xuatXu" class="form-label">Xuất xứ</label>
-<!--                            <select class="form-select" ng-model="form.xuatXu">-->
-<!--                                <option value="Anh">Anh</option>-->
-<!--                                <option value="Mĩ">Mĩ</option>-->
-<!--                                <option value="Trung Quốc">Trung Quốc</option>-->
-<!--                            </select>-->
                             <input type="text" id="xuatXu" ng-model="form.xuatXu" class="form-control"
                                    placeholder="Nhập xuất xứ sản phẩm">
                         </div>
-                        <div class="col-md-6">
-                            <label for="idDanhMuc" class="form-label">Danh mục</label>
-                            <select required id="idDanhMuc" ng-model="form.idDanhMuc" class="form-select" required ng-options="danhmuc.id as danhmuc.ten for danhmuc in danhmuc">
+                    </div>
+                    <div class="row gx-3 mt-3">
+<!--                        <div class="col-md-6">-->
+<!--                            <label for="idDanhMuc" class="form-label">Danh mục</label>-->
+<!--                            <select required id="idDanhMuc" ng-model="form.idDanhMuc" class="form-select" required ng-options="danhmuc.id as danhmuc.ten for danhmuc in danhmuc">-->
+<!--                            </select>-->
+<!--                        </div>-->
+                        <div class="mb-3">
+                            <label for="danhMucCha" class="form-label">Dành cho</label>
+                            <select class="form-select" id="danhMucCha" ng-model="selectedDanhMucCha"
+                                    ng-change="loadDanhMucCon(selectedDanhMucCha, 1)">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucRoot" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <!-- Select danh mục con của danh mục cha -->
+                        <div class="mb-3" ng-show="selectedDanhMucCha && selectedDanhMucCha !== ''">
+                            <label for="danhMucCon" class="form-label">Phân loại</label>
+                            <select class="form-select" id="danhMucCon" ng-model="selectedDanhMucCon"
+                                    ng-change="loadDanhMucCon(selectedDanhMucCon, 2)">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucChildren" value="{{dm.id}}">{{dm.ten}}</option>
+                            </select>
+                        </div>
+
+                        <!-- Select danh mục con của danh mục con -->
+                        <div class="mb-3" ng-show="selectedDanhMucCon && selectedDanhMucCon !== ''">
+                            <label for="danhMucConCon" class="form-label">Danh Mục</label>
+                            <select class="form-select" id="danhMucConCon" ng-model="selectedDanhMucConCon">
+                                <option value="" selected>Không chọn</option>
+                                <option ng-repeat="dm in danhMucConCon" value="{{dm.id}}">{{dm.ten}}</option>
                             </select>
                         </div>
                     </div>
