@@ -13,4 +13,7 @@ import java.util.List;
 public interface DanhMucRepository extends JpaRepository<DanhMuc, Long> {
     List<DanhMuc> findByTrangThai(Integer active);
 
+    List<DanhMuc> findByIdChaIsNull();
+
+    List<DanhMuc> findByIdCha(Long parentId);
 }

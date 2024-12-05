@@ -54,4 +54,9 @@ public class DanhMucController {
         ServiceResult result = danhMucProcessor.delete(id);
         return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/get-children")
+    public ResponseEntity<ServiceResult> getCategoryChilden() {
+        return ResponseEntity.ok(danhMucProcessor.getCategoryChildren());
+    }
 }

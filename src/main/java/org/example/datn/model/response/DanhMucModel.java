@@ -8,6 +8,7 @@ import org.example.datn.model.CommonModel;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class DanhMucModel extends CommonModel {
     private String ten;
     private String moTa;
     private Integer trangThai;
+    private List<DanhMucModel> children;
 }

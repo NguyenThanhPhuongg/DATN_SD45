@@ -33,4 +33,12 @@ public class DanhMucService {
     public List<DanhMuc> getActive() {
         return repo.findByTrangThai(SystemConstant.ACTIVE);
     }
+
+    public List<DanhMuc> findByIdChaIsNull() {
+        return repo.findByIdChaIsNull();
+    }
+
+    public List<DanhMuc> findByIdCha(Long parentId) {
+        return repo.findByIdCha(parentId);
+    }
 }

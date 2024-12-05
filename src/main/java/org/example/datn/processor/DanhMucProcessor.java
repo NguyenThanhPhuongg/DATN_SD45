@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,7 +26,7 @@ public class DanhMucProcessor {
     private DanhMucService service;
 
     @Autowired
-    private DanhMucTransformer transformer;
+    private DanhMucTransformer danhMucTransformer;
 
     public ServiceResult save(DanhMuc request, UserAuthentication ua) {
         request.setNguoiTao(ua.getPrincipal());
@@ -51,19 +54,51 @@ public class DanhMucProcessor {
 
     public ServiceResult findAll() {
         var list = service.getAll();
-        var models = list.stream().map(transformer::toModel).collect(Collectors.toList());
+        var models = list.stream().map(danhMucTransformer::toModel).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public ServiceResult getById(Long id) {
         DanhMuc danhMuc = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại"));
-        var model = transformer.toModel(danhMuc);
+        var model = danhMucTransformer.toModel(danhMuc);
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
     public DanhMucModel findById(Long id) {
         return service.findById(id)
-                .map(transformer::toModel)
+                .map(danhMucTransformer::toModel)
                 .orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại"));
     }
+
+    public ServiceResult getCategoryChildren() {
+        List<DanhMuc> danhMucList = service.findByIdChaIsNull();
+
+        List<DanhMucModel> danhMucModelList = danhMucList.stream()
+                .map(danhMucTransformer::toModel)
+                .collect(Collectors.toList());
+
+        for (DanhMucModel danhMucModel : danhMucModelList) {
+            List<DanhMucModel> children = getCategoryChildren(danhMucModel.getId());
+
+            danhMucModel.setChildren(children);
+        }
+
+        return new ServiceResult(danhMucModelList, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
+
+    private List<DanhMucModel> getCategoryChildren(Long parentId) {
+        List<DanhMuc> danhMucConList = service.findByIdCha(parentId);
+
+        List<DanhMucModel> children = danhMucConList.stream()
+                .map(danhMucTransformer::toModel)
+                .collect(Collectors.toList());
+
+        for (DanhMucModel child : children) {
+            List<DanhMucModel> subChildren = getCategoryChildren(child.getId());
+            child.setChildren(subChildren);
+        }
+
+        return children;
+    }
+
 }
