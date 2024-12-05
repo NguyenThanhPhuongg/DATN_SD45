@@ -363,4 +363,26 @@ button:hover {
     opacity: 1;
     transform: translateY(0);
 }
+.store-address {
+    background-color: #f4f4f4; /* Màu nền nhẹ */
+    padding: 40px 0;
+    text-align: center;
+}
+
+.store-address h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.store-address p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.store-address .map iframe {
+    margin-top: 20px;
+    max-width: 100%;
+    border-radius: 8px;
+}
 
