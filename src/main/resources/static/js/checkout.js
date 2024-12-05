@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', checkToken);
 let fetchedAddresses = []; // Biến toàn cục để lưu địa chỉ đã fetch
 let addressDataId;
 let phuongThucVanChuyenId;
@@ -854,8 +855,38 @@ function closeVoucherModal() {
     document.body.style.overflow = "";
 }
 
-// // Add event listener to the "Chọn voucher khác" button
-// document.querySelector('.voucher-text button').addEventListener('click', openVoucherModal);
+function checkToken() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Bạn chưa đăng nhập!',
+            text: 'Vui lòng đăng nhập để tiếp tục.',
+            confirmButtonText: 'Đến trang đăng nhập',
+            willClose: () => {
+                window.location.href = '/v1/auth/login';
+            }
+        });
+    } else {
+        try {
+            const decodedToken = jwt_decode(token);
+            console.log(decodedToken);
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Token không hợp lệ',
+                text: 'Vui lòng đăng nhập lại.',
+                confirmButtonText: 'Đến trang đăng nhập',
+                willClose: () => {
+                    window.location.href = '/v1/auth/login';
+                }
+            });
+        }
+    }
+}
+
+// window.onload = checkToken;
 
 
 

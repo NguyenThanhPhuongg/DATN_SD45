@@ -241,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchCartData();
 });
 document.addEventListener('DOMContentLoaded', () => {
+    checkToken();
     // Xóa selectedItems khỏi local storage khi trang được tải lại
     localStorage.removeItem('selectedItems');
     fetchCartData();
@@ -254,3 +255,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function checkToken() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Bạn chưa đăng nhập!',
+            text: 'Vui lòng đăng nhập để tiếp tục.',
+            confirmButtonText: 'Đến trang đăng nhập',
+            willClose: () => {
+                window.location.href = '/v1/auth/login';
+            }
+        });
+    } else {
+        try {
+            const decodedToken = jwt_decode(token);
+            console.log(decodedToken);
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Token không hợp lệ',
+                text: 'Vui lòng đăng nhập lại.',
+                confirmButtonText: 'Đến trang đăng nhập',
+                willClose: () => {
+                    window.location.href = '/v1/auth/login';
+                }
+            });
+        }
+    }
+}
+

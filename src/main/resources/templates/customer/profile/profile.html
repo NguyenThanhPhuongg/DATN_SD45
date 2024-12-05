@@ -3325,6 +3325,39 @@
     // Gọi hàm để set trạng thái ban đầu khi modal được mở
     toggleFields();
 
+    function checkToken() {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Bạn chưa đăng nhập!',
+                text: 'Vui lòng đăng nhập để tiếp tục.',
+                confirmButtonText: 'Đến trang đăng nhập',
+                willClose: () => {
+                    window.location.href = '/v1/auth/login';
+                }
+            });
+        } else {
+            try {
+                const decodedToken = jwt_decode(token);
+                console.log(decodedToken);
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Token không hợp lệ',
+                    text: 'Vui lòng đăng nhập lại.',
+                    confirmButtonText: 'Đến trang đăng nhập',
+                    willClose: () => {
+                        window.location.href = '/v1/auth/login';
+                    }
+                });
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        checkToken();
+    });
 </script>
 </body>
 </html>
