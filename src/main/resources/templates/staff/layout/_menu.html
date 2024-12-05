@@ -39,22 +39,24 @@
 
                 <div class="sb-sidenav-menu-heading">QUẢN LÝ</div>
                 <!-- Quản trị hệ thông -->
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages"
-                   aria-expanded="false" aria-controls="collapsePages">
-                    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                    Quản trị hệ thống
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapsePages" aria-labelledby="headingTwo"
-                     data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                        <a class="nav-link" href="#!/taikhoan">
-                            Quản lý người dùng
-                        </a>
-                        <a class="nav-link" href="#!/group">
-                            Quản lý phân quyền
-                        </a>
-                    </nav>
+                <div id="adminMenu" style="display: none;">
+                    <!-- Quản trị hệ thống -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages"
+                       aria-expanded="false" aria-controls="collapsePages">
+                        <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                        Quản trị hệ thống
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                            <a class="nav-link" href="#!/taikhoan">
+                                Quản lý người dùng
+                            </a>
+                            <a class="nav-link" href="#!/group">
+                                Quản lý phân quyền
+                            </a>
+                        </nav>
+                    </div>
                 </div>
                 <!-- Quản lý Danh mục -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
@@ -374,7 +376,7 @@
         </div>
         <div class="sb-sidenav-footer">
             <div class="small">Đăng nhập với tư cách:</div>
-            Admin Ziaza Store
+            <div id="userRole">Admin Ziaza Store</div> <!-- Chỗ này sẽ thay đổi thành Admin hoặc Staff -->
         </div>
     </nav>
 </div>

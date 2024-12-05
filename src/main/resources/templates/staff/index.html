@@ -31,12 +31,13 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <style>
-        td{
+        td {
             white-space: nowrap;
             overflow: hidden;
-            text-overflow:ellipsis;
+            text-overflow: ellipsis;
             max-width: 150px;
         }
+
         /*////// anh sản phẩm*/
         #previewContainer {
             display: grid;
@@ -48,6 +49,7 @@
             padding: 10px;
             border-radius: 5px;
         }
+
         .image-wrapper {
             position: relative;
             width: 100%;
@@ -55,6 +57,7 @@
             overflow: hidden;
             border-radius: 5px;
         }
+
         .image-wrapper img {
             position: absolute;
             top: 0;
@@ -63,6 +66,7 @@
             height: 100%;
             object-fit: cover;
         }
+
         .delete-icon {
             position: absolute;
             top: 5px;
@@ -78,6 +82,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .product-list-modal {
             position: fixed;
             top: 0;
@@ -88,7 +93,8 @@
             padding: 0;
             border: 1px solid #ccc;
         }
-        .product-list-modal .dialog-bg{
+
+        .product-list-modal .dialog-bg {
             background: rgba(0, 0, 0, 0.5);
             position: absolute;
             top: 0;
@@ -96,7 +102,8 @@
             width: 100%;
             height: 100%;
         }
-        .product-list-modal-content{
+
+        .product-list-modal-content {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -107,25 +114,30 @@
             border: 1px solid rgba(0, 0, 0, .2);
             border-radius: .3rem;
         }
-        .product-list-modal-content .list-body{
+
+        .product-list-modal-content .list-body {
             max-height: 500px;
             overflow: auto;
             overflow-x: hidden
         }
-        .nav-cont{
-            //border-bottom: 1px solid #dee2e6;
+
+        .nav-cont {
+        / / border-bottom: 1 px solid #dee2e6;
         }
-        .nav-tab-slide{
+
+        .nav-tab-slide {
             overflow-x: auto;
             overflow-y: hidden;
             max-width: 100%;
         }
-        .tabs-bill{
+
+        .tabs-bill {
             max-width: 100%;
             overflow-y: hidden;
             overflow-x: auto;
             border-bottom: 0;
         }
+
         /* width */
         .tabs-bill::-webkit-scrollbar {
             display: none;
@@ -137,20 +149,23 @@
             display: none;
         }
 
-        .tabs-bill li{
+        .tabs-bill li {
 
             position: relative;
         }
-        .tabs-bill li button{
+
+        .tabs-bill li button {
             padding-right: 30px;
             color: #000;
             font-size: 14px;
             position: relative;
         }
-        .tabs-bill li button.active{
+
+        .tabs-bill li button.active {
             font-weight: 500;
         }
-        .tabs-bill li button.active:before{
+
+        .tabs-bill li button.active:before {
             content: '';
             position: absolute;
             bottom: 0;
@@ -160,31 +175,37 @@
             height: 1px;
             background: #ffffff;
         }
-        .tabs-bill li span{
+
+        .tabs-bill li span {
             position: absolute;
             top: 5px;
             right: 7px;
             z-index: 2;
             cursor: pointer;
         }
+
         .tab-content-bill {
             padding: 20px 15px;
             border: 1px solid #dee2e6;
             border-radius: 0 0 5px 5px;
             margin-top: -1px;
         }
+
         .nav-cont .btn:disabled,
-        .nav-cont .btn[disabled]{
+        .nav-cont .btn[disabled] {
             visibility: hidden;
             opacity: 0;
         }
-        .tab-content-bill .form-control{
+
+        .tab-content-bill .form-control {
             font-size: 13px;
         }
-        .done-bill{
+
+        .done-bill {
             opacity: 0.6;
             pointer-events: none;
         }
+
         .position-relative {
             position: relative;
         }
@@ -276,28 +297,51 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.js"></script>
 <script>
-    window.onload = function() {
-        const token = localStorage.getItem('token');
+    // Hàm kiểm tra quyền truy cập
+    function checkAccess() {
+        const token = localStorage.getItem('token'); // Lấy token từ localStorage
         const path = window.location.pathname;
+        const hash = window.location.hash;
 
+        // Kiểm tra nếu không có token, hiển thị trang thông báo và yêu cầu đăng nhập
         if (!token) {
             showNotificationPage("Bạn chưa đăng nhập, vui lòng đăng nhập lại.", true);
             return;
         }
 
         try {
+            // Giải mã token
             const decodedToken = jwt_decode(token);
 
+            // Kiểm tra nếu người dùng là ADMIN
+            if (decodedToken.role === 'ADMIN') {
+                // Hiển thị menu Quản trị hệ thống nếu là ADMIN
+                document.getElementById('adminMenu').style.display = 'block';
+                document.getElementById('userRole').innerText = "Admin Ziaza Store";
+            } else {
+                // Ẩn menu nếu không phải ADMIN
+                document.getElementById('adminMenu').style.display = 'none';
+                document.getElementById('userRole').innerText = "Staff Ziaza Store";
+                // Nếu người dùng không phải ADMIN, chặn truy cập vào /staff#!/taikhoan và /staff#!/group
+                if (hash === '#!/taikhoan' || hash === '#!/group') {
+                    showNotificationPage("Bạn không có quyền truy cập vào trang này.");
+                    return;
+                }
+            }
+
+            // Nếu không phải ADMIN và truy cập vào các trang không hợp lệ, chặn truy cập
             if ((decodedToken.role !== 'USER' && decodedToken.role !== 'ADMIN') && path.startsWith('/staff')) {
                 showNotificationPage("Bạn không có quyền truy cập vào trang này.");
                 return;
             }
 
         } catch (error) {
+            // Nếu token không hợp lệ
             showNotificationPage("Token không hợp lệ.");
         }
-    };
+    }
 
+    // Hàm hiển thị trang thông báo
     function showNotificationPage(message, showLoginButton = false) {
         let content = `
     <div style="height: 100vh; display: flex; justify-content: center; align-items: center; font-size: 24px; text-align: center; background-color: #fff;">
@@ -313,9 +357,14 @@
         document.body.innerHTML = content;
     }
 
+    // Hàm chuyển hướng đến trang đăng nhập
     function redirectToLogin() {
         window.location.href = '/v1/auth/login';
     }
+
+    // Kiểm tra quyền truy cập khi trang được tải (window.onload) và khi hash thay đổi (hashchange)
+    window.onload = checkAccess;
+    window.onhashchange = checkAccess;
 
 </script>
 </body>
