@@ -478,11 +478,14 @@ $(document).ready(function () {
         function checkToken() {
             const token = localStorage.getItem('token');
             if (!token) {
-                $('#tokenWarning').fadeIn();
-
-                $('#closeTokenWarning').on('click', function () {
-                    $('#tokenWarning').fadeOut();
-                    window.location.href = '/v1/auth/login';
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Bạn chưa đăng nhập!',
+                    text: 'Vui lòng đăng nhập để tiếp tục.',
+                    confirmButtonText: 'Đến trang đăng nhập',
+                    willClose: () => {
+                        window.location.href = '/v1/auth/login';
+                    }
                 });
 
                 return false;
