@@ -300,7 +300,7 @@ app.config(function ($routeProvider) {
         })
 
         .otherwise({
-            redirectTo: "/tongquan" // Chuyển hướng đến đường dẫn mặc định
+            redirectTo: "/bhtq" // Chuyển hướng đến đường dẫn mặc định
         });
 
 })

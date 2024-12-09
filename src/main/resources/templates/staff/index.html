@@ -491,9 +491,12 @@
             } else {
                 // Ẩn menu nếu không phải ADMIN
                 document.getElementById('adminMenu').style.display = 'none';
+                document.getElementById('tongQuan').style.display = 'none';
+                document.getElementById('voucher').style.display = 'none';
+
                 document.getElementById('userRole').innerText = "Staff Ziaza Store";
                 // Nếu người dùng không phải ADMIN, chặn truy cập vào /staff#!/taikhoan và /staff#!/group
-                if (hash === '#!/taikhoan' || hash === '#!/group') {
+                if (hash === '#!/taikhoan' || hash === '#!/group' || hash === '#!/tongquan' || hash === '#!/listkhuyenmai' || hash === '#!/danhsachspkm') {
                     showNotificationPage("Bạn không có quyền truy cập vào trang này.");
                     return;
                 }
