@@ -54,13 +54,29 @@ public class DanhMucProcessor {
 
     public ServiceResult findAll() {
         var list = service.getAll();
-        var models = list.stream().map(danhMucTransformer::toModel).collect(Collectors.toList());
+        var models = list.stream().map(danhMuc -> {
+            // Chuyển đối tượng DanhMuc thành DanhMucModel
+            DanhMucModel model = danhMucTransformer.toModel(danhMuc);
+
+            // Kiểm tra nếu idCha không phải null trước khi gọi findById
+            if (danhMuc.getIdCha() != null) {
+                service.findById(danhMuc.getIdCha()).ifPresent(model::setDanhMucCha);
+            }
+
+            // Trả về model sau khi đã gán danh mục cha
+            return model;
+        }).collect(Collectors.toList());
+
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+
     public ServiceResult getById(Long id) {
         DanhMuc danhMuc = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại"));
-        var model = danhMucTransformer.toModel(danhMuc);
+        DanhMucModel model = danhMucTransformer.toModel(danhMuc);
+        if (danhMuc.getIdCha() != null) {
+            service.findById(danhMuc.getIdCha()).ifPresent(model::setDanhMucCha);
+        }
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
