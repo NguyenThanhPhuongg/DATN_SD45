@@ -116,58 +116,39 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <!-- Trường Tên Danh Mục -->
                         <div class="mb-3">
                             <label for="tenDanhMuc" class="form-label">Tên Danh Mục</label>
                             <input type="text" class="form-control" id="tenDanhMuc" ng-model="formAdd.ten"
-                                   placeholder="Nhập tên danh mục" required>
+                                   placeholder="Nhập tên danh mục">
                         </div>
-
-                        <!-- Trường Mô Tả -->
                         <div class="mb-3">
                             <label for="moTaDanhMuc" class="form-label">Mô Tả</label>
                             <textarea class="form-control" id="moTaDanhMuc" ng-model="formAdd.moTa"
-                                      placeholder="Nhập mô tả danh mục" required></textarea>
+                                      placeholder="Nhập mô tả danh mục"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="fz-14">
+                                Danh mục cha
+                                <span class="text-danger">(*)</span>
+                            </label>
+                            <div class="dropdown">
+                                <button class="btn btn-dropdown"
+                                        id="dropdown-basic-button-danhmuchoso"
+                                        ng-click="toggleDropdown()"
+                                        aria-haspopup="true"
+                                        aria-expanded="false">
+                                    <span id="dropdown-title">Chọn danh mục cha</span>
+                                    <i class="bi bi-chevron-down" id="dropdown-arrow"></i>
+                                </button>
+
+                                <div class="dropdown-menu" id="dropdown-menu">
+                                    <!-- Cây danh mục-->
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Danh mục cha -->
-                        <div class="mb-3">
-                            <label for="danhMucCha" class="form-label">Danh Mục Cha</label>
-                            <select class="form-select" id="danhMucCha" ng-model="selectedDanhMucCha"
-                                    ng-change="loadDanhMucCon(selectedDanhMucCha, 1)">
-                                <option value="" selected>Không chọn</option>
-                                <option ng-repeat="dm in danhMucRoot" value="{{dm.id}}">{{dm.ten}}</option>
-                            </select>
-                        </div>
 
-                        <!-- Select danh mục con của danh mục cha -->
-                        <div class="mb-3" ng-show="selectedDanhMucCha && selectedDanhMucCha !== ''">
-                            <label for="danhMucCon" class="form-label">Danh Mục Con</label>
-                            <select class="form-select" id="danhMucCon" ng-model="selectedDanhMucCon"
-                                    ng-change="loadDanhMucCon(selectedDanhMucCon, 2)">
-                                <option value="" selected>Không chọn</option>
-                                <option ng-repeat="dm in danhMucChildren" value="{{dm.id}}">{{dm.ten}}</option>
-                            </select>
-                        </div>
 
-                        <!-- Select danh mục con của danh mục con -->
-                        <div class="mb-3" ng-show="selectedDanhMucCon && selectedDanhMucCon !== ''">
-                            <label for="danhMucConCon" class="form-label">Danh Mục Con Của Danh Mục Con</label>
-                            <select class="form-select" id="danhMucConCon" ng-model="selectedDanhMucConCon">
-                                <option value="" selected>Không chọn</option>
-                                <option ng-repeat="dm in danhMucConCon" value="{{dm.id}}">{{dm.ten}}</option>
-                            </select>
-                        </div>
-
-                        <!-- Select danh mục con của danh mục con của danh mục con -->
-                        <div class="mb-3" ng-show="selectedDanhMucConCon && selectedDanhMucConCon !== ''">
-                            <label for="danhMucConConCon" class="form-label">Danh Mục Con Của Danh Mục Con Của Danh Mục
-                                Con</label>
-                            <select class="form-select" id="danhMucConConCon" ng-model="selectedDanhMucConConCon">
-                                <option value="" selected>Không chọn</option>
-                                <option ng-repeat="dm in danhMucConConCon" value="{{dm.id}}">{{dm.ten}}</option>
-                            </select>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
