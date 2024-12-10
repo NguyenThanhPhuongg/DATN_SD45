@@ -214,15 +214,15 @@
                                             </td>
                                         </tr>
 
-                                        <tr>
-                                            <td>
-                                                <select name="" ng-model="bill.diemThuong" ng-change="getTotalAmount(bill)" class="form-control mb-1 form-control-sm">
-                                                    <option value="" selected>-- Chọn khuyến mãi --</option>
-                                                    <option ng-repeat="voucher in vouchers" ng-value="voucher.giaTri">{{ voucher.ten }}</option>
-                                                </select>
-                                                <span ng-if="bill.diemThuong > 0">Giảm {{ bill.diemThuong }}%</span>
-                                            </td>
-                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td>-->
+<!--                                                <select name="" ng-model="bill.diemThuong" ng-change="getTotalAmount(bill)" class="form-control mb-1 form-control-sm">-->
+<!--                                                    <option value="" selected>&#45;&#45; Chọn khuyến mãi &#45;&#45;</option>-->
+<!--                                                    <option ng-repeat="voucher in vouchers" ng-value="voucher.giaTri">{{ voucher.ten }}</option>-->
+<!--                                                </select>-->
+<!--                                                <span ng-if="bill.diemThuong > 0">Giảm {{ bill.diemThuong }}%</span>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
 
                                         <tr>
                                             <td>
@@ -377,6 +377,7 @@
                                 <div class="bill-info-head" >
                                     <p class="mb-1"><b>Ngày mua:</b> <span>{{bill.dateBill}}</span></p>
                                     <p class="mb-1"><b>Nhân viên bán hàng:</b> <span>{{bill.tenNguoiTao}}</span></p>
+                                    <p class="mb-1"><b>Hình thức thanh toán:</b> <span>{{bill.payCustomer === 'money' ? 'Tiền mặt' : 'Chuyển khoản'}}</span></p>
                                     <p class="mb-1" ng-if="bill.phoneCustomer !== null && bill.phoneCustomer !== '' && bill.nameCustomer !== null && bill.nameCustomer !== ''">
                                         <b>Người mua:</b> <span>{{bill.nameCustomer || Ziaza}}  ( +{{bill.billDiem}} điểm)</span>
                                     </p>
@@ -420,7 +421,7 @@
                                 </table>
                                 <div class="d-flex fw-bold justify-content-between">
                                     <div class="total-quantity">Tổng số lượng: {{bill.totalQuantity}}</div>
-                                    <div class="total-quantity">Giá gốc: {{bill.totalBill}}</div>
+                                    <div class="total-quantity">Giá gốc: {{formatCurrency(bill.totalBill)}} VNĐ</div>
                                     <div class="total-total">Tổng thanh toán: {{formatCurrency(getTotalAmount(bill))}} VNĐ</div>
                                 </div>
                             </div>
