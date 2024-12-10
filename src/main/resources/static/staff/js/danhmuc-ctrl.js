@@ -3,9 +3,6 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
     $scope.formAdd = {}; // Biến lưu thông tin khi thêm danh mục
     $scope.formEdit = {}; // Biến lưu thông tin khi chỉnh sửa danh mục
     $scope.danhMucRoot = []; // Danh mục gốc (danh mục cha cấp 1)
-    $scope.danhMucChildren = []; // Danh mục con của danh mục cha đang chọn
-    $scope.danhMucConCon = []; // Danh mục con của danh mục con
-    $scope.danhMucConConCon = []; // Danh mục con của danh mục con của danh mục con
     $scope.searchText = ''; // Biến tìm kiếm
     $scope.selectedIdCha = null;
     $scope.pager = {
@@ -61,6 +58,7 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
                 event.stopPropagation();
 
                 document.getElementById('dropdown-title').textContent = category.ten;
+                document.getElementById('dropdown-title-edit').textContent = category.ten;
 
                 selectCategory(category);
                 $scope.toggleDropdown();
@@ -156,9 +154,6 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
         $http.get('/rest/danhmuc', headers).then((resp) => {
             $scope.items = resp.data.data;
             $scope.danhMucRoot = $scope.items.filter(dm => !dm.idCha); // Lọc danh mục cha cấp 1
-            $scope.danhMucChildren = []; // Reset danh mục con
-            $scope.danhMucConCon = []; // Reset danh mục con con
-            $scope.danhMucConConCon = []; // Reset danh mục con con con
             $scope.pager.updateItems();
         }).catch((err) => {
             console.error(err);
@@ -219,35 +214,6 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
     };
 
 
-    // $scope.edit = function (id) {
-    //     const danhMuc = $scope.items.find(item => item.id === id);
-    //     $scope.formEdit = angular.copy(danhMuc);
-    // };
-    //
-    // // Cập nhật danh mục
-    // $scope.update = function () {
-    //     const updatedDanhMuc = angular.copy($scope.formEdit);
-    //     updatedDanhMuc.idCha = $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha; // Gán idCha tương ứng
-    //
-    //     $http.put('/rest/danhmuc/' + updatedDanhMuc.id, updatedDanhMuc, headers).then((resp) => {
-    //         alert('Cập nhật danh mục thành công');
-    //         $scope.load(); // Reload lại danh sách danh mục
-    //         $('#editModal').modal('hide'); // Đóng modal
-    //     }).catch((err) => {
-    //         console.error(err);
-    //         alert('Lỗi khi cập nhật danh mục!');
-    //     });
-    // };
-    //
-    // // Reset form edit
-    // $scope.resetFormEdit = function () {
-    //     $scope.formEdit = {};
-    //     $scope.selectedDanhMucCha = '';
-    //     $scope.selectedDanhMucCon = '';
-    //     $scope.selectedDanhMucConCon = '';
-    //     $scope.selectedDanhMucConConCon = '';
-    // };
-
     // Reset form thêm danh mục
     $scope.resetFormAdd = function () {
         $scope.formAdd = {
@@ -260,65 +226,7 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
         return danhMucCha ? danhMucCha.ten : 'Không có danh mục cha'; // Trả về tên danh mục hoặc 'Không có danh mục cha' nếu không tìm thấy
     };
 
-    // Chỉnh sửa danh mục
-    // Phương thức edit
-    $scope.edit = function (id) {
-        const item = $scope.items.find(item => item.id === id);
-        if (item) {
-            $scope.formEdit = angular.copy(item);
 
-            // Gán selectedDanhMucCha là idCha của danh mục con
-            $scope.selectedDanhMucCha = item.idCha;
-
-            // Load danh mục con dựa trên selectedDanhMucCha
-            if ($scope.selectedDanhMucCha) {
-                $scope.loadDanhMucCon($scope.selectedDanhMucCha, 1);  // Tải danh mục con cấp 1
-            }
-
-            // Nếu có danh mục con, gán selectedDanhMucCon là id của danh mục con hiện tại
-            if ($scope.formEdit.idCha) {
-                $scope.selectedDanhMucCon = item.idCha;  // Chọn đúng danh mục con
-            }
-        }
-    };
-
-    // Cập nhật danh mục
-    $scope.update = function () {
-        swal({
-            title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật danh mục?",
-            icon: "warning",
-            buttons: ["Hủy", "Xác nhận"],
-            dangerMode: true,
-        }).then((willUpdate) => {
-            if (willUpdate) {
-                const item = angular.copy($scope.formEdit);
-                item.idCha = $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha; // Gán idCha tương ứng
-
-                $http.put('/rest/danhmuc/' + item.id, item, headers).then((resp) => {
-                    // Cập nhật vào danh sách sau khi update thành công
-                    const index = $scope.items.findIndex(dm => dm.id === item.id);
-                    if (index !== -1) {
-                        $scope.items[index] = resp.data.data; // Cập nhật danh mục mới
-                    }
-                    toastr.success("Đã cập nhật danh mục", "Thành công!");
-                    $('#editModal').modal('hide');
-                    $scope.load(); // Reload danh sách
-                    $scope.resetFormEdit(); // Reset form chỉnh sửa
-                }).catch((err) => {
-                    console.error(err);
-                    toastr.error("Có lỗi", "Lỗi!");
-                });
-            }
-        });
-    };
-
-    // Reset form chỉnh sửa
-    $scope.resetFormEdit = function () {
-        $scope.formEdit = {
-            ten: '', moTa: '', idCha: '',
-        };
-    };
 
     $scope.validateForm = function (form, errorContainer, isUpdate = false) {
         // Kiểm tra tên
@@ -359,9 +267,13 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
     });
 
     $scope.updateTrangThaiTo1 = function (item) {
+        if (item.trangThai === 1) {
+            toastr.error("Danh mục này đang hoạt động", "Lỗi!");
+            return;
+        }
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
+            text: "Bạn có chắc muốn mở khóa danh mục này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -375,42 +287,163 @@ app.controller('danhmuc-ctrl', function ($scope, $http) {
                         'Authorization': 'Bearer ' + token
                     }
                 }).then(resp => {
-                    $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
+                    console.log(resp);
+                    if (resp.data.code === '200') {
+                        toastr.success("Đã mở khóa thành công", "Thành công!");
+                        $scope.load();
+                    }else {
+                        toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    }
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    const errorMessage = error.data && error.data.message ? error.data.message : "Cập nhật trạng thái thất bại";
+                    toastr.error(errorMessage, "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
         });
     };
 
+
     $scope.updateTrangThaiTo2 = function (item) {
+        if (item.trangThai === 0) {
+            toastr.error("Danh mục này đã bị khóa trước đó", "Lỗi!");
+            return;
+        }
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            text: "Bạn có chắc muốn khóa danh mục này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
         }).then((willUpdate) => {
             if (willUpdate) {
                 let updatedItem = angular.copy(item);
-                updatedItem.trangThai = 2;
+                updatedItem.trangThai = 0;
                 var token = localStorage.getItem('token');
                 $http.put(`/rest/danhmuc/${updatedItem.id}`, updatedItem, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
                 }).then(resp => {
-                    $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                    if (resp.data.code === '200') {
+                        toastr.success("Đã khóa thành công", "Thành công!");
+                        $scope.load();
+                    }else {
+                        toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    }
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    const errorMessage = error.data && error.data.message ? error.data.message : "Cập nhật trạng thái thất bại";
+                    toastr.error(errorMessage, "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
         });
     };
+    $scope.formEdit = {};  // Biến lưu thông tin khi chỉnh sửa danh mục
+
+    // Hàm hiển thị modal chỉnh sửa
+    $scope.edit = function (id) {
+        // Tìm danh mục theo ID
+        const danhMuc = $scope.items.find(item => item.id === id);
+        if (danhMuc) {
+            $scope.formEdit = angular.copy(danhMuc);  // Sao chép dữ liệu vào formEdit
+            $scope.selectedCategory = $scope.formEdit.idCha ? $scope.items.find(item => item.id === $scope.formEdit.idCha) : null;  // Lưu danh mục cha đã chọn
+            $scope.loadDanhMucForModalEdit();  // Nạp lại cây danh mục cho modal
+            $('#editModal').modal('show');  // Mở modal chỉnh sửa
+        }
+    };
+
+    // Hàm cập nhật danh mục sau khi chỉnh sửa
+    $scope.update = function () {
+        // Kiểm tra thông tin form trước khi gửi
+        if (!$scope.formEdit.ten || $scope.formEdit.ten.trim() === '') {
+            toastr.error("Tên danh mục không được để trống", "Lỗi!");
+            return;
+        }
+
+        // Hiển thị hộp thoại xác nhận
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn cập nhật danh mục này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+            dangerMode: true,
+        }).then((willUpdate) => {
+            if (willUpdate) {
+                // Sao chép thông tin formEdit
+                const updatedItem = angular.copy($scope.formEdit);
+                updatedItem.idCha = $scope.selectedCategory ? $scope.selectedCategory.id : null;
+
+                // Gọi API để cập nhật danh mục
+                $http.put(`/rest/danhmuc/${updatedItem.id}`, updatedItem, headers).then((resp) => {
+                    // Cập nhật lại danh mục trong danh sách
+                    const index = $scope.items.findIndex(item => item.id === updatedItem.id);
+                    if (index !== -1) {
+                        $scope.items[index] = resp.data.data;
+                    }
+                    $scope.load();
+                    toastr.success("Cập nhật danh mục thành công", "Thành công!");
+                    $('#editModal').modal('hide');  // Đóng modal
+                }).catch((err) => {
+                    toastr.error("Cập nhật danh mục thất bại", "Lỗi!");
+                    console.error(err);
+                });
+            }
+        });
+    };
+
+    // Nạp lại cây danh mục cho modal edit
+    $scope.loadDanhMucForModalEdit = function () {
+        $http.get('/rest/danhmuc/get-children', headers)
+            .then(function (response) {
+                const categories = response.data.data;
+                const dropdownMenu = document.getElementById('dropdown-menu-edit');
+                dropdownMenu.innerHTML = ''; // Xóa nội dung cũ
+                generateTree(categories, dropdownMenu); // Tạo lại cây danh mục
+            })
+            .catch(function (error) {
+                console.error('Lỗi khi lấy danh mục:', error);
+            });
+    };
+
+    // Cập nhật thông tin danh mục khi chọn danh mục cha
+    $scope.selectCategoryForEdit = function (category) {
+        $scope.selectedCategory = category;  // Lưu danh mục cha đã chọn vào selectedCategory
+        document.getElementById('dropdown-title-edit').textContent = category.ten;  // Cập nhật tiêu đề dropdown
+        $scope.formEdit.idCha = category.id;  // Cập nhật vào formEdit
+        $scope.toggleDropdownEdit();  // Đóng dropdown
+    };
+
+    // Hiển thị tên danh mục cha đã chọn
+    $scope.getTenDanhMuc = function (idCha) {
+        const danhMucCha = $scope.items.find(item => item.id === idCha);
+        return danhMucCha ? danhMucCha.ten : 'Không có danh mục cha'; // Trả về tên danh mục hoặc 'Không có danh mục cha' nếu không tìm thấy
+    };
+
+    // Hàm toggle ẩn/hiện danh mục con cho modal Edit
+    $scope.toggleDropdownEdit = function() {
+        const dropdownMenu = document.getElementById('dropdown-menu-edit');
+        dropdownMenu.classList.toggle('show');
+
+        const dropdownArrow = document.getElementById('dropdown-arrow-edit');
+        dropdownArrow.classList.toggle('bi-chevron-down');
+        dropdownArrow.classList.toggle('bi-chevron-up');
+    };
+
+    // Reset modal Edit khi đóng
+    $scope.resetModalEdit = function () {
+        $scope.formEdit = {
+            ten: '', moTa: '', idCha: ''
+        };
+        $scope.selectedCategory = null;
+        document.getElementById('dropdown-title-edit').textContent = 'Chọn danh mục cha';
+    };
+
+    // Gọi hàm resetModalEdit khi đóng modal
+    $('#editModal').on('hidden.bs.modal', function () {
+        $scope.resetModalEdit();
+    });
+
 
     // Khởi chạy
     $scope.load();
