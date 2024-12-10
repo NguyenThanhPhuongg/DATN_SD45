@@ -258,7 +258,22 @@ form .inputGroup2 #showPasswordToggle input:disabled ~ .indicator:after {
   font-size: 1em; /* Cỡ chữ mặc định cho câu hỏi */
   text-align: center; /* Căn giữa */
   margin-top: 1em; /* Khoảng cách giữa nút login và câu hỏi */
+  position: relative;
+}
+.forgot-password-link {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 14px;
+  text-decoration: none;
+  color: #007bff;
 }
 
-/* Add this to your CSS file, e.g., `auth_login.css` */
-/*# sourceMappingURL=auth_login.css.map */
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+input::placeholder {
+  font-size: 14px;               /* Kích thước chữ placeholder */
+  color: #888;                   /* Màu chữ placeholder */
+}
+

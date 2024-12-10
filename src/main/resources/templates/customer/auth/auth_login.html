@@ -194,31 +194,33 @@
 
         <div class="inputGroup inputGroup1">
             <label for="loginEmail" id="loginEmailLabel">Email</label>
-            <input type="email" id="loginEmail" maxlength="254" required/>
+            <input type="email" id="loginEmail" maxlength="254" placeholder="Nhập email của bạn" required/>
 
         </div>
         <div class="inputGroup inputGroup2">
             <label for="loginPassword" id="loginPasswordLabel">Password</label>
-            <input type="password" id="loginPassword" required/>
+            <input type="password" id="loginPassword" placeholder="Nhập password của bạn" required/>
             <label id="showPasswordToggle" for="showPasswordCheck">Show
                 <input id="showPasswordCheck" type="checkbox"/>
                 <div class="indicator"></div>
             </label>
         </div>
         <div class="inputGroup inputGroup3">
-            <button type="button" id="loginBtn">Log in</button>
+            <button type="button" id="loginBtn">Đăng nhập</button>
         </div>
         <div class="inputGroup inputGroup5">
             <button type="button" id="fb-login-button" class="fb-login-btn">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
                      alt="Facebook"
                      width="30" height="30">
-                Continue with Facebook
+                Đăng nhập với Facebook
             </button>
         </div>
         <div class="inputGroup inputGroup4">
-            <p>Bạn chưa có tài khoản? <a href="/v1/auth/register" id="registerLink">Register?</a></p>
+            <p>Bạn chưa có tài khoản? <a href="/v1/auth/register" id="registerLink">Đăng ký?</a></p>
+            <a href="/v1/auth/forgot-password" id="forgotPasswordLink" class="forgot-password-link">Quên mật khẩu?</a>
         </div>
+
     </form>
 </main>
 <!--<div th:include="footer::body"></div>-->
