@@ -30,8 +30,7 @@ public class DanhMucController {
     // Lấy danh mục theo ID
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResult> getById(@PathVariable Long id) {
-        ServiceResult result = danhMucProcessor.getById(id);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return ResponseEntity.ok(danhMucProcessor.getById(id));
     }
 
     // Tạo mới danh mục với thông tin UserAuthentication

@@ -15,7 +15,7 @@ public class AuthenController {
 
     @GetMapping("/login")
     public String login() {
-        return "customer/auth/login";
+        return "customer/auth/auth_login";
     }
 
     @GetMapping("/forgot-password")

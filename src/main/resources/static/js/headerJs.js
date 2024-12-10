@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         updateCartBadge(0); // Nếu không có token, hiển thị 0
     }
+    fetchMenuData();
 });
 
 // Hàm lấy số lượng sản phẩm trong giỏ hàng và cập nhật badge
@@ -127,3 +128,60 @@ function updateCartBadge(count) {
     }
 }
 //
+// Hàm tạo danh mục con cho mỗi cấp
+function createSubMenu(children, level = 1) {
+    const subMenu = document.createElement('ul');
+    subMenu.classList.add('submenu'); // Thêm class submenu để kiểm soát hiển thị
+
+    children.forEach(child => {
+        const subCategoryItem = document.createElement('li');
+        subCategoryItem.textContent = child.ten;
+
+        // Lắng nghe sự kiện hover vào menu con để hiển thị cấp tiếp theo
+        subCategoryItem.addEventListener('mouseenter', () => {
+            // Tạo cấp độ con tiếp theo (nếu có) khi hover vào mục con
+            if (child.children && child.children.length > 0) {
+                const nextLevelMenu = createSubMenu(child.children, level + 1);
+                subCategoryItem.appendChild(nextLevelMenu); // Thêm submenu con vào mục này
+            }
+        });
+
+        subMenu.appendChild(subCategoryItem);
+    });
+
+    return subMenu;
+}
+
+// Hàm gắn danh mục con vào các menu cha dựa trên data-id
+function populateMenu(data) {
+    // Lấy tất cả các liên kết trong menu
+    const menuLinks = document.querySelectorAll('.header-link');
+
+    // Duyệt qua tất cả các menu link
+    menuLinks.forEach(link => {
+        const menuId = link.getAttribute('data-id'); // Lấy data-id từ các liên kết
+
+        // Tìm danh mục tương ứng trong dữ liệu API
+        const category = data.find(item => item.id == menuId);
+
+        // Nếu có danh mục con, thêm submenu cấp 1
+        if (category && category.children && category.children.length > 0) {
+            const subMenu = createSubMenu(category.children, 1);
+            link.appendChild(subMenu); // Thêm submenu vào link
+        }
+    });
+}
+
+function fetchMenuData() {
+    fetch('/rest/danhmuc/get-children')
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.data) {
+                populateMenu(data.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching menu data:', error);
+        });
+}
+

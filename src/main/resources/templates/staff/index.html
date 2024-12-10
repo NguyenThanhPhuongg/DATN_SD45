@@ -233,6 +233,176 @@
             transform: translateY(-50%);
             cursor: pointer;
         }
+        /* Style for the dropdown button */
+        .btn-dropdown {
+            background-color: #f8f9fa;
+            color: #495057;
+            border: 1px solid #ced4da;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .btn-dropdown:focus {
+            outline: none;
+            border-color: #0056b3;
+        }
+
+        /* Dropdown menu styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 999;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        /* Style for tree structure */
+        .treeview-item {
+            padding-left: 20px;
+            cursor: pointer;
+        }
+
+        .treeview-item .treeview-item {
+            padding-left: 20px;
+        }
+
+        /* Active selection style */
+        .treeview-item.selected {
+            background-color: #f1f1f1;
+        }
+
+        .fz-14 {
+            font-size: 14px;
+        }
+
+        .text-danger {
+            color: red;
+        }
+        /* Cấu trúc chung */
+        .fz-14 {
+            font-size: 14px;
+        }
+
+        .text-danger {
+            color: #d9534f;
+        }
+
+        /* Style cho Button Dropdown */
+        .btn-dropdown {
+            position: relative;
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-dropdown:hover {
+            background-color: #e2e6ea;
+            border-color: #adb5bd;
+        }
+
+        /* Style cho mũi tên */
+        .bi-chevron-down, .bi-chevron-up {
+            font-size: 16px;
+            color: #495057;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-dropdown i {
+            margin-left: 10px;
+        }
+
+        /* Style cho Menu Dropdown */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        /* Khi menu được hiển thị */
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        /* Style cho các mục trong cây danh mục */
+        .treeview-item {
+            padding: 8px 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .treeview-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .treeview-item i {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* Style cho các mục danh mục con */
+        .sub-categories {
+            margin-left: 20px;
+        }
+
+        /* Style khi danh mục con được ẩn hoặc hiển thị */
+        .sub-categories.show {
+            display: block;
+        }
+
+        /* Style cho trường hợp thông báo lỗi */
+        .invalid-feedback {
+            color: #d9534f;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Chỉnh sửa hiệu ứng cho các phần tử khi đang load */
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
 
     </style>
@@ -321,9 +491,12 @@
             } else {
                 // Ẩn menu nếu không phải ADMIN
                 document.getElementById('adminMenu').style.display = 'none';
+                document.getElementById('tongQuan').style.display = 'none';
+                document.getElementById('voucher').style.display = 'none';
+
                 document.getElementById('userRole').innerText = "Staff Ziaza Store";
                 // Nếu người dùng không phải ADMIN, chặn truy cập vào /staff#!/taikhoan và /staff#!/group
-                if (hash === '#!/taikhoan' || hash === '#!/group') {
+                if (hash === '#!/taikhoan' || hash === '#!/group' || hash === '#!/tongquan' || hash === '#!/listkhuyenmai' || hash === '#!/danhsachspkm') {
                     showNotificationPage("Bạn không có quyền truy cập vào trang này.");
                     return;
                 }
