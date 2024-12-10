@@ -11397,3 +11397,31 @@ input:checked + .slider:before {
     height: 400px; /* Đặt chiều cao cố định */
 }
 
+
+/* Cải thiện cách dòng và hiệu ứng hover */
+.list-group-item {
+    cursor: pointer;
+    padding: 10px 15px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease; /* Hiệu ứng chuyển động mượt mà */
+}
+
+/* Hiệu ứng hover khi di chuột qua */
+.danh-muc-item:hover {
+    background-color: #e9ecef; /* Màu nền nhẹ khi hover */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Hiệu ứng bóng đổ */
+}
+
+/* Đánh dấu item đang được nhấn */
+.active-item {
+    background-color: #007bff; /* Màu nền khi danh mục được chọn */
+    color: white; /* Màu chữ trắng */
+    font-weight: bold; /* Chữ đậm */
+}
+
+/* Hiệu ứng hover khi chưa nhấn *
+/* Tạo khoảng cách giữa các mục con */
+.danhMucTree > .list-group {
+    margin-left: 20px;
+}

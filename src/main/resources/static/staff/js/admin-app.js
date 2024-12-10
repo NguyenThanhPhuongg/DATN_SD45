@@ -37,6 +37,57 @@ app.directive('currencyInput', function () {
         },
     };
 });
+app.directive('danhMucTree', function() {
+    return {
+        restrict: 'E',
+        scope: {
+            danhMucList: '='
+        },
+        template: `
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="danhMuc in danhMucList">
+                    <!-- Hiển thị tên danh mục và sự kiện click -->
+                    <div class="danh-muc-item" ng-click="toggleChildren(danhMuc)" ng-mouseenter="onHover(danhMuc)" ng-class="{'active-item': danhMuc.showChildren, 'hover-item': !danhMuc.showChildren}">
+                        {{danhMuc.ten}}
+                    </div>
+                    
+                    <!-- Hiển thị danh mục con nếu có -->
+                    <danh-muc-tree ng-if="danhMuc.showChildren" danh-muc-list="danhMuc.children"></danh-muc-tree>
+                </li>
+            </ul>
+        `,
+        link: function(scope) {
+            // Hàm toggle để hiển thị danh mục con khi click
+            scope.toggleChildren = function(danhMuc) {
+                if (danhMuc.children && danhMuc.children.length > 0) {
+                    // Nếu danh mục con đang mở, đóng nó
+                    if (danhMuc.showChildren) {
+                        danhMuc.showChildren = false;
+                    } else {
+                        // Đóng tất cả danh mục con khác trong cùng cấp
+                        scope.closeAllSiblings(danhMuc);
+                        // Mở danh mục con này
+                        danhMuc.showChildren = true;
+                    }
+                }
+            };
+
+            // Hàm để đóng tất cả danh mục con khác trong cùng cấp
+            scope.closeAllSiblings = function(danhMuc) {
+                angular.forEach(scope.danhMucList, function(item) {
+                    if (item !== danhMuc && item.showChildren) {
+                        item.showChildren = false;
+                    }
+                });
+            };
+
+            // Hiệu ứng hover chỉ thay đổi màu sắc mà không mở/đóng danh mục con
+            scope.onHover = function(danhMuc) {
+                // Bạn có thể xử lý các logic hover tại đây nếu cần (tạo hiệu ứng, thay đổi màu sắc, etc.)
+            };
+        }
+    };
+});
 
 app.directive('formatNumber', function () {
     return {
