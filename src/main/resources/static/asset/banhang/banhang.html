@@ -59,7 +59,7 @@
                  id="bill{{bill.name}}" role="tabpanel">
                 <div ng-class="{'done-bill' : bill.disabled}">
                     <div class="d-grid gap-2 d-md-flex justify-content-between mb-3">
-                        <h6 ng-if="bill.totalQuantity > 0" class="me-auto">Tổng sản phẩm ({{bill.totalQuantity}})</h6>
+                        <h6 ng-if="bill.totalQuantity > 0" class="me-auto">Tổng sản phẩm ({{ removeLeadingZeros(bill.totalQuantity)}})</h6>
                         <button class="btn btn-dark btn-sm ms-auto"  ng-click="showListProduct(bill)">
                             <svg style="vertical-align: text-bottom;" xmlns="http://www.w3.org/2000/svg"  width="18" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
@@ -118,9 +118,18 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" ng-model="item.soLuong" min="1"
-                                               max="item.soLuongMax"
-                                               ng-init="item.quantity = (item.quantity && item.quantity > 0) ? item.quantity : 1" ng-change="updateQuantity(bill, item)"/>
+                                        <div class="input-group">
+                                            <button style="width: 28px; border-color: #dee2e6;" class="btn stn-sm btn-outline-secondary" type="button"  ng-click="decreaseQuantity(bill, item)">-</button>
+                                            <input type="text" class="form-control text-center form-control-sm"
+                                                   ng-model="item.soLuong"
+                                                   max="item.soLuongMax"
+                                                   ng-keypress="allowOnlyNumbers($event)"
+                                                   ng-input="removeNonNumeric(item)"
+                                                   ng-init="item.quantity = (item.quantity && item.quantity > 0) ? item.quantity : 1"
+                                                   ng-change="updateQuantity(bill, item)"/>
+                                            <button style="width: 28px; border-color: #dee2e6;" class="btn btn-sm btn-outline-secondary" type="button" ng-click="increaseQuantity(bill, item)">+</button>
+                                        </div>
+
                                     </td>
                                     <td class="text-end">
                                         {{ formatCurrency(item.gia) }}
@@ -180,7 +189,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr ng-if="bill.diemTichLuy > 0">
+                                        <tr ng-if="bill.diemTichLuy > 0 && bill.nameCustomer !== null">
                                             <td>
                                                 <div>
                                                     Điểm tích lũy hiện có:
@@ -368,8 +377,12 @@
                                 <div class="bill-info-head" >
                                     <p class="mb-1"><b>Ngày mua:</b> <span>{{bill.dateBill}}</span></p>
                                     <p class="mb-1"><b>Nhân viên bán hàng:</b> <span>{{bill.tenNguoiTao}}</span></p>
-                                    <p class="mb-1"><b>Người mua:</b> <span>{{bill.nameCustomer || Ziaza}} </span></p>
-                                    <p class="mb-1"><b>Đểm tích lũy sau khi hoàn thành hóa đơn:</b> <span>{{ bill.diemTichLuy }} điểm</span></p>
+                                    <p class="mb-1" ng-if="bill.phoneCustomer !== null && bill.phoneCustomer !== '' && bill.nameCustomer !== null && bill.nameCustomer !== ''">
+                                        <b>Người mua:</b> <span>{{bill.nameCustomer || Ziaza}}  ( +{{bill.billDiem}} điểm)</span>
+                                    </p>
+                                    <p class="mb-1" ng-if="bill.phoneCustomer !== null && bill.phoneCustomer !== '' && bill.nameCustomer !== null && bill.nameCustomer !== ''">
+                                        <b>Đểm tích lũy sau khi hoàn thành hóa đơn:</b> <span>{{ bill.diemTichLuy }} điểm</span>
+                                    </p>
                                     <p><b>Số HĐ:</b> <span>{{bill.codeBill}}</span></p>
                                 </div>
                                 <table class="table table-bordered">
@@ -416,6 +429,18 @@
                                 <button type="button"  data-bs-dismiss="modal" ng-click="printBill(bill, index)" class="btn btn-primary btn-done-bill">In hóa đơn</button>
                                 <button type="button"  data-bs-dismiss="modal" ng-click="clearBill(bill, index)" class="btn btn-success btn-done-bill">Hoàn thành</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                    <div id="bankToast-{{bill.name}}" class="toast border-0 bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="toast-body text-nowrap">
+                                Thanh toán chuyển khoản thành công  <b>{{formatCurrency(getTotalAmount(bill))}}</b> VNĐ!
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
                     </div>
                 </div>
