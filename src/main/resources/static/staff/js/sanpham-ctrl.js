@@ -182,7 +182,7 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                 formData.append("xuatXu", $scope.form.xuatXu);
                 formData.append("moTa", $scope.form.moTa);
                 formData.append("gia", $scope.form.gia);
-                formData.append("idDanhMuc", $scope.selectedDanhMucConConCon || $scope.selectedDanhMucCon || $scope.selectedDanhMucCha);
+                formData.append("idDanhMuc", $scope.form.idDanhMuc);
                 formData.append("idThuongHieu", $scope.form.idThuongHieu);
                 formData.append("idChatLieu", $scope.form.idChatLieu);
                 formData.append("trangThai", 1);
@@ -397,11 +397,11 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         //     errorContainer.idDanhMuc = false;
         // }
 
-        if (!$scope.selectedDanhMucConCon) {
-            errorContainer.selectedDanhMucConCon = true;
+        if (!form.idDanhMuc) {
+            errorContainer.idDanhMuc = true;
             toastr.error("Bạn chưa chọn danh mục.", "Lỗi!");
         } else {
-            errorContainer.selectedDanhMucConCon = false;
+            errorContainer.idDanhMuc = false;
         }
 
         if (!form.idThuongHieu) {
@@ -477,5 +477,107 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
         "hideEasing": "linear",
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
+    };
+
+    $scope.toggleDropdown = function(event) {
+        $scope.loadDanhMucForModal();
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        dropdownMenu.classList.toggle('show');
+
+        const dropdownArrow = document.getElementById('dropdown-arrow');
+        dropdownArrow.classList.toggle('bi-chevron-down');
+        dropdownArrow.classList.toggle('bi-chevron-up');
+        console.log("Selected Category ID: ", $scope.form.idDanhMuc);
+
+    };
+
+
+// Hàm đệ quy tạo cây danh mục (bao gồm các danh mục con nếu có)
+    function generateTree(categories, parentElement) {
+        categories.forEach(category => {
+            const categoryElement = document.createElement('div');
+            categoryElement.classList.add('treeview-item');
+            categoryElement.textContent = category.ten;
+
+            categoryElement.onclick = function(event) {
+                event.stopPropagation();
+
+                document.getElementById('dropdown-title').textContent = category.ten;
+
+                selectCategory(category);
+                $scope.toggleDropdown();
+            };
+
+            if (category.children && category.children.length > 0) {
+                const toggleButton = document.createElement('i');
+                toggleButton.classList.add('bi', 'bi-chevron-down');
+                toggleButton.classList.add('toggle-button');
+                toggleButton.onclick = function(event) {
+                    event.stopPropagation();
+                    toggleSubCategories(category);
+                };
+                categoryElement.appendChild(toggleButton);
+            }
+
+            if (category.children && category.children.length > 0) {
+                const subCategoriesContainer = document.createElement('div');
+                subCategoriesContainer.classList.add('sub-categories');
+                subCategoriesContainer.style.display = 'none';
+                generateTree(category.children, subCategoriesContainer);
+                categoryElement.appendChild(subCategoriesContainer);
+            }
+
+            parentElement.appendChild(categoryElement);
+        });
+    }
+
+    $scope.selectedCategory = null;
+
+    function selectCategory(category) {
+        $scope.selectedCategory = category;
+        $scope.form.idDanhMuc = category.id; // Gán ID danh mục vào form
+
+        // Kiểm tra xem phần tử dropdown-title có tồn tại không
+        var dropdownTitleElement = document.getElementById('dropdown-title');
+        if (dropdownTitleElement) {
+            dropdownTitleElement.textContent = category.ten; // Cập nhật giao diện
+        } else {
+            console.log("Element with id 'dropdown-title' not found.");
+        }
+
+        // Log giá trị idDanhMuc để kiểm tra
+        console.log("Selected Category ID: ", $scope.form.idDanhMuc);
+    }
+
+
+
+// Hàm toggle ẩn/hiện danh mục con
+    function toggleSubCategories(category) {
+        const subCategoriesContainer = event.target.closest('.treeview-item').querySelector('.sub-categories');
+        if (subCategoriesContainer) {
+            const icon = event.target;
+            // Toggle ẩn/hiện danh mục con
+            if (subCategoriesContainer.style.display === 'none') {
+                subCategoriesContainer.style.display = 'block';  // Hiển thị danh mục con
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');  // Đổi sang mũi tên trỏ lên
+            } else {
+                subCategoriesContainer.style.display = 'none';  // Ẩn danh mục con
+                icon.classList.remove('bi-chevron-up');
+                icon.classList.add('bi-chevron-down');  // Đổi sang mũi tên trỏ xuống
+            }
+        }
+    }
+    $scope.loadDanhMucForModal = function () {
+        $http.get('/rest/danhmuc/get-children')
+            .then(function (response) {
+                const categories = response.data.data;
+                const dropdownMenu = document.getElementById('dropdown-menu');
+                dropdownMenu.innerHTML = ''; // Xóa nội dung cũ
+                generateTree(categories, dropdownMenu); // Tạo lại cây danh mục
+            })
+            .catch(function (error) {
+                console.error('Lỗi khi lấy danh mục:', error);
+            });
     };
 });

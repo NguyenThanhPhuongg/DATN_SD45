@@ -264,6 +264,10 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
         });
     };
 
+    $scope.resetAdd = function () {
+        $scope.initialize();
+    };
+
     $scope.update1 = function (item) {
         swal({
             title: "Xác nhận",
