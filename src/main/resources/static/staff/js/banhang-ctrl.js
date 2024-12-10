@@ -224,6 +224,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             idPhuongThucVanChuyen:0,
             nguoiCapNhat:0,
             payCustomer: 'money',
+            bankPaymentInterval: null,
             payQRbank: null,
             codeBill: null,
             dateBill: null,
@@ -250,7 +251,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
         // Xóa hóa đơn
         $scope.bills.splice(index, 1);
-
+        $scope.saveBillsToLocalStorage()
         // Đặt lại hóa đơn đang hoạt động (activeBill)
         if ($scope.activeBill >= $scope.bills.length) {
             $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá
@@ -581,12 +582,25 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         return formatter.format(amount);
     };
     $scope.onChangePayment = function (bill) {
+        // Nếu chuyển sang phương thức tiền mặt
         if (bill.payCustomer === 'money') {
             console.log("Chọn phương thức thanh toán: Tiền mặt");
-            // Thực hiện các hành động khác nếu cần khi chọn Tiền mặt
+
+            // Hủy trạng thái thanh toán ngân hàng nếu có
+            if (bill.bankPaymentInterval) {
+                clearInterval(bill.bankPaymentInterval);
+                bill.bankPaymentInterval = null;
+                console.log("Đã hủy giao dịch thanh toán ngân hàng.");
+            }
+
+            // Đặt lại trạng thái thanh toán ngân hàng
+            bill.payQRbank = null;
+            bill.bankSuccess = false;
+
             return;
         }
 
+        // Nếu chọn phương thức ngân hàng
         if (bill.payCustomer === 'bank') {
             const AMOUNT = $scope.getTotalAmount(bill);
             const DESCRIPTION = encodeURIComponent('Thanh toán QR tại quầy');
@@ -597,16 +611,19 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             bill.payQRbank = `${BASE_QR_URL}?amount=${AMOUNT}&addInfo=${DESCRIPTION}&accountName=${ACCOUNT_NAME}`;
 
             // Theo dõi trạng thái thanh toán ngân hàng
-            setTimeout(() => {
+            bill.bankPaymentInterval = setTimeout(() => {
                 monitorBankPayment(bill);
             }, 10000);
         }
     };
 
+
+    // Chuyển khoản thành công
     function monitorBankPayment(bill) {
-        let intervalId;
-        let maxRetries = 10; // Giới hạn số lần gọi API
+        let maxRetries = 20; // Giới hạn số lần gọi API
         let retries = 0;
+        // console.log($scope.getTotalAmount(bill))
+        // return;
         // Hàm kiểm tra thanh toán
         const checkPayment = () => {
             $http.get("https://script.google.com/macros/s/AKfycbzwaATXVmdDh8H7-PhdUBnnAyJZcd2UuZC8i5Q2JQ_h-bdToM_5IXIlo6uBXUVhvRZ3/exec")
@@ -617,48 +634,49 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                     const lastDescription = lastPaid['Mô tả'];
 
                     if (lastPrice === $scope.getTotalAmount(bill) && !bill.bankSuccess) {
-                        // Hiển thị thông báo
-                        const toastBankExample = document.getElementById(`bankToast-${bill.name}`);
-                        const toast = new bootstrap.Toast(toastBankExample);
-                        toast.show();
+                        $scope.payBill(bill); // Xử lý thanh toán thành công
 
                         // Cập nhật trạng thái thanh toán
                         bill.bankSuccess = true;
 
                         // Dừng interval
-                        clearInterval(intervalId);
+                        clearInterval(bill.bankPaymentInterval);
+                        bill.bankPaymentInterval = null;
                     }
                 })
                 .catch(error => {
                     console.error("Lỗi khi gọi API thanh toán:", error);
                 });
 
-            // Kiểm tra số lần thử
             retries++;
             if (retries >= maxRetries) {
-                console.warn("Hết số lần kiểm tra thanh toán.");
-                clearInterval(intervalId);
+                alert("Hết số lần kiểm tra thanh toán.");
+                clearInterval(bill.bankPaymentInterval);
+                bill.bankPaymentInterval = null;
             }
         };
 
-        // Đặt setInterval với điều kiện dừng
-        intervalId = setInterval(checkPayment, 1000);
+        // Đặt interval
+        bill.bankPaymentInterval = setInterval(checkPayment, 1000);
 
-        // Tự động dừng sau 40 giây
+        // Tự động dừng sau 40 giây nếu chưa thành công
         setTimeout(() => {
             if (!bill.bankSuccess) {
-                console.warn("Quá thời gian chờ thanh toán.");
-                clearInterval(intervalId);
+                alert("Quá thời gian chờ thanh toán.");
+                clearInterval(bill.bankPaymentInterval);
+                bill.bankPaymentInterval = null;
             }
         }, 40000);
     }
 
-    $scope.calculatePoints = function (bill) {
-        return Math.floor(bill.totalBillLast / 1000); // Tính điểm tích lũy
-    };
+
+    // $scope.calculatePoints = function (bill) {
+    //     return Math.floor(bill.totalBillLast / 1000); // Tính điểm tích lũy
+    // };
     $scope.payBill = function (bill) {
-        bill.totalBillLast = $scope.getTotalAmount(bill)
-        bill.billDiem = Math.floor(bill.totalBillLast / 1000)
+        //bill.totalBillLast = $scope.getTotalAmount(bill)
+        console.log(bill);
+        bill.billDiem = Math.floor($scope.getTotalAmount(bill) / 1000)
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
                 bill.disabled = true;
@@ -669,7 +687,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 });
                 let dataDiemUse = {
                     idNguoiDung: bill.idCustomer,
-                    diemCanSuDung: bill.diemSuDung
+                    diemCanSuDung: bill.diemSuDung || 0
                 };
                 let paramsUse = new URLSearchParams();
                 for (let key in dataDiemUse) {
@@ -678,7 +696,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
                 let dataDiem = {
                     idNguoiDung: bill.idCustomer,
-                    diem: $scope.calculatePoints(bill)
+                    diem: bill.billDiem
                 };
                 let params = new URLSearchParams();
                 for (let key in dataDiem) {
@@ -728,12 +746,14 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 }
 
                 billModal.show();
+                $scope.saveBillsToLocalStorage()
             }
         });
 
     };
     $scope.clearBill = function (bill, index) {
         $scope.bills.splice(index, 1);
+        $scope.saveBillsToLocalStorage()
         // Đặt lại hóa đơn đang hoạt động (activeBill)
         if ($scope.activeBill >= $scope.bills.length) {
             $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá
