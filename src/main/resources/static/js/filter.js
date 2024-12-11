@@ -467,6 +467,19 @@ function createCategoryItem(category, allCategories) {
 
 // Biến toàn cục lưu ID của danh mục được chọn
 let selectedCategoryId = null;
+// Lấy idDanhMuc từ URL
+function getCategoryIdFromURL() {
+    const params = new URLSearchParams(window.location.search); // Lấy query string từ URL
+    return params.get('idDanhMuc'); // Trả về giá trị idDanhMuc
+}
+
+// Gán idDanhMuc vào selectedCategoryId
+document.addEventListener('DOMContentLoaded', function () {
+    selectedCategoryId = getCategoryIdFromURL(); // Lấy idDanhMuc từ URL
+    if (selectedCategoryId) {
+        console.log("Selected Category ID:", selectedCategoryId);
+    }
+});
 
 // Hàm xử lý khi checkbox thay đổi
 function handleCheckboxChange(checkbox, category) {

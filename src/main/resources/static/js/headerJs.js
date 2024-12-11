@@ -136,6 +136,12 @@ function createSubMenu(children, level = 1) {
     children.forEach(child => {
         const subCategoryItem = document.createElement('li');
         subCategoryItem.textContent = child.ten;
+        // Thêm sự kiện click cho danh mục con
+        subCategoryItem.addEventListener('click', (event) => {
+            event.stopPropagation(); // Ngừng sự kiện propagating để tránh sự kiện click vào menu cha
+            // Khi click vào danh mục con, gửi idDanhMuc sang trang search
+            window.location.href = `/search?idDanhMuc=${child.id}`;
+        });
 
         // Lắng nghe sự kiện hover vào menu con để hiển thị cấp tiếp theo
         subCategoryItem.addEventListener('mouseenter', () => {
@@ -168,6 +174,10 @@ function populateMenu(data) {
         if (category && category.children && category.children.length > 0) {
             const subMenu = createSubMenu(category.children, 1);
             link.appendChild(subMenu); // Thêm submenu vào link
+            link.addEventListener('click', (event) => {
+                event.stopPropagation(); // Ngừng sự kiện propagating
+                window.location.href = `/search?idDanhMuc=${category.id}`; // Chuyển hướng đến trang search với idDanhMuc
+            });
         }
     });
 }
