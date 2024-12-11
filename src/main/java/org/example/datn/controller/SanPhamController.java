@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController("SanPhamApi")
 @RequestMapping("/san-pham")
@@ -74,4 +75,13 @@ public class SanPhamController {
         return ResponseEntity.ok(processor.searchProducts(request));
     }
 
+    @Autowired
+    private SanPhamService sanPhamService;
+
+    // Các phương thức khác...
+
+    @GetMapping("/san-pham-ban-chay")
+    public List<Map<String, Object>> getTopSellingProducts() {
+        return sanPhamService.getTopSellingProducts();
+    }
 }

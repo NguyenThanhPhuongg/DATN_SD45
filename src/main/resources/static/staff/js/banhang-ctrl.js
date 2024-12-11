@@ -221,7 +221,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             tenNguoiTao: document.getElementById("nameAdmin").textContent || 'Admin',
             diemSuDung: 0,
             idDiaChiGiaoHang:0,
-            idPhuongThucVanChuyen:0,
+            idPhuongThucVanChuyen:3,
             nguoiCapNhat:0,
             payCustomer: 'money',
             bankPaymentInterval: null,
