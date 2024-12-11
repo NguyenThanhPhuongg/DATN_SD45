@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,5 +25,20 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
     // Lấy sản phẩm sắp xếp theo giá giảm dần
     List<SanPham> findAllByOrderByGiaDesc();
+
+    @Query("SELECT s FROM SanPham s WHERE " +
+            "(:keyword IS NULL OR (LOWER(s.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.ma) LIKE LOWER(CONCAT('%', :keyword, '%')))) AND " +
+            "(:idChatLieu IS NULL OR s.idChatLieu = :idChatLieu) AND " +
+            "(:idThuongHieu IS NULL OR s.idThuongHieu = :idThuongHieu) AND " +
+            "(:idDanhMuc IS NULL OR s.idDanhMuc = :idDanhMuc) AND " +
+            "(:giaMin IS NULL OR s.gia >= :giaMin) AND " +
+            "(:giaMax IS NULL OR s.gia <= :giaMax)")
+    List<SanPham> searchSanPham(
+            @Param("keyword") String keyword,
+            @Param("idChatLieu") Long idChatLieu,
+            @Param("idThuongHieu") Long idThuongHieu,
+            @Param("idDanhMuc") Long idDanhMuc,
+            @Param("giaMin") BigDecimal giaMin,
+            @Param("giaMax") BigDecimal giaMax);
 
 }

@@ -21,4 +21,6 @@ public interface ApDungKhuyenMaiRepository extends JpaRepository<ApDungKhuyenMai
     List<ApDungKhuyenMai> findByIdNguoiDungAndDaSuDung(Long idNguoiDung, Boolean daSuDung);
 
     Optional<ApDungKhuyenMai> findByIdKhuyenMaiAndIdNguoiDung(Long idKhuyenMai, Long idNguoiDung);
+
+    Optional<ApDungKhuyenMai> findByIdSanPhamAndTrangThai(Long idSanPham, Integer trangThai);
 }

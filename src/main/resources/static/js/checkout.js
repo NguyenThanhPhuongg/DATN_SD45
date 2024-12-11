@@ -564,7 +564,7 @@ async function fetchShippingMethods() {
 
         // Kiểm tra xem có dữ liệu hay không
         if (result.data && result.data.length > 0) {
-            const shippingData = result.data[1]; // Lấy phương thức vận chuyển đầu tiên
+            const shippingData = result.data[0]; // Lấy phương thức vận chuyển đầu tiên
 
             // Gán id vào biến toàn cục phuongThucVanChuyenId
             phuongThucVanChuyenId = shippingData.id;

@@ -40,4 +40,10 @@ public class ApDungKhuyenMaiService {
     public List<ApDungKhuyenMai> findAll() {
         return repo.findAll();
     }
+
+    public Optional<ApDungKhuyenMai> findByIdSanPhamAndTrangThai(Long idSanPham, Integer trangThai){
+        return repo.findByIdSanPhamAndTrangThai(idSanPham, trangThai);
+    }
+
+
 }

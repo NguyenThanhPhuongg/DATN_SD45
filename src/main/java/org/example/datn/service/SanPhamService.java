@@ -5,6 +5,7 @@ import org.example.datn.repository.SanPhamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,9 @@ public class SanPhamService {
 
     public List<SanPham> searchProductsByName(String ten) {
         return repo.findByTenContaining(ten);
+    }
+    public List<SanPham> searchSanPham(String keyword, Long idChatLieu, Long idThuongHieu, Long idDanhMuc, BigDecimal giaMin, BigDecimal giaMax) {
+        return repo.searchSanPham(keyword, idChatLieu, idThuongHieu, idDanhMuc, giaMin, giaMax);
     }
 
 }

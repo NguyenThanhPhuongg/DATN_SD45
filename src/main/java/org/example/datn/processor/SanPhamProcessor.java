@@ -1,13 +1,16 @@
 package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
+import org.example.datn.entity.ApDungKhuyenMai;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.request.SanPhamRequest;
 import org.example.datn.model.response.SanPhamModel;
 import org.example.datn.repository.SanPhamRepository;
 import org.example.datn.service.*;
+import org.example.datn.transformer.SanPhamTransformer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,6 +48,10 @@ public class SanPhamProcessor {
     private SizeService sizeService;
     @Autowired
     private HinhAnhServices hinhAnhServices;
+    @Autowired
+    private SanPhamTransformer sanPhamTransformer;
+    @Autowired
+    private ApDungKhuyenMaiService apDungKhuyenMaiService;
 
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
@@ -176,7 +183,7 @@ public class SanPhamProcessor {
 
 
     // Cập nhật nếu không có ảnh mới
-    public ServiceResult update(Long id, SanPhamModel model,UserAuthentication ua) {
+    public ServiceResult update(Long id, SanPhamModel model, UserAuthentication ua) {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
         LocalDateTime ngayTao = sanPham.getNgayTao();
         Long nguoiTao = sanPham.getNguoiTao();
@@ -226,5 +233,25 @@ public class SanPhamProcessor {
         var sanPhamChiTiet = sanPhamChiTietService.findByIdSanPham(idSanPham);
         sanPhamChiTiet.forEach(e -> e.setGia(gia));
         sanPhamChiTietService.saveAll(sanPhamChiTiet);
+    }
+
+    public ServiceResult searchProducts(SanPhamRequest request) {
+        List<SanPham> list = service.searchSanPham(request.getKeyword(), request.getIdChatLieu(), request.getIdThuongHieu(), request.getIdDanhMuc(), request.getGiaMin(), request.getGiaMax());
+        var models = list.stream().map(sanPham -> {
+            var model = sanPhamTransformer.toModel(sanPham);
+            Optional<ApDungKhuyenMai> optionalApDungKhuyenMai = apDungKhuyenMaiService.findByIdSanPhamAndTrangThai(sanPham.getId(), 1);
+            if (optionalApDungKhuyenMai.isPresent()) {
+                ApDungKhuyenMai apDungKhuyenMai = optionalApDungKhuyenMai.get();
+                if (apDungKhuyenMai.getGiaTriGiam() != null) {
+                    BigDecimal giaTriGiam = apDungKhuyenMai.getGiaTriGiam();
+                    BigDecimal giaSauKhuyenMai = sanPham.getGia().subtract(giaTriGiam);
+                    model.setGiaSauKhuyenMai(giaSauKhuyenMai);
+                }else {
+                    model.setGiaSauKhuyenMai(sanPham.getGia());
+                }
+            }
+            return model;
+        }).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 }
