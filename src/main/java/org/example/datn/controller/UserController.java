@@ -43,8 +43,8 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<ServiceResult> getAll() {
-        return ResponseEntity.ok(processor.getAll());
+    public ResponseEntity<ServiceResult> getClient() {
+        return ResponseEntity.ok(processor.getClient());
     }
 
     @PostMapping("/get-list")

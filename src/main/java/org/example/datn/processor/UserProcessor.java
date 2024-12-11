@@ -111,6 +111,10 @@ public class UserProcessor {
         var models = userService.findAll().stream().map(mapper()).collect(Collectors.toList());
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
+    public ServiceResult getClient() {
+        var models = userService.findByRole(UserRoles.CLIENT).stream().map(mapper()).collect(Collectors.toList());
+        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+    }
 
     public List<UserModel> getAcctive() {
         var userModel = userService.findAllByStatus(UserStatus.ACTIVE).stream().map(mapper()).collect(Collectors.toList());

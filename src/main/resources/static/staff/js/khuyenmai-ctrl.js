@@ -24,7 +24,10 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         }, updateItems: function () {
             // Lọc các mục theo tìm kiếm và loại
             const filteredItems = $scope.items.filter(item => {
-                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
+                const matchesSearch =
+                    item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
+                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase()) ||
+                    item.ma.toLowerCase().includes($scope.searchText.toLowerCase());
                 const matchesLoai = !$scope.selectedLoai || item.loai === Number($scope.selectedLoai);
                 return matchesSearch && matchesLoai;
             });
@@ -34,6 +37,7 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             // Cập nhật danh sách các mục cho trang hiện tại
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
+
     };
     // Hàm để gọi API lấy danh sách khuyến mãi
     $scope.getKhuyenMaiList = function () {
@@ -101,11 +105,11 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         }
 
 
-        if (($scope.form.loai == 1) && !$scope.form.ten) {
+        if (!$scope.form.ten) {
             toastr.error("Vui lòng nhập tên khuyến mãi.", "Lỗi!");
             return;
         }
-        if (($scope.form.loai == 2) && !$scope.form.ma) {
+        if (!$scope.form.ma) {
             toastr.error("Vui lòng nhập mã khuyến mãi.", "Lỗi!");
             return;
         }
@@ -142,8 +146,8 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         }
 
         var requestData = {
-            ma: $scope.form.loai === 1 ? '' : $scope.form.ma,  // Nếu loai là 1 thì không gửi ma
-            ten: $scope.form.loai === 2 ? '' : $scope.form.ten, // Nếu loai là 2 thì không gửi ten
+            ma: $scope.form.ma,  // Nếu loai là 1 thì không gửi ma
+            ten: $scope.form.ten, // Nếu loai là 2 thì không gửi ten
             moTa: $scope.form.moTa,
             giaTri: $scope.form.giaTri,
             ngayBatDau: ngayBatDau.format('YYYY-MM-DDTHH:mm:ss'),
@@ -378,8 +382,8 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
 
         // Tạo đối tượng request data để gửi lên API
         var requestData = {
-            ma: $scope.detailForm.loai === 'Sản phẩm' ? '' : $scope.detailForm.ma,  // Nếu loai là Sản phẩm, không gửi mã
-            ten: $scope.detailForm.loai === 'Người dùng' ? '' : $scope.detailForm.ten, // Nếu loai là Người dùng, không gửi tên
+            ma: $scope.detailForm.ma,  // Nếu loai là Sản phẩm, không gửi mã
+            ten: $scope.detailForm.ten, // Nếu loai là Người dùng, không gửi tên
             moTa: $scope.detailForm.moTa,
             giaTri: $scope.detailForm.giaTri,
             ngayBatDau: ngayBatDau,
