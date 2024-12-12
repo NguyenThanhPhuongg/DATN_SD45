@@ -25,4 +25,6 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
     List<HoaDonChiTiet> findByIdHoaDonAndIdSanPhamChiTietIn(Long idHoaDon, List<Long> idSanPhamChiTiets);
 
     Optional<HoaDonChiTiet> findByIdHoaDonAndIdSanPhamChiTiet(Long idHoaDon, Long idSanPhamChiTiet);
+    List<HoaDonChiTiet> findByTrangThai(Integer trangThai);
+
 }
