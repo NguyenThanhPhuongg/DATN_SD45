@@ -2,9 +2,7 @@ package org.example.datn.processor;
 
 import io.swagger.models.auth.In;
 import org.example.datn.constants.SystemConstant;
-import org.example.datn.entity.GioHangChiTiet;
-import org.example.datn.entity.SanPham;
-import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.entity.*;
 import org.example.datn.exception.InputInvalidException;
 import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.ServiceResult;
@@ -51,6 +49,10 @@ public class GioHangChiTietProcessor {
     private SizeService sizeService;
     @Autowired
     private MauSacService mauSacService;
+    @Autowired
+    private ApDungKhuyenMaiService apDungKhuyenMaiService;
+    @Autowired
+    private KhuyenMaiService khuyenMaiService;
 
     @Transactional(rollbackOn = Exception.class)
     public ServiceResult save(GioHangChiTietRequest request, UserAuthentication ua) {
@@ -78,7 +80,6 @@ public class GioHangChiTietProcessor {
             gioHangChiTiet.get().setNgayCapNhat(LocalDateTime.now());
             service.save(gioHangChiTiet.get());
 
-//            spct.setSoLuong(soLuongConLai - request.getSoLuong());
         } else {
             GioHangChiTiet ghct = new GioHangChiTiet();
             BeanUtils.copyProperties(request, ghct);
@@ -87,10 +88,12 @@ public class GioHangChiTietProcessor {
             ghct.setGia(sanPham.getGia());
             ghct.setIdSanPhamChiTiet(spct.getId());
             ghct.setTrangThai(StatusGioHang.CHUA_DAT_HANG.getValue());
+            ghct.setNguoiTao(ua.getPrincipal());
+            ghct.setNgayTao(LocalDateTime.now());
+            ghct.setNgayCapNhat(LocalDateTime.now());
+            ghct.setNguoiCapNhat(ua.getPrincipal());
             service.save(ghct);
-//            spct.setSoLuong(soLuongConLai - request.getSoLuong());
         }
-//        spctService.save(spct);
         return new ServiceResult();
     }
 
@@ -161,11 +164,45 @@ public class GioHangChiTietProcessor {
                 .map(this::convertToSanPhamModel)
                 .collect(Collectors.toList());
 
+        for (GioHangChiTietModel model : models) {
+            SanPhamChiTietModel spctModel = sanPhamChiTietList.stream()
+                    .filter(spct -> spct.getId().equals(model.getIdSanPhamChiTiet()))
+                    .findFirst().orElse(null);
+
+            if (spctModel != null) {
+                List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(spctModel.getIdSanPham());
+
+                BigDecimal giaSauKhuyenMai = BigDecimal.ZERO;
+                boolean hasValidPromotion = false;
+
+                for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
+                    KhuyenMai khuyenMai = khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).orElse(null);
+
+                    if (khuyenMai != null) {
+                        if (LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
+                                LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
+                                khuyenMai.getTrangThai() == 1) {
+
+                            if (apDungKhuyenMai.getGiaTriGiam() != null) {
+                                giaSauKhuyenMai = giaSauKhuyenMai.add(apDungKhuyenMai.getGiaTriGiam());
+                            }
+                            hasValidPromotion = true;
+                        }
+                    }
+                }
+
+                if (hasValidPromotion) {
+                    model.setGiaSauKhuyenMai(spctModel.getGia().subtract(giaSauKhuyenMai));
+                } else {
+                    model.setGiaSauKhuyenMai(null);
+                }
+            }
+        }
+
         mapSpctsToModels(models, sanPhamChiTietList, sanPhamList);
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
-
 
     public ServiceResult getByIdIn(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -200,11 +237,45 @@ public class GioHangChiTietProcessor {
                 .map(this::convertToSanPhamModel)
                 .collect(Collectors.toList());
 
+        for (GioHangChiTietModel model : models) {
+            SanPhamChiTietModel spctModel = sanPhamChiTietList.stream()
+                    .filter(spct -> spct.getId().equals(model.getIdSanPhamChiTiet()))
+                    .findFirst().orElse(null);
+
+            if (spctModel != null) {
+                List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(spctModel.getIdSanPham());
+
+                BigDecimal giaSauKhuyenMai = BigDecimal.ZERO;
+                boolean hasValidPromotion = false;
+
+                for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
+                    KhuyenMai khuyenMai = khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).orElse(null);
+
+                    if (khuyenMai != null) {
+                        if (LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
+                                LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
+                                khuyenMai.getTrangThai() == 1) {
+
+                            if (apDungKhuyenMai.getGiaTriGiam() != null) {
+                                giaSauKhuyenMai = giaSauKhuyenMai.add(apDungKhuyenMai.getGiaTriGiam());
+                            }
+                            hasValidPromotion = true;
+                        }
+                    }
+                }
+
+                if (hasValidPromotion) {
+                    model.setGiaSauKhuyenMai(spctModel.getGia().subtract(giaSauKhuyenMai));
+                } else {
+                    model.setGiaSauKhuyenMai(null);
+                }
+            }
+        }
+
         mapSpctsToModels(models, sanPhamChiTietList, sanPhamList);
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
-
 
     public GioHangChiTietModel mapToModel(GioHangChiTiet entity) {
         if (entity == null) {

@@ -93,6 +93,10 @@ public class HoaDonProcessor {
     private SizeService sizeService;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private ApDungKhuyenMaiService apDungKhuyenMaiService;
+    @Autowired
+    private KhuyenMaiService khuyenMaiService;
 
     public ServiceResult getAll() {
         var list = service.getAll();
@@ -163,29 +167,53 @@ public class HoaDonProcessor {
         var gioHangChiTiet = gioHangChiTietService.findByIdIn(request.getIdGioHangChiTiet());
         BigDecimal tongTien = BigDecimal.ZERO;
         List<HoaDonChiTietDTO> hoaDonChiTietDTOList = new ArrayList<>();
+
         for (GioHangChiTiet ghct : gioHangChiTiet) {
             HoaDonChiTiet hdct = new HoaDonChiTiet();
             hdct.setIdHoaDon(hoaDon.getId());
             hdct.setIdSanPhamChiTiet(ghct.getIdSanPhamChiTiet());
             hdct.setSoLuong(ghct.getSoLuong());
-            hdct.setGia(ghct.getGia());
-            BigDecimal giaTien = ghct.getGia().multiply(BigDecimal.valueOf(ghct.getSoLuong()));
+
+            var sanPhamChiTiet = sanPhamChiTietService.findById(ghct.getIdSanPhamChiTiet())
+                    .orElseThrow(() -> NotFoundEntityException.of("sanPhamChiTiet.not.found"));
+            var sanPham = sanPhamService.findById(sanPhamChiTiet.getIdSanPham())
+                    .orElseThrow(() -> NotFoundEntityException.of("sanPham.not.found"));
+
+            BigDecimal giaSauKhuyenMai = sanPhamChiTiet.getGia();
+            List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(sanPhamChiTiet.getIdSanPham());
+
+            for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
+                KhuyenMai khuyenMai = khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).orElse(null);
+
+                if (khuyenMai != null && LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
+                        LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
+                        khuyenMai.getTrangThai() == 1) {
+
+                    if (apDungKhuyenMai.getGiaTriGiam() != null) {
+                        giaSauKhuyenMai = giaSauKhuyenMai.subtract(apDungKhuyenMai.getGiaTriGiam());
+                    }
+                }
+            }
+
+            BigDecimal giaTien = giaSauKhuyenMai.multiply(BigDecimal.valueOf(ghct.getSoLuong()));
             tongTien = tongTien.add(giaTien);
+
+            hdct.setGia(giaSauKhuyenMai);
             hdct.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
             hdct.setNgayTao(LocalDateTime.now());
             hdct.setNgayCapNhat(LocalDateTime.now());
             hdct.setNguoiTao(ua.getPrincipal());
             hdct.setNguoiCapNhat(ua.getPrincipal());
             hoaDonChiTietService.save(hdct);
+
             ghct.setTrangThai(StatusGioHang.DA_DAT_HANG.getValue());
             gioHangChiTietService.save(ghct);
 
-            var sanPhamChiTiet = sanPhamChiTietService.findById(ghct.getIdSanPhamChiTiet()).orElseThrow(() -> NotFoundEntityException.of("sanPhamChiTiet.not.found"));
-            var sanPham = sanPhamService.findById(sanPhamChiTiet.getIdSanPham()).orElseThrow(() -> NotFoundEntityException.of("sanPham.not.found"));
             var size = sizeService.findById(sanPhamChiTiet.getIdSize()).orElseThrow(() -> NotFoundEntityException.of("size.not.found"));
             var mauSac = mauSacService.findById(sanPhamChiTiet.getIdMauSac()).orElseThrow(() -> NotFoundEntityException.of("mauSac.not.found"));
             HoaDonChiTietDTO hdctDTO = new HoaDonChiTietDTO(sanPham.getTen(), sanPham.getAnh(), size.getTen(), mauSac.getTen(),hdct.getSoLuong(), sanPham.getGia());  // Tạo DTO từ HoaDonChiTiet và SanPhamChiTiet
             hoaDonChiTietDTOList.add(hdctDTO);
+
             Integer soLuongMua = ghct.getSoLuong();
             Integer soLuongConLai = sanPhamChiTiet.getSoLuong() - soLuongMua;
             if (soLuongConLai < 0) {
@@ -199,18 +227,21 @@ public class HoaDonProcessor {
             tongTien = tongTien.subtract(request.getGiaTriVoucher());
         }
 
-        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen()).orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
+        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen())
+                .orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
         tongTien = tongTien.add(phuongThucVanChuyen.getPhiVanChuyen());
 
         hoaDon.setTongTien(tongTien);
         hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
         service.save(hoaDon);
+
         ThanhToan thanhToan = new ThanhToan();
         thanhToan.setIdHoaDon(hoaDon.getId());
         thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
         thanhToan.setSoTien(hoaDon.getTongTien());
         thanhToan.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusThanhToan.CHUA_THANH_TOAN.getValue() : StatusThanhToan.DANG_XU_LY.getValue());
         thanhToanService.save(thanhToan);
+
         if (phuongThucThanhToan.getLoai().equals(TypeThanhToan.VNPAY)) {
             HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String ipAddress = VNPayUtil.getIpAddress(httpRequest);
@@ -218,9 +249,11 @@ public class HoaDonProcessor {
             emailService.sendOrderSuccessfully(ua.getEmail(), ua.getName(), hoaDonChiTietDTOList, tongTien, hoaDon.getNgayDatHang());
             return new ServiceResult(vnPayResponse, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
         }
+
         emailService.sendOrderSuccessfully(ua.getEmail(), ua.getName(), hoaDonChiTietDTOList, tongTien, hoaDon.getNgayDatHang());
         return new ServiceResult();
     }
+
 
     public static String getRandomNumber(int len) {
         Random rnd = new Random();

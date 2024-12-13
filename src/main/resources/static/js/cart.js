@@ -179,7 +179,8 @@ function renderCart(items) {
     items.forEach(item => {
         const sanPham = item.sanPham || {}; // Xử lý trường hợp sanPham là null
         const sanPhamChiTiet = item.sanPhamChiTiet || {};
-        const total = sanPham.gia * item.soLuong;
+        const gia = item.giaSauKhuyenMai ? item.giaSauKhuyenMai : item.gia;
+        const total = gia * item.soLuong;
         totalAmount += total;
         const productItem = document.createElement('div');
         productItem.className = 'product-item';
@@ -192,7 +193,9 @@ function renderCart(items) {
                     <span style="margin-left: 10px;">Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}</span>
                 </span>
             </div>
-            <div class="price">₫${sanPham.gia}</div>
+           <div class="price">
+    ₫<span id="price">${gia}</span>
+</div>
             <div class="quantity">
                 <button>-</button>
                 <span>${item.soLuong}</span>
