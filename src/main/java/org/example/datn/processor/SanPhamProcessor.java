@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -247,25 +247,31 @@ public class SanPhamProcessor {
 
             List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(sanPham.getId());
 
-            AtomicReference<BigDecimal> giaSauKhuyenMai = new AtomicReference<>(BigDecimal.ZERO);
+            BigDecimal giaSauKhuyenMai = BigDecimal.ZERO;
+            boolean hasValidPromotion = false;
 
             for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
-                khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).ifPresent(khuyenMai -> {
+                KhuyenMai khuyenMai = khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).orElse(null);
+
+                if (khuyenMai != null) {
                     if (LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
                             LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
                             khuyenMai.getTrangThai() == 1) {
 
                         if (apDungKhuyenMai.getGiaTriGiam() != null) {
-                            giaSauKhuyenMai.updateAndGet(v -> v.add(apDungKhuyenMai.getGiaTriGiam()));
+                            giaSauKhuyenMai = giaSauKhuyenMai.add(apDungKhuyenMai.getGiaTriGiam());
                         }
+                        hasValidPromotion = true;
                     }
-                });
+                }
             }
 
-            if (giaSauKhuyenMai.get().compareTo(sanPham.getGia()) >= 0) {
-                model.setGiaSauKhuyenMai(BigDecimal.ZERO);
-            } else {
-                model.setGiaSauKhuyenMai(sanPham.getGia().subtract(giaSauKhuyenMai.get()));
+            if (hasValidPromotion) {
+                if (giaSauKhuyenMai.compareTo(sanPham.getGia()) >= 0) {
+                    model.setGiaSauKhuyenMai(BigDecimal.ZERO);
+                } else {
+                    model.setGiaSauKhuyenMai(sanPham.getGia().subtract(giaSauKhuyenMai));
+                }
             }
 
             return model;
@@ -273,7 +279,6 @@ public class SanPhamProcessor {
 
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
-
 
 
 }
