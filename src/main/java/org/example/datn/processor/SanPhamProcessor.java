@@ -2,6 +2,7 @@ package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.ApDungKhuyenMai;
+import org.example.datn.entity.KhuyenMai;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.SanPhamChiTiet;
 import org.example.datn.model.ServiceResult;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Component
@@ -52,6 +54,8 @@ public class SanPhamProcessor {
     private SanPhamTransformer sanPhamTransformer;
     @Autowired
     private ApDungKhuyenMaiService apDungKhuyenMaiService;
+    @Autowired
+    private KhuyenMaiService khuyenMaiService;
 
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
@@ -237,21 +241,39 @@ public class SanPhamProcessor {
 
     public ServiceResult searchProducts(SanPhamRequest request) {
         List<SanPham> list = service.searchSanPham(request.getKeyword(), request.getIdChatLieu(), request.getIdThuongHieu(), request.getIdDanhMuc(), request.getGiaMin(), request.getGiaMax());
+
         var models = list.stream().map(sanPham -> {
             var model = sanPhamTransformer.toModel(sanPham);
-            Optional<ApDungKhuyenMai> optionalApDungKhuyenMai = apDungKhuyenMaiService.findByIdSanPhamAndTrangThai(sanPham.getId(), 1);
-            if (optionalApDungKhuyenMai.isPresent()) {
-                ApDungKhuyenMai apDungKhuyenMai = optionalApDungKhuyenMai.get();
-                if (apDungKhuyenMai.getGiaTriGiam() != null) {
-                    BigDecimal giaTriGiam = apDungKhuyenMai.getGiaTriGiam();
-                    BigDecimal giaSauKhuyenMai = sanPham.getGia().subtract(giaTriGiam);
-                    model.setGiaSauKhuyenMai(giaSauKhuyenMai);
-                }else {
-                    model.setGiaSauKhuyenMai(sanPham.getGia());
-                }
+
+            List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(sanPham.getId());
+
+            AtomicReference<BigDecimal> giaSauKhuyenMai = new AtomicReference<>(BigDecimal.ZERO);
+
+            for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
+                khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).ifPresent(khuyenMai -> {
+                    if (LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
+                            LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
+                            khuyenMai.getTrangThai() == 1) {
+
+                        if (apDungKhuyenMai.getGiaTriGiam() != null) {
+                            giaSauKhuyenMai.updateAndGet(v -> v.add(apDungKhuyenMai.getGiaTriGiam()));
+                        }
+                    }
+                });
             }
+
+            if (giaSauKhuyenMai.get().compareTo(sanPham.getGia()) >= 0) {
+                model.setGiaSauKhuyenMai(BigDecimal.ZERO);
+            } else {
+                model.setGiaSauKhuyenMai(sanPham.getGia().subtract(giaSauKhuyenMai.get()));
+            }
+
             return model;
         }).collect(Collectors.toList());
+
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
+
+
+
 }

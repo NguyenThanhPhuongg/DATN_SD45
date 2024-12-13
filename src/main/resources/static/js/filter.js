@@ -33,11 +33,12 @@ $(document).ready(function () {
                 <div class="card-body">
                     <div class="text-start">
                         <h6 class="card-title fw-bold">${product.ten}</h6>
-                        ${product.giaSauKhuyenMai ? `
+                        ${product.giaSauKhuyenMai !== null ? `
                             <p class="price old-price">${product.gia.toLocaleString()}đ</p>
                             <p class="price new-price">${product.giaSauKhuyenMai.toLocaleString()}đ</p>
                         ` : `<p class="price">${product.gia.toLocaleString()}đ</p>`}
                     </div>
+
                     <div class="d-flex justify-content-between align-items-center">
                         <button class="btn btn-buy btn-dark w-75">Mua ngay</button>
                         <span style="cursor: pointer" class="icon-heart">
