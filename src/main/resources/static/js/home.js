@@ -102,16 +102,6 @@ $(document).ready(function () {
                         $('#productPrice').text(product.gia.toLocaleString() + ' VND'); // Giá sản phẩm
                         $('#productDescription').text(product.moTa); // Mô tả ngắn
 
-                        // Cập nhật danh sách màu sắc (Sử dụng input radio buttons)
-                        $('#colorOptions').empty();
-                        product.listMauSac.forEach(function (mauSac, index) {
-                            $('#colorOptions').append(`
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="color" id="color${mauSac.id}" value="${mauSac.id}">
-                                <label class="form-check-label" for="color${mauSac.id}">${mauSac.ten}</label>
-                            </div>
-                        `);
-                        });
 
                         //image
                         $(document).ready(function() {
@@ -187,16 +177,42 @@ $(document).ready(function () {
                             setActiveImage(activeIndex);  // Cập nhật viền thumbnail
                         });
 
-                        // Cập nhật danh sách kích thước (Sử dụng input radio buttons)
                         $('#sizeOptions').empty();
-                        product.listSize.forEach(function (size, index) {
+                        product.listSize.forEach(function (size) {
                             $('#sizeOptions').append(`
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="size" id="size${size.id}" value="${size.id}">
-                                <label class="form-check-label" for="size${size.id}">${size.ten}</label>
-                            </div>
-                        `);
+                            <label class="custom-radio">
+                                <input type="radio" name="size" id="size${size.id}" value="${size.id}">
+                                <span class="radio-label">${size.ten}</span>
+                            </label>
+                            `);
                         });
+
+
+                        const colorMap = {
+                            "Đỏ": "#ff0000",
+                            "Xanh Dương": "#0000ff",
+                            "Xanh Lá": "#00ff00",
+                            "Vàng": "#ffff00",
+                            "Tím": "#800080",
+                            "Cam": "#ffa500",
+                            "Hồng": "#ff69b4",
+                            "Trắng": "#ffffff",
+                            "Đen": "#000000",
+                            "Xám": "#808080"
+                        };
+
+                        $('#colorOptions').empty();
+                        product.listMauSac.forEach(function (mauSac) {
+                            const colorCode = colorMap[mauSac.ten] || "#cccccc"; // Mặc định màu xám nếu không khớp
+
+                            $('#colorOptions').append(`
+                            <label class="custom-radio-circle">
+                                <input type="radio" name="color" id="color${mauSac.id}" value="${mauSac.id}">
+                                <span class="radio-circle" style="background-color: ${colorCode};" title="${mauSac.ten}"></span>
+                            </label>
+                            `);
+                        });
+
 
                         // Cập nhật số lượng sản phẩm còn lại
                         const totalQuantity = product.listSanPhamChiTiet.reduce((sum, item) => sum + item.soLuong, 0);
@@ -273,11 +289,12 @@ $(document).ready(function () {
                     $('#quantityLeft').text(0);
                     $('#productPrice').text('Không khả dụng');
                 }
-            } else {
-                // Hiển thị yêu cầu chọn đầy đủ khi chưa chọn màu sắc và kích thước
-                $('#quantityLeft').text("Vui lòng chọn màu sắc và kích thước");
-                $('#productPrice').text("Vui lòng chọn màu sắc và kích thước");
             }
+            // else {
+            //     // Hiển thị yêu cầu chọn đầy đủ khi chưa chọn màu sắc và kích thước
+            //     $('#quantityLeft').text("Vui lòng chọn màu sắc và kích thước");
+            //     $('#productPrice').text("Vui lòng chọn màu sắc và kích thước");
+            // }
 
             // Cập nhật tình trạng vô hiệu hóa các lựa chọn
             disableUnavailableOptions(product);
@@ -566,7 +583,7 @@ $(document).ready(function () {
             <br>
             <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
                 <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
-                    Add to wishlist
+                    Yêu thích
                 </a>
                 <i class="fas fa-bars" style="color: white"></i> <!-- Dấu gạch đứng như biểu tượng menu -->
                 <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
@@ -615,6 +632,7 @@ $(document).ready(function () {
             function (isInWishlist) {
                 if (isInWishlist) {
                     showToast('Sản phẩm đã có trong danh sách yêu thích.', 'info');
+                    toastr.info('Sản phẩm đã có trong danh sách yêu thích.', 'Đã có');
                     updateWishlistButton(button, heartIcon);
                 } else {
                     addProductToWishlist(productId, authToken, heartIcon, button);
@@ -623,6 +641,7 @@ $(document).ready(function () {
             function (error) {
                 console.error("Lỗi khi kiểm tra sản phẩm trong wishlist:", error);
                 showToast('Có lỗi khi kiểm tra danh sách yêu thích.', 'danger');
+                toastr.warning('Có lỗi khi kiểm tra danh sách yêu thích.', 'Lỗi');
             }
         );
     }
@@ -634,11 +653,13 @@ $(document).ready(function () {
         sendAjax(`/yeu-thich/${productId}`, 'POST', authToken, null,
             function () {
                 showToast('Đã thêm sản phẩm vào danh sách yêu thích!', 'success');
+                toastr.success('Đã thêm sản phẩm vào danh sách yêu thích!', 'Thành công');
                 updateWishlistButton(button, heartIcon);
             },
             function (error) {
                 console.error("Lỗi khi thêm sản phẩm vào danh sách yêu thích:", error);
                 showToast('Có lỗi khi thêm sản phẩm vào yêu thích.', 'danger');
+                toastr.danger('Có lỗi khi thêm sản phẩm vào yêu thích.', 'Lỗi');
                 button.attr('disabled', false);
             }
         );
@@ -675,6 +696,74 @@ $(document).ready(function () {
         toast.toast({delay: 3000});
         toast.toast('show');
     }
+    /////////////////////////////// wislist detail product //////////////////////
+    $(document).ready(function () {
+        // Lấy ID sản phẩm từ URL
+        const url = window.location.href;
+        const productId = url.split('/').pop(); // Lấy phần cuối của URL, giả sử URL là /productDetail/10007
+
+        // Gắn sự kiện cho nút yêu thích
+        $('#addWislist').on('click', function () {
+            const authToken = localStorage.getItem("token");
+
+            if (!authToken) {
+                showToast('Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích.', 'danger');
+                return;
+            }
+
+            // Kiểm tra sản phẩm đã có trong danh sách yêu thích chưa
+            checkProductInWishlist(productId, authToken);
+        });
+
+        // Kiểm tra sản phẩm đã có trong danh sách yêu thích chưa
+        function checkProductInWishlist(productId, authToken) {
+            $.ajax({
+                url: `/yeu-thich/${productId}/check`, // Endpoint để kiểm tra
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + authToken
+                },
+                success: function (isInWishlist) {
+                    if (isInWishlist) {
+                        showToast('Sản phẩm đã có trong danh sách yêu thích.', 'info');
+                        toastr.info('Sản phẩm đã có trong danh sách yêu thích.', 'Đã có');
+                    } else {
+                        addProductToWishlist(productId, authToken);
+                    }
+                },
+                error: function (error) {
+                    console.error("Lỗi khi kiểm tra sản phẩm trong wishlist:", error);
+                    showToast('Có lỗi khi kiểm tra danh sách yêu thích.', 'danger');
+                    toastr.danger('Có lỗi khi thêm sản phẩm vào yêu thích.', 'Lỗi');
+                }
+            });
+        }
+
+        // Hàm thêm sản phẩm vào wishlist
+        function addProductToWishlist(productId, authToken) {
+            // Gửi yêu cầu AJAX để thêm sản phẩm vào wishlist
+            $.ajax({
+                url: `/yeu-thich/${productId}`,
+                type: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + authToken
+                },
+                success: function (response) {
+                    // Thông báo thành công
+                    showToast('Đã thêm sản phẩm vào danh sách yêu thích!', 'success');
+                    toastr.success('Đã thêm sản phẩm vào danh sách yêu thích!', 'Thành công');
+                },
+                error: function (error) {
+                    console.error("Lỗi khi thêm sản phẩm vào danh sách yêu thích:", error);
+                    showToast('Có lỗi khi thêm sản phẩm vào yêu thích.', 'danger');
+                    toastr.danger('Có lỗi khi thêm sản phẩm vào yêu thích.', 'Lỗi');
+                }
+            });
+        }
+
+        // Hàm hiển thị thông báo
+    });
+
 
     //////////////////////// danh sách bán chạy /////////////////////////
 
@@ -725,7 +814,7 @@ $(document).ready(function () {
             <br>
             <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
                 <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
-                    Add to wishlist
+                    Yêu thích
                 </a>
                 <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
                     Xem chi tiết
