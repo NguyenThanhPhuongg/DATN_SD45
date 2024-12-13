@@ -16,7 +16,7 @@ $(document).ready(function () {
                 const products = response.data;
 
                 if (Array.isArray(products)) {
-                    allProducts = products;
+                    allProducts = products.filter(product => product.trangThai === 1);  // Lọc sản phẩm có trangThai là 1
 
                     // Lấy giá khuyến mãi dựa trên tên sản phẩm
                     const searchPromises = allProducts.map(product => {
