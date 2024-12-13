@@ -819,8 +819,11 @@ $(document).ready(function () {
                 dataType: 'json',
                 success: function (products) {
                     if (Array.isArray(products)) {
+                        // Lọc sản phẩm có trangThai = 1
+                        const validProducts = products.filter(product => product.trangThai === 1);
+
                         // Tạo các promise để lấy giaSauKhuyenMai từ API search
-                        const searchPromises = products.map(product => {
+                        const searchPromises = validProducts.map(product => {
                             return $.ajax({
                                 url: '/san-pham/search',
                                 method: 'POST',
@@ -836,7 +839,7 @@ $(document).ready(function () {
 
                         // Chờ tất cả các yêu cầu API hoàn tất
                         Promise.all(searchPromises).then(() => {
-                            displayTopSellingProducts(products);
+                            displayTopSellingProducts(validProducts); // Hiển thị sản phẩm đã lọc
                         });
                     } else {
                         console.error('Expected an array but got:', products);
@@ -855,7 +858,7 @@ $(document).ready(function () {
 
             products.forEach(product => {
                 const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia);
-                const formattedSalePrice = product.giaSauKhuyenMai ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauKhuyenMai) : '';
+                const formattedSalePrice = product.giaSauKhuyenMai ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: ' VND' }).format(product.giaSauKhuyenMai) : '';
 
                 // Kiểm tra giá sau khuyến mãi và ẩn thẻ nếu không có
                 const salePriceHTML = product.giaSauKhuyenMai ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>` : '';
@@ -897,6 +900,5 @@ $(document).ready(function () {
         // Gọi hàm lấy sản phẩm bán chạy
         fetchTopSellingProducts();
     });
-
 
 });

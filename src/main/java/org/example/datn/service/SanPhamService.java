@@ -95,6 +95,7 @@ public class SanPhamService {
                 productData.put("ma", sanPham.getMa());
                 productData.put("gia", sanPham.getGia());
                 productData.put("totalSales", entry.getValue());
+                productData.put("trangThai", sanPham.getTrangThai());
 
                 topSellingProducts.add(productData);
             }

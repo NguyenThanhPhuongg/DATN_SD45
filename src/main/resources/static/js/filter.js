@@ -18,36 +18,43 @@ $(document).ready(function () {
     function createProductHtml(product) {
         // Kiểm tra nếu có giá sau khuyến mãi
         const saleTag = product.giaSauKhuyenMai ? `
-        <div class="sale-tag">Sale</div>
-    ` : ''; // Nếu có, thêm thẻ "SALE"
+        <div class="hot-sale-badge position-absolute translate-middle">
+             <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
+        </div>
+        ` : ''; // Nếu có, thêm thẻ "SALE"
 
         return `
-        <div class="col-md-3 mb-3 product" data-product-id="${product.id}">
-            <div class="card product-card">
-                <a href="/productDetail/${product.id}">
-                    <div class="image-container">
-                        <img style="width: 270px; height: 270px;" src="/images/${product.anh || 'default.png'}" alt="${product.ten}">
-                        ${saleTag}  <!-- Hiển thị thẻ SALE nếu có khuyến mãi -->
-                    </div>
-                </a>
-                <div class="card-body">
-                    <div class="text-start">
-                        <h6 class="card-title fw-bold">${product.ten}</h6>
-                        ${product.giaSauKhuyenMai !== null ? `
+            <div class="col-md-3 mb-3 product" data-product-id="${product.id}">
+                <div class=" product-card">
+                    <a href="/productDetail/${product.id}">
+                        <div class="image-container">
+                            <img class="product-image" style="width: 100%; height: 100%; object-fit: contain;" src="/images/${product.anh || 'default.png'}" alt="${product.ten}">
+                            ${saleTag}  <!-- Hiển thị thẻ SALE nếu có khuyến mãi -->
+                        </div>
+                    </a>
+                    <div class="card-body">
+                        <div class="text-start">
+                            <a href="/productDetail/${product.id}">
+                                <h6 class="card-title fw-bold">${product.ten}</h6>                    
+                            </a>
+                             ${product.giaSauKhuyenMai !== null ? `
                             <p class="price old-price">${product.gia.toLocaleString()}đ</p>
                             <p class="price new-price">${product.giaSauKhuyenMai.toLocaleString()}đ</p>
-                        ` : `<p class="price">${product.gia.toLocaleString()}đ</p>`}
-                    </div>
+                            ` : `<p class="price">${product.gia.toLocaleString()}đ</p>`}
+                        </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button class="btn btn-buy btn-dark w-75">Mua ngay</button>
-                        <span style="cursor: pointer" class="icon-heart">
-                            <i style="font-size: 24px" class="bi bi-heart"></i>
-                        </span>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-buy btn-dark w-75">                            
+                                <a style="color: white" href="/productDetail/${product.id}">XEM CHI TIẾT
+                                </a>
+                            </button>
+                            <span style="cursor: pointer" class="icon-heart">
+                                <i style="font-size: 24px" class="bi bi-heart"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
     }
 
 
@@ -74,8 +81,8 @@ $(document).ready(function () {
     // Hàm hiển thị sản phẩm theo trang
     function showPage(page) {
         currentPage = page;
-        const startIndex = (currentPage - 1) * 8; // 8 sản phẩm mỗi trang
-        const endIndex = startIndex + 8;
+        const startIndex = (currentPage - 1) * 16; // 8 sản phẩm mỗi trang
+        const endIndex = startIndex + 16;
         const productsToDisplay = allProducts.slice(startIndex, endIndex);  // Lọc sản phẩm theo trang
 
         resultsContainer.empty();
@@ -129,8 +136,6 @@ $(document).ready(function () {
     }
 
 
-
-
     // Hàm gắn sự kiện cho biểu tượng trái tim
     function attachWishlistEvent() {
         $('.icon-heart i').off('click').on('click', function () {
@@ -138,7 +143,7 @@ $(document).ready(function () {
             const authToken = localStorage.getItem('token');
 
             if (!authToken) {
-                alert('Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích.');
+                toastr.info('Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích.', 'Kiểm tra');
                 return;
             }
 
@@ -152,7 +157,7 @@ $(document).ready(function () {
                 },
                 success: function (isInWishlist) {
                     if (isInWishlist) {
-                        alert('Sản phẩm đã có trong danh sách yêu thích.');
+                        toastr.info('Sản phẩm đã có trong danh sách yêu thích.', 'Đã có');
                         heartIcon.removeClass('bi-heart').addClass('bi-heart-fill');
                     } else {
                         $.ajax({
@@ -162,17 +167,17 @@ $(document).ready(function () {
                                 "Authorization": `Bearer ${authToken}`
                             },
                             success: function () {
-                                alert('Đã thêm sản phẩm vào danh sách yêu thích!');
+                                toastr.success('Đã thêm sản phẩm vào danh sách yêu thích!', 'Thành công');
                                 heartIcon.removeClass('bi-heart').addClass('bi-heart-fill');
                             },
                             error: function () {
-                                alert('Có lỗi xảy ra khi thêm vào danh sách yêu thích.');
+                                toastr.dangerMode('Có lỗi khi thêm sản phẩm vào yêu thích.', 'Lỗi');
                             }
                         });
                     }
                 },
                 error: function () {
-                    alert('Có lỗi xảy ra khi kiểm tra danh sách yêu thích.');
+                    toastr.dangerMode('Có lỗi khi khi kiểm trả danh sách yêu thích.', 'Lỗi');
                 }
             });
         });
@@ -216,7 +221,7 @@ $(document).ready(function () {
 
             // Lưu trữ sản phẩm mới và tính lại tổng số trang
             allProducts = data.data;
-            totalPages = Math.ceil(allProducts.length / 8); // 8 sản phẩm mỗi trang
+            totalPages = Math.ceil(allProducts.length / 16); // 8 sản phẩm mỗi trang
 
             if (allProducts.length === 0) {
                 displayMessage('Không tìm thấy sản phẩm nào!');
@@ -305,28 +310,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 let selectedMaterialId = null;
 let selectedBrandId = null;
 
-// Render các checkbox chất liệu
+// Render các checkbox chất liệu  <label class="form-check-label" for="material${material.id}">${material.ten}</label>
 function renderMaterials(materials) {
     const materialContainer = document.querySelector('.filter-group#material-group');
     materials.forEach(material => {
         const checkboxHTML = `
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="${material.id}" id="material${material.id}" onchange="handleMaterialCheckboxChange(this)">
-                <label class="form-check-label" for="material${material.id}">${material.ten}</label>
+                <input class="form-check-input" type="checkbox" value="${material.id}" id="material${material.id}" onchange="handleMaterialCheckboxChange(this)">${material.ten}
             </div>
+           
         `;
         materialContainer.innerHTML += checkboxHTML;
     });
 }
 
-// Render các checkbox thương hiệu
+// Render các checkbox thương hiệu <label class="form-check-label" for="brand${brand.id}">${brand.ten}</label>
 function renderBrands(brands) {
     const brandContainer = document.querySelector('.filter-group#brand-group');
     brands.forEach(brand => {
         const checkboxHTML = `
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="${brand.id}" id="brand${brand.id}" onchange="handleBrandCheckboxChange(this)">
-                <label class="form-check-label" for="brand${brand.id}">${brand.ten}</label>
+                <input class="form-check-input" type="checkbox" value="${brand.id}" id="brand${brand.id}" onchange="handleBrandCheckboxChange(this)">${brand.ten}
             </div>
         `;
         brandContainer.innerHTML += checkboxHTML;
