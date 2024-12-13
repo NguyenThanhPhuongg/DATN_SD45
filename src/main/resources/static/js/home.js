@@ -13,30 +13,37 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             success: function (response) {
-                console.log(response);  // Kiểm tra dữ liệu trả về
-
                 const products = response.data;
 
                 if (Array.isArray(products)) {
-                    // Lưu toàn bộ sản phẩm vào mảng `allProducts`
                     allProducts = products;
 
-                    // Sắp xếp sản phẩm theo `ngayTao` mới nhất (giảm dần)
-                    allProducts.sort(function (a, b) {
-                        const dateA = new Date(a.ngayTao);  // Chuyển ngày tạo thành đối tượng Date
-                        const dateB = new Date(b.ngayTao);  // Chuyển ngày tạo thành đối tượng Date
-                        return dateB - dateA;  // So sánh để sắp xếp giảm dần
+                    // Lấy giá khuyến mãi dựa trên tên sản phẩm
+                    const searchPromises = allProducts.map(product => {
+                        return $.ajax({
+                            url: 'san-pham/search',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                keyword: product.ten
+                            })
+                        }).then(searchResponse => {
+                            const foundProduct = searchResponse.data.find(p => p.id === product.id);
+                            product.giaSauKhuyenMai = foundProduct ? foundProduct.giaSauKhuyenMai : product.gia;
+                        });
                     });
 
-                    // Hiển thị sản phẩm của trang hiện tại
-                    displayProducts(currentPage);
+                    // Chờ tất cả các yêu cầu API hoàn tất
+                    Promise.all(searchPromises).then(() => {
+                        allProducts.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao));
+                        displayProducts(currentPage);
 
-                    // Cập nhật nút "Xem thêm" hoặc "Ẩn bớt"
-                    if (currentPage < totalPages - 1) {
-                        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');  // Nếu không phải trang cuối
-                    } else {
-                        $('#load-more').hide();  // Nếu là trang cuối, ẩn nút "Xem thêm"
-                    }
+                        if (currentPage < totalPages - 1) {
+                            $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
+                        } else {
+                            $('#load-more').hide();
+                        }
+                    });
                 } else {
                     console.error('Expected array but got:', products);
                 }
@@ -46,7 +53,6 @@ $(document).ready(function () {
             }
         });
     }
-
 
     // Gọi hàm để hiển thị sản phẩm ngay khi trang tải
     $(document).ready(function () {
@@ -99,9 +105,32 @@ $(document).ready(function () {
                         $('#productName').text(product.ten);
                         $('#productBrand').text(product.thuonghieu.ten); // Thương hiệu
                         $('#productCode').text(product.ma); // Mã sản phẩm
-                        $('#productPrice').text(product.gia.toLocaleString() + ' VND'); // Giá sản phẩm
+                        $('#productPrice').text(product.gia.toLocaleString() + ' ₫'); // Giá sản phẩm
                         $('#productDescription').text(product.moTa); // Mô tả ngắn
 
+                        // Lấy giaSauKhuyenMai từ API search
+                        $.ajax({
+                            url: '/san-pham/search',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                keyword: product.ten
+                            }),
+                            success: function (searchResponse) {
+                                const foundProduct = searchResponse.data?.find(p => p.id === product.id);
+                                if (foundProduct) {
+                                    const giaSauKhuyenMai = foundProduct.giaSauKhuyenMai;
+                                    if (giaSauKhuyenMai && giaSauKhuyenMai < product.gia) {
+                                        const formattedSalePrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(giaSauKhuyenMai);
+                                        $('#productSalePrice').text(formattedSalePrice);  // Hiển thị giá sau khuyến mãi
+                                        $('#productPrice').css('text-decoration', 'line-through');  // Gạch ngang giá gốc
+                                    }
+                                }
+                            },
+                            error: function (error) {
+                                console.error("Error fetching sale price:", error);
+                            }
+                        });
 
                         //image
                         $(document).ready(function() {
@@ -361,7 +390,7 @@ $(document).ready(function () {
         }
     });
 
-    fetchProducts();
+    // fetchProducts();
 
     $(document).ready(function () {
         // Kiểm tra token
@@ -570,30 +599,40 @@ $(document).ready(function () {
 
     // Hàm tạo HTML cho từng sản phẩm
     function createProductHtml(product) {
-        const formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(product.gia);
+        const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia);
+        const formattedSalePrice = product.giaSauKhuyenMai ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauKhuyenMai) : '';
+
+        // Kiểm tra giá sau khuyến mãi và ẩn thẻ nếu không có
+        const salePriceHTML = product.giaSauKhuyenMai ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>` : '';
+        const oldPriceClass = product.giaSauKhuyenMai ? 'text-decoration: line-through;' : '';
 
         return `
         <div class="product d-flex flex-column align-items-center justify-content-between">
-            <div class="image-wrapper">
-                <a href="/productDetail/${product.id}">
-                    <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
-                </a>
-            </div>
-            <div class="price-and-name text-center">
-                <p class="name" style="font-size: 19px;">${product.ten}</p>
-                <p class="price fw-bold" style="font-size: 20px">${formattedPrice}</p>
-            </div>
-            <br>
-            <br>
-            <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
-                <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
-                    Yêu thích
-                </a>
-                <i class="fas fa-bars" style="color: white"></i> <!-- Dấu gạch đứng như biểu tượng menu -->
-                <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
-                    Xem chi tiết
-                </a>
-            </div>
+             <div class="image-wrapper">
+                  <a href="/productDetail/${product.id}">
+                       <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
+                  </a>
+                  ${product.giaSauKhuyenMai ? `
+                  <div class="hot-sale-badge position-absolute translate-middle">
+                       <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
+                  </div>` : ''}
+             </div>
+             <div class="price-and-name text-center">
+                  <p class="name" style="font-size: 19px;">${product.ten}</p>
+                  <p class="price fw-bold" style="font-size: 22px; ${oldPriceClass}">
+                      ${formattedPrice}
+                  </p>
+                  ${salePriceHTML}
+             </div>
+             <br><br>
+             <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
+                 <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
+                      Yêu thích
+                 </a>
+                 <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
+                      Xem chi tiết
+                 </a>
+             </div>
         </div>
     `;
     }
@@ -780,8 +819,25 @@ $(document).ready(function () {
                 dataType: 'json',
                 success: function (products) {
                     if (Array.isArray(products)) {
-                        // Hiển thị sản phẩm bán chạy
-                        displayTopSellingProducts(products);
+                        // Tạo các promise để lấy giaSauKhuyenMai từ API search
+                        const searchPromises = products.map(product => {
+                            return $.ajax({
+                                url: '/san-pham/search',
+                                method: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    keyword: product.ten
+                                })
+                            }).then(searchResponse => {
+                                const foundProduct = searchResponse.data?.find(p => p.id === product.id);
+                                product.giaSauKhuyenMai = foundProduct ? foundProduct.giaSauKhuyenMai : product.gia;
+                            });
+                        });
+
+                        // Chờ tất cả các yêu cầu API hoàn tất
+                        Promise.all(searchPromises).then(() => {
+                            displayTopSellingProducts(products);
+                        });
                     } else {
                         console.error('Expected an array but got:', products);
                     }
@@ -798,34 +854,42 @@ $(document).ready(function () {
             productContainer.empty();  // Xóa nội dung cũ nếu có
 
             products.forEach(product => {
-                const formattedPrice = new Intl.NumberFormat('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND'
-                }).format(product.gia);
+                const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia);
+                const formattedSalePrice = product.giaSauKhuyenMai ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauKhuyenMai) : '';
+
+                // Kiểm tra giá sau khuyến mãi và ẩn thẻ nếu không có
+                const salePriceHTML = product.giaSauKhuyenMai ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>` : '';
+                const oldPriceClass = product.giaSauKhuyenMai ? 'text-decoration: line-through;' : '';
 
                 const productHtml = `
-        <div class="product d-flex flex-column align-items-center justify-content-between">
-            <div class="image-wrapper">
-                <a href="/productDetail/${product.id}">
-                    <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
-                </a>
-            </div>
-            <div class="price-and-name text-center">
-                <p class="name" style="font-size: 19px;">${product.ten}</p>
-                <p class="price fw-bold" style="font-size: 20px">${formattedPrice}</p>
-            </div>
-            <br>
-            <br>
-            <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
-                <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
-                    Yêu thích
-                </a>
-                <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
-                    Xem chi tiết
-                </a>
-            </div>
-        </div>
-        `;
+                <div class="product d-flex flex-column align-items-center justify-content-between">
+                    <div class="image-wrapper">
+                        <a href="/productDetail/${product.id}">
+                            <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
+                        </a>
+                        ${product.giaSauKhuyenMai ? `
+                        <div class="hot-sale-badge position-absolute translate-middle">
+                            <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
+                        </div>` : ''}
+                    </div>
+                    <div class="price-and-name text-center">
+                        <p class="name" style="font-size: 19px;">${product.ten}</p>
+                        <p class="price fw-bold" style="font-size: 22px; ${oldPriceClass}">
+                            ${formattedPrice}
+                        </p>
+                        ${salePriceHTML}
+                    </div>
+                    <br><br>
+                    <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
+                        <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
+                            Yêu thích
+                        </a>
+                        <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            `;
                 productContainer.append(productHtml);  // Thêm sản phẩm vào danh sách
             });
         }
@@ -833,5 +897,6 @@ $(document).ready(function () {
         // Gọi hàm lấy sản phẩm bán chạy
         fetchTopSellingProducts();
     });
+
 
 });

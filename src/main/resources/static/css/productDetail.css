@@ -135,8 +135,13 @@
 
 #productPrice{
     font-size: 30px;
-    font-weight: 700;
+    font-weight: 600;
     padding-bottom: 20px;
+}
+#productSalePrice{
+    font-size: 32px;
+    font-weight: 700;
+    color: red;
 }
 .product-color{
     font-size: 20px;

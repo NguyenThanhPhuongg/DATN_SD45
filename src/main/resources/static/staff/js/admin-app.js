@@ -350,9 +350,6 @@ app.config(function ($routeProvider) {
             controller: "test-ctrl"
         })
 
-        .otherwise({
-            redirectTo: "/bhtq" // Chuyển hướng đến đường dẫn mặc định
-        });
 
 })
 

@@ -276,6 +276,7 @@
     align-items: center;
     overflow: hidden;
     transform: scale(1.2);
+    position: relative;
 }
 
 .product-image {
@@ -370,4 +371,18 @@
 }
 
 
+/* Định vị thông báo "Hot Sale" ở góc trên bên phải */
+.hot-sale-badge {
+    position: absolute;
+    top: 40px;
+    right: -40px;
+    padding: 5px;
+    animation: blink 1s infinite;  /* Hiệu ứng nhấp nháy */
+}
 
+
+/* Điều chỉnh kích thước của ảnh động hoặc icon */
+.hot-sale-badge img {
+    width: 70px;  /* Điều chỉnh kích thước của ảnh động hoặc icon */
+    height: auto;
+}
