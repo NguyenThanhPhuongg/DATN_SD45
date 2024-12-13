@@ -461,9 +461,13 @@ $(document).ready(function () {
                     if (isBuyNow) {
                         window.location.href = '/cart';
                     } else {
-                        setTimeout(function () {
-                            location.reload();
-                        }, 800);
+                        const token = localStorage.getItem('token');
+                        if (token) {
+                            fetchCartItemCount(token); // Gọi hàm lấy số lượng giỏ hàng nếu có token
+                        } else {
+                            updateCartBadge(0); // Nếu không có token, hiển thị 0
+                        }
+                        fetchMenuData();
                     }
                 },
                 error: function (error) {

@@ -152,9 +152,13 @@ function deleteItem(itemId) {
             if (result.code === '200') {
                 toastr.success('Sản phẩm đã được xóa thành công!', 'Thành công');
                 fetchCartData();
-                setTimeout(function () {
-                    location.reload();
-                }, 500);
+                const token = localStorage.getItem('token');
+                if (token) {
+                    fetchCartItemCount(token); // Gọi hàm lấy số lượng giỏ hàng nếu có token
+                } else {
+                    updateCartBadge(0); // Nếu không có token, hiển thị 0
+                }
+                fetchMenuData();
             } else {
                 console.error('Xóa sản phẩm thất bại', result.message);
                 toastr.error('Xóa sản phẩm thất bại!', 'Lỗi');
