@@ -202,6 +202,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         // Tạo tên hóa đơn mới
         const newBillName = $scope.generateBillName(lastBillName);
         let bill = {
+            type: 'OFFLINE',
             stt: $scope.bills.length + 1,
             name: newBillName,
             totalBill: 0,
@@ -547,6 +548,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 $scope.onKeyDownName = function(bill) {
                     if (event.keyCode === 13) {
                         let dataUser ={
+                            type: 'OFFLINE',
                             email: `ziaza${bill.phoneCustomer}@gmail.com`,
                             name: bill.nameCustomer,
                             phone: bill.phoneCustomer,

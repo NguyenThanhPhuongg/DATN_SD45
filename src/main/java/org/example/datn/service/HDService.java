@@ -78,6 +78,7 @@ public class HDService {
         hoaDon.setNgayThanhToan(LocalDateTime.now());
         hoaDon.setNgayDatHang(LocalDateTime.now());
         hoaDon.setNgayCapNhat(LocalDateTime.now());
+        hoaDon.setNgayGiaoHang(LocalDateTime.now());
         hoaDon.setIdDiaChiGiaoHang(hdRequest.getIdDiaChiGiaoHang());
         hoaDon.setIdPhuongThucVanChuyen(hdRequest.getIdPhuongThucVanChuyen());
         hoaDon.setNguoiCapNhat(hdRequest.getNguoiCapNhat());

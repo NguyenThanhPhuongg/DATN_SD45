@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.example.datn.model.enums.UserRoles;
+import org.example.datn.model.enums.UserType;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
@@ -36,5 +37,7 @@ public class RegisterModel {
     LocalDate ngaySinh;
 
     UserRoles role;
+
+    UserType type;
 
 }

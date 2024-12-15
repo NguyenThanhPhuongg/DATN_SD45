@@ -5,5 +5,6 @@ package org.example.datn.model.enums;
 public enum UserType {
     FB,
     GG,
-    NORMAL
+    NORMAL,
+    OFFLINE
 }
