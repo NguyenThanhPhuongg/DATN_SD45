@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="card-body">
-            <input type="text" ng-model="searchText1" placeholder="Tìm kiếm..." class="form-control mb-3"/>
+            <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control mb-3"/>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -21,7 +21,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="item in hoaDons">
+                <tr ng-repeat="item in pager.hoaDons">
                     <td>{{$index + 1}}</td>
                     <td>{{item.ma}}</td>
                     <td>{{item.userModel.profile.hoVaTen}}</td>
@@ -65,7 +65,7 @@
                 <!-- Bộ chọn số lượng dữ liệu hiển thị -->
                 <div class="me-auto">
                     <label for="pageSizeSelect" class="me-2">Hiển thị:</label>
-                    <select id="pageSizeSelect" ng-model="pager0.size" ng-change="pager0.updateItems()"
+                    <select id="pageSizeSelect" ng-model="pager.size" ng-change="pager.updateItems()"
                             class="form-select d-inline-block w-auto">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>

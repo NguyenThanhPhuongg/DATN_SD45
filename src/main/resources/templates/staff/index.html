@@ -7,6 +7,10 @@
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <title>Home - Manage</title>
     <link rel="stylesheet" href="../staff/css/css.css">
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.2/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.2/dist/sweetalert2.all.min.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 
@@ -233,6 +237,7 @@
             transform: translateY(-50%);
             cursor: pointer;
         }
+
         /* Style for the dropdown button */
         .btn-dropdown {
             background-color: #f8f9fa;
@@ -290,6 +295,7 @@
         .text-danger {
             color: red;
         }
+
         /* Cấu trúc chung */
         .fz-14 {
             font-size: 14px;
@@ -400,8 +406,54 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #userInfoForm {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        #userInfoForm .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        #userInfoForm .col-md-6 {
+            width: 48%;
+            margin-bottom: 20px;
+        }
+
+        #avatarContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        #avatar {
+            width: 200px; /* Điều chỉnh chiều rộng */
+            height: 300px; /* Điều chỉnh chiều cao */
+            object-fit: cover; /* Đảm bảo ảnh không bị méo và chiếm toàn bộ không gian */
+            border-radius: 10px; /* Để tạo các góc bo tròn (có thể thay đổi hoặc bỏ) */
+        }
+
+
+        form .mb-3 {
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            cursor: pointer;
         }
 
 
@@ -418,6 +470,100 @@
     <div id="layoutSidenav_content">
         <main style="background-color:gainsboro; padding: 20px 20px;">
             <div ng-view style="background-color:white; "></div>
+            <!-- Modal -->
+            <div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg"> <!-- Điều chỉnh kích thước modal ở đây (modal-lg, modal-sm, hoặc custom kích thước) -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="userInfoModalLabel">Thông tin người dùng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form thông tin người dùng -->
+                            <form id="formInfo" class="row">
+                                <!-- Phần nhập thông tin (nửa trái) -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Tên đăng nhập:</label>
+                                        <input type="text" class="form-control" id="username" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Tên:</label>
+                                        <input type="text" class="form-control" id="name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email:</label>
+                                        <input type="email" class="form-control" id="email">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Số điện thoại:</label>
+                                        <input type="text" class="form-control" id="phone">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="cccd" class="form-label">CCCD:</label>
+                                        <input type="text" class="form-control" id="cccd">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Giới tính:</label><br>
+                                        <input type="radio" id="male" name="gender" value="NAM"> Nam
+                                        <input type="radio" id="female" name="gender" value="NU"> Nữ
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="dob" class="form-label">Ngày sinh:</label>
+                                        <input type="date" class="form-control" id="dob">
+                                    </div>
+                                </div>
+
+                                <!-- Phần avatar (nửa phải) -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="avatar" class="form-label">Ảnh đại diện:</label>
+                                        <div id="avatarContainer" class="text-center">
+                                            <img id="avatar" src="default-avatar.jpg" alt="Avatar" class="img-fluid rounded-circle" width="150">
+                                        </div>
+                                        <!-- Input chọn ảnh -->
+                                        <input type="file" class="form-control mt-2" id="avatarFile" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="changePasswordModalLabel">Đổi mật khẩu</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="changePasswordForm">
+                                <div class="mb-3">
+                                    <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
+                                    <input type="password" class="form-control" id="oldPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                    <input type="password" class="form-control" id="newPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                                    <input type="password" class="form-control" id="confirmPassword" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary" id="changePasswordBtn">Cập nhật</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
         <footer class="py-4 bg-light mt-auto"
                 th:include="staff/layout/_footer :: body">
@@ -538,6 +684,261 @@
     // Kiểm tra quyền truy cập khi trang được tải (window.onload) và khi hash thay đổi (hashchange)
     window.onload = checkAccess;
     window.onhashchange = checkAccess;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        function loadUserInfo(token) {
+            fetch('user/get', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.data && data.data.profile) {
+                        const profile = data.data.profile;
+
+                        document.getElementById("username").value = data.data.userName || '';
+                        document.getElementById("name").value = profile.hoVaTen || '';
+                        document.getElementById("email").value = profile.email || '';
+                        document.getElementById("phone").value = profile.phone || '';
+                        document.getElementById("cccd").value = profile.cccd || '';
+                        document.getElementById("dob").value = profile.ngaySinh || '';
+                        document.getElementById("nameAdmin").textContent = profile.hoVaTen || '';
+
+                        if (profile.gioiTinh === "NAM") {
+                            document.getElementById("male").checked = true;
+                        } else if (profile.gioiTinh === "NU") {
+                            document.getElementById("female").checked = true;
+                        }
+
+                        const avatarSrc = profile.avatar || 'default-avatar.jpg';
+                        document.getElementById("avatar").src = avatarSrc;
+
+                    } else {
+                        alert('Không thể tải thông tin người dùng');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gọi API:', error);
+                    alert('Đã xảy ra lỗi trong quá trình lấy thông tin người dùng');
+                });
+        }
+
+        // Khi người dùng nhấp vào "Thông tin" trong dropdown
+        document.getElementById("viewInfo").addEventListener("click", function () {
+            var userInfoModal = new bootstrap.Modal(document.getElementById("userInfoModal"));
+            userInfoModal.show();
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                alert("Vui lòng đăng nhập trước!");
+                window.location.href = "v1/auth/login";
+                return;
+            }
+
+            // Gọi hàm để lấy thông tin người dùng
+            loadUserInfo(token);
+        });
+
+        // Xử lý khi người dùng chọn avatar mới
+        document.getElementById("avatarFile").addEventListener("change", function (event) {
+            const file = event.target.files[0]; // Lấy file người dùng chọn
+
+            if (file) {
+                const reader = new FileReader();
+
+                // Khi file được đọc xong
+                reader.onload = function (e) {
+                    const avatarImage = document.getElementById("avatar");
+                    avatarImage.src = e.target.result;  // Cập nhật ảnh avatar mới
+                };
+
+                // Đọc file dưới dạng URL
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById("userInfoModal").addEventListener('hidden.bs.modal', function () {
+            document.getElementById("formInfo").reset();  // Reset form khi đóng modal
+        });
+        // Hàm để cập nhật thông tin người dùng
+        function updateUserInfo(token) {
+            const formData = new FormData();
+
+            // Lấy thông tin từ form
+            formData.append("request", JSON.stringify({
+                hoVaTen: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                cccd: document.getElementById("cccd").value,
+                gioiTinh: document.querySelector('input[name="gender"]:checked').value,
+                ngaySinh: document.getElementById("dob").value
+            }));
+
+            // Thêm file avatar nếu có
+            const avatarFile = document.getElementById("avatarFile").files[0];
+            if (avatarFile) {
+                formData.append("file", avatarFile);
+            }
+
+            //call api update
+            fetch('profile/update', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Kết quả cập nhật thông tin:', data);
+                    if (data.code === "200") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cập nhật thành công!',
+                            text: 'Thông tin của bạn đã được cập nhật.',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            position: 'center',
+                            toast: false,
+                        });
+
+                        loadUserInfo(token);
+                        var userInfoModal = new bootstrap.Modal(document.getElementById("userInfoModal"));
+                        userInfoModal.hide();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Cập nhật thất bại',
+                            text: data.message || 'Đã có lỗi xảy ra, vui lòng thử lại!'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi cập nhật thông tin:', error);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống',
+                        text: 'Đã xảy ra lỗi khi cập nhật thông tin. Vui lòng thử lại sau.'
+                    });
+                });
+        }
+
+        // Xử lý khi người dùng gửi form cập nhật thông tin
+        document.getElementById("formInfo").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem("token");
+
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn cập nhật thông tin?',
+                text: "Thông tin sẽ được cập nhật ngay lập tức!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Cập nhật',
+                cancelButtonText: 'Hủy bỏ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateUserInfo(token);
+                }
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("changePasswordLink").addEventListener("click", function () {
+            new bootstrap.Modal(document.getElementById("changePasswordModal")).show();
+        });
+
+        // Xử lý gửi yêu cầu đổi mật khẩu khi người dùng nhấn Cập nhật
+        document.getElementById("changePasswordBtn").addEventListener("click", function () {
+            const oldPassword = document.getElementById("oldPassword").value;
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            // Kiểm tra nếu mật khẩu mới và xác nhận mật khẩu không khớp
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Mật khẩu mới không khớp',
+                    text: 'Vui lòng xác nhận lại mật khẩu mới.'
+                });
+                return;
+            }
+
+            // Kiểm tra nếu mật khẩu cũ không hợp lệ
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Vui lòng nhập đầy đủ thông tin',
+                    text: 'Các trường mật khẩu không được để trống.'
+                });
+                return;
+            }
+
+            const token = localStorage.getItem("token");
+            const changePasswordModel = {
+                oldPassword: oldPassword,
+                password: newPassword,
+                retypePassword: confirmPassword
+            };
+
+            // Gửi request POST để đổi mật khẩu
+            fetch('auth/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(changePasswordModel)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === "200") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cập nhật mật khẩu thành công',
+                            text: 'Mật khẩu của bạn đã được thay đổi.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        // Đóng modal
+                        document.getElementById("changePasswordModal").querySelector('.btn-close').click();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Cập nhật mật khẩu thất bại',
+                            text: data.message || 'Đã có lỗi xảy ra, vui lòng thử lại!'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi đổi mật khẩu:', error);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống',
+                        text: 'Đã xảy ra lỗi khi đổi mật khẩu. Vui lòng thử lại sau.'
+                    });
+                });
+        });
+        document.getElementById("changePasswordModal").addEventListener('hidden.bs.modal', function () {
+            document.getElementById("changePasswordForm").reset();
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("logoutLink").addEventListener("click", function () {
+            localStorage.removeItem("token");
+
+            window.location.href = "v1/auth/login";
+        });
+    });
+
 
 </script>
 </body>

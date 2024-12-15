@@ -3,6 +3,7 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
     $scope.trangThai = 0; // Giá trị mặc định, cập nhật từ URL nếu có
     $scope.form = {};
     $scope.hoaDonChiTiets = []; // Mảng chứa danh sách hóa đơn chi tiết
+    $scope.searchText = ''; // Mảng chứa danh sách hóa đơn chi tiết
 
     $scope.pager = {
         page: 0,
@@ -29,12 +30,12 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
             this.page = this.count - 1;
             this.updateItems();
         },
-        updateItems: function () {
-            const filteredItems = $scope.items.filter(item => {
-                const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase()) ||
-                    item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
-                const matchesIdCha = !$scope.selectedIdCha || item.idCha === Number($scope.selectedIdCha);
-                return matchesSearch && matchesIdCha;
+        updateItems : function () {
+            const filteredItems = $scope.hoaDons.filter(item => {
+                const matchesSearch =
+                    item.ma.toLowerCase().includes($scope.searchText.toLowerCase()) ||
+                    item.userModel.profile.hoVaTen.toLowerCase().includes($scope.searchText.toLowerCase()); // Tìm theo tên người đặt
+                return matchesSearch;
             });
 
             // Sắp xếp theo ngày cập nhật mới nhất
@@ -45,10 +46,15 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
             });
 
             this.count = Math.ceil(filteredItems.length / this.size);
-            this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
+            this.hoaDons = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
     };
 
+    $scope.$watch('searchText', function (newValue, oldValue) {
+        if (newValue !== oldValue) {
+            $scope.pager.updateItems();
+        }
+    });
 
     $scope.edit0 = function (item) {
         // Chuyển timestamp thành Date object

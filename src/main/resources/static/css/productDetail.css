@@ -127,4 +127,130 @@
     cursor: pointer;
     border: 2px solid #ccc;
 }
+/*/////////////// chujjj4/////////////////////////////*/
+#productName {
+    font-size: 26px;
+    font-weight: 500;
+}
 
+#productPrice{
+    font-size: 30px;
+    font-weight: 600;
+    padding-bottom: 20px;
+}
+#productSalePrice{
+    font-size: 32px;
+    font-weight: 700;
+    color: red;
+}
+.product-color{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* Ẩn radio gốc */
+input[type="radio"] {
+    display: none;
+}
+
+/* Tùy chỉnh giao diện radio */
+.custom-radio {
+    display: inline-block;
+    margin: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Hình vuông đại diện */
+.radio-label {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+/* Giao diện tùy chỉnh cho hình tròn */
+.custom-radio-circle {
+    display: inline-block;
+    margin: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Hình tròn đại diện */
+.radio-circle {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 2px solid black;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+/* Khi được chọn */
+input[type="radio"]:checked + .radio-label {
+    outline: 1px solid black;
+    outline-offset: 2px;
+}
+
+input[type="radio"]:checked + .radio-circle{
+    outline: 1px solid black;
+    outline-offset: 2px;
+}
+
+/* Bỏ hiệu ứng hover */
+.custom-radio:hover .radio-label {
+    background-color: #f8f9fa;
+}
+
+.custom-radio-circle:hover .radio-circle {
+    border-color: #ccc; /* Không thay đổi khi hover */
+}
+
+.button-buy-product {
+    display: flex;
+    justify-content: space-between; /* Tùy chọn: phân bố đều các nút */
+}
+
+.button-buy-product button {
+    flex: 1; /* Mỗi button chiếm 50% chiều rộng của phần tử chứa */
+    height: 50px; /* Đảm bảo chiều cao của button */
+    margin-right: 10px; /* Khoảng cách giữa các nút */
+}
+
+.button-buy-product button:last-child {
+    margin-right: 0; /* Loại bỏ margin bên phải cho nút cuối cùng */
+}
+
+.button-add-wislist{
+    display: flex;
+    justify-content: center; /* Tùy chọn: phân bố đều các nút */
+    margin-top: 10px;
+}
+.button-add-wislist button {
+    height: 50px; /* Đảm bảo chiều cao của button */
+    width: 70%;
+    border: 1px solid black;
+}
+
+/* Điều chỉnh khoảng cách giữa các chữ */
+.product-color a {
+    margin-left: 10px;
+    text-decoration: underline;
+    color: gray; /* Hoặc màu bạn muốn */
+    font-weight: 200;
+}
+
+/* Tùy chỉnh màu và bỏ gạch chân */
+.product-color a:hover {
+    text-decoration: underline;
+    color: gray; /* Hoặc màu bạn muốn */
+    font-weight: 200;
+}
+
+/* Modal image customization */

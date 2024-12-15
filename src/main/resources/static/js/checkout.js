@@ -449,7 +449,7 @@ function populateTable(data) {
     let totalItemPrice = 0; // Variable to store total item price
 
     data.forEach(item => {
-        const gia = item.sanPham.gia; // Get price from product details
+        const gia = item.giaSauKhuyenMai ? item.giaSauKhuyenMai : item.gia;
         const soLuong = item.soLuong; // Get quantity
         const tongCong = gia * soLuong; // Calculate total
 

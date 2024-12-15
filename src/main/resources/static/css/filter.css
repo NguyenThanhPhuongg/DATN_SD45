@@ -116,18 +116,22 @@
 }
 /* Cấu trúc chung cho các sản phẩm */
 .product-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    /*border: 1px solid #ddd;*/
+    /*border-radius: 8px;*/
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hiệu ứng khi hover lên sản phẩm */
 .product-card:hover {
-    transform: translateY(-10px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
+
+/* Hiệu ứng khi hover lên sản phẩm */
+/*.product-card:hover {*/
+/*    transform: translateY(-10px);*/
+/*    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);*/
+/*}*/
 
 /* Phần hình ảnh */
 .product-card img {
@@ -137,9 +141,9 @@
     transition: transform 0.3s ease;
 }
 
-.product-card:hover img {
-    transform: scale(1.05);
-}
+/*.product-card:hover img {*/
+/*    transform: scale(1.05);*/
+/*}*/
 
 /* Thẻ thông tin sản phẩm */
 .product-card .card-body {
@@ -148,7 +152,7 @@
 }
 
 .card-title {
-    font-size: 1.1rem;
+    font-size: 18px;
     font-weight: bold;
     color: #333;
     margin-bottom: 10px;
@@ -158,8 +162,8 @@
 }
 
 .price {
-    font-size: 1.2rem;
-    color: #e74c3c;
+    font-size: 22px;
+    color: black;
     font-weight: bold;
     margin-bottom: 15px;
 }
@@ -176,10 +180,10 @@
 }
 
 /* Hiệu ứng hover cho nút mua ngay */
-.btn-buy:hover {
-    background-color: #333; /* Màu nền đen đậm khi hover */
-    transform: scale(1.05); /* Phóng to nhẹ khi hover */
-}
+/*.btn-buy:hover {*/
+/*    background-color: #333; !* Màu nền đen đậm khi hover *!*/
+/*    transform: scale(1.05); !* Phóng to nhẹ khi hover *!*/
+/*}*/
 
 
 /* Icon yêu thích */
@@ -207,10 +211,10 @@
 }
 
 /* Thêm hiệu ứng hover cho các sản phẩm */
-.product-card:hover {
-    transform: scale(1.05); /* Mở rộng nhẹ khi hover */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Tăng độ bóng khi hover */
-}
+/*.product-card:hover {*/
+/*    transform: scale(1.05); !* Mở rộng nhẹ khi hover *!*/
+/*    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); !* Tăng độ bóng khi hover *!*/
+/*}*/
 
 /* Responsive cho các thiết bị di động */
 @media (max-width: 768px) {
@@ -253,15 +257,15 @@
 }
 /* Giá cũ (gạch ngang và chữ nhỏ) */
 .price.old-price {
-    font-size: 0.9rem;  /* Chữ nhỏ */
-    color: #888;  /* Màu xám cho giá cũ */
+    font-size: 22px;  /* Chữ nhỏ */
+    color: black;  /* Màu xám cho giá cũ */
     text-decoration: line-through; /* Gạch ngang */
     margin-bottom: 5px;  /* Khoảng cách nhỏ giữa giá cũ và giá mới */
 }
 
 /* Giá mới (nổi bật) */
 .price.new-price {
-    font-size: 1.2rem;  /* Chữ lớn hơn cho giá mới */
+    font-size: 22px;  /* Chữ lớn hơn cho giá mới */
     color: #e74c3c;  /* Màu đỏ cho giá khuyến mãi */
     font-weight: bold;  /* In đậm để làm nổi bật giá mới */
 }
@@ -270,7 +274,7 @@
     display: flex;
     flex-direction: column;  /* Đặt các phần tử trong card theo chiều dọc */
     height: 100%;  /* Chiều cao đầy đủ của card */
-    box-sizing: border-box;
+    /*box-sizing: border-box;*/
 }
 
 /* Phần nội dung trên cùng của sản phẩm */
@@ -284,10 +288,6 @@
 /* Căn chỉnh nút Mua ngay và biểu tượng yêu thích xuống dưới */
 .d-flex.justify-content-between.align-items-center {
     margin-top: auto;  /* Đẩy các phần tử xuống dưới */
-}
-/* Chắc chắn rằng hình ảnh và phần tử "SALE" được căn chỉnh đúng */
-.image-container {
-    position: relative;  /* Đảm bảo "SALE" được căn chỉnh tuyệt đối trong ảnh */
 }
 
 .sale-tag {
@@ -308,4 +308,50 @@
 .sale-tag:hover {
     background-color: #c0392b;  /* Màu đỏ đậm hơn khi hover */
     cursor: pointer;
+}
+.hot-sale-badge {
+    position: absolute;
+    top: 30px;
+    right: -40px;
+    padding: 5px;
+    animation: blink 1s infinite;  /* Hiệu ứng nhấp nháy */
+}
+
+
+/* Điều chỉnh kích thước của ảnh động hoặc icon */
+.hot-sale-badge img {
+    width: 70px;  /* Điều chỉnh kích thước của ảnh động hoặc icon */
+    height: auto;
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Hoặc chiều cao bạn muốn cho ảnh */
+    overflow: hidden;  /* Đảm bảo không có phần thừa ra ngoài */
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;  /* Giữ tỷ lệ ảnh và đảm bảo ảnh luôn nằm gọn trong div */
+}
+
+/* Ghim sidebar khi cuộn */
+.filter-box {
+    position: sticky;
+    top: 20px; /* Khoảng cách từ phía trên khi dính */
+    z-index: 100; /* Đảm bảo nó nằm trên các phần tử khác nếu cần */
+    background: white; /* Đặt nền trắng để không bị trong suốt */
+    padding: 20px;
+    /*border: 1px solid #ccc;*/
+    /*border-radius: 8px;*/
+}
+
+.form-check {
+    width: 50%;
+    display: inline-block;
+}
+.filter-group h5{
+    margin-bottom: 10px;
 }

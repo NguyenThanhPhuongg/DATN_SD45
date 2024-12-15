@@ -45,5 +45,9 @@ public class ApDungKhuyenMaiService {
         return repo.findByIdSanPhamAndTrangThai(idSanPham, trangThai);
     }
 
+    public List<ApDungKhuyenMai> findByIdSanPham(Long idSanPham){
+        return repo.findByIdSanPham(idSanPham);
+    }
+
 
 }

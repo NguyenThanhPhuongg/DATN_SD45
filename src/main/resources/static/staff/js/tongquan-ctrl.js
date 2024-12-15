@@ -893,7 +893,7 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
                                 });
 
                                 // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
-                                $scope.topSanPhamBanChay = Object.entries(productQuantityMap)
+                                $scope.topSanPhamBanChayTaiQuay = Object.entries(productQuantityMap)
                                     .map(([productId, totalQuantity]) => {
                                         const sanPham = allSanPham.find(sp => sp.id === parseInt(productId));
                                         return { productId, totalQuantity, tenSanPham: sanPham ? sanPham.ten : 'N/A', maSanPham: sanPham ? sanPham.ma : 'N/A'
@@ -905,24 +905,24 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
                                 $scope.renderTopProductsChart(); // Hiển thị biểu đồ sau khi tính toán xong
 
                                 // Lấy sản phẩm bán chạy nhất
-                                $scope.topSanPhamBanChayNhat = $scope.topSanPhamBanChay[0];
+                                $scope.topSanPhamBanChayNhatTaiQuay = $scope.topSanPhamBanChayTaiQuay[0];
 
                                 // Phân trang cho top 10 sản phẩm bán chạy
                                 $scope.Size = 5; // Số lượng sản phẩm mỗi trang
                                 $scope.Page = 1; // Trang hiện tại
 
                                 // Tính tổng số trang
-                                $scope.Pages = Math.ceil($scope.topSanPhamBanChay.length / $scope.Size);
+                                $scope.Pages = Math.ceil($scope.topSanPhamBanChayTaiQuay.length / $scope.Size);
 
                                 // Hàm lấy danh sách sản phẩm cho trang hiện tại
-                                $scope.getPageData1 = function () {
+                                $scope.getPageData3 = function () {
                                     const startIndex = ($scope.Page - 1) * $scope.Size;
                                     const endIndex = startIndex + $scope.Size;
-                                    return $scope.topSanPhamBanChay.slice(startIndex, endIndex);
+                                    return $scope.topSanPhamBanChayTaiQuay.slice(startIndex, endIndex);
                                 };
 
-                                console.log("Top 10 sản phẩm bán chạy nhất trong ngày:", $scope.topSanPhamBanChay);
-                                console.log("Sản phẩm bán chạy nhất:", $scope.topSanPhamBanChayNhat);
+                                console.log("Top 10 sản phẩm bán chạy nhất trong ngày:", $scope.topSanPhamBanChayTaiQuay);
+                                console.log("Sản phẩm bán chạy nhất:", $scope.topSanPhamBanChayNhatTaiQuay);
                             })
                             .catch(function (error) {
                                 console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
