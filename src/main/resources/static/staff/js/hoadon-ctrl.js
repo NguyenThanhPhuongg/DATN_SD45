@@ -40,8 +40,8 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
 
             // Sắp xếp theo ngày cập nhật mới nhất
             filteredItems.sort((a, b) => {
-                const dateA = new Date(a.ngayCapNhat); // Giả sử `ngayCapNhat` là trường ngày
-                const dateB = new Date(b.ngayCapNhat);
+                const dateA = new Date(a.ngayTao); // Giả sử `ngayCapNhat` là trường ngày
+                const dateB = new Date(b.ngayTao);
                 return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
             });
 

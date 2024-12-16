@@ -35,6 +35,11 @@ app.controller("listproduct-ctrl", function ($scope, $http, $rootScope, $locatio
                 const matchesSearch = item.ma.toString().toLowerCase().includes($scope.searchText.toLowerCase()) || item.ten.toLowerCase().includes($scope.searchText.toLowerCase());
                 return matchesSearch && $scope.filterByAttributes(item) && statusMatches;
             });
+            filteredItems.sort((a, b) => {
+                const dateA = new Date(a.ngayTao); // Giả sử `ngayCapNhat` là trường ngày
+                const dateB = new Date(b.ngayTao);
+                return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
+            });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }

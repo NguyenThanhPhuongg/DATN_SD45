@@ -36,6 +36,12 @@ app.controller("size-ctrl", function ($scope, $http) {
                 const matchesIdCha = !$scope.selectedIdCha || item.idCha === Number($scope.selectedIdCha);
                 return matchesSearch && matchesIdCha;
             });
+            filteredItems.sort((a, b) => {
+                const dateA = new Date(a.ngayTao); // Giả sử `ngayCapNhat` là trường ngày
+                const dateB = new Date(b.ngayTao);
+                return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
+            });
+
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }

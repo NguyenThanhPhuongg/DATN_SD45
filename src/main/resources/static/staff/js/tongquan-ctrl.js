@@ -1058,4 +1058,5 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
                 console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
             });
     };
+
 });

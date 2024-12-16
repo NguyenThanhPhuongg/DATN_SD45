@@ -70,7 +70,7 @@
 .brands-section {
     background-color: #222;
     padding: 50px 0;
-    margin-left: calc(-50vw + 50%); /* Đảm bảo phần này không bị giới hạn */
+    /*margin-left: calc(-50vw + 50%); !* Đảm bảo phần này không bị giới hạn *!*/
 }
 
 .brand-wrapper {
