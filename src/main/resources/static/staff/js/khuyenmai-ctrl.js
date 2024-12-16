@@ -31,7 +31,11 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
                 const matchesLoai = !$scope.selectedLoai || item.loai === Number($scope.selectedLoai);
                 return matchesSearch && matchesLoai;
             });
-
+            filteredItems.sort((a, b) => {
+                const dateA = new Date(a.ngayTao); // Giả sử `ngayCapNhat` là trường ngày
+                const dateB = new Date(b.ngayTao);
+                return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
+            });
             // Cập nhật số trang
             this.count = Math.ceil(filteredItems.length / this.size);
             // Cập nhật danh sách các mục cho trang hiện tại

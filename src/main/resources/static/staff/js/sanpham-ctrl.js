@@ -1,4 +1,4 @@
-app.controller("sanpham-ctrl", function ($scope, $http) {
+app.controller("sanpham-ctrl", function ($scope, $http,$location) {
     $scope.items = [];
     $scope.form = {};
     $scope.danhmuc = [];
@@ -228,6 +228,8 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                             Promise.all(addDetailsPromises).then(() => {
                                 $scope.initialize();
                                 $scope.reset();
+                                $location.path('/listsanpham');
+                                toastr.success("Sản phẩm và chi tiết sản phẩm đã được thêm thành công", "Thành công!");
                             }).catch(error => {
                                 console.error("Lỗi khi thêm chi tiết sản phẩm:", error);
                             });
@@ -237,7 +239,6 @@ app.controller("sanpham-ctrl", function ($scope, $http) {
                     }).catch(error => {
                         console.error("Lỗi khi lấy sản phẩm mới nhất:", error);
                     });
-                    toastr.success("Sản phẩm và chi tiết sản phẩm đã được thêm thành công", "Thành công!");
                 }).catch(error => {
                     console.error("Có lỗi khi thêm sản phẩm", error);
                     $scope.errorMessage = "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.";

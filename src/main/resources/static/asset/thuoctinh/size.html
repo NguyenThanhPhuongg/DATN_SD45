@@ -24,9 +24,9 @@
                 <input type="text" ng-model="searchText" placeholder="Tìm kiếm..." class="form-control me-2"/>
                 <select ng-model="selectedIdCha" class="form-select me-2" ng-change="pager.updateItems()">
                     <option value="">Tất cả Size</option>
-                    <option value="1">Áo, Quần</option>
-                    <option value="2">Giầy, Dép</option>
-                    <option value="3">Khác</option>
+                    <option value="1">Áo</option>
+                    <option value="2">Quần</option>
+                    <option value="3">Phụ kiện</option>
                 </select>
             </div>
             <table class="table table-striped">
@@ -45,9 +45,9 @@
                     <td>{{$index + 1 + (pager.page * pager.size)}}</td>
                     <td>{{item.id}}</td>
                     <td>
-                        <span ng-if="item.idCha === 1">Áo, Quần</span>
-                        <span ng-if="item.idCha === 2">Giầy, Dép</span>
-                        <span ng-if="item.idCha === 3">Khác</span>
+                        <span ng-if="item.idCha === 1">Áo</span>
+                        <span ng-if="item.idCha === 2">Quần</span>
+                        <span ng-if="item.idCha === 3">Phụ kiện</span>
                     </td>
                     <td>{{item.ten}}</td>
                     <td>
@@ -128,9 +128,9 @@
                             <div class="col-md-7 mt-2">
                                 <label for="inputIDCha" class="form-label">Dành cho</label>
                                 <select class="form-select" aria-label="Default select example" ng-model="form.idCha">
-                                    <option ng-value="1" selected>Áo, Quần</option>
-                                    <option ng-value="2">Giầy, Dép</option>
-                                    <option ng-value="3">Khác</option>
+                                    <option ng-value="1" selected>Áo</option>
+                                    <option ng-value="2">Quần</option>
+                                    <option ng-value="3">Phụ kiện</option>
                                 </select>
                             </div>
 <!--                            <div class="col-md-6 mt-2">-->
@@ -186,9 +186,9 @@
                                 <label for="inputIDCha" class="form-label">Dành cho</label>
                                 <select class="form-select" aria-label="Default select example"
                                         ng-model="formAdd.idCha">
-                                    <option value="1" selected>Áo, Quần</option>
-                                    <option value="2">Giầy, Dép</option>
-                                    <option value="3">Khác</option>
+                                    <option value="1" selected>Áo</option>
+                                    <option value="2">Quần</option>
+                                    <option value="3">Phụ kiện</option>
                                 </select>
                             </div>
                             <div class="col-md-12 mt-2">

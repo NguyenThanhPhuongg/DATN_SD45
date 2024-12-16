@@ -43,6 +43,11 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                 const matchesSearch = item.id.toString().toLowerCase().includes($scope.searchText.toLowerCase());
                 return matchesSearch && statusMatches;
             });
+            filteredItems.sort((a, b) => {
+                const dateA = new Date(a.ngayTao); // Giả sử `ngayCapNhat` là trường ngày
+                const dateB = new Date(b.ngayTao);
+                return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
+            });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }

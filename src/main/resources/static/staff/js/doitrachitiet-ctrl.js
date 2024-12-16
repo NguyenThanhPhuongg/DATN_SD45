@@ -33,6 +33,11 @@ app.controller("chitietdoitra-ctrl", function ($scope, $http, $rootScope) {
             const filteredItems = $scope.items.filter(item => {
                 return item.idYeuCauDoiTra === $scope.selectedId;
             });
+            filteredItems.sort((a, b) => {
+                const dateA = new Date(a.ngayTao); // Giả sử `ngayCapNhat` là trường ngày
+                const dateB = new Date(b.ngayTao);
+                return dateB - dateA; // Sắp xếp theo thứ tự giảm dần
+            });
             this.count = Math.ceil(filteredItems.length / this.size);
             this.items = filteredItems.slice(this.page * this.size, (this.page + 1) * this.size);
         }
