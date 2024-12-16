@@ -378,7 +378,7 @@ CREATE TABLE [hoa_don]
     [ngay_dat_hang] DATETIME DEFAULT GETDATE(),
     [ngay_giao_hang] DATETIME,
     [ngay_thanh_toan] DATETIME DEFAULT GETDATE(),
-    [tong_tien] DECIMAL(10,2),
+    [tong_tien] DECIMAL(18,2),
     [diem_su_dung] INT,
     [ly_do_huy] NVARCHAR(300),
     [trang_thai] INT DEFAULT 1,
@@ -406,7 +406,7 @@ CREATE TABLE [chi_tiet_hoa_don]
     [id_hoa_don] BIGINT,
     [id_san_pham_chi_tiet] BIGINT,
     [so_luong] INT,
-    [gia] DECIMAL(10,2),
+    [gia] DECIMAL(18,2),
     [trang_thai] INT DEFAULT 1,
     [trang_thai_doi_tra] INT ,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
@@ -450,7 +450,7 @@ CREATE TABLE [chi_tiet_gio_hang]
     [id_gio_hang] BIGINT,
     [id_san_pham_chi_tiet] BIGINT,
     [so_luong] INT,
-    [gia] DECIMAL(10,2),
+    [gia] DECIMAL(18,2),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
@@ -540,7 +540,7 @@ CREATE TABLE [san_pham]
     [ma] NVARCHAR(200),
     [xuat_xu] NVARCHAR(200),
     [mo_ta] NVARCHAR(MAX),
-    [gia] DECIMAL(10,2),
+    [gia] DECIMAL(18,2),
     [anh] NVARCHAR(MAX),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
@@ -565,7 +565,7 @@ CREATE TABLE [chi_tiet_san_pham]
     [id_size] BIGINT,
     [id_mau_sac] BIGINT,
     [so_luong] INT,
-    [gia] DECIMAL(10,2),
+    [gia] DECIMAL(18,2),
     [ghi_chu] NVARCHAR(MAX),
     [trang_thai] INT DEFAULT 1,
     [ngay_tao] DATETIME DEFAULT GETDATE(),
@@ -679,7 +679,7 @@ CREATE TABLE [khuyen_mai]
     [ma] VARCHAR(100),
     [mo_ta] NVARCHAR(1000),
     [loai] INT,
-    [gia_tri] DECIMAL(10,2),
+    [gia_tri] DECIMAL(18,2),
     [ngay_bat_dau] DATETIME,
     [ngay_ket_thuc] DATETIME,
     [trang_thai] INT DEFAULT 1,
@@ -688,7 +688,6 @@ CREATE TABLE [khuyen_mai]
     [nguoi_tao] BIGINT,
     [nguoi_cap_nhat] BIGINT
 ) ON [PRIMARY];
-
 GO
 
 --- ap dung khuyen mai
@@ -707,7 +706,7 @@ CREATE TABLE [ap_dung_khuyen_mai]
     [id_khuyen_mai] BIGINT,
     [id_san_pham] BIGINT,
     [id_nguoi_dung] BIGINT,
-    [gia_tri_giam] DECIMAL(10,2),
+    [gia_tri_giam] DECIMAL(18,2),
     [ngay_ap_dung] DATETIME,
     [trang_thai] INT DEFAULT 1,
     [da_su_dung] BIT,

@@ -1059,4 +1059,296 @@ app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) 
             });
     };
 
+    $scope.selectTimeFrameTaiQuay = function(timeFrame) {
+        const today = new Date();
+        let startDate, endDate, startDonHang, endDonHang;
+
+        // Lấy ngày bắt đầu và kết thúc của khoảng thời gian đã chọn
+        if (timeFrame === 'today') {
+            startDate = new Date(today.setHours(0, 0, 0, 0));
+            endDate = new Date(today.setHours(23, 59, 59, 999));
+            startDonHang = new Date(today.setHours(0, 0, 0, 0));
+            endDonHang = new Date(today.setHours(23, 59, 59, 999));
+        } else if (timeFrame === 'week') {
+            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())); // Chủ nhật tuần này
+            startOfWeek.setHours(0, 0, 0, 0);
+            startDate = startOfWeek;
+            endDate = new Date(startOfWeek);
+            endDate.setDate(startOfWeek.getDate() + 6); // Cuối tuần
+            endDate.setHours(23, 59, 59, 999);
+
+            const startOfWeekDH = new Date(today.setDate(today.getDate() - today.getDay())); // Chủ nhật tuần này
+            startOfWeekDH.setHours(0, 0, 0, 0);
+            startDonHang = startOfWeekDH;
+            endDonHang = new Date(startOfWeekDH);
+            endDonHang.setDate(startOfWeekDH.getDate() + 6); // Cuối tuần
+            endDonHang.setHours(23, 59, 59, 999);
+        } else if (timeFrame === 'month') {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
+            startDate.setHours(0, 0, 0, 0);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
+            endDate.setHours(23, 59, 59, 999);
+
+            startDonHang = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
+            startDonHang.setHours(0, 0, 0, 0);
+            endDonHang = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
+            endDonHang.setHours(23, 59, 59, 999);
+        } else if (timeFrame === 'year') {
+            startDate = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
+            startDate.setHours(0, 0, 0, 0);
+            endDate = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
+            endDate.setHours(23, 59, 59, 999);
+
+            startDonHang = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
+            startDonHang.setHours(0, 0, 0, 0);
+            endDonHang = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
+            endDonHang.setHours(23, 59, 59, 999);
+        } else if (timeFrame === 'all') {
+            // startDate = new Date(0);  // Không giới hạn ngày bắt đầu (Epoch start)
+            startDate = new Date(0);  // Ngày bắt đầu hợp lý hơn
+            endDate = new Date();    // Không giới hạn ngày kết thúc (hiện tại)
+
+            startDonHang = new Date(0);  // Ngày bắt đầu hợp lý hơn
+            endDonHang = new Date();    // Không giới hạn ngày kết thúc (hiện tại)
+        }
+
+        // Gọi filterAndCalculate để lọc và tính toán doanh thu, số lượng và danh sách sản phẩm bán chạy
+        $scope.filterAndCalculateTaiQuay(startDate, endDate);
+        $scope.filterAndCalculateTaiQuay(startDonHang, endDonHang);
+
+    };
+
+    $scope.filterAndCalculateTaiQuay = function(startDate, endDate) {
+        // Lọc các đơn hàng trong khoảng thời gian đã chọn
+        const filteredItems = $scope.items.filter(item => {
+            const statusMatches = item.trangThai === 7;
+            const ngayCapNhat = new Date(item.ngayCapNhat);
+            return statusMatches && ngayCapNhat >= startDate && ngayCapNhat <= endDate;
+        });
+        // Tính doanh thu và số lượng cho khoảng thời gian này
+        $scope.doanhThuTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
+        $scope.soLuongTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.soLuong), 0);
+
+        // Lấy danh sách sản phẩm từ API /san-pham
+        $http.get('/san-pham')
+            .then(function(sanPhamResponse) {
+                const SanPham = sanPhamResponse.data.data;
+
+                // Lấy chi tiết sản phẩm từ API /spct
+                $http.get('/spct')
+                    .then(function(spctResponse) {
+                        const SanPhamChiTiet = spctResponse.data.data;
+
+                        // Lấy danh sách hóa đơn chi tiết từ API /hoa-don-chi-tiet
+                        $http.get('/hoa-don-chi-tiet')
+                            .then(function(hdctResponse) {
+                                const HoaDonChiTiet = hdctResponse.data.data;
+                                const invoiceIds = filteredItems.map(item => item.id);
+                                const filteredHdct = HoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
+
+                                // Tính tổng số lượng các sản phẩm bán ra
+                                $scope.soLuongNgayTaiQuay = filteredHdct.reduce((total, item) => total + parseFloat(item.soLuong), 0);
+
+                                const productQuantity = {};
+
+                                // Tính tổng số lượng của các sản phẩm
+                                filteredHdct.forEach(hdctItem => {
+                                    const spct = SanPhamChiTiet.find(spct => spct.id === hdctItem.idSanPhamChiTiet);
+                                    if (spct) {
+                                        const productId = spct.idSanPham;
+                                        const quantity = parseFloat(hdctItem.soLuong);
+                                        productQuantity[productId] = (productQuantity[productId] || 0) + quantity;
+                                    }
+                                });
+
+                                // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
+                                $scope.SanPhamBanChayTaiQuay = Object.entries(productQuantity)
+                                    .map(([productId, totalQuantity]) => {
+                                        const sanPham = SanPham.find(sp => sp.id === parseInt(productId));
+                                        return {
+                                            productId,
+                                            totalQuantity,
+                                            tenSanPham: sanPham ? sanPham.ten : 'N/A',
+                                            maSanPham: sanPham ? sanPham.ma : 'N/A'
+                                        };
+                                    })
+                                    .sort((a, b) => b.totalQuantity - a.totalQuantity)
+                                    .slice(0, 10); // Lấy top 10 sản phẩm bán chạy nhất
+
+                                // Lấy sản phẩm bán chạy nhất
+                                $scope.SanPhamBanChayNhatTaiQuay = $scope.SanPhamBanChayTaiQuay[0];
+                                $scope.renderTopProductsChart4();
+
+                                console.log("Top 10 sản phẩm bán chạy nhất trong khoảng thời gian:", $scope.SanPhamBanChayTaiQuay);
+                                console.log("Sản phẩm bán chạy nhất:", $scope.SanPhamBanChayNhatTaiQuay);
+                            })
+                            .catch(function(error) {
+                                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
+                            });
+                    })
+                    .catch(function(error) {
+                        console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
+                    });
+            })
+            .catch(function(error) {
+                console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
+            });
+
+    };
+
+    $scope.selectCustomTimeFrameTaiQuay = function() {
+        if ($scope.startDate && $scope.endDate) {
+            const startDate = new Date($scope.startDate);
+            const endDate = new Date($scope.endDate);
+
+            // Gọi filterAndCalculate để lọc và tính toán doanh thu, số lượng
+            $scope.filterAndCalculateTaiQuay(startDate, endDate);
+        }
+    };
+
+    $scope.renderTopProductsChart4 = function() {
+        // Kiểm tra nếu biểu đồ đã tồn tại, hủy nó trước khi vẽ mới
+        if ($scope.topProductsChart) {
+            $scope.topProductsChart.destroy(); // Hủy bỏ biểu đồ cũ
+        }
+
+        // Dữ liệu cho biểu đồ
+        const labels = $scope.SanPhamBanChayTaiQuay.map(product => product.tenSanPham);
+        const quantities = $scope.SanPhamBanChayTaiQuay.map(product => product.totalQuantity);
+
+        // Cấu hình biểu đồ
+        const ctx = document.getElementById('topProductsChart4').getContext('2d');
+        $scope.topProductsChart = new Chart(ctx, {
+            type: 'bar',  // Loại biểu đồ: bar (cột)
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sản phẩm bán chạy',
+                    data: quantities,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền của các cột
+                    borderColor: 'rgba(75, 192, 192, 1)', // Màu viền của các cột
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true // Đảm bảo trục y bắt đầu từ 0
+                    }
+                }
+            }
+        });
+    };
+
+    $scope.selectTimeFrame1TaiQuay = function(timeFrame) {
+        const today = new Date();
+        let startDonHang, endDonHang;
+
+        if (timeFrame === 'today') {
+            startDonHang = new Date(today.setHours(0, 0, 0, 0));
+            endDonHang = new Date(today.setHours(23, 59, 59, 999));
+        } else if (timeFrame === 'week') {
+            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+            startDonHang = new Date(startOfWeek.setHours(0, 0, 0, 0));
+            endDonHang = new Date(today.setDate(startOfWeek.getDate() + 6));
+            endDonHang.setHours(23, 59, 59, 999);
+        } else if (timeFrame === 'month') {
+            startDonHang = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDonHang = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            endDonHang.setHours(23, 59, 59, 999);
+        } else if (timeFrame === 'year') {
+            startDonHang = new Date(today.getFullYear(), 0, 1);
+            endDonHang = new Date(today.getFullYear(), 11, 31);
+            endDonHang.setHours(23, 59, 59, 999);
+        } else if (timeFrame === 'all') {
+            startDonHang = new Date(0);
+            endDonHang = new Date();
+        }
+
+        $scope.filterDonhangTaiQuay(startDonHang, endDonHang);
+        $scope.renderTopProductsChart5();
+    };
+
+    $scope.filterDonhangTaiQuay = function(startDate, endDate) {
+        $scope.filteredItemsForChartTaiQuay = $scope.items.filter(item => {
+            const ngayCapNhat = new Date(item.ngayCapNhat);
+            return ngayCapNhat >= startDate && ngayCapNhat <= endDate;
+        });
+        $scope.donHangThanhCongOnline = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 5).length;
+        // Đếm số lượng đơn hàng theo trạng thái trong dữ liệu đã lọc
+        $scope.donHangThanhCongTaiQuay = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 7).length;
+    };
+
+    $scope.renderTopProductsChart5 = function() {
+        if (!$scope.filteredItemsForChartTaiQuay || $scope.filteredItemsForChartTaiQuay.length === 0) {
+            console.log('Không có dữ liệu để vẽ biểu đồ.');
+            return;
+        }
+
+        // Đếm số lượng đơn hàng theo trạng thái
+        const countTrangThai5 = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 5).length;
+        const countTrangThai7 = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 7).length;
+
+        // Dữ liệu cho biểu đồ
+        const labels = ['Tại quầy','Online'];
+        const data = [ countTrangThai7, countTrangThai5];
+
+        // Hủy biểu đồ cũ nếu tồn tại
+        if ($scope.topProductsChart) {
+            $scope.topProductsChart.destroy();
+        }
+
+        // Cấu hình và vẽ biểu đồ
+        const ctx = document.getElementById('topProductsChart5').getContext('2d');
+        $scope.topProductsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Số lượng đơn hàng',
+                    data: data,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    };
+
+    $scope.selectCustomTimeFrameDonHangTaiQuay = function() {
+        if ($scope.startDonHang && $scope.endDonHang) {
+            const startDonHang = new Date($scope.startDonHang);
+            const endDonHang = new Date($scope.endDonHang);
+
+            $scope.filterDonhangTaiQuay(startDonHang, endDonHang);
+            $scope.renderTopProductsChart5();
+        }
+    };
+
 });

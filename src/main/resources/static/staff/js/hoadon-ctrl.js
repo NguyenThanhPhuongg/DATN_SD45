@@ -92,6 +92,8 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
                 return "đã giao";
             case 5:
                 return "đã hủy";
+            case 7:
+                return "tại quầy";
             default:
                 return "không xác định";
         }

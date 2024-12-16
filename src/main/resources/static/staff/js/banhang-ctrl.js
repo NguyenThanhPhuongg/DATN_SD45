@@ -616,7 +616,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             // Bắt đầu gọi API thanh toánh sau 5s
             bill.bankPaymentInterval = setTimeout(() => {
                 monitorBankPayment(bill);
-            }, 5000);
+            }, 20000);
         }
     };
 

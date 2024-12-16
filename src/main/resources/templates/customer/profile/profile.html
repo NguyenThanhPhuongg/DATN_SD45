@@ -1670,6 +1670,13 @@
         <h2>Yêu cầu đổi trả</h2>
         <form id="request-return-form">
             <!-- Loại yêu cầu -->
+            <!-- Danh sách sản phẩm chi tiết để chọn -->
+            <label for="product-list">Chọn sản phẩm:</label>
+            <div id="product-list" class="product-list">
+                <!-- Các sản phẩm sẽ được hiển thị ở đây -->
+            </div>
+            <br/>
+
             <label for="type">Loại yêu cầu:</label>
             <select id="type" name="type" required onchange="toggleFields()">
                 <option value="DOI_HANG">Đổi hàng</option>
@@ -1708,13 +1715,6 @@
                 <!-- Preview sẽ hiển thị ở đây -->
             </div>
             <br/>
-            <br/>
-
-            <!-- Danh sách sản phẩm chi tiết để chọn -->
-            <label for="product-list">Chọn sản phẩm:</label>
-            <div id="product-list" class="product-list">
-                <!-- Các sản phẩm sẽ được hiển thị ở đây -->
-            </div>
             <br/>
 
             <!-- Nút Gửi yêu cầu -->
@@ -1933,7 +1933,7 @@
                 // Hiển thị tổng tiền hoàn lại cho đơn hàng
                 const totalDiv = document.createElement('div');
                 totalDiv.classList.add('order-total');
-                totalDiv.innerHTML = `<strong>Số tiền đã hoàn lại: ${totalRefund.toLocaleString('vi-VN')}₫</strong>`;  // Hiển thị tổng số tiền hoàn lại
+                // totalDiv.innerHTML = `<strong>Số tiền: ${totalRefund.toLocaleString('vi-VN')}₫</strong>`;  // Hiển thị tổng số tiền hoàn lại
                 orderContainer.appendChild(orderDetails);
                 orderContainer.appendChild(totalDiv);
 
