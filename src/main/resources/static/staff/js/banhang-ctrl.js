@@ -19,7 +19,6 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             console.log($scope.sliderPosition)
         }
     };
-
     $scope.nextTab = function () {
         if ($scope.sliderPosition < $scope.maxSliderPosition) {
             $scope.sliderPosition++;
@@ -35,12 +34,12 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         return '0';
     };
 
-
+    //Lưu thông tin hóa đơn vào bộ nhớ trình duyệt
     $scope.saveBillsToLocalStorage = function() {
         localStorage.setItem('bills', JSON.stringify($scope.bills));
     };
 
-
+    // Ds sp khuyến mãi
     $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
         .then(function (response) {
             let arrKm = response.data.data;
@@ -58,6 +57,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
         });
 
+    // Ds chương trình khuyến mãi
     $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
         .then(function (response) {
             let arrKm = response.data.data;
@@ -153,6 +153,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         }
     }
 
+// End Thiết lập Firebase
 
     $scope.clearData = function () {
         ref.remove()
@@ -612,21 +613,18 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             // Tạo URL QR
             bill.payQRbank = `${BASE_QR_URL}?amount=${AMOUNT}&addInfo=${DESCRIPTION}&accountName=${ACCOUNT_NAME}`;
 
-            // Theo dõi trạng thái thanh toán ngân hàng
+            // Bắt đầu gọi API thanh toánh sau 5s
             bill.bankPaymentInterval = setTimeout(() => {
                 monitorBankPayment(bill);
-            }, 10000);
+            }, 5000);
         }
     };
 
 
     // Chuyển khoản thành công
     function monitorBankPayment(bill) {
-        let maxRetries = 20; // Giới hạn số lần gọi API
+        let maxRetries = 250; // Giới hạn số lần gọi API
         let retries = 0;
-        // console.log($scope.getTotalAmount(bill))
-        // return;
-        // Hàm kiểm tra thanh toán
         const checkPayment = () => {
             $http.get("https://script.google.com/macros/s/AKfycbzwaATXVmdDh8H7-PhdUBnnAyJZcd2UuZC8i5Q2JQ_h-bdToM_5IXIlo6uBXUVhvRZ3/exec")
                 .then(resp => {
@@ -661,23 +659,19 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         // Đặt interval
         bill.bankPaymentInterval = setInterval(checkPayment, 1000);
 
-        // Tự động dừng sau 40 giây nếu chưa thành công
+        // Tự động dừng sau 5 phút nếu chưa thành công
         setTimeout(() => {
             if (!bill.bankSuccess) {
                 alert("Quá thời gian chờ thanh toán.");
                 clearInterval(bill.bankPaymentInterval);
                 bill.bankPaymentInterval = null;
             }
-        }, 40000);
+        }, 300000);
     }
 
-
-    // $scope.calculatePoints = function (bill) {
-    //     return Math.floor(bill.totalBillLast / 1000); // Tính điểm tích lũy
-    // };
+    // Thanh toán
     $scope.payBill = function (bill) {
         //bill.totalBillLast = $scope.getTotalAmount(bill)
-        console.log(bill);
         bill.billDiem = Math.floor($scope.getTotalAmount(bill) / 1000)
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
