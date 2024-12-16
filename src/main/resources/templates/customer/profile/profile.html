@@ -1903,8 +1903,10 @@
                         }
 
                         // Tính số tiền hoàn lại cho sản phẩm
-                        const thanhTien = hdct.gia * soLuong;
-                        totalRefund += thanhTien;  // Cộng vào tổng tiền hoàn lại
+                        if (hdct.trangThaiDoiTra === 2) {
+                            thanhTien = hdct.gia * soLuong;
+                            totalRefund += thanhTien;  // Cộng vào tổng tiền hoàn lại
+                        }
 
                         orderItem.innerHTML = `
                         <h3>
@@ -1931,7 +1933,7 @@
                 // Hiển thị tổng tiền hoàn lại cho đơn hàng
                 const totalDiv = document.createElement('div');
                 totalDiv.classList.add('order-total');
-                totalDiv.innerHTML = `<strong>Số tiền hoàn lại: ${totalRefund.toLocaleString('vi-VN')}₫</strong>`;  // Hiển thị tổng số tiền hoàn lại
+                totalDiv.innerHTML = `<strong>Số tiền đã hoàn lại: ${totalRefund.toLocaleString('vi-VN')}₫</strong>`;  // Hiển thị tổng số tiền hoàn lại
                 orderContainer.appendChild(orderDetails);
                 orderContainer.appendChild(totalDiv);
 
