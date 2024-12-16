@@ -208,7 +208,7 @@ public class UserProcessor {
         user.setPassword(hashedPass);
         user.setRole(model.getRole() != null ? model.getRole() : UserRoles.CLIENT);
         user.setStatus(UserStatus.ACTIVE);
-        user.setType(UserType.NORMAL);
+        user.setType(model.getType() != null ? model.getType() : UserType.NORMAL);
         user.setXacThuc(false);
         user.setNgayTao(LocalDateTime.now());
         user.setNgayCapNhat(LocalDateTime.now());
