@@ -183,7 +183,7 @@ function renderCart(items) {
     items.forEach(item => {
         const sanPham = item.sanPham || {}; // Xử lý trường hợp sanPham là null
         const sanPhamChiTiet = item.sanPhamChiTiet || {};
-        const gia = item.giaSauKhuyenMai ? item.giaSauKhuyenMai : item.gia;
+        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.gia;
         const total = gia * item.soLuong;
         totalAmount += total;
         const productItem = document.createElement('div');

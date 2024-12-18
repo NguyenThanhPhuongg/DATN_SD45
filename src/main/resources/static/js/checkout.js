@@ -449,7 +449,7 @@ function populateTable(data) {
     let totalItemPrice = 0; // Variable to store total item price
 
     data.forEach(item => {
-        const gia = item.giaSauKhuyenMai ? item.giaSauKhuyenMai : item.gia;
+        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.gia;
         const soLuong = item.soLuong; // Get quantity
         const tongCong = gia * soLuong; // Calculate total
 
@@ -830,17 +830,29 @@ function selectVoucher() {
 
 function updateTotalPayment() {
     const totalItemPriceText = document.getElementById('totalItemPrice').textContent;
-    console.log('totalItemPriceText', totalItemPriceText);  // In ra: "2.000.000 đ"
+    console.log('totalItemPriceText', totalItemPriceText); // In ra: "2.000.000 đ"
 
-// Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
+    // Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
     const totalItemPrice = parseFloat(totalItemPriceText.replace(/[^\d.-]/g, '').replace(/\./g, ''));
-    console.log('totalItemPrice', totalItemPrice);  // In ra: 2000000
+    console.log('totalItemPrice', totalItemPrice);
 
     const shippingFee = 30000; // Default shipping fee
-    const totalPayment = totalItemPrice + shippingFee - selectedVoucherValue; // Subtract the voucher value and add shipping fee
+    let totalPayment = totalItemPrice + shippingFee - selectedVoucherValue;
+    let totalPriceWithoutShipping = totalItemPrice - selectedVoucherValue;
+
+    if (totalPayment < 0) {
+        totalPayment = 0;
+    }
+
+    if (totalPriceWithoutShipping < 0) {
+        totalPriceWithoutShipping = 0;
+    }
+
     console.log('totalPayment', totalPayment);
+    console.log('totalPriceWithoutShipping', totalPriceWithoutShipping);
+
     document.getElementById('totalPayment').textContent = `${totalPayment.toLocaleString()} đ`;
-    document.querySelector('.total-price').textContent = `Tổng Cộng: ${(totalItemPrice - selectedVoucherValue).toLocaleString()} ₫`; // Update the total price without shipping fee
+    document.querySelector('.total-price').textContent = `Tổng Cộng: ${totalPriceWithoutShipping.toLocaleString()} ₫`;
     document.getElementById('voucherDiscount').textContent = `${selectedVoucherValue.toLocaleString()} đ`;
 }
 

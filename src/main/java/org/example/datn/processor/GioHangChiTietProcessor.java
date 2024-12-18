@@ -65,11 +65,11 @@ public class GioHangChiTietProcessor {
         if (request.getSoLuong() > soLuongConLai) {
             throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
         }
-       service.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(gioHang.getId(), spct.getId(), StatusGioHang.CHUA_DAT_HANG.getValue()).ifPresent(g -> {
-           if (request.getSoLuong() + g.getSoLuong() > soLuongConLai) {
-               throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
-           }
-       });
+        service.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(gioHang.getId(), spct.getId(), StatusGioHang.CHUA_DAT_HANG.getValue()).ifPresent(g -> {
+            if (request.getSoLuong() + g.getSoLuong() > soLuongConLai) {
+                throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho.");
+            }
+        });
         var gioHangChiTiet = service.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(gioHang.getId(), spct.getId(), StatusGioHang.CHUA_DAT_HANG.getValue());
 
         if (gioHangChiTiet.isPresent()) {
@@ -192,7 +192,9 @@ public class GioHangChiTietProcessor {
                 }
 
                 if (hasValidPromotion) {
-                    model.setGiaSauKhuyenMai(spctModel.getGia().subtract(giaSauKhuyenMai));
+                    giaSauKhuyenMai = spctModel.getGia().subtract(giaSauKhuyenMai);
+                    giaSauKhuyenMai.max(BigDecimal.ZERO);
+                    model.setGiaSauKhuyenMai(giaSauKhuyenMai);
                 } else {
                     model.setGiaSauKhuyenMai(null);
                 }
@@ -265,7 +267,9 @@ public class GioHangChiTietProcessor {
                 }
 
                 if (hasValidPromotion) {
-                    model.setGiaSauKhuyenMai(spctModel.getGia().subtract(giaSauKhuyenMai));
+                    giaSauKhuyenMai = spctModel.getGia().subtract(giaSauKhuyenMai);
+                   giaSauKhuyenMai.max(BigDecimal.ZERO);
+                    model.setGiaSauKhuyenMai(giaSauKhuyenMai);
                 } else {
                     model.setGiaSauKhuyenMai(null);
                 }
