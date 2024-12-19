@@ -192,9 +192,7 @@ public class GioHangChiTietProcessor {
                 }
 
                 if (hasValidPromotion) {
-                    giaSauKhuyenMai = spctModel.getGia().subtract(giaSauKhuyenMai);
-                    giaSauKhuyenMai.max(BigDecimal.ZERO);
-                    model.setGiaSauKhuyenMai(giaSauKhuyenMai);
+                    model.setGiaSauKhuyenMai(spctModel.getGia().subtract(giaSauKhuyenMai).max(BigDecimal.ZERO));
                 } else {
                     model.setGiaSauKhuyenMai(null);
                 }
@@ -267,9 +265,7 @@ public class GioHangChiTietProcessor {
                 }
 
                 if (hasValidPromotion) {
-                    giaSauKhuyenMai = spctModel.getGia().subtract(giaSauKhuyenMai);
-                   giaSauKhuyenMai.max(BigDecimal.ZERO);
-                    model.setGiaSauKhuyenMai(giaSauKhuyenMai);
+                    model.setGiaSauKhuyenMai(spctModel.getGia().subtract(giaSauKhuyenMai).max(BigDecimal.ZERO));
                 } else {
                     model.setGiaSauKhuyenMai(null);
                 }

@@ -267,11 +267,9 @@ public class SanPhamProcessor {
             }
 
             if (hasValidPromotion) {
-                if (giaSauKhuyenMai.compareTo(sanPham.getGia()) >= 0) {
-                    model.setGiaSauKhuyenMai(BigDecimal.ZERO);
-                } else {
-                    model.setGiaSauKhuyenMai(sanPham.getGia().subtract(giaSauKhuyenMai));
-                }
+                model.setGiaSauKhuyenMai(sanPham.getGia().subtract(giaSauKhuyenMai).max(BigDecimal.ZERO));
+            } else {
+                model.setGiaSauKhuyenMai(null);
             }
 
             return model;
