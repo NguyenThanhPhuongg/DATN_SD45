@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ViewProductDetailController {
     @GetMapping("/productDetail/{id}")
     public String productDetail() {
-        return "/customer/productDetail/index";
+        return "customer/productDetail/index";
     }
 }
