@@ -7,43 +7,80 @@ $(document).ready(function () {
 
     let allProducts = []; // Mảng lưu tất cả các sản phẩm
 
+    // function fetchProducts() {
+    //     $.ajax({
+    //         url: '/san-pham',
+    //         method: 'GET',
+    //         dataType: 'json',
+    //         success: function (response) {
+    //             const products = response.data;
+    //
+    //             if (Array.isArray(products)) {
+    //                 allProducts = products.filter(product => product.trangThai === 1);  // Lọc sản phẩm có trangThai là 1
+    //
+    //                 // Lấy giá khuyến mãi dựa trên tên sản phẩm
+    //                 const searchPromises = allProducts.map(product => {
+    //                     return $.ajax({
+    //                         url: 'san-pham/search',
+    //                         method: 'POST',
+    //                         contentType: 'application/json',
+    //                         data: JSON.stringify({
+    //                             keyword: product.ten
+    //                         })
+    //                     }).then(searchResponse => {
+    //                         const foundProduct = searchResponse.data.find(p => p.id === product.id);
+    //                         product.giaSauKhuyenMai = foundProduct ? foundProduct.giaSauKhuyenMai : product.gia;
+    //                     });
+    //                 });
+    //
+    //                 // Chờ tất cả các yêu cầu API hoàn tất
+    //                 Promise.all(searchPromises).then(() => {
+    //                     allProducts.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao));
+    //                     displayProducts(currentPage);
+    //
+    //                     if (currentPage < totalPages - 1) {
+    //                         $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
+    //                     } else {
+    //                         $('#load-more').hide();
+    //                     }
+    //                 });
+    //             } else {
+    //                 console.error('Expected array but got:', products);
+    //             }
+    //         },
+    //         error: function (error) {
+    //             console.error('Error fetching products:', error);
+    //         }
+    //     });
+    // }
+
     function fetchProducts() {
         $.ajax({
-            url: '/san-pham',
-            method: 'GET',
-            dataType: 'json',
+            url: '/san-pham/search',  // Dùng API search thay vì /san-pham
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                keyword: ""  // Truyền từ khóa tìm kiếm rỗng để lấy tất cả sản phẩm
+            }),
             success: function (response) {
                 const products = response.data;
 
                 if (Array.isArray(products)) {
-                    allProducts = products.filter(product => product.trangThai === 1);  // Lọc sản phẩm có trangThai là 1
+                    // Lọc sản phẩm có trạng thái là 1 (đang hoạt động)
+                    allProducts = products.filter(product => product.trangThai === 1);
 
-                    // Lấy giá khuyến mãi dựa trên tên sản phẩm
-                    const searchPromises = allProducts.map(product => {
-                        return $.ajax({
-                            url: 'san-pham/search',
-                            method: 'POST',
-                            contentType: 'application/json',
-                            data: JSON.stringify({
-                                keyword: product.ten
-                            })
-                        }).then(searchResponse => {
-                            const foundProduct = searchResponse.data.find(p => p.id === product.id);
-                            product.giaSauKhuyenMai = foundProduct ? foundProduct.giaSauKhuyenMai : product.gia;
-                        });
-                    });
+                    // Sắp xếp các sản phẩm theo ngày tạo
+                    allProducts.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao));
 
-                    // Chờ tất cả các yêu cầu API hoàn tất
-                    Promise.all(searchPromises).then(() => {
-                        allProducts.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao));
-                        displayProducts(currentPage);
+                    // Hiển thị sản phẩm lên trang
+                    displayProducts(currentPage);
 
-                        if (currentPage < totalPages - 1) {
-                            $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
-                        } else {
-                            $('#load-more').hide();
-                        }
-                    });
+                    // Kiểm tra và điều chỉnh hiển thị nút Load More
+                    if (currentPage < totalPages - 1) {
+                        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
+                    } else {
+                        $('#load-more').hide();
+                    }
                 } else {
                     console.error('Expected array but got:', products);
                 }
@@ -53,6 +90,7 @@ $(document).ready(function () {
             }
         });
     }
+
 
     // Gọi hàm để hiển thị sản phẩm ngay khi trang tải
     $(document).ready(function () {
@@ -108,29 +146,11 @@ $(document).ready(function () {
                         $('#productPrice').text(product.gia.toLocaleString() + ' ₫'); // Giá sản phẩm
                         $('#productDescription').text(product.moTa); // Mô tả ngắn
 
-                        // Lấy giaSauKhuyenMai từ API search
-                        $.ajax({
-                            url: '/san-pham/search',
-                            method: 'POST',
-                            contentType: 'application/json',
-                            data: JSON.stringify({
-                                keyword: product.ten
-                            }),
-                            success: function (searchResponse) {
-                                const foundProduct = searchResponse.data?.find(p => p.id === product.id);
-                                if (foundProduct) {
-                                    const giaSauKhuyenMai = foundProduct.giaSauKhuyenMai;
-                                    if (giaSauKhuyenMai && giaSauKhuyenMai < product.gia) {
-                                        const formattedSalePrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(giaSauKhuyenMai);
-                                        $('#productSalePrice').text(formattedSalePrice);  // Hiển thị giá sau khuyến mãi
-                                        $('#productPrice').css('text-decoration', 'line-through');  // Gạch ngang giá gốc
-                                    }
-                                }
-                            },
-                            error: function (error) {
-                                console.error("Error fetching sale price:", error);
-                            }
-                        });
+                        if (product.giaSauKhuyenMai != null) {
+                            const formattedSalePrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauKhuyenMai);
+                            $('#productSalePrice').text(formattedSalePrice);  // Hiển thị giá sau khuyến mãi
+                            $('#productPrice').css('text-decoration', 'line-through');  // Gạch ngang giá gốc
+                        }
 
                         //image
                         $(document).ready(function() {
@@ -604,12 +624,23 @@ $(document).ready(function () {
 
     // Hàm tạo HTML cho từng sản phẩm
     function createProductHtml(product) {
-        const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia);
-        const formattedSalePrice = product.giaSauKhuyenMai ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauKhuyenMai) : '';
+        console.log('product:', product);
 
-        // Kiểm tra giá sau khuyến mãi và ẩn thẻ nếu không có
-        const salePriceHTML = product.giaSauKhuyenMai ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>` : '';
-        const oldPriceClass = product.giaSauKhuyenMai ? 'text-decoration: line-through;' : '';
+        // Định dạng giá gốc
+        const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.gia);
+
+        // Kiểm tra giaSauKhuyenMai, nếu có giá trị thì hiển thị giá sau khuyến mãi
+        const formattedSalePrice = product.giaSauKhuyenMai != null
+            ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauKhuyenMai)
+            : '';
+
+        // Nếu có giá sau khuyến mãi thì tạo HTML cho giá sau khuyến mãi, nếu không thì không có gì
+        const salePriceHTML = product.giaSauKhuyenMai != null
+            ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>`
+            : '';
+
+        // Nếu có giá khuyến mãi, gạch ngang giá gốc
+        const oldPriceClass = product.giaSauKhuyenMai != null ? 'text-decoration: line-through;' : '';
 
         return `
         <div class="product d-flex flex-column align-items-center justify-content-between">
@@ -617,7 +648,7 @@ $(document).ready(function () {
                   <a href="/productDetail/${product.id}">
                        <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
                   </a>
-                  ${product.giaSauKhuyenMai ? `
+                  ${product.giaSauKhuyenMai != null ? `
                   <div class="hot-sale-badge position-absolute translate-middle">
                        <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
                   </div>` : ''}

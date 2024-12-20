@@ -80,7 +80,34 @@ public class SanPhamProcessor {
         model.setListMauSac(mauSac);
 
         var hinhAnhs = hinhAnhServices.getImagesByProductId(id); // Lấy hình ảnh từ bảng hinh_anh
+
         model.setHinhAnhList(hinhAnhs);
+
+        List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(id);
+        BigDecimal giaSauKhuyenMai = BigDecimal.ZERO;
+        boolean hasValidPromotion = false;
+
+        for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
+            KhuyenMai khuyenMai = khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).orElse(null);
+
+            if (khuyenMai != null) {
+                if (LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
+                        LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
+                        khuyenMai.getTrangThai() == 1) {
+
+                    if (apDungKhuyenMai.getGiaTriGiam() != null) {
+                        giaSauKhuyenMai = giaSauKhuyenMai.add(apDungKhuyenMai.getGiaTriGiam());
+                    }
+                    hasValidPromotion = true;
+                }
+            }
+        }
+
+        if (hasValidPromotion) {
+            model.setGiaSauKhuyenMai(sp.getGia().subtract(giaSauKhuyenMai).max(BigDecimal.ZERO));
+        } else {
+            model.setGiaSauKhuyenMai(null);
+        }
         return new ServiceResult(model, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
