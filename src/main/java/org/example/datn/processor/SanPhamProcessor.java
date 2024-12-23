@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -266,14 +267,67 @@ public class SanPhamProcessor {
         sanPhamChiTietService.saveAll(sanPhamChiTiet);
     }
 
-    public ServiceResult searchProducts(SanPhamRequest request) {
-        List<SanPham> list = service.searchSanPham(request.getKeyword(), request.getIdChatLieu(), request.getIdThuongHieu(), request.getIdDanhMuc(), request.getGiaMin(), request.getGiaMax());
+//    public ServiceResult searchProducts(SanPhamRequest request) {
+//        List<SanPham> list = service.searchSanPham(request.getKeyword(), request.getIdChatLieu(), request.getIdThuongHieu(), request.getIdDanhMuc(), request.getGiaMin(), request.getGiaMax());
+//
+//        var models = list.stream().map(sanPham -> {
+//            var model = sanPhamTransformer.toModel(sanPham);
+//
+//            List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(sanPham.getId());
+//
+//            BigDecimal giaSauKhuyenMai = BigDecimal.ZERO;
+//            boolean hasValidPromotion = false;
+//
+//            for (ApDungKhuyenMai apDungKhuyenMai : apDungKhuyenMais) {
+//                KhuyenMai khuyenMai = khuyenMaiService.findById(apDungKhuyenMai.getIdKhuyenMai()).orElse(null);
+//
+//                if (khuyenMai != null) {
+//                    if (LocalDateTime.now().isAfter(khuyenMai.getNgayBatDau()) &&
+//                            LocalDateTime.now().isBefore(khuyenMai.getNgayKetThuc()) &&
+//                            khuyenMai.getTrangThai() == 1) {
+//
+//                        if (apDungKhuyenMai.getGiaTriGiam() != null) {
+//                            giaSauKhuyenMai = giaSauKhuyenMai.add(apDungKhuyenMai.getGiaTriGiam());
+//                        }
+//                        hasValidPromotion = true;
+//                    }
+//                }
+//            }
+//
+//            if (hasValidPromotion) {
+//                model.setGiaSauKhuyenMai(sanPham.getGia().subtract(giaSauKhuyenMai).max(BigDecimal.ZERO));
+//            } else {
+//                model.setGiaSauKhuyenMai(null);
+//            }
+//
+//            return model;
+//        }).collect(Collectors.toList());
+//
+//        return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+//    }
 
+    public ServiceResult searchProducts(SanPhamRequest request) {
+        // Tìm kiếm sản phẩm dựa trên từ khóa và các tiêu chí
+        List<SanPham> list = service.searchSanPham(request.getKeyword(), request.getIdChatLieu(),
+                request.getIdThuongHieu(), request.getIdDanhMuc(),
+                request.getGiaMin(), request.getGiaMax());
+
+        // Lấy danh sách sản phẩm bán chạy
+        List<Map<String, Object>> topSellingProducts = service.getTopSellingProducts();
+        List<Long> topSellingProductIds = topSellingProducts.stream()
+                .map(product -> (Long) product.get("id"))
+                .collect(Collectors.toList());
+
+        // Biến đổi danh sách sản phẩm sang model kèm thông tin bán chạy
         var models = list.stream().map(sanPham -> {
             var model = sanPhamTransformer.toModel(sanPham);
 
-            List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(sanPham.getId());
+            // Kiểm tra nếu sản phẩm là sản phẩm bán chạy
+            boolean isTopSelling = topSellingProductIds.contains(sanPham.getId());
+            model.setIsTopSelling(isTopSelling);
 
+            // Tính giá sau khuyến mãi
+            List<ApDungKhuyenMai> apDungKhuyenMais = apDungKhuyenMaiService.findByIdSanPham(sanPham.getId());
             BigDecimal giaSauKhuyenMai = BigDecimal.ZERO;
             boolean hasValidPromotion = false;
 
@@ -302,8 +356,8 @@ public class SanPhamProcessor {
             return model;
         }).collect(Collectors.toList());
 
+        // Trả về danh sách sản phẩm với thông tin bán chạy
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
-
 
 }

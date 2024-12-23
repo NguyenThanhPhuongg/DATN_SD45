@@ -56,4 +56,15 @@ public class SanPhamModel extends CommonModel {
     }
 
     private List<HinhAnh> hinhAnhList;
+
+    private boolean isTopSelling;
+
+    public boolean getIsTopSelling() {
+        return isTopSelling;
+    }
+
+    public void setIsTopSelling(boolean isTopSelling) {
+        this.isTopSelling = isTopSelling;
+    }
+
 }
