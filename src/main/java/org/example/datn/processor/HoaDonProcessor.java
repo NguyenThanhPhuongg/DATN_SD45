@@ -360,7 +360,7 @@ public class HoaDonProcessor {
             var hoaDonChiTietModels = hoaDonChiTiets.stream().map(hoaDonChiTietTransformer::toModel).collect(Collectors.toList());
             var diaChiGiaoHangModel = diaChiGiaoHangProcessor.findById(e.getIdDiaChiGiaoHang());
             var phuongThucVanChuyenModel = phuongThucVanChuyenProcessor.findById(e.getIdPhuongThucVanChuyen());
-            var userModel = userProcessor.findById(e.getIdDiaChiGiaoHang());
+            var userModel = userProcessor.findById(e.getIdNguoiDung());
             model.setDiaChiGiaoHangModel(diaChiGiaoHangModel);
             model.setPhuongThucVanChuyenModel(phuongThucVanChuyenModel);
             model.setUserModel(userModel);
