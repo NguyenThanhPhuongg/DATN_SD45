@@ -200,7 +200,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật thương hiệu này sang Active?",
+            text: "Bạn có chắc muốn mở khóa thương hiệu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -215,9 +215,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật thương hiệu này sang Active", "Thành công!");
+                    toastr.success("Đã mở khóa thương hiệu này", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật thương hiệu thất bại", "Lỗi!");
+                    toastr.error("Mở khóa thương hiệu này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -227,7 +227,7 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật thương hiệu này sang Locked?",
+            text: "Bạn có chắc muốn khóa thương hiệu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -242,9 +242,9 @@ app.controller("thuonghieu-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thương hiệu này sang Locked", "Thành công!");
+                    toastr.success("Đã khóa thương hiệu này", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thương hiệu thất bại", "Lỗi!");
+                    toastr.error("Khóa thương hiệu này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }

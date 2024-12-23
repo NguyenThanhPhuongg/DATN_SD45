@@ -236,7 +236,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
 
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            text: "Bạn có chắc muốn cập nhật sản phẩm chi tiết sản phẩm này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -257,14 +257,14 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                     }
                 }).then(resp => {
                     $scope.initialize(); // Tải lại dữ liệu
-                    toastr.success("Cập nhật thành công", "Thành công!");
+                    toastr.success("Cập nhật sản phẩm chi tiết thành công", "Thành công!");
                     $('#exampleModal').modal('hide');
                 }).catch(error => {
-                    toastr.error("Cập nhật thất bại", "Thất bại!");
+                    toastr.error("Cập nhật sản phẩm chi tiết thất bại", "Thất bại!");
                     console.log("Error: ", error);
                 });
             } else {
-                toastr.info("Cập nhật sản phẩm đã bị hủy", "Hủy cập nhật!");
+                toastr.info("Cập nhật sản phẩm chi tiết đã bị hủy", "Hủy cập nhật!");
             }
         });
     };
@@ -276,7 +276,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.update1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 1?",
+            text: "Bạn có chắc muốn mỏ khóa sản phẩm chi tiết này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -291,9 +291,9 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 1", "Thành công!");
+                    toastr.success("Mỏ khóa sản phẩm chi tiết này thành công", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Mỏ khóa sản phẩm chi tiết này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -303,7 +303,7 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
     $scope.update2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái thành 2?",
+            text: "Bạn có chắc muốn khóa sản phẩm chi tiết này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -318,9 +318,9 @@ app.controller("quanlyspct-ctrl", function ($scope, $http, $rootScope, $location
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái thành 2", "Thành công!");
+                    toastr.success("Khóa sản phẩm chi tiết này thành công", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Khóa sản phẩm chi tiết này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }

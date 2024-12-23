@@ -67,7 +67,7 @@ app.controller("sanphamdoitra-ctrl", function ($scope, $http, $rootScope, $locat
     $scope.undoSanPham = function (id) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái đơn hàng này?",
+            text: "Bạn có chắc muốn hoàn tác sản phẩm đổi trả này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -81,10 +81,10 @@ app.controller("sanphamdoitra-ctrl", function ($scope, $http, $rootScope, $locat
                 $http.post(`/doi-tra/${id}`, {}, {
                     headers: {Authorization: `Bearer ${token}`}
                 }).then(resp => {
-                    toastr.success("Undo sản phẩm thành công!", "Thành công");
+                    toastr.success("Hoàn tác sản phẩm đổi trả thành công!", "Thành công");
                     $scope.initialize();
                 }).catch(error => {
-                    console.error("Lỗi khi hủy hóa đơn: ", error);
+                    console.error("Lỗi: ", error);
                     toastr.error("Có lỗi xảy ra, vui lòng thử lại sau!", "Thất bại");
                 });
             } else {
@@ -96,7 +96,7 @@ app.controller("sanphamdoitra-ctrl", function ($scope, $http, $rootScope, $locat
     $scope.sanPhamFail = function (id) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái đơn hàng này?",
+            text: "Bạn có chắc muốn hủy sản phẩm đổi trả này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -110,10 +110,10 @@ app.controller("sanphamdoitra-ctrl", function ($scope, $http, $rootScope, $locat
                 $http.post(`/doi-tra/fail/${id}`, {}, {
                     headers: {Authorization: `Bearer ${token}`}
                 }).then(resp => {
-                    toastr.success("Undo sản phẩm thành công!", "Thành công");
+                    toastr.success("Hủy sản phẩm đổi trả thành công", "Thành công!");
                     $scope.initialize();
                 }).catch(error => {
-                    console.error("Lỗi khi hủy hóa đơn: ", error);
+                    console.error("Lỗi: ", error);
                     toastr.error("Có lỗi xảy ra, vui lòng thử lại sau!", "Thất bại");
                 });
             } else {
@@ -137,7 +137,7 @@ app.controller("sanphamdoitra-ctrl", function ($scope, $http, $rootScope, $locat
         }
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn hủy đơn hàng này?",
+            text: "Bạn có chắc muốn hủy sản phẩm đổi trả này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -155,12 +155,12 @@ app.controller("sanphamdoitra-ctrl", function ($scope, $http, $rootScope, $locat
                     }
                 })
                     .then(function (response) {
-                        toastr.success("Hủy đơn hàng thành công", "Thành công!");
+                        toastr.success("Hủy sản phẩm đổi trả thành công", "Thành công!");
                         $('#huyYeuCau').modal('hide');
                         $scope.initialize();
                     })
                     .catch(function (error) {
-                        toastr.error("Có lỗi không thể hủy đơn hàng", "Lỗi!");
+                        toastr.error("Có lỗi không thể hủy sản phẩm đổi trả", "Lỗi!");
                         console.error(error);
                     });
             } else {

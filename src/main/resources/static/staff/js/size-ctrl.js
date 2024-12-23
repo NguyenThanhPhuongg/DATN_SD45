@@ -103,13 +103,13 @@ app.controller("size-ctrl", function ($scope, $http) {
         // Kiểm tra tên
         if (!form.ten) {
             errorContainer.ten = true;
-            toastr.error("Tên không được để trống.", "Lỗi!");
+            toastr.error("Tên size không được để trống.", "Lỗi!");
         } else if (form.ten.length > 100) {
             errorContainer.ten = true;
             toastr.error("Tên size không lớn quá 100 ký tự", "Lỗi!");
         } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
             errorContainer.ten = true;
-            toastr.error("Tên không được chứa ký tự đặc biệt.", "Lỗi!");
+            toastr.error("Tên size không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.items.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -117,14 +117,14 @@ app.controller("size-ctrl", function ($scope, $http) {
             )
         ) {
             errorContainer.ten = true;
-            toastr.error("Tên đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
+            toastr.error("Tên size đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
         } else {
             errorContainer.ten = false;
         }
 
         if (!form.idCha) {
             errorContainer.idCha = true;
-            toastr.error("Bạn chưa chọn loại.", "Lỗi!");
+            toastr.error("Bạn chưa chọn loại size.", "Lỗi!");
         } else {
             errorContainer.idCha = false;
         }
@@ -201,7 +201,7 @@ app.controller("size-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái size thành Active?",
+            text: "Bạn có chắc muốn mở khóa size này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -216,9 +216,9 @@ app.controller("size-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái size thành Active", "Thành công!");
+                    toastr.success("Đã mở khóa size này", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Mở khóa size này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -228,7 +228,7 @@ app.controller("size-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái size thành Locked?",
+            text: "Bạn có chắc muốn cập khóa size này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -243,9 +243,9 @@ app.controller("size-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái size thành Locked", "Thành công!");
+                    toastr.success("Đã khóa size này", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Khóa size này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }

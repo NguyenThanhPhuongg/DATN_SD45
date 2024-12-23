@@ -105,13 +105,13 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
         // Kiểm tra tên
         if (!form.ten) {
             errorContainer.ten = true;
-            toastr.error("Tên không được để trống.", "Lỗi!");
+            toastr.error("Tên chất liệu không được để trống.", "Lỗi!");
         } else if (form.ten.length < 0 || form.ten.length > 200) {
             errorContainer.ten = true;
-            toastr.error("Tên không quá 200 ký tự", "Lỗi!");
+            toastr.error("Tên chất liệu không quá 200 ký tự", "Lỗi!");
         } else if (/[!@#$%^&*()~|]/.test(form.ten)) {  // Kiểm tra ký tự đặc biệt @$%#
             errorContainer.ten = true;
-            toastr.error("Tên không được chứa ký tự đặc biệt.", "Lỗi!");
+            toastr.error("Tên chất liệu không được chứa ký tự đặc biệt.", "Lỗi!");
         } else if (
             $scope.items.some(item =>
                 item.ten.trim().toLowerCase() === form.ten.trim().toLowerCase() &&
@@ -119,7 +119,7 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
             )
         ) {
             errorContainer.ten = true;
-            toastr.error("Tên đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
+            toastr.error("Tên chất liệu đã tồn tại. Vui lòng chọn tên khác.", "Lỗi!");
         } else {
             errorContainer.ten = false;
         }
@@ -203,7 +203,7 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo1 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái chất liệu thành Active?",
+            text: "Bạn có chắc muốn mở khóa chất liệu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -218,9 +218,9 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái chất liệu thành Active", "Thành công!");
+                    toastr.success("Đã mở khóa chất liệu này", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Mở khóa chất liệu này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }
@@ -230,7 +230,7 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
     $scope.updateTrangThaiTo2 = function (item) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái chất liệu thành Locked?",
+            text: "Bạn có chắc muốn khóa chất liệu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -245,9 +245,9 @@ app.controller("chatlieu-ctrl", function ($scope, $http) {
                     }
                 }).then(resp => {
                     $scope.initialize();
-                    toastr.success("Đã cập nhật trạng thái chất liệu thành Locked", "Thành công!");
+                    toastr.success("Đã khóa chất liệu này", "Thành công!");
                 }).catch(error => {
-                    toastr.error("Cập nhật trạng thái thất bại", "Lỗi!");
+                    toastr.error("Khóa chất liệu này thất bại", "Lỗi!");
                     console.error("Error: ", error);
                 });
             }

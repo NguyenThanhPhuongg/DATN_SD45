@@ -357,7 +357,7 @@ app.controller("listproduct-ctrl", function ($scope, $http, $rootScope, $locatio
     };
 
     $scope.selectProduct = function (item) {
-        console.log("Selected Product ID: ", item.id); // Log để kiểm tra
+        console.log("Selected Product ID: ", item.id);
         $rootScope.selectedProductId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $rootScope.selectedProductTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
         $rootScope.selectedProductGia = item.gia; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
@@ -365,9 +365,9 @@ app.controller("listproduct-ctrl", function ($scope, $http, $rootScope, $locatio
     };
 
     $scope.selectImages = function (item) {
-        console.log("Selected Images ID: ", item.id); // Log để kiểm tra
-        $rootScope.selectedImagesId = item.id; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
-        $rootScope.selectedImagesTen = item.ten; // Lưu ID sản phẩm vào rootScope để sử dụng ở trang khác
+        console.log("Selected Images ID: ", item.id);
+        $rootScope.selectedImagesId = item.id;
+        $rootScope.selectedImagesTen = item.ten;
         $location.path('/hinhanh'); // Chuyển hướng đến trang sản phẩm chi tiết
     };
 

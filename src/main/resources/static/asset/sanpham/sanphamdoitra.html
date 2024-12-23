@@ -24,7 +24,7 @@
                     <option value="">Tất cả trạng thái</option>
                     <option value="0">Chờ kiểm tra</option>
                     <option value="1">Hoàn tác</option>
-                    <option value="2">Sản phẩm fail</option>
+                    <option value="2">Sản phẩm lỗi</option>
                 </select>
             </div>
             <table class="table table-striped">
@@ -56,9 +56,9 @@
                     <td>
                         <div class="badge"
                              ng-class="{'bg-primary': item.trangThai === 0, 'bg-success': item.trangThai === 1, 'bg-danger': item.trangThai === 2}">
-                            <span ng-if="item.trangThai === 0">Check </span>
-                            <span ng-if="item.trangThai === 1">Undo</span>
-                            <span ng-if="item.trangThai === 2">Broken </span>
+                            <span ng-if="item.trangThai === 0">Chờ kiểm tra</span>
+                            <span ng-if="item.trangThai === 1">Hoàn tác</span>
+                            <span ng-if="item.trangThai === 2">Sản phẩm lỗi</span>
                         </div>
                     </td>
                     <td>

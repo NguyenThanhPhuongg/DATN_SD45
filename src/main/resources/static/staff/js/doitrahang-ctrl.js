@@ -92,7 +92,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
     $scope.updateStatus = function (idDoiTra) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái đơn hàng này?",
+            text: "Bạn có chắc muốn duyệt yêu cầu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -112,11 +112,11 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                             $scope.items[index] = updatedItem;
                         }
                     }
-                    toastr.success("Cập nhật trạng thái yêu cầu thành công", "Thành công!");
+                    toastr.success("Duyệt yêu cầu thành công", "Thành công!");
                     $scope.initialize();
                 }).catch(function (error) {
                     toastr.error("Có lỗi", "Lỗi!");
-                    console.error("Lỗi khi cập nhật trạng thái:", error);
+                    console.error("Lỗi khi duyệt yêu cầu:", error);
                 });
             } else {
                 toastr.info("Hành động đã hủy", "Hủy!");
@@ -139,7 +139,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
         }
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn hủy đơn hàng này?",
+            text: "Bạn có chắc muốn hủy yêu cầu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -157,12 +157,12 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     }
                 })
                     .then(function (response) {
-                        toastr.success("Hủy đơn hàng thành công", "Thành công!");
+                        toastr.success("Hủy yêu cầu thành công", "Thành công!");
                         $('#huyYeuCau').modal('hide');
                         $scope.initialize();
                     })
                     .catch(function (error) {
-                        toastr.error("Có lỗi không thể hủy đơn hàng", "Lỗi!");
+                        toastr.error("Có lỗi không thể hủy yêu cầu", "Lỗi!");
                         console.error(error);
                     });
             } else {
@@ -213,7 +213,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
     $scope.updateChiTietStatusHoanThanh = function (chiTiet) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái chi tiết này?",
+            text: "Bạn có chắc muốn duyệt sản phẩm yêu cầu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -235,19 +235,20 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     }
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
-                    toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
+                    toastr.success("Duyệt sản phẩm yêu cầu thành công", "Thành công!");
                     $scope.initialize();
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");
-                    console.error("Lỗi khi cập nhật trạng thái chi tiết:", error);
+                    console.error("Lỗi khi duyệt sản phẩm yêu cầu:", error);
                 });
             }
         });
     };
+
     $scope.updateChiTietStatusHuy = function (chiTiet) {
         swal({
             title: "Xác nhận",
-            text: "Bạn có chắc muốn cập nhật trạng thái chi tiết này?",
+            text: "Bạn có chắc muốn hủy sản phẩm yêu cầu này?",
             icon: "warning",
             buttons: ["Hủy", "Xác nhận"],
             dangerMode: true,
@@ -271,10 +272,10 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
                     $('#sanPhamDoiTraChiTiet').modal('hide');
-                    toastr.success("Cập nhật trạng thái chi tiết thành công", "Thành công!");
+                    toastr.success("Hủy sản phẩm yêu cầu thành công", "Thành công!");
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");
-                    console.error("Lỗi khi cập nhật trạng thái chi tiết:", error);
+                    console.error("Lỗi khi hủy sản phẩm yêu cầu:", error);
                 });
             }
         });
