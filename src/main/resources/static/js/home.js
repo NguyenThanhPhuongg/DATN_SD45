@@ -605,88 +605,88 @@ $(document).ready(function () {
 
     });
 
-    function displayProducts(page) {
-        const productContainer = $('#product-info');
-
-        // Ẩn container với hiệu ứng mờ dần
-        productContainer.fadeOut(100, function () {
-            productContainer.empty(); // Xóa sản phẩm cũ
-
-            const startIndex = page * productsPerPage;
-            const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage);
-
-            // Hiển thị sản phẩm mới
-            productsToShow.forEach(product => productContainer.append(createProductHtml(product)));
-
-            productContainer.fadeIn(100); // Hiển thị lại với hiệu ứng
-
-            attachHoverEffect();  // Gắn sự kiện hover
-            attachWishlistEvent(); // Gắn sự kiện wishlist
-        });
-    }
+    // function displayProducts(page) {
+    //     const productContainer = $('#product-info');
+    //
+    //     // Ẩn container với hiệu ứng mờ dần
+    //     productContainer.fadeOut(100, function () {
+    //         productContainer.empty(); // Xóa sản phẩm cũ
+    //
+    //         const startIndex = page * productsPerPage;
+    //         const productsToShow = allProducts.slice(startIndex, startIndex + productsPerPage);
+    //
+    //         // Hiển thị sản phẩm mới
+    //         productsToShow.forEach(product => productContainer.append(createProductHtml(product)));
+    //
+    //         productContainer.fadeIn(100); // Hiển thị lại với hiệu ứng
+    //
+    //         attachHoverEffect();  // Gắn sự kiện hover
+    //         attachWishlistEvent(); // Gắn sự kiện wishlist
+    //     });
+    // }
 
     // Hàm tạo HTML cho từng sản phẩm
-    function createProductHtml(product) {
-        console.log('product:', product);
-
-        // Định dạng giá gốc
-        const formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(product.gia);
-
-        // Kiểm tra giaSauKhuyenMai, nếu có giá trị thì hiển thị giá sau khuyến mãi
-        const formattedSalePrice = product.giaSauKhuyenMai != null
-            ? new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(product.giaSauKhuyenMai)
-            : '';
-
-        // Nếu có giá sau khuyến mãi thì tạo HTML cho giá sau khuyến mãi, nếu không thì không có gì
-        const salePriceHTML = product.giaSauKhuyenMai != null
-            ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>`
-            : '';
-
-        // Nếu có giá khuyến mãi, gạch ngang giá gốc
-        const oldPriceClass = product.giaSauKhuyenMai != null ? 'text-decoration: line-through;' : '';
-
-        return `
-        <div class="product d-flex flex-column align-items-center justify-content-between">
-             <div class="image-wrapper">
-                  <a href="/productDetail/${product.id}">
-                       <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
-                  </a>
-                  ${product.giaSauKhuyenMai != null ? `
-                  <div class="hot-sale-badge position-absolute translate-middle">
-                       <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
-                  </div>` : ''}
-             </div>
-             <div class="price-and-name text-center">
-                  <p class="name" style="font-size: 19px;">${product.ten}</p>
-                  <p class="price fw-bold" style="font-size: 22px; ${oldPriceClass}">
-                      ${formattedPrice}
-                  </p>
-                  ${salePriceHTML}
-             </div>
-             <br><br>
-             <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
-                 <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
-                      Yêu thích
-                 </a>
-                 <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
-                      Xem chi tiết
-                 </a>
-             </div>
-        </div>
-    `;
-    }
-
-    // Gắn sự kiện hover
-    function attachHoverEffect() {
-        $('.product').hover(
-            function () {
-                $(this).find('.add-to-wishlist-btn').fadeIn(200);
-            },
-            function () {
-                $(this).find('.add-to-wishlist-btn').fadeOut(200);
-            }
-        );
-    }
+    // function createProductHtml(product) {
+    //     console.log('product:', product);
+    //
+    //     // Định dạng giá gốc
+    //     const formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(product.gia);
+    //
+    //     // Kiểm tra giaSauKhuyenMai, nếu có giá trị thì hiển thị giá sau khuyến mãi
+    //     const formattedSalePrice = product.giaSauKhuyenMai != null
+    //         ? new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(product.giaSauKhuyenMai)
+    //         : '';
+    //
+    //     // Nếu có giá sau khuyến mãi thì tạo HTML cho giá sau khuyến mãi, nếu không thì không có gì
+    //     const salePriceHTML = product.giaSauKhuyenMai != null
+    //         ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>`
+    //         : '';
+    //
+    //     // Nếu có giá khuyến mãi, gạch ngang giá gốc
+    //     const oldPriceClass = product.giaSauKhuyenMai != null ? 'text-decoration: line-through;' : '';
+    //
+    //     return `
+    //     <div class="product d-flex flex-column align-items-center justify-content-between">
+    //          <div class="image-wrapper">
+    //               <a href="/productDetail/${product.id}">
+    //                    <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
+    //               </a>
+    //               ${product.giaSauKhuyenMai != null ? `
+    //               <div class="hot-sale-badge position-absolute translate-middle">
+    //                    <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
+    //               </div>` : ''}
+    //          </div>
+    //          <div class="price-and-name text-center">
+    //               <p class="name" style="font-size: 19px;">${product.ten}</p>
+    //               <p class="price fw-bold" style="font-size: 23px; ${oldPriceClass}">
+    //                   ${formattedPrice}
+    //               </p>
+    //               ${salePriceHTML}
+    //          </div>
+    //          <br><br>
+    //          <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
+    //              <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
+    //                   Yêu thích
+    //              </a>
+    //              <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
+    //                   Xem chi tiết
+    //              </a>
+    //          </div>
+    //     </div>
+    // `;
+    // }
+    //
+    // // Gắn sự kiện hover
+    // function attachHoverEffect() {
+    //     $('.product').hover(
+    //         function () {
+    //             $(this).find('.add-to-wishlist-btn').fadeIn(200);
+    //         },
+    //         function () {
+    //             $(this).find('.add-to-wishlist-btn').fadeOut(200);
+    //         }
+    //     );
+    // }
 
     // Gắn sự kiện wishlist
     function attachWishlistEvent() {
@@ -856,7 +856,10 @@ $(document).ready(function () {
             const productContainer = $(`#${containerId}`);
             productContainer.empty();
 
-            products.forEach(product => {
+            // Chỉ lấy 8 sản phẩm đầu tiên
+            const limitedProducts = products.slice(0, 8);
+
+            limitedProducts.forEach(product => {
                 const formattedPrice = new Intl.NumberFormat('vi-VN', {
                     style: 'currency',
                     currency: 'VND'
@@ -885,7 +888,7 @@ $(document).ready(function () {
                 </div>
                 <div class="price-and-name text-center">
                     <p class="name" style="font-size: 19px;">${product.ten}</p>
-                    <p class="price fw-bold" style="font-size: 22px; ${oldPriceClass}">
+                    <p class="price fw-bold" style="font-size: 23px; ${oldPriceClass}">
                         ${formattedPrice}
                     </p>
                     ${salePriceHTML}
@@ -948,14 +951,8 @@ $(document).ready(function () {
                     displayCategoryProducts(topSellingProducts, 'sanphambanchay'); // Hiển thị sản phẩm bán chạy
 
                     // Hiển thị sản phẩm lên trang
-                    displayProducts(currentPage);
-
-                    // Kiểm tra và điều chỉnh hiển thị nút Load More
-                    if (currentPage < totalPages - 1) {
-                        $('#load-more').html('<i style="font-size: 24px" class="bi bi-arrow-right"></i>');
-                    } else {
-                        $('#load-more').hide();
-                    }
+                    // displayProducts(currentPage);
+                    attachWishlistEvent(); // Gắn sự kiện wishlist
                 },
                 error: function (error) {
                     console.error('Error fetching products:', error);

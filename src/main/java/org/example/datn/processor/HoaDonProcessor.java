@@ -318,32 +318,19 @@ public class HoaDonProcessor {
         HoaDon hoaDon = service.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
 
-        // Xác định trạng thái mới dựa trên trạng thái hiện tại
-        Integer newTrangThai;
-        switch (hoaDon.getTrangThai()) {
-            case 0:
-            case 1:
-                newTrangThai = StatusHoaDon.DA_HUY.getValue();
-                break;
-            case 2:
-                newTrangThai = StatusHoaDon.DA_HUY.getValue();
-                break;
-            case 3:
-                newTrangThai = StatusHoaDon.DA_HUY.getValue();
-                break;
-            default:
-                throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");
-        }
-        // Cập nhật trạng thái hóa đơn
+        // Cập nhật trạng thái hủy cho hóa đơn (với tất cả các trạng thái đều có thể hủy)
         hoaDon.setLyDoHuy(lyDoHuy);
-        hoaDon.setTrangThai(newTrangThai);
+        hoaDon.setTrangThai(StatusHoaDon.DA_HUY.getValue());
         hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDon.setNguoiCapNhat(ua.getPrincipal());
 
-        // Cập nhật trạng thái các chi tiết hóa đơn
-        updateHoaDonChiTiet(id, newTrangThai);
+        // Cập nhật trạng thái chi tiết hóa đơn
+        updateHoaDonChiTiet(id, StatusHoaDon.DA_HUY.getValue());
+
+        // Hủy các chi tiết hóa đơn (nếu có logic hủy)
         cancelOrderDetails(hoaDon);
-        // Lưu hóa đơn
+
+        // Lưu hóa đơn sau khi cập nhật
         service.save(hoaDon);
 
         // Trả về kết quả thành công
