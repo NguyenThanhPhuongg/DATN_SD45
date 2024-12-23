@@ -9,6 +9,7 @@ import org.example.datn.repository.SizeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,5 +57,9 @@ public class KhuyenMaiService {
 
     public List<KhuyenMai> findByIdIn(List<Long> ids) {
         return repo.findByIdIn(ids);
+    }
+
+    public List<KhuyenMai> findByIdInAndNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(List<Long> khuyenMaiIds, LocalDateTime now, LocalDateTime now1) {
+        return repo.findByIdInAndNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(khuyenMaiIds, now, now1);
     }
 }

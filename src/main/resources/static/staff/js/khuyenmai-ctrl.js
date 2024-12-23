@@ -220,7 +220,6 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
     };
 
 
-
     $scope.products = [];
     $scope.users = [];
     $scope.selectAllProducts = false;  // Dùng để theo dõi trạng thái checkbox ở tiêu đề bảng sản phẩm
@@ -429,30 +428,30 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             buttons: true,
             dangerMode: true,
         }).then((willUpdate) => {
-                if (willUpdate) {
-                    // Lấy token từ localStorage
-                    var token = localStorage.getItem('token');
+            if (willUpdate) {
+                // Lấy token từ localStorage
+                var token = localStorage.getItem('token');
 
-                    // Gửi dữ liệu đến API để cập nhật khuyến mãi
-                    $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        }
-                    })
-                        .then(function (response) {
-                            // Hiển thị thông báo thành công
-                            toastr.success("Khuyến mãi đã được cập nhật thành công!", "Thành công!");
-                            $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
-                            $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
-                        }, function (error) {
-                            console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
-                            toastr.error("Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!", "Lỗi!");
-                        });
-                } else {
-                    // Người dùng hủy thao tác
-                    toastr.info("Hủy hành động!", "Hủy!");
-                }
-            });
+                // Gửi dữ liệu đến API để cập nhật khuyến mãi
+                $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(function (response) {
+                        // Hiển thị thông báo thành công
+                        toastr.success("Khuyến mãi đã được cập nhật thành công!", "Thành công!");
+                        $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
+                        $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
+                    }, function (error) {
+                        console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
+                        toastr.error("Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!", "Lỗi!");
+                    });
+            } else {
+                // Người dùng hủy thao tác
+                toastr.info("Hủy hành động!", "Hủy!");
+            }
+        });
     };
 
 
@@ -472,6 +471,14 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         "hideEasing": "linear",
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
+    };
+
+    $scope.isValidDate = function (ngayBatDau, ngayKetThuc) {
+        var currentDate = new Date();
+        var startDate = new Date(ngayBatDau);
+        var endDate = new Date(ngayKetThuc);
+
+        return currentDate >= startDate && currentDate <= endDate;
     };
 
 });

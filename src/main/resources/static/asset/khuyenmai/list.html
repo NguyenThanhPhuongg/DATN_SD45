@@ -46,11 +46,13 @@
                     <td>{{item.giaTri | currency:'₫'}}</td>
                     <td>
                         <div class="badge"
-                             ng-class="{'bg-success': item.trangThai === 1, 'bg-secondary': item.trangThai === 0}">
-                            <span ng-if="item.trangThai === 0">Chưa áp dụng</span>
-                            <span ng-if="item.trangThai === 1">Đang áp dụng</span>
+                             ng-class="{'bg-success': isValidDate(item.ngayBatDau, item.ngayKetThuc),
+                                    'bg-secondary': !isValidDate(item.ngayBatDau, item.ngayKetThuc)}">
+                            <span ng-if="isValidDate(item.ngayBatDau, item.ngayKetThuc)">Đang áp dụng</span>
+                            <span ng-if="!isValidDate(item.ngayBatDau, item.ngayKetThuc)">Chưa áp dụng</span>
                         </div>
                     </td>
+
                     <td>
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-link" type="button" data-bs-toggle="modal"
