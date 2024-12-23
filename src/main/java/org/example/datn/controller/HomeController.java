@@ -28,10 +28,10 @@ public class HomeController {
     }
     @GetMapping("/staff")
     public String staff(){
-        return "/staff/index";
+        return "staff/index";
     }
     @GetMapping("/qr")
     public String staffQr(){
-        return "/staff/qr";
+        return "staff/qr";
     }
 }

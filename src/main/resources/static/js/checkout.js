@@ -447,14 +447,15 @@ function populateTable(data) {
     const tableBody = document.querySelector('#products tbody');
     tableBody.innerHTML = ''; // Clear old content
     let totalItemPrice = 0; // Variable to store total item price
-
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    };
     data.forEach(item => {
-        const gia = item.giaSauKhuyenMai ? item.giaSauKhuyenMai : item.gia;
+        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.gia;
         const soLuong = item.soLuong; // Get quantity
         const tongCong = gia * soLuong; // Calculate total
 
         totalItemPrice += tongCong; // Add to total item price
-
         const row = document.createElement('tr');
         row.style.backgroundColor = '#f0f0f0'; // Set gray background
         row.style.borderRadius = '10px'; // Rounded corners
@@ -467,20 +468,20 @@ function populateTable(data) {
                 <span>${item.sanPham.ten}</span>
                 <span style="font-size: 14px;">(Size: ${item.sanPhamChiTiet.size.ten}, Màu: ${item.sanPhamChiTiet.mauSac.ten})</span>
             </td>
-            <td class="product-price">${gia.toLocaleString()} đ</td>
+            <td class="product-price">${formatCurrency(gia)}</td>
             <td class="product-quantity">${soLuong}</td>
-            <td class="product-total">${tongCong.toLocaleString()} đ</td>
+            <td class="product-total">${formatCurrency(tongCong)}</td>
         `;
         tableBody.appendChild(row);
     });
 
     // Update total item price in the table
-    document.getElementById('totalItemPrice').textContent = `${totalItemPrice.toLocaleString()} đ`;
-    document.querySelector('.total-price').textContent = `Tổng Cộng: ${totalItemPrice.toLocaleString()} ₫`;
+    document.getElementById('totalItemPrice').textContent = `${formatCurrency(totalItemPrice)}`;
+    document.querySelector('.total-price').textContent = `Tổng Cộng: ${formatCurrency(totalItemPrice)}`;
 
     const shippingFee = 30000; // Default shipping fee
     const totalPayment = totalItemPrice + shippingFee;
-    document.getElementById('totalPayment').textContent = `${totalPayment.toLocaleString()} đ`;
+    document.getElementById('totalPayment').textContent = `${formatCurrency(totalPayment)}`;
 }
 
 
@@ -575,6 +576,14 @@ async function fetchShippingMethods() {
                 <span class="shipping-text">${shippingData.ten}</span>
                 <button class="change-button" onclick="openShippingModal()">Thay đổi</button>
             `;
+            const shipElement = document.getElementById('ship');
+
+            if (shippingData.phiVanChuyen === 0 || shippingData.phiVanChuyen == null) {
+                shipElement.textContent = 'Miễn phí';
+            } else {
+                shipElement.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(shippingData.phiVanChuyen);
+            }
+
         } else {
             shippingMethodElement.innerHTML = '<p>Không có phương thức vận chuyển nào</p>';
         }
@@ -830,17 +839,29 @@ function selectVoucher() {
 
 function updateTotalPayment() {
     const totalItemPriceText = document.getElementById('totalItemPrice').textContent;
-    console.log('totalItemPriceText', totalItemPriceText);  // In ra: "2.000.000 đ"
+    console.log('totalItemPriceText', totalItemPriceText); // In ra: "2.000.000 đ"
 
-// Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
+    // Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
     const totalItemPrice = parseFloat(totalItemPriceText.replace(/[^\d.-]/g, '').replace(/\./g, ''));
-    console.log('totalItemPrice', totalItemPrice);  // In ra: 2000000
+    console.log('totalItemPrice', totalItemPrice);
 
     const shippingFee = 30000; // Default shipping fee
-    const totalPayment = totalItemPrice + shippingFee - selectedVoucherValue; // Subtract the voucher value and add shipping fee
+    let totalPayment = totalItemPrice + shippingFee - selectedVoucherValue;
+    let totalPriceWithoutShipping = totalItemPrice - selectedVoucherValue;
+
+    if (totalPayment < 0) {
+        totalPayment = 0;
+    }
+
+    if (totalPriceWithoutShipping < 0) {
+        totalPriceWithoutShipping = 0;
+    }
+
     console.log('totalPayment', totalPayment);
+    console.log('totalPriceWithoutShipping', totalPriceWithoutShipping);
+
     document.getElementById('totalPayment').textContent = `${totalPayment.toLocaleString()} đ`;
-    document.querySelector('.total-price').textContent = `Tổng Cộng: ${(totalItemPrice - selectedVoucherValue).toLocaleString()} ₫`; // Update the total price without shipping fee
+    document.querySelector('.total-price').textContent = `Tổng Cộng: ${totalPriceWithoutShipping.toLocaleString()} ₫`;
     document.getElementById('voucherDiscount').textContent = `${selectedVoucherValue.toLocaleString()} đ`;
 }
 

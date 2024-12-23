@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,6 @@ public interface KhuyenMaiRepository extends JpaRepository<KhuyenMai, Long> {
     boolean existsByMa(String ma);
 
     List<KhuyenMai> findByIdIn(List<Long> ids);
+
+    List<KhuyenMai> findByIdInAndNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(List<Long> khuyenMaiIds, LocalDateTime now, LocalDateTime now1);
 }

@@ -217,8 +217,15 @@ public class KhuyenMaiProcessor {
                 .map(ApDungKhuyenMai::getIdKhuyenMai)
                 .distinct()
                 .collect(Collectors.toList());
-        List<KhuyenMai> khuyenMais = service.findByIdIn(khuyenMaiIds);
-        List<KhuyenMaiModel> khuyenMaiModels = khuyenMais.stream().map(khuyenMaiTransformer::toModel).collect(Collectors.toList());
+
+        LocalDateTime now = LocalDateTime.now();
+        List<KhuyenMai> khuyenMais = service.findByIdInAndNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(
+                khuyenMaiIds, now, now);
+
+        List<KhuyenMaiModel> khuyenMaiModels = khuyenMais.stream()
+                .map(khuyenMaiTransformer::toModel)
+                .collect(Collectors.toList());
+
         return new ServiceResult(khuyenMaiModels, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 

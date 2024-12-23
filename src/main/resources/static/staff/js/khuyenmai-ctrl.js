@@ -65,7 +65,23 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             });
     };
 
+    $scope.formatCurrency = function(amount) {
+        if (amount != null) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+        return ''; // Trả về chuỗi rỗng nếu amount là null hoặc undefined
+    };
 
+    $scope.formatGiaTri = function() {
+        // Kiểm tra nếu giá trị giaTri hợp lệ
+        if ($scope.detailForm.giaTri) {
+            // Lấy giá trị từ input và loại bỏ ký tự không phải số
+            let formattedValue = $scope.detailForm.giaTri.replace(/[^\d]/g, '');
+
+            // Dùng Intl.NumberFormat để format thành tiền tệ
+            $scope.detailForm.giaTri = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(formattedValue);
+        }
+    };
     // Hàm gọi khi thay đổi từ khóa tìm kiếm hoặc loại khuyến mãi
     $scope.$watch('searchText', function (newValue, oldValue) {
         if (newValue !== oldValue) {
@@ -218,7 +234,6 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
                 }
             });
     };
-
 
 
     $scope.products = [];
@@ -429,30 +444,30 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             buttons: true,
             dangerMode: true,
         }).then((willUpdate) => {
-                if (willUpdate) {
-                    // Lấy token từ localStorage
-                    var token = localStorage.getItem('token');
+            if (willUpdate) {
+                // Lấy token từ localStorage
+                var token = localStorage.getItem('token');
 
-                    // Gửi dữ liệu đến API để cập nhật khuyến mãi
-                    $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        }
-                    })
-                        .then(function (response) {
-                            // Hiển thị thông báo thành công
-                            toastr.success("Khuyến mãi đã được cập nhật thành công!", "Thành công!");
-                            $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
-                            $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
-                        }, function (error) {
-                            console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
-                            toastr.error("Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!", "Lỗi!");
-                        });
-                } else {
-                    // Người dùng hủy thao tác
-                    toastr.info("Hủy hành động!", "Hủy!");
-                }
-            });
+                // Gửi dữ liệu đến API để cập nhật khuyến mãi
+                $http.put('/khuyen-mai/update/' + $scope.detailForm.id, requestData, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(function (response) {
+                        // Hiển thị thông báo thành công
+                        toastr.success("Khuyến mãi đã được cập nhật thành công!", "Thành công!");
+                        $('#viewDetailModal').modal('hide'); // Đóng modal sau khi lưu thành công
+                        $scope.getKhuyenMaiList(); // Cập nhật lại danh sách khuyến mãi
+                    }, function (error) {
+                        console.error('Có lỗi xảy ra khi cập nhật khuyến mãi:', error);
+                        toastr.error("Có lỗi xảy ra khi cập nhật khuyến mãi. Vui lòng thử lại!", "Lỗi!");
+                    });
+            } else {
+                // Người dùng hủy thao tác
+                toastr.info("Hủy hành động!", "Hủy!");
+            }
+        });
     };
 
 
@@ -472,6 +487,14 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
         "hideEasing": "linear",
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
+    };
+
+    $scope.isValidDate = function (ngayBatDau, ngayKetThuc) {
+        var currentDate = new Date();
+        var startDate = new Date(ngayBatDau);
+        var endDate = new Date(ngayKetThuc);
+
+        return currentDate >= startDate && currentDate <= endDate;
     };
 
 });

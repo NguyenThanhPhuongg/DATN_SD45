@@ -65,8 +65,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // Cho phép tất cả các origin
-        configuration.setAllowCredentials(false); // Không cho phép gửi thông tin xác thực
+        configuration.setAllowedOrigins(Arrays.asList("https://ziaza.up.railway.app/"));
+        configuration.setAllowCredentials(true); // Không cho phép gửi thông tin xác thực
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
 

@@ -281,3 +281,33 @@ button {
         opacity: 1;
     }
 }
+.product-content {
+    display: flex; /* Căn chỉnh ảnh và thông tin sản phẩm theo hàng ngang */
+    align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+}
+
+.product-image {
+    width: 100px; /* Kích thước ảnh */
+    height: auto; /* Giữ tỷ lệ ảnh */
+    margin-left: 10px; /* Khoảng cách giữa ảnh và checkbox */
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column; /* Đảm bảo tên sản phẩm và phân loại nằm theo chiều dọc */
+    margin-left: 15px; /* Khoảng cách giữa ảnh và thông tin */
+}
+
+.product-name {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left; /* Dịch tên sản phẩm sang trái */
+    margin: 0; /* Đảm bảo không có khoảng cách thừa */
+}
+
+.product-details {
+    margin-top: 5px; /* Khoảng cách giữa tên sản phẩm và phân loại */
+    font-size: 14px;
+    color: #555;
+}
+

@@ -194,6 +194,7 @@ public class HoaDonProcessor {
                     }
                 }
             }
+            giaSauKhuyenMai = giaSauKhuyenMai.max(BigDecimal.ZERO);
 
             BigDecimal giaTien = giaSauKhuyenMai.multiply(BigDecimal.valueOf(ghct.getSoLuong()));
             tongTien = tongTien.add(giaTien);
@@ -224,17 +225,16 @@ public class HoaDonProcessor {
         }
 
         if (request.getGiaTriVoucher() != null) {
-            tongTien = tongTien.subtract(request.getGiaTriVoucher());
+            tongTien = tongTien.subtract(request.getGiaTriVoucher()).max(BigDecimal.ZERO);
         }
 
-        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen())
-                .orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
-        tongTien = tongTien.add(phuongThucVanChuyen.getPhiVanChuyen());
+//        var phuongThucVanChuyen = phuongThucVanChuyenProcessor.get(request.getIdPhuongThucVanChuyen())
+//                .orElseThrow(() -> new EntityNotFoundException("phuongThucVanChuyen.not.found"));
+//        tongTien = tongTien.add(phuongThucVanChuyen.getPhiVanChuyen());
 
         hoaDon.setTongTien(tongTien);
         hoaDon.setTrangThai(phuongThucThanhToan.getLoai().equals(TypeThanhToan.CASH) ? StatusHoaDon.CHO_XAC_NHAN.getValue() : StatusHoaDon.CHO_THANH_TOAN.getValue());
         service.save(hoaDon);
-
         ThanhToan thanhToan = new ThanhToan();
         thanhToan.setIdHoaDon(hoaDon.getId());
         thanhToan.setIdPhuongThucThanhToan(phuongThucThanhToan.getId());
