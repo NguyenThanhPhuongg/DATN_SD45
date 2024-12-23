@@ -43,7 +43,7 @@
                         <span ng-if="item.loai === 1">Sản Phẩm</span>
                         <span ng-if="item.loai === 2">Người dùng</span>
                     </td>
-                    <td>{{item.giaTri | currency:'₫'}}</td>
+                    <td>{{formatCurrency(item.giaTri)}}</td>
                     <td>
                         <div class="badge"
                              ng-class="{'bg-success': isValidDate(item.ngayBatDau, item.ngayKetThuc),

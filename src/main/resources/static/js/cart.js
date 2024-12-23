@@ -58,17 +58,23 @@ function updateTotalSection() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
     const productItems = document.querySelectorAll('.product-item');
     let totalAmount = 0;
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    };
     let selectedCount = 0;
     productItems.forEach(item => {
         const checkbox = item.querySelector('input[type="checkbox"]');
         if (checkbox.checked) {
-            const total = parseFloat(item.querySelector('.total').textContent.replace(/[^\d.-]/g, ''));
+            const totalText = item.querySelector('.total').textContent;
+            console.log(totalText);
+            const total = parseFloat(totalText.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.'));
+            console.log(total);
             totalAmount += total;
             selectedCount++;
         }
     });
     const totalSection = document.querySelector('.total-section .total');
-    totalSection.innerHTML = `Tổng thanh toán (${selectedCount} Sản phẩm): ₫${totalAmount}`;
+    totalSection.innerHTML = `Tổng thanh toán (${selectedCount} Sản phẩm): ${formatCurrency(totalAmount)}`;
 }
 
 function handleQuantityChange(itemId, isIncreasing) {
@@ -95,9 +101,13 @@ function handleQuantityChange(itemId, isIncreasing) {
             if (result.code == '200') {
                 // Cập nhật hiển thị số lượng và tổng tiền
                 productItem.querySelector('.quantity span').textContent = newQuantity;
-                const price = parseFloat(productItem.querySelector('.price').textContent.replace(/[^\d.-]/g, ''));
+                const price = parseFloat(productItem.querySelector('.price').textContent.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.'));
                 const total = newQuantity * price;
-                productItem.querySelector('.total').textContent = `₫${total}`;
+                const formatCurrency = (amount) => {
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+                };
+                productItem.querySelector('.total').textContent = `${formatCurrency(total)}`;
+                console.log("total", total);
                 updateTotalSection();
             } else {
                 toastr.error(result.message || 'Cập nhật số lượng thất bại!', 'Lỗi');
@@ -184,28 +194,38 @@ function renderCart(items) {
         const sanPham = item.sanPham || {}; // Xử lý trường hợp sanPham là null
         const sanPhamChiTiet = item.sanPhamChiTiet || {};
         const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.gia;
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        };
         const total = gia * item.soLuong;
         totalAmount += total;
         const productItem = document.createElement('div');
         productItem.className = 'product-item';
         const itemHtml = `
+          
            <div>
-                <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} data-id="${item.id}">
-                <img class="product-image" src="/images/${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}">
-                <span>
-                    <span style="font-size: 20px;">${sanPham.ten || 'Sản phẩm không xác định'}</span>
-                    <span style="margin-left: 10px;">Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}</span>
-                </span>
-            </div>
-           <div class="price">
-    ₫<span id="price">${gia}</span>
+    <div class="product-content">
+    <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} data-id="${item.id}">
+    
+        <img class="product-image" src="/images/${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}">
+        <div class="product-info">
+            <span class="product-name" style="font-size: 20px;">${sanPham.ten || 'Sản phẩm không xác định'}</span>
+            <span class="product-details">
+                Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}
+            </span>
+        </div>
+    </div>
 </div>
+
+           <div class="price">
+            ${formatCurrency(gia)}
+        </div>
             <div class="quantity">
                 <button>-</button>
                 <span>${item.soLuong}</span>
                 <button>+</button>
             </div>
-            <div class="total">₫${total}</div>
+            <div class="total">${formatCurrency(total)}</div>
             <div><button class="btn delete-btn">Xóa</button></div>
         `;
         productItem.innerHTML = itemHtml;

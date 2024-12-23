@@ -65,7 +65,23 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             });
     };
 
+    $scope.formatCurrency = function(amount) {
+        if (amount != null) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+        return ''; // Trả về chuỗi rỗng nếu amount là null hoặc undefined
+    };
 
+    $scope.formatGiaTri = function() {
+        // Kiểm tra nếu giá trị giaTri hợp lệ
+        if ($scope.detailForm.giaTri) {
+            // Lấy giá trị từ input và loại bỏ ký tự không phải số
+            let formattedValue = $scope.detailForm.giaTri.replace(/[^\d]/g, '');
+
+            // Dùng Intl.NumberFormat để format thành tiền tệ
+            $scope.detailForm.giaTri = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(formattedValue);
+        }
+    };
     // Hàm gọi khi thay đổi từ khóa tìm kiếm hoặc loại khuyến mãi
     $scope.$watch('searchText', function (newValue, oldValue) {
         if (newValue !== oldValue) {
