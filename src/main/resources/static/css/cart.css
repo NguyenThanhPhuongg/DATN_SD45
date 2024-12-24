@@ -100,18 +100,21 @@ body {
     background-color: #ccc;
 }
 
-.price, .total {
-    color: red;
-    white-space: nowrap;
-}
+/*.price {*/
+/*    color: red;*/
+/*    white-space: nowrap;*/
+/*}*/
 
 .btn, .checkout-btn {
-    background-color: #ee4d2d;
+    background-color: #323232;
     color: #fff;
-    padding: 10px 20px;
-    border: 1px solid #e74c3c;
+    padding: 10px 40px;  /* Tăng padding ngang để nút dài hơn */
+    border-radius: 0;    /* Đảm bảo các góc vuông */
     cursor: pointer;
+    width: auto;         /* Đảm bảo chiều rộng tự động theo nội dung */
+    font-family: 'SVN-Gotham', sans-serif !important;
 }
+
 
 .btn:hover, .checkout-btn:hover {
     background-color: #ee4d2d;
@@ -131,10 +134,24 @@ body {
 }
 
 .total-section .total {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
-    color: #e74c3c;
+    /*color: #e74c3c;*/
 }
+.total {
+    display: flex;
+    flex-direction: column; /* Hiển thị theo chiều dọc */
+    align-items: flex-start; /* Căn lề trái */
+    font-family: 'SVN-Gotham', sans-serif !important; /* Sử dụng font SVN-Gotham */
+    color: black; /* Màu chữ đen */
+    font-size: 14px; /* Kích thước chữ */
+    gap: 5px; /* Khoảng cách giữa các dòng */
+}
+
+.total span {
+    font-weight: bold; /* Làm đậm chữ cho các phần tử trong .total */
+}
+
 
 .total-container {
     display: flex;
@@ -175,7 +192,7 @@ body {
     width: 100px;
     height: 100px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 0px;
     border: 1px solid #ddd;
     margin-right: 10px;
 }
@@ -345,7 +362,7 @@ button {
     background-color: red;
     color: white;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 0px;
 }
 
 /* Nút Xóa bị vô hiệu hóa khi sản phẩm hết hàng */

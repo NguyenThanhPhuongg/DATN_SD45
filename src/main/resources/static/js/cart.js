@@ -62,20 +62,27 @@ function updateTotalSection() {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     };
     let selectedCount = 0;
+
     productItems.forEach(item => {
         const checkbox = item.querySelector('input[type="checkbox"]');
         if (checkbox.checked) {
             const totalText = item.querySelector('.total').textContent;
-            console.log(totalText);
             const total = parseFloat(totalText.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.'));
-            console.log(total);
             totalAmount += total;
             selectedCount++;
         }
     });
+
     const totalSection = document.querySelector('.total-section .total');
-    totalSection.innerHTML = `Tổng thanh toán (${selectedCount} Sản phẩm): ${formatCurrency(totalAmount)}`;
+
+    // Cập nhật "Tổng sản phẩm" và "Tạm tính"
+    const totalProducts = document.querySelector('.total-products');
+    const temporaryTotal = document.querySelector('.temporary-total');
+
+    totalProducts.textContent = `Tổng sản phẩm: ${selectedCount}`;
+    temporaryTotal.textContent = `Tạm tính: ${formatCurrency(totalAmount)}`;
 }
+
 
 function handleQuantityChange(itemId, isIncreasing) {
     const productItem = document.querySelector(`.product-item input[data-id="${itemId}"]`).closest('.product-item');
