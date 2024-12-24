@@ -310,4 +310,61 @@ button {
     font-size: 14px;
     color: #555;
 }
+/* Làm mờ sản phẩm hết hàng nhưng không vô hiệu hóa nút "Xóa" */
+.out-of-stock {
+    opacity: 0.5; /* Làm mờ sản phẩm */
+    pointer-events: none; /* Không cho phép tương tác cho các phần tử khác */
+    position: relative; /* Đảm bảo container có vị trí để định vị label "Hết hàng" */
+}
+
+/* Hiển thị chữ "Hết hàng" ở góc trên bên phải */
+.out-of-stock-label {
+    position: absolute;
+    top: 10px; /* Khoảng cách từ trên cùng */
+    right: 10px; /* Khoảng cách từ bên phải */
+    background-color: rgba(0, 0, 0, 0.7); /* Nền bán trong suốt */
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 9999; /* Đảm bảo label luôn ở trên ảnh */
+}
+
+/* Đảm bảo ảnh có position relative để label "Hết hàng" được căn chỉnh chính xác */
+.product-image {
+    width: 100%; /* Hoặc tùy chỉnh kích thước ảnh */
+    max-width: 200px; /* Tùy chỉnh chiều rộng tối đa của ảnh */
+    height: auto;
+    position: relative; /* Để cho phép căn chỉnh label "Hết hàng" */
+}
+
+/* Nút Xóa sẽ không bị làm mờ khi sản phẩm hết hàng */
+.delete-btn {
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Nút Xóa bị vô hiệu hóa khi sản phẩm hết hàng */
+.delete-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+/* Hiển thị thông báo "Không đủ số lượng" */
+.out-of-stock-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 10;
+}
+
 

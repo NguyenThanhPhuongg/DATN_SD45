@@ -185,10 +185,12 @@ function renderCart(items) {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
     const productSection = document.querySelector('.product-section');
     productSection.innerHTML = '';
+
     if (items.length === 0) {
         productSection.innerHTML = '<p>Không có sản phẩm nào.</p>';
         return;
     }
+
     let totalAmount = 0;
     items.forEach(item => {
         const sanPham = item.sanPham || {}; // Xử lý trường hợp sanPham là null
@@ -197,40 +199,52 @@ function renderCart(items) {
         const formatCurrency = (amount) => {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
         };
+
         const total = gia * item.soLuong;
         totalAmount += total;
+
+        // Kiểm tra nếu sản phẩm hết hàng
+        const isOutOfStock = sanPhamChiTiet.soLuong === 0;
+        // Kiểm tra nếu số lượng giỏ hàng vượt quá số lượng có sẵn
+        const isNotEnoughStock = item.soLuong > sanPhamChiTiet.soLuong;
+
         const productItem = document.createElement('div');
         productItem.className = 'product-item';
-        const itemHtml = `
-          
-           <div>
-    <div class="product-content">
-    <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} data-id="${item.id}">
-    
-        <img class="product-image" src="/images/${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}">
-        <div class="product-info">
-            <span class="product-name" style="font-size: 20px;">${sanPham.ten || 'Sản phẩm không xác định'}</span>
-            <span class="product-details">
-                Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}
-            </span>
-        </div>
-    </div>
-</div>
 
-           <div class="price">
-            ${formatCurrency(gia)}
-        </div>
+        // HTML của sản phẩm
+        const itemHtml = `
+            <div class="product-content ${isOutOfStock || isNotEnoughStock ? 'out-of-stock' : ''}">
+                <!-- Hiển thị chữ "Hết hàng" nếu hết hàng -->
+                ${isOutOfStock ? '<span class="out-of-stock-label">Hết hàng</span>' : ''}
+                <!-- Hiển thị chữ "Không đủ số lượng" nếu số lượng giỏ hàng vượt quá số lượng có sẵn (chỉ khi không hết hàng) -->
+                ${!isOutOfStock && isNotEnoughStock ? '<span class="out-of-stock-label">Không đủ số lượng</span>' : ''}
+                
+                <input type="checkbox" ${selectedItems.includes(item.id) ? 'checked' : ''} 
+                    data-id="${item.id}" ${isOutOfStock || isNotEnoughStock ? 'disabled' : ''}>
+                <img class="product-image" src="/images/${sanPham.anh || ''}" alt="${sanPham.ten || 'Không có ảnh'}">
+                <div class="product-info">
+                    <span class="product-name" style="font-size: 20px;">${sanPham.ten || 'Sản phẩm không xác định'}</span>
+                    <span class="product-details">
+                        Phân loại: ${sanPhamChiTiet.mauSac?.ten || 'N/A'}, Size: ${sanPhamChiTiet.size?.ten || 'N/A'}
+                    </span>
+                </div>
+            </div>
+            <div class="price">
+                ${formatCurrency(gia)}
+            </div>
             <div class="quantity">
-                <button>-</button>
+                <button ${isOutOfStock || isNotEnoughStock ? 'disabled' : ''}>-</button>
                 <span>${item.soLuong}</span>
-                <button>+</button>
+                <button ${isOutOfStock || isNotEnoughStock ? 'disabled' : ''}>+</button>
             </div>
             <div class="total">${formatCurrency(total)}</div>
-            <div><button class="btn delete-btn">Xóa</button></div>
+            <div><button class="btn delete-btn" data-id="${item.id}">Xóa</button></div>
         `;
+
         productItem.innerHTML = itemHtml;
         productSection.appendChild(productItem);
     });
+
     updateTotalSection();
 
     // Thêm sự kiện cho các nút tăng giảm số lượng
@@ -252,7 +266,7 @@ function renderCart(items) {
     // Thêm sự kiện cho các nút Xóa
     document.querySelectorAll('.product-item .delete-btn').forEach(button => {
         button.addEventListener('click', (e) => {
-            const itemId = e.target.closest('.product-item').querySelector('input[data-id]').dataset.id;
+            const itemId = e.target.dataset.id;  // Lấy ID từ data-id thay vì tìm kiếm lại
             handleDelete(itemId);
         });
     });
@@ -260,7 +274,6 @@ function renderCart(items) {
     // Thêm sự kiện cho nút Mua Hàng
     document.querySelector('.checkout-btn').addEventListener('click', handleCheckout);
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     // Xóa selectedItems khỏi local storage khi trang được tải lại
