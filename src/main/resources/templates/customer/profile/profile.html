@@ -1670,14 +1670,13 @@
         <h2>Yêu cầu đổi trả</h2>
         <form id="request-return-form">
             <!-- Loại yêu cầu -->
-            <!-- Danh sách sản phẩm chi tiết để chọn -->
-            <label for="product-list">Chọn sản phẩm:</label>
+            <label for="product-list">Chọn sản phẩm:<span style="color: red;">*</span></label>
             <div id="product-list" class="product-list">
                 <!-- Các sản phẩm sẽ được hiển thị ở đây -->
             </div>
             <br/>
 
-            <label for="type">Loại yêu cầu:</label>
+            <label for="type">Loại yêu cầu: <span style="color: red;">*</span></label>
             <select id="type" name="type" required onchange="toggleFields()">
                 <option value="DOI_HANG">Đổi hàng</option>
                 <option value="TRA_HANG">Trả hàng</option>
@@ -1685,7 +1684,7 @@
             <br/>
 
             <!-- Lý do yêu cầu -->
-            <label for="reason">Lý do:</label>
+            <label for="reason">Lý do: <span style="color: red;">*</span></label>
             <textarea id="reason" name="reason" rows="4" required></textarea>
             <br/>
 
@@ -1696,20 +1695,20 @@
 
             <!-- Thông tin mặt hàng muốn đổi (ẩn mặc định, chỉ hiển thị khi chọn Đổi hàng) -->
             <div id="product-exchange-info" style="display: none;">
-                <label for="product-exchange">Thông tin mặt hàng muốn đổi:</label>
-                <textarea id="product-exchange" name="product-exchange" rows="4" placeholder="Thông tin về mặt hàng muốn đổi"></textarea>
+                <label for="product-exchange">Thông tin mặt hàng muốn đổi: <span style="color: red;">*</span></label>
+                <textarea id="product-exchange" name="product-exchange" rows="4" placeholder="Thông tin về mặt hàng muốn đổi" required></textarea>
                 <br/>
             </div>
 
             <!-- Thông tin chuyển khoản (ẩn mặc định, chỉ hiển thị khi chọn Trả hàng) -->
             <div id="bank-info-section" style="display: none;">
-                <label for="bank-info">Thông tin chuyển khoản:</label>
+                <label for="bank-info">Thông tin chuyển khoản: <span style="color: red;">*</span></label>
                 <textarea id="bank-info" name="bank-info" rows="4" placeholder="Nhập thông tin chuyển khoản (tên tài khoản, số tài khoản, ngân hàng, v.v.)" required></textarea>
                 <br/>
             </div>
 
             <!-- Thêm trường chọn tệp -->
-            <label for="files">Chọn tệp (Hình ảnh hoặc Video):</label>
+            <label for="files">Chọn tệp (Hình ảnh hoặc Video):<span style="color: red;">*</span></label>
             <input type="file" id="files" name="files[]" accept="image/*,video/*" multiple>
             <div id="file-preview" class="file-preview">
                 <!-- Preview sẽ hiển thị ở đây -->
@@ -1723,7 +1722,6 @@
         </form>
     </div>
 </div>
-
 
 <div th:include="footer::body"></div>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -3000,8 +2998,8 @@
 
             const quantityDisplay = document.createElement('input');
             quantityDisplay.type = 'number';
-            quantityDisplay.value = 0;  // Mặc định là 0
-            quantityDisplay.min = 0;
+            quantityDisplay.value = 1;  // Mặc định là 0
+            quantityDisplay.min = 1;
             quantityDisplay.max = item.soLuong;  // Số lượng tối đa không được vượt quá số lượng đã mua
             quantityDisplay.addEventListener('change', () => updateQuantity(item.idSanPhamChiTiet, parseInt(quantityDisplay.value) - parseInt(quantityDisplay.defaultValue), item.soLuong));
 
@@ -3040,6 +3038,7 @@
 
     // Cập nhật số lượng sản phẩm muốn đổi
     function updateQuantity(productId, change, maxQuantity) {
+        event.preventDefault();
         const quantityInput = document.querySelector(`#product-${productId} .quantity-control input`);
         let currentQuantity = parseInt(quantityInput.value);
         let newQuantity = currentQuantity + change;
@@ -3077,7 +3076,7 @@
         }
 
         // In ra mảng idSanPhamChiTiets để kiểm tra
-        console.log(idSanPhamChiTiets);
+        console.log('idSanPhamChiTiets',idSanPhamChiTiets);
     }
 
 
@@ -3085,6 +3084,10 @@
     function closeRequestReturnModal() {
         const modal = document.getElementById("request-return-modal");
         modal.classList.remove("show"); // Loại bỏ lớp "show" khi đóng modal
+        const form = document.getElementById('request-return-form');
+        form.reset();
+        const filePreview = document.getElementById('file-preview');
+        filePreview.innerHTML = '';
     }
 
     // Hàm ẩn modal khi bấm ngoài modal
@@ -3174,7 +3177,7 @@
         const selectedProducts = [];  // Mảng các đối tượng sản phẩm chi tiết (bao gồm ID và số lượng)
 
         // Duyệt qua tất cả các sản phẩm trong modal để lấy thông tin ID và số lượng
-        document.querySelectorAll('.product-item').forEach(item => {
+        document.querySelectorAll('.product-item.selected').forEach(item => {
             const productId = item.getAttribute('id').split('-')[1]; // Lấy ID sản phẩm từ ID của item
             const quantity = parseInt(item.querySelector('.quantity-control input').value);  // Lấy số lượng từ input của từng sản phẩm
 
@@ -3193,7 +3196,7 @@
         const bankInfo = document.getElementById('bank-info').value;  // Thông tin chuyển khoản
         const productExchangeInfo = document.getElementById('product-exchange').value;  // Thông tin mặt hàng muốn đổi
         const files = document.getElementById('files').files;  // Các tệp đã chọn
-
+        console.log('selectedProducts', selectedProducts);
         // Kiểm tra các điều kiện bắt buộc
         if (selectedProducts.length === 0) {
             toastr.error('Bạn phải chọn ít nhất một sản phẩm để gửi yêu cầu.', 'Lỗi');
@@ -3222,6 +3225,10 @@
                 toastr.error('Bạn phải nhập thông tin chuyển khoản.', 'Lỗi');
                 return;
             }
+        }
+        if (files.length === 0) {
+            toastr.error('Bạn phải chọn ít nhất một tệp để gửi yêu cầu.', 'Lỗi');
+            return;
         }
 
 
