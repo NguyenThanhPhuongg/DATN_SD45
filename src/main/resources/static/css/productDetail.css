@@ -173,6 +173,12 @@ input[type="radio"] {
     background-color: white;
     transition: all 0.3s ease;
 }
+/* Làm mờ phần tử khi bị vô hiệu hóa */
+.custom-radio.disabled,
+.custom-radio-circle.disabled {
+    opacity: 0.3;  /* Làm mờ phần tử */
+    pointer-events: none;  /* Tắt tương tác với phần tử */
+}
 
 /* Giao diện tùy chỉnh cho hình tròn */
 .custom-radio-circle {
@@ -194,12 +200,12 @@ input[type="radio"] {
 
 /* Khi được chọn */
 input[type="radio"]:checked + .radio-label {
-    outline: 1px solid black;
+    outline: 3px solid black;
     outline-offset: 2px;
 }
 
 input[type="radio"]:checked + .radio-circle{
-    outline: 1px solid black;
+    outline: 3px solid black;
     outline-offset: 2px;
 }
 

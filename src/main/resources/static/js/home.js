@@ -226,7 +226,10 @@ $(document).ready(function () {
                         // Lắng nghe sự kiện khi carousel thay đổi ảnh
                         $('#carouselExampleAutoplaying').on('slid.bs.carousel', function () {
                             const activeIndex = $('#productImages .carousel-item.active').index();  // Lấy index của ảnh đang hiển thị
-                            setActiveImage(activeIndex);  // Cập nhật viền thumbnail
+
+                            // Cập nhật ảnh trong carousel và thumbnail
+                            $('#productImages .carousel-item').removeClass('active').eq(activeIndex).addClass('active');
+                            $('#thumbnailImages img').css('border', '2px solid #ccc').eq(activeIndex).css('border', '2px solid #000');
                         });
 
                         $('#sizeOptions').empty();
@@ -371,9 +374,11 @@ $(document).ready(function () {
                 ).map(item => item.idSize);
 
                 if (selectedSize && !availableSizes.includes(parseInt(selectedSize))) {
-                    $(this).prop('disabled', true); // Disable nếu không có size tương ứng
+                    $(this).prop('disabled', true); // Vô hiệu hóa nếu không có size tương ứng
+                    $(this).closest('.custom-radio-circle').addClass('disabled'); // Thêm lớp 'disabled' để làm mờ
                 } else {
-                    $(this).prop('disabled', false); // Enable nếu có size tương ứng
+                    $(this).prop('disabled', false); // Kích hoạt nếu có size tương ứng
+                    $(this).closest('.custom-radio-circle').removeClass('disabled'); // Xóa lớp 'disabled' khi kích hoạt lại
                 }
             });
 
@@ -385,9 +390,11 @@ $(document).ready(function () {
                 ).map(item => item.idMauSac);
 
                 if (selectedColor && !availableColors.includes(parseInt(selectedColor))) {
-                    $(this).prop('disabled', true); // Disable nếu không có màu tương ứng
+                    $(this).prop('disabled', true); // Vô hiệu hóa nếu không có màu tương ứng
+                    $(this).closest('.custom-radio').addClass('disabled'); // Thêm lớp 'disabled' để làm mờ
                 } else {
-                    $(this).prop('disabled', false); // Enable nếu có màu tương ứng
+                    $(this).prop('disabled', false); // Kích hoạt nếu có màu tương ứng
+                    $(this).closest('.custom-radio').removeClass('disabled'); // Xóa lớp 'disabled' khi kích hoạt lại
                 }
             });
         }
