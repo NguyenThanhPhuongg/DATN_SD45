@@ -2203,10 +2203,7 @@
                     if (response.ok) {
                         const data = await response.json();
                         toastr.success('Cập nhật thành công!', 'Thành công');
-
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 500);
+                        ganThongTinVaoForm();
                     } else {
                         toastr.error('Có lỗi xảy ra khi cập nhật thông tin.', 'Lỗi');
                     }
