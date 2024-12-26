@@ -123,8 +123,16 @@ function fetchCartItemCount(token) {
 // Hàm cập nhật số lượng giỏ hàng trong badge
 function updateCartBadge(count) {
     const cartBadge = document.querySelector('.cart-badge');
+    const cartCount = document.querySelector('.cart-count');
+    const cartTotal = document.querySelector('.cart-total');
     if (cartBadge) {
         cartBadge.textContent = count; // Cập nhật số lượng giỏ hàng
+    }
+    if (cartCount) {
+        cartCount.textContent = count; // Cập nhật số lượng giỏ hàng
+    }
+    if (cartTotal) {
+        cartTotal.textContent = count; // Cập nhật số lượng giỏ hàng
     }
 }
 //

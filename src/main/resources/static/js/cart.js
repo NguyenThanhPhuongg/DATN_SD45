@@ -67,7 +67,7 @@ function updateTotalSection() {
         const checkbox = item.querySelector('input[type="checkbox"]');
         if (checkbox.checked) {
             const totalText = item.querySelector('.total').textContent;
-            const total = parseFloat(totalText.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.'));
+            const total = parseFloat(totalText.replace(/[^\d,]/g, '').replace(/,/g, '').replace(/\./g, '.'));
             totalAmount += total;
             selectedCount++;
         }
@@ -245,7 +245,8 @@ function renderCart(items) {
                 <button ${isOutOfStock || isNotEnoughStock ? 'disabled' : ''}>+</button>
             </div>
             <div class="total">${formatCurrency(total)}</div>
-            <div><button class="btn delete-btn" data-id="${item.id}">Xóa</button></div>
+            <div><button class="btn delete-btn" data-id="${item.id}"><i class="fa fa-trash"></i></button></div>
+
         `;
 
         productItem.innerHTML = itemHtml;
@@ -273,7 +274,7 @@ function renderCart(items) {
     // Thêm sự kiện cho các nút Xóa
     document.querySelectorAll('.product-item .delete-btn').forEach(button => {
         button.addEventListener('click', (e) => {
-            const itemId = e.target.dataset.id;  // Lấy ID từ data-id thay vì tìm kiếm lại
+            const itemId = e.target.closest('.delete-btn').dataset.id;  // Lấy ID từ data-id thay vì tìm kiếm lại
             handleDelete(itemId);
         });
     });
@@ -333,4 +334,164 @@ function checkToken() {
         }
     }
 }
+$(document).ready(function () {
+    // Hàm hiển thị sản phẩm
+    function displayCategoryProducts(products, containerId) {
+        const productContainer = $(`#${containerId}`);
+        productContainer.empty();
 
+        // Chỉ lấy 8 sản phẩm đầu tiên
+        const limitedProducts = products.slice(0, 8);
+
+        limitedProducts.forEach(product => {
+            const formattedPrice = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(product.gia);
+            const formattedSalePrice = product.giaSauKhuyenMai
+                ? new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(product.giaSauKhuyenMai)
+                : '';
+            const salePriceHTML = product.giaSauKhuyenMai
+                ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>`
+                : '';
+            const oldPriceClass = product.giaSauKhuyenMai ? 'text-decoration: line-through;' : '';
+
+            const productHtml = `
+            <div class="product d-flex flex-column align-items-center justify-content-between">
+                <div class="image-wrapper">
+                    <a href="/productDetail/${product.id}">
+                        <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
+                    </a>
+                    ${product.giaSauKhuyenMai ? `
+                    <div class="hot-sale-badge position-absolute translate-middle">
+                        <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
+                    </div>` : ''}
+                </div>
+                <div class="price-and-name text-center">
+                    <p class="name" style="font-size: 19px;">${product.ten}</p>
+                    <p class="price fw-bold" style="font-size: 23px; ${oldPriceClass}">
+                        ${formattedPrice}
+                    </p>
+                    ${salePriceHTML}
+                </div>
+                <br><br>
+                <div class="product-buttons d-flex justify-content-center mt-3 gap-2">
+                    <a class="btn w-50 add-to-wishlist-btn" data-product-id="${product.id}">
+                        Yêu thích
+                    </a>
+                    <a href="/productDetail/${product.id}" class="btn w-50 view-details-btn">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        `;
+            productContainer.append(productHtml);
+        });
+    }
+
+    // Hàm lấy toàn bộ sản phẩm
+    function fetchAllProducts() {
+        $.ajax({
+            url: '/san-pham/search',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({trangThai: 1}),
+            success: function (response) {
+                const products = response.data || [];
+
+                const topSellingProducts = products.filter(product => product.isTopSelling);
+                displayCategoryProducts(topSellingProducts, 'sanphambanchay'); // Hiển thị sản phẩm bán chạy
+
+                // Hiển thị sản phẩm lên trang
+                // displayProducts(currentPage);
+                attachWishlistEvent(); // Gắn sự kiện wishlist
+            },
+            error: function (error) {
+                console.error('Error fetching products:', error);
+            }
+        });
+    }
+
+    // Gọi hàm
+    fetchAllProducts(); // Gọi API lấy toàn bộ sản phẩm
+});
+function attachWishlistEvent() {
+    $('.add-to-wishlist-btn').off('click').on('click', function (e) {
+        e.preventDefault();
+
+        const productId = $(this).data('product-id');
+        const authToken = localStorage.getItem("token");
+
+        if (!authToken) {
+            showToast('Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích.', 'danger');
+            return;
+        }
+
+        const heartIcon = $(this).closest('.product').find('.icon-heart i');
+        const button = $(this);
+
+        checkProductInWishlist(productId, authToken, heartIcon, button);
+    });
+}
+
+// Kiểm tra và thêm vào danh sách yêu thích
+function checkProductInWishlist(productId, authToken, heartIcon, button) {
+    sendAjax(`/yeu-thich/${productId}/check`, 'GET', authToken, null,
+        function (isInWishlist) {
+            if (isInWishlist) {
+                showToast('Sản phẩm đã có trong danh sách yêu thích.', 'info');
+                toastr.info('Sản phẩm đã có trong danh sách yêu thích.', 'Đã có');
+            } else {
+                addProductToWishlist(productId, authToken, heartIcon, button);
+            }
+        },
+        function (error) {
+            console.error("Lỗi khi kiểm tra sản phẩm trong wishlist:", error);
+            showToast('Có lỗi khi kiểm tra danh sách yêu thích.', 'danger');
+            toastr.warning('Có lỗi khi kiểm tra danh sách yêu thích.', 'Lỗi');
+        }
+    );
+}
+
+// Thêm sản phẩm vào wishlist
+function addProductToWishlist(productId, authToken, heartIcon, button) {
+    button.attr('disabled', true);
+
+    sendAjax(`/yeu-thich/${productId}`, 'POST', authToken, null,
+        function () {
+            showToast('Đã thêm sản phẩm vào danh sách yêu thích!', 'success');
+            toastr.success('Đã thêm sản phẩm vào danh sách yêu thích!', 'Thành công');
+        },
+        function (error) {
+            console.error("Lỗi khi thêm sản phẩm vào danh sách yêu thích:", error);
+            showToast('Có lỗi khi thêm sản phẩm vào yêu thích.', 'danger');
+            toastr.danger('Có lỗi khi thêm sản phẩm vào yêu thích.', 'Lỗi');
+            button.attr('disabled', false);
+        }
+    );
+}
+function sendAjax(url, method, authToken, data, successCallback, errorCallback) {
+    $.ajax({
+        url: url,
+        method: method,
+        headers: {
+            "Authorization": `Bearer ${authToken}`
+        },
+        data: data,
+        success: successCallback,
+        error: errorCallback
+    });
+}
+function showToast(message, type) {
+    const toastBody = $('#toast .toast-body');
+    toastBody.text(message);
+
+    const toast = $('#toast').removeClass('bg-danger bg-success bg-info');
+    toast.addClass(type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : 'bg-info');
+
+    toast.toast({delay: 3000});
+    toast.toast('show');
+}

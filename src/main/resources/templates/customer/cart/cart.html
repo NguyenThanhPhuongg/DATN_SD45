@@ -24,39 +24,73 @@
 
     <!-- Thêm Toastr JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <script src="/js/cart.js"></script>
     <script src="/js/headerJs.js"></script>
 </head>
 <body>
 <div th:include="header-all::body"></div>
 <main>
+    <div class="breadcrumb-container">
+        <a href="/" class="breadcrumb-home">Trang chủ</a> /
+        <span class="breadcrumb-cart">Giỏ hàng (<span class="cart-count">0</span>)</span>
+    </div>
+    <div class="cart-info-container">
+        <div class="cart-title">Giỏ hàng của bạn</div>
+        <div class="cart-summary">
+            <span class="cart-total-items">Tổng cộng (<span class="cart-total">0</span>)</span>
+            <p class="cart-notice">
+                Các mặt hàng trong giỏ hàng của bạn không được bảo lưu — hãy kiểm tra ngay để đặt hàng.
+            </p>
+        </div>
+    </div>
     <div class="container">
-        <div class="header">
-            <div>Sản Phẩm</div>
-            <div>Đơn Giá</div>
-            <div>Số Lượng</div>
-            <div>Số Tiền</div>
-            <div>Thao Tác</div>
+        <div class="left-section">
+            <div class="checkbox-container">
+                <input type="checkbox" id="selectAllCheckbox"> CHỌN TẤT CẢ
+            </div>
+            <div class="product-section">
+                <!-- Sản phẩm sẽ được render ở đây từ API -->
+            </div>
         </div>
-        <div class="product-section">
-            <!-- Sản phẩm sẽ được render ở đây từ API -->
-        </div>
-        <div class="total-section">
-            <div class="total-container">
-                <div>
-                    <input type="checkbox" id="selectAllCheckbox"> Chọn Tất cả
+        <div class="right-section">
+            <div class="summary-title">TÓM TẮT ĐƠN HÀNG</div>
+            <div class="total-section">
+                <div class="total-container">
+                    <div class="summary-total">
+                        <span class="note">Chưa bao gồm phí vận chuyển</span>
+                        <span class="total-products">Tổng sản phẩm: 0</span>
+                        <span class="temporary-total">Tạm tính: </span>
+                    </div>
+                    <span class="discount-note">Bạn có thể nhập mã giảm giá ở trang thanh toán</span>
+                    <button class="checkout-btn">THANH TOÁN</button>
                 </div>
-                <div class="total">
-                    <span class="total-products">Tổng sản phẩm: 0</span>
-                    <span class="temporary-total">Tạm tính: 0 VND</span>
-                </div>
-                <div>
-                    <button class="checkout-btn">MUA HÀNG</button>
+                <div class="info-section">
+                    <div class="info-item">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                        <span class="info-text">ĐỔI HÀNG TRONG 15 NGÀY</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fa fa-phone" aria-hidden="true"></i>
+                        <span class="info-text">TỔNG ĐÀI BÁN HÀNG 0387 321 305</span>
+                    </div>
                 </div>
             </div>
         </div>
 
+
     </div>
+    <div>
+        <h2 class="title text-center" style="margin-top: 83px">CÓ LẼ BẠN SẼ THÍCH</h2>
+    </div>
+    <div id="sanphambanchay" class="product-list spbc d-flex justify-content-start flex-wrap my-5">
+
+    </div>
+    <div class="banner-container">
+        <img th:src="@{/images/banner.jpeg}" alt="" class="banner">
+    </div>
+
     <div class="alert"></div>
 </main>
 
