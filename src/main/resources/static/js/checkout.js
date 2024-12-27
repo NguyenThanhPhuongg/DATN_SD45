@@ -432,7 +432,16 @@ async function fetchCartData() {
 
             const data = await response.json();
             console.log(data); // Kiểm tra cấu trúc dữ liệu
-            populateTable(data.data); // Sử dụng data.data
+            const token = localStorage.getItem('token');
+            const userResponse = await fetch('user/get', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const userData = await userResponse.json();
+            console.log('userDataa:',userData);
+            populateTable(data.data, userData.data);
         } catch (error) {
             console.error('Có vấn đề với yêu cầu:', error);
         }
@@ -442,8 +451,32 @@ async function fetchCartData() {
 }
 
 document.addEventListener('DOMContentLoaded', fetchCartData);
+// window.addEventListener('beforeunload', () => {
+//     localStorage.removeItem('user');
+// });
+// document.addEventListener('DOMContentLoaded', fetchUserData);
+// async function fetchUserData() {
+//     const userFromStorage = localStorage.getItem('user');
+//     if (userFromStorage) {
+//         return JSON.parse(userFromStorage);
+//     }
+//     const token = localStorage.getItem('token');
+//     const response = await fetch('user/get', {
+//         method: 'GET',
+//         headers: {
+//             'Authorization': `Bearer ${token}`
+//         }
+//     });
+//     if (response.ok) {
+//         const userData  = await response.json();
+//         localStorage.setItem('user', JSON.stringify(userData.data));
+//         return data;
+//     } else {
+//         console.error('Lỗi khi lấy dữ liệu người dùng');
+//     }
+// }
 
-function populateTable(data) {
+function populateTable(data, userData) {
     const tableBody = document.querySelector('#products tbody');
     tableBody.innerHTML = ''; // Clear old content
     let totalItemPrice = 0; // Variable to store total item price
@@ -479,9 +512,42 @@ function populateTable(data) {
     document.getElementById('totalItemPrice').textContent = `${formatCurrency(totalItemPrice)}`;
     document.querySelector('.total-price').textContent = `Tổng Cộng: ${formatCurrency(totalItemPrice)}`;
 
-    const shippingFee = 30000; // Default shipping fee
-    const totalPayment = totalItemPrice + shippingFee;
+    // Tính toán phí vận chuyển và tổng thanh toán dựa trên cấp bậc người dùng
+    let shippingFee = 30000; // Default shipping fee
+
+    let discount = 0; // Khởi tạo biến giảm giá
+
+    if (userData.capBac === 'VANG') {
+        discount = 0.1; // Giảm 10% cho cấp bậc VANG
+        if (totalItemPrice >= 500000) {
+            shippingFee = 0; // Miễn phí ship nếu tổng giá trị >= 500,000 và cấp bậc là VANG
+        }
+    } else if (userData.capBac === 'KIM_CUONG') {
+        discount = 0.2; // Giảm 20% cho cấp bậc KIM_CUONG
+        shippingFee = 0; // Miễn phí ship cho cấp bậc KIM_CUONG
+    }
+
+    const discountAmount = totalItemPrice * discount; // Số tiền giảm giá
+    const totalAfterDiscount = totalItemPrice - discountAmount; // Tổng tiền sau khi giảm giá
+
+    // Tính tổng thanh toán (sau giảm giá và cộng phí vận chuyển)
+    const totalPayment = totalAfterDiscount + shippingFee;
+    updateMembershipBenefits(userData);
     document.getElementById('totalPayment').textContent = `${formatCurrency(totalPayment)}`;
+}
+function updateMembershipBenefits(userData) {
+    const membershipBenefits = document.getElementById('membershipBenefits');
+
+    // Kiểm tra cấp bậc của người dùng và cập nhật nội dung phù hợp
+    if (userData.capBac === 'VANG') {
+        membershipBenefits.textContent = 'Giảm giá 10%, giao hàng miễn phí trên 500,000₫';
+    } else if (userData.capBac === 'KIM_CUONG') {
+        membershipBenefits.textContent = 'Giảm giá 20%, giao hàng miễn phí không giới hạn, hỗ trợ 24/7';
+    } else if (userData.capBac === 'BAC') {
+        membershipBenefits.textContent = 'Không có ưu đãi';
+    } else {
+        membershipBenefits.textContent = 'Cấp bậc không hợp lệ';
+    }
 }
 
 
@@ -818,7 +884,7 @@ function selectVoucher() {
         }
 
         selectedVoucherId = selectedVoucher.value;
-        selectedVoucherValue = voucherValue; // Lưu giá trị voucher dưới dạng số
+        selectedVoucherValue = voucherValue;
 
         const selectedVoucherLabel = selectedVoucher.nextElementSibling;
         const voucherInfo = document.querySelector('.voucher');
@@ -838,30 +904,18 @@ function selectVoucher() {
 
 
 function updateTotalPayment() {
-    const totalItemPriceText = document.getElementById('totalItemPrice').textContent;
-    console.log('totalItemPriceText', totalItemPriceText); // In ra: "2.000.000 đ"
+    const totalPaymentText = document.getElementById('totalPayment').textContent;
 
     // Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
-    const totalItemPrice = parseFloat(totalItemPriceText.replace(/[^\d.-]/g, '').replace(/\./g, ''));
-    console.log('totalItemPrice', totalItemPrice);
+    const total = parseFloat(totalPaymentText.replace(/[^\d.-]/g, '').replace(/\./g, ''));
 
-    const shippingFee = 30000; // Default shipping fee
-    let totalPayment = totalItemPrice + shippingFee - selectedVoucherValue;
-    let totalPriceWithoutShipping = totalItemPrice - selectedVoucherValue;
+    let totalPayment = total - selectedVoucherValue;
 
     if (totalPayment < 0) {
         totalPayment = 0;
     }
-
-    if (totalPriceWithoutShipping < 0) {
-        totalPriceWithoutShipping = 0;
-    }
-
-    console.log('totalPayment', totalPayment);
-    console.log('totalPriceWithoutShipping', totalPriceWithoutShipping);
-
     document.getElementById('totalPayment').textContent = `${totalPayment.toLocaleString()} đ`;
-    document.querySelector('.total-price').textContent = `Tổng Cộng: ${totalPriceWithoutShipping.toLocaleString()} ₫`;
+    // document.querySelector('.total-price').textContent = `Tổng Cộng: ${totalPriceWithoutShipping.toLocaleString()} ₫`;
     document.getElementById('voucherDiscount').textContent = `${selectedVoucherValue.toLocaleString()} đ`;
 }
 

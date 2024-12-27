@@ -1419,6 +1419,51 @@
             flex-grow: 1;
             margin-left: 15px;
         }
+        .avatar-container {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+        .user-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Huy hiệu Bạc */
+        .badge-silver {
+            background: linear-gradient(45deg, #dcdcdc, #c0c0c0); /* Gradient bạc sáng đến bạc đậm */
+            color: #4f4f4f; /* Màu chữ xám đậm để tạo sự tương phản */
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8); /* Bóng chữ sáng */
+            border: 1px solid #a9a9a9; /* Viền bạc */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Hiệu ứng đổ bóng */
+        }
+
+        /* Huy hiệu Vàng */
+        .badge-gold {
+            background: linear-gradient(45deg, #ffd700, #ffaf00); /* Gradient vàng sáng đến vàng đậm */
+            color: #fff; /* Màu chữ trắng */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); /* Bóng chữ tối */
+            border: 1px solid #b8860b; /* Viền vàng đậm */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Hiệu ứng đổ bóng */
+        }
+
+        /* Huy hiệu Kim Cương */
+        .badge-diamond {
+            background: linear-gradient(45deg, #a1c4fd, #c2e9fb); /* Gradient xanh lấp lánh */
+            color: #004085; /* Màu chữ xanh đậm */
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.6); /* Bóng chữ sáng */
+            border: 1px solid #87ceeb; /* Viền xanh nhạt */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Hiệu ứng đổ bóng */
+        }
+
 
 
     </style>
@@ -1453,7 +1498,10 @@
     <div class="container">
         <div class="sidebar">
             <div class="user-info">
-                <img src="" alt="User Icon" class="user-icon" id="user-avatar"/>
+                <div class="avatar-container">
+                    <img src="" alt="" class="user-icon" id="user-avatar"/>
+                    <span class="user-badge" id="user-badge"></span>
+                </div>
                 <div class="user-name" id="user-name">Username</div>
             </div>
 
@@ -2135,6 +2183,20 @@
                     document.querySelector('input[name="gender"][value="NAM"]').checked = true;
                 } else if (profile.gioiTinh === 'NU') {
                     document.querySelector('input[name="gender"][value="NU"]').checked = true;
+                }
+                const capBac = duLieuNguoiDung.data.capBac;
+                const badgeElement = document.getElementById('user-badge');
+                if (capBac === 'BAC') {
+                    badgeElement.textContent = 'Bạc';
+                    badgeElement.className = 'user-badge badge-silver';
+                } else if (capBac === 'VANG') {
+                    badgeElement.textContent = 'Vàng';
+                    badgeElement.className = 'user-badge badge-gold';
+                } else if (capBac === 'KIM_CUONG') {
+                    badgeElement.textContent = 'Kim Cương';
+                    badgeElement.className = 'user-badge badge-diamond';
+                } else {
+                    badgeElement.style.display = 'none'; // Ẩn huy hiệu nếu không có cấp bậc hợp lệ
                 }
 
             }

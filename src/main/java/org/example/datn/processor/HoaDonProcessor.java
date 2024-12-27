@@ -97,6 +97,8 @@ public class HoaDonProcessor {
     private ApDungKhuyenMaiService apDungKhuyenMaiService;
     @Autowired
     private KhuyenMaiService khuyenMaiService;
+    @Autowired
+    private UserService userService;
 
     public ServiceResult getAll() {
         var list = service.getAll();
@@ -212,7 +214,7 @@ public class HoaDonProcessor {
 
             var size = sizeService.findById(sanPhamChiTiet.getIdSize()).orElseThrow(() -> NotFoundEntityException.of("size.not.found"));
             var mauSac = mauSacService.findById(sanPhamChiTiet.getIdMauSac()).orElseThrow(() -> NotFoundEntityException.of("mauSac.not.found"));
-            HoaDonChiTietDTO hdctDTO = new HoaDonChiTietDTO(sanPham.getTen(), sanPham.getAnh(), size.getTen(), mauSac.getTen(),hdct.getSoLuong(), sanPham.getGia());  // Tạo DTO từ HoaDonChiTiet và SanPhamChiTiet
+            HoaDonChiTietDTO hdctDTO = new HoaDonChiTietDTO(sanPham.getTen(), sanPham.getAnh(), size.getTen(), mauSac.getTen(), hdct.getSoLuong(), sanPham.getGia());  // Tạo DTO từ HoaDonChiTiet và SanPhamChiTiet
             hoaDonChiTietDTOList.add(hdctDTO);
 
             Integer soLuongMua = ghct.getSoLuong();
@@ -222,6 +224,14 @@ public class HoaDonProcessor {
             }
             sanPhamChiTiet.setSoLuong(soLuongConLai);
             sanPhamChiTietService.save(sanPhamChiTiet);
+        }
+        var user = userService.findById(hoaDon.getIdNguoiDung()).orElseThrow(NotFoundEntityException.ofSupplier("User not found"));
+        if (user.getCapBac() != null) {
+            if (user.getCapBac().equals(MembershipLevel.VANG)) {
+                tongTien = tongTien.multiply(BigDecimal.valueOf(0.9)); // Giảm 10% cho cấp bậc VANG
+            } else if (user.getCapBac().equals(MembershipLevel.KIM_CUONG)) {
+                tongTien = tongTien.multiply(BigDecimal.valueOf(0.8)); // Giảm 20% cho cấp bậc KIM_CUONG
+            }
         }
 
         if (request.getGiaTriVoucher() != null) {
@@ -266,11 +276,11 @@ public class HoaDonProcessor {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public ServiceResult updateStatus(Long id, UserAuthentication ua) {
+    public ServiceResult updateStatus(Long id, UserAuthentication ua) throws NotFoundEntityException {
         // Tìm hóa đơn theo ID
         HoaDon hoaDon = service.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hóa đơn không tồn tại"));
-
+        var user = userService.findById(hoaDon.getIdNguoiDung()).orElseThrow(NotFoundEntityException.ofSupplier("User not found"));
         // Xác định trạng thái mới dựa trên trạng thái hiện tại
         Integer newTrangThai;
         switch (hoaDon.getTrangThai()) {
@@ -285,6 +295,9 @@ public class HoaDonProcessor {
                 newTrangThai = StatusHoaDon.HOAN_THANH.getValue();
                 hoaDon.setNgayThanhToan(LocalDateTime.now());
                 hoaDon.setNgayGiaoHang(LocalDateTime.now());
+                user.setTongChiTieu(user.getTongChiTieu().add(hoaDon.getTongTien()));
+                user.updateMembershipLevel();
+                userService.save(user);
                 break;
             default:
                 throw new IllegalArgumentException("Trạng thái không hợp lệ để cập nhật");

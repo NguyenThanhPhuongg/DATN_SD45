@@ -72,7 +72,7 @@ public class HoaDonController {
 
     @PutMapping("/update-status/{id}")
     public ResponseEntity<ServiceResult> updateByTrangThai(@PathVariable Long id,
-                                                           UserAuthentication ua) throws DuplicatedException {
+                                                           UserAuthentication ua) throws DuplicatedException, NotFoundEntityException {
         ServiceResult result = processor.updateStatus(id, ua);
         return ResponseEntity.ok(result);
     }
