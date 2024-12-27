@@ -107,6 +107,8 @@ CREATE TABLE [nguoi_dung]
     [loai] NVARCHAR(50),
     [xac_thuc] BIT,
     [trang_thai] NVARCHAR(50),
+    [tong_chi_tieu] DECIMAL(18, 2),
+    [cap_bac] NVARCHAR(20),
     [ngay_tao] DATETIME DEFAULT GETDATE(),
     [ngay_cap_nhat] DATETIME DEFAULT GETDATE(),
     [nguoi_tao] BIGINT,
