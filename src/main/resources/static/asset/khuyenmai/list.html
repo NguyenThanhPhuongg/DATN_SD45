@@ -165,12 +165,21 @@
 
                             <!-- Table: Sản phẩm hoặc Người dùng (Dựa trên Loại) -->
                             <div ng-show="form.loai === 1">
-                                <label class="form-label">Chọn sản phẩm</label>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <label class="form-label mb-0">Chọn sản phẩm</label>
+                                    <div class="search-box">
+                                        <i class="fa fa-search search-icon"></i>
+                                        <input type="text" class="form-control search-input" placeholder="Tìm kiếm theo tên hoặc mã sản phẩm"
+                                               ng-model="searchQuery">
+                                    </div>
+                                </div>
+
                                 <table class="table table-striped">
                                     <thead>
                                     <tr>
-                                        <th><input type="checkbox" ng-model="selectAllProducts"
-                                                   ng-change="toggleSelectAllProducts()"></th>
+                                        <th>
+                                            <input type="checkbox" ng-model="selectAllProducts" ng-change="toggleSelectAllProducts()">
+                                        </th>
                                         <th>STT</th>
                                         <th>Mã sản phẩm</th>
                                         <th>Tên sản phẩm</th>
@@ -179,7 +188,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="sp in products">
+                                    <tr ng-repeat="sp in products | filter:productFilter">
                                         <td><input type="checkbox" ng-model="sp.selected"/></td>
                                         <td>{{$index + 1}}</td>
                                         <td>{{sp.ma}}</td>
@@ -193,19 +202,28 @@
 
 
                             <div ng-show="form.loai === 2">
-                                <label class="form-label">Chọn người dùng</label>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <label class="form-label mb-0">Chọn người dùng</label>
+                                    <div class="search-box">
+                                        <i class="fa fa-search search-icon"></i>
+                                        <input type="text" class="form-control search-input" placeholder="Tìm kiếm theo họ và tên hoặc username"
+                                               ng-model="searchQuery">
+                                    </div>
+                                </div>
+
                                 <table class="table table-striped">
                                     <thead>
                                     <tr>
-                                        <th><input type="checkbox" ng-model="selectAllUsers"
-                                                   ng-change="toggleSelectAllUsers()"></th>
+                                        <th>
+                                            <input type="checkbox" ng-model="selectAllUsers" ng-change="toggleSelectAllUsers()">
+                                        </th>
                                         <th>STT</th>
                                         <th>Tên người dùng</th>
                                         <th>Tên đăng nhập</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="nd in users">
+                                    <tr ng-repeat="nd in users | filter:userFilter">
                                         <td><input type="checkbox" ng-model="nd.selected"/></td>
                                         <td>{{$index + 1}}</td>
                                         <td>{{nd.profile.hoVaTen}}</td>
@@ -214,6 +232,7 @@
                                     </tbody>
                                 </table>
                             </div>
+
                         </form>
                     </div>
                 </div>

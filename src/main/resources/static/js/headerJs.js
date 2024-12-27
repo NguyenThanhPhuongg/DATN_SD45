@@ -122,20 +122,10 @@ function fetchCartItemCount(token) {
 
 // Hàm cập nhật số lượng giỏ hàng trong badge
 function updateCartBadge(count) {
-    const cartBadge = document.querySelector('.cart-badge');
-    const cartCount = document.querySelector('.cart-count');
-    const cartTotal = document.querySelector('.cart-total');
-    if (cartBadge) {
-        cartBadge.textContent = count; // Cập nhật số lượng giỏ hàng
-    }
-    if (cartCount) {
-        cartCount.textContent = count; // Cập nhật số lượng giỏ hàng
-    }
-    if (cartTotal) {
-        cartTotal.textContent = count; // Cập nhật số lượng giỏ hàng
-    }
+    const elements = document.querySelectorAll('.cart-badge, .cart-count, .cart-total');
+    elements.forEach(element => element.textContent = count);
 }
-//
+
 // Hàm tạo danh mục con cho mỗi cấp
 function createSubMenu(children, level = 1) {
     const subMenu = document.createElement('ul');

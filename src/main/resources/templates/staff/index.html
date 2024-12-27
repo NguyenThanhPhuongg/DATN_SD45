@@ -455,6 +455,36 @@
         input[type="file"] {
             cursor: pointer;
         }
+        /* Bố cục cho hộp tìm kiếm */
+        .search-box {
+            position: relative;
+            width: 50%; /* Đặt độ rộng tùy chỉnh */
+            padding-top: 10px;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 10px 8px 35px; /* Tạo khoảng cách với biểu tượng */
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
 
 
     </style>
