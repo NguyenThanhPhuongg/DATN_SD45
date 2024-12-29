@@ -430,7 +430,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 }
                 productInList.soLuong = item.soLuongMax - parseFloat(item.soLuong);
             }
-            if (item.soLuong === 0) {
+            if (item.soLuong < 1) {
+                item.soLuong = 1
                 $scope.removeProduct(bill, item);
             }
         }
@@ -461,14 +462,13 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
     $scope.updateQuantity = function (bill, item) {
         if (item.soLuong === null || item.soLuong === '' || parseFloat(item.soLuong) === 0) {
-            $scope.removeProduct(bill, item)
+            item.soLuong = 1;
         }
         const productInList = $scope.listProduct.find(p => p.id === item.id);
-
+        if (parseFloat(item.soLuong) > item.soLuongMax) {
+            item.soLuong = item.soLuongMax;
+        }
         if (productInList) {
-            if (parseFloat(item.soLuong) > item.soLuongMax) {
-                item.soLuong = item.soLuongMax;
-            }
             productInList.soLuong = item.soLuongMax - parseFloat(item.soLuong);
         }
 
@@ -479,25 +479,49 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         $scope.updateTotalBill(bill);
     };
     $scope.removeProduct = function (bill, product) {
-        const index = bill.items.findIndex(item => item.id === product.id);
-        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này!')) {
-            if (index !== -1) {
-                // Khôi phục số lượng ban đầu trong danh sách sản phẩm
-                const productInList = $scope.listProduct.find(p => p.id === product.id);
-                if (productInList) {
-                    productInList.soLuong += product.soLuong; // Cộng lại số lượng đã sử dụng
-                }
-
-                // Xóa sản phẩm khỏi hóa đơn
-                bill.items.splice(index, 1);
-
-                // Cập nhật tổng hóa đơn
-                $scope.updateTotalBill(bill);
-            } else {
-                console.log("Sản phẩm không được tìm thấy trong mảng items.");
-            }
+        if (!bill || !bill.items || !product || !$scope.listProduct) {
+            console.error("Dữ liệu không hợp lệ.");
+            return;
         }
+        const index = bill.items.findIndex(item => item.id === product.id);
+        // Lưu giá trị ban đầu của sản phẩm
+        const originalQuantity = product.soLuong;
+
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn xóa sản phẩm này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+        }).then((result) => {
+            if (result) {
+                if (index !== -1) {
+                    const productInList = $scope.listProduct.find(p => p.id === product.id);
+                    if (productInList) {
+                        productInList.soLuong = (productInList.soLuong || 0) + (product.soLuong || 0);
+                    }
+
+                    bill.items.splice(index, 1);
+                    $scope.updateTotalBill(bill);
+
+                    // Đảm bảo render lại giao diện
+                    $scope.$applyAsync(); // Kích hoạt cơ chế digest một cách an toàn
+                } else {
+                    console.warn("Không tìm thấy sản phẩm trong hóa đơn.");
+                }
+            } else {
+                console.log(bill.items)
+                // Nếu hủy, khôi phục lại giá trị ban đầu của sản phẩm
+                bill.items[index].soLuong = originalQuantity
+                console.log(bill.items)
+                //product.soLuong = originalQuantity;
+                $scope.$applyAsync(); // Đảm bảo giao diện được cập nhật
+            }
+        }).catch(error => {
+            console.error("Lỗi trong SweetAlert:", error);
+        });
     };
+
+
 
     $scope.searchFilter = function(product) {
 
