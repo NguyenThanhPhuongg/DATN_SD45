@@ -208,7 +208,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             nguoiTao: parseFloat(document.getElementById("nameAdmin").getAttribute('data-id')) || 0,
             tenNguoiTao: document.getElementById("nameAdmin").textContent || 'Admin',
             diemSuDung: '',
-            idDiaChiGiaoHang:3,
+            idDiaChiGiaoHang:0,
             idPhuongThucVanChuyen:3,
             nguoiCapNhat:0,
             payCustomer: 'money',
