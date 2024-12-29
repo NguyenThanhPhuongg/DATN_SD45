@@ -33,7 +33,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+    <link rel="stylesheet" href="">
     <style>
         td {
             white-space: nowrap;
@@ -208,6 +208,7 @@
         .done-bill {
             opacity: 0.6;
             pointer-events: none;
+            background: url("/images/rb_8234.png") no-repeat center center/ 150px;
         }
 
         .position-relative {
@@ -455,10 +456,14 @@
         input[type="file"] {
             cursor: pointer;
         }
-
+        #tableproductlist2 .dropdown-item{
+            font-size: 12px;
+        }
+        #tableproductlist2 .dropdown-item:focus, #tableproductlist2 .dropdown-item:hover{
+            background-color: #e9ecef;
+        }
 
     </style>
-    <link rel="stylesheet" href="../staff/css/group.css">
 </head>
 
 <body class="sb-nav-fixed" ng-app="admin-app">
@@ -573,9 +578,13 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
         crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+
 <script src="../staff/js/js.js"></script>
 <script src="../staff/js/admin-app.js"></script>
 <script src="../staff/js/banhang-ctrl.js"></script>
@@ -608,7 +617,7 @@
         crossorigin="anonymous"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.js"></script>
