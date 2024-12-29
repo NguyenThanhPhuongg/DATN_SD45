@@ -1,28 +1,42 @@
 
 // Khởi tạo controller AngularJS
-app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $location) {
+app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $location, $timeout) {
     $scope.bills = JSON.parse(localStorage.getItem('bills')) || [];
     $scope.activeBill = 0;
     $scope.showPopUp = false;
     $scope.listProduct = JSON.parse(localStorage.getItem('listProduct')) || [];
     $scope.listProductPromotion = [];
     $scope.vouchers = [];
-    $scope.searchQuery = '';
-    $scope.sliderOffset = 0; // Vị trí dịch chuyển của slider
-    $scope.sliderPosition = 0; // Vị trí hiện tại
-    $scope.maxSliderPosition = 11;
+    $scope.searchTerm = '';
+    $scope.barcode = '';
+    $scope.sliderOffset = 0;
+    $scope.sliderPosition = 0;
+    $scope.maxSliderPosition = 8;
+    $scope.modeScan = false
+
+    $scope.toggleModeScan = function() {
+        $scope.modeScan = !$scope.modeScan;
+        if ($scope.modeScan) {
+            $timeout(function() {
+                var barcodeInput = document.querySelector('input[name="barcode"]');
+                if (barcodeInput) {
+                    barcodeInput.focus();
+                }
+            }, 0);
+        }
+    };
 
     $scope.prevTab = function () {
         if ($scope.sliderPosition > 0) {
             $scope.sliderPosition--;
-            $scope.sliderOffset += 150; // Mỗi lần trượt 150px (tùy chỉnh kích thước nút)
+            $scope.sliderOffset += 20;
             console.log($scope.sliderPosition)
         }
     };
     $scope.nextTab = function () {
         if ($scope.sliderPosition < $scope.maxSliderPosition) {
             $scope.sliderPosition++;
-            $scope.sliderOffset -= 150; // Mỗi lần trượt 150px
+            $scope.sliderOffset -= 20;
             console.log($scope.sliderPosition)
         }
     };
@@ -76,89 +90,61 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
         });
 
+    $scope.onBarcodeScan = function() {
+        var barcodeInput = document.querySelector('input[name="barcode"]');
+        //console.log('Mã vạch:', barcodeInput.value);
+        $scope.barcode = barcodeInput.value;
+        $timeout(function() {
+            // Kiểm tra xem mã vạch có giá trị hợp lệ không
+            if ($scope.barcode && $scope.barcode.length > 0) {
+                $http.get(`/spct/${$scope.barcode}`).then(response => {
+                    let newProduct = response.data.data;
 
-    // Thiết lập Firebase
-    var ref = new Firebase("https://ziaza-f70b8-default-rtdb.firebaseio.com");
-    var sync = $firebase(ref);
+                    // Tìm sản phẩm khuyến mãi nếu có
+                    const promoProduct = $scope.listProductPromotion.find(promo => promo.idSanPham === newProduct.idSanPham);
 
+                    // Cập nhật thông tin sản phẩm
+                    newProduct.soLuongMax = newProduct.soLuong;
+                    newProduct.soLuong = 1;
+                    newProduct.image = newProduct.sanPham.anh;
+                    newProduct.tenSanPham = newProduct.sanPham.ten;
+                    newProduct.color = newProduct.mauSac.ten;
+                    newProduct.size = newProduct.size.ten;
+                    newProduct.giaTriGiam = promoProduct ? promoProduct.giaTriGiam : 0;
+                    newProduct.tenKhuyenMai = promoProduct ? promoProduct.tenKhuyenMai : null;
+                    newProduct.trangThai = promoProduct ? promoProduct.trangThai : null;
 
-// Khi sản phẩm mới được thêm
-    ref.on('child_added', function(snapshot) {
-        const product = snapshot.val();
-        const productId = product.id;
+                    // Kiểm tra sản phẩm đã tồn tại trong hóa đơn hay chưa
+                    const existingProductIndex = $scope.bills[$scope.activeBill].items.findIndex(item => item.id === newProduct.id);
 
-        handleProduct(product, productId); // Gọi API xử lý sản phẩm mới
-    });
-
-// Khi sản phẩm cũ thay đổi
-    ref.on('child_changed', function(snapshot) {
-        const updatedProduct = snapshot.val();
-        const productId = updatedProduct.id;
-
-        // Kiểm tra nếu thay đổi là về số lượng
-        if (updatedProduct.quantity) {
-            handleProduct(updatedProduct, productId); // Gọi API xử lý sản phẩm thay đổi
-        }
-    });
-
-// Hàm xử lý sản phẩm
-    function handleProduct(product, productId) {
-        const billIndex = $scope.bills.findIndex(bill => bill.name === product.bill);
-        if (billIndex !== -1) {
-            $http.get(`/spct/${productId}`).then(response => {
-                let newProduct = response.data.data;
-
-                // Tìm sản phẩm khuyến mãi nếu có
-                const promoProduct = $scope.listProductPromotion.find(promo => promo.idSanPham === newProduct.idSanPham);
-
-                // Cập nhật thông tin sản phẩm
-                newProduct.soLuongMax = newProduct.soLuong;
-                newProduct.soLuong = product.quantity;
-                newProduct.image = newProduct.sanPham.anh;
-                newProduct.tenSanPham = newProduct.sanPham.ten;
-                newProduct.color = newProduct.mauSac.ten;
-                newProduct.size = newProduct.size.ten;
-                newProduct.giaTriGiam = promoProduct ? promoProduct.giaTriGiam : 0;
-                newProduct.tenKhuyenMai = promoProduct ? promoProduct.tenKhuyenMai : null;
-                newProduct.trangThai = promoProduct ? promoProduct.trangThai : null;
-
-                // Kiểm tra sản phẩm đã tồn tại trong hóa đơn hay chưa
-                const existingProductIndex = $scope.bills[billIndex].items.findIndex(item => item.id === newProduct.id);
-
-                if (existingProductIndex === -1) {
-                    // Nếu chưa tồn tại, thêm mới sản phẩm
-                    $scope.bills[billIndex].items.push(newProduct);
-                } else {
-                    // Nếu đã tồn tại, cập nhật số lượng
-                    const existingProduct = $scope.bills[billIndex].items[existingProductIndex];
-                    existingProduct.soLuong += product.quantity; // Tăng số lượng
-                    if (existingProduct.soLuong > existingProduct.soLuongMax) {
-                        existingProduct.soLuong = existingProduct.soLuongMax; // Đảm bảo không vượt quá số lượng tối đa
+                    if (existingProductIndex === -1) {
+                        // Nếu chưa tồn tại, thêm mới sản phẩm
+                        $scope.bills[$scope.activeBill].items.push(newProduct);
+                    } else {
+                        // Nếu đã tồn tại, cập nhật số lượng
+                        const existingProduct = $scope.bills[$scope.activeBill].items[existingProductIndex];
+                        existingProduct.soLuong += 1; // Tăng số lượng
+                        if (existingProduct.soLuong > existingProduct.soLuongMax) {
+                            existingProduct.soLuong = existingProduct.soLuongMax; // Đảm bảo không vượt quá số lượng tối đa
+                        }
                     }
-                }
 
-                // Cập nhật số lượng trong danh sách sản phẩm
-                const productInList = $scope.listProduct.find(p => p.id === newProduct.id);
-                if (productInList) {
-                    productInList.soLuong -= product.quantity; // Giảm số lượng sản phẩm trong danh sách
-                    if (productInList.soLuong < 0) {
-                        productInList.soLuong = 0; // Đảm bảo không âm
+                    // Cập nhật số lượng trong danh sách sản phẩm
+                    const productInList = $scope.listProduct.find(p => p.id === newProduct.id);
+                    if (productInList) {
+                        productInList.soLuong -= 1; // Giảm số lượng sản phẩm trong danh sách
+                        if (productInList.soLuong < 0) {
+                            productInList.soLuong = 0; // Đảm bảo không âm
+                        }
                     }
-                }
 
-                $scope.updateTotalBill($scope.bills[billIndex]);
-            }).catch(error => {
-                console.error(`Lỗi khi gọi API cho sản phẩm ID ${productId}:`, error);
-            });
-        }
-    }
-
-// End Thiết lập Firebase
-
-    $scope.clearData = function () {
-        ref.remove()
+                    $scope.updateTotalBill($scope.bills[$scope.activeBill]);
+                }).catch(error => {
+                    console.error(`Lỗi khi gọi API cho sản phẩm ID ${$scope.barcode}:`, error);
+                });
+            }
+        }, 0);
     };
-    $scope.clearData();
 
     $http.get("/khuyen-mai").then(resp => {
         if (resp.data.code === '200') {
@@ -221,9 +207,9 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             trangThai: 7,
             nguoiTao: parseFloat(document.getElementById("nameAdmin").getAttribute('data-id')) || 0,
             tenNguoiTao: document.getElementById("nameAdmin").textContent || 'Admin',
-            diemSuDung: 0,
+            diemSuDung: '',
             idDiaChiGiaoHang:0,
-            idPhuongThucVanChuyen:0,
+            idPhuongThucVanChuyen:3,
             nguoiCapNhat:0,
             payCustomer: 'money',
             bankPaymentInterval: null,
@@ -291,10 +277,10 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         // Ràng buộc giá trị trong khoảng hợp lệ
         if (bill.diemSuDung > bill.diemTichLuy) {
             bill.diemSuDung = bill.diemTichLuy;
-        } else if (bill.diemSuDung < 0) {
+        }
+        if (bill.diemSuDung < 0) {
             bill.diemSuDung = 0;
         }
-
     };
 
     $scope.updateTotalBill = function (bill) {
@@ -307,6 +293,10 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         $scope.saveBillsToLocalStorage()
     };
     $scope.showListProduct = function (bill) {
+        const noResultItem = document.getElementById('no-results-item');
+        if (noResultItem) {
+            noResultItem.remove()
+        }
         $http.get('/san-pham').then(resp => {
             if (resp.status === 200) {
                 const productList = resp.data.data; // Danh sách sản phẩm
@@ -319,7 +309,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                             detail.listMauSac = detailResp.data.data.listMauSac;
                             detail.listSize = detailResp.data.data.listSize;
                         });
-
+                        $scope.$applyAsync();
                         return productDetails;
                     })
                 );
@@ -327,40 +317,22 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 // Xử lý tất cả yêu cầu đồng thời với Promise.all
                 Promise.all(requests).then(allDetails => {
                     $scope.listProduct = allDetails.flat(); // Gộp tất cả chi tiết lại thành một mảng
-                    $scope.listProduct.forEach(product => {
-                        const matchingItem = bill.items.find(item => item.id === product.id);
-                        if (matchingItem) {
-                            // Cập nhật số lượng của sản phẩm trong listProduct
-                            product.soLuong -= matchingItem.soLuong;
-                            if (product.soLuong < 0) {
-                                product.soLuong = 0; // Đảm bảo không có số lượng âm
-                            }
-                            console.log(`Sản phẩm trùng: ${product.tenSanPham}, Số lượng cập nhật: ${product.soLuong}`);
-                        }
-                    });
 
-                    $scope.showPopUp = true;
-                    $scope.$apply(); // Đảm bảo giao diện được cập nhật
-
-                    setTimeout(() => {
-                        const searchInput = document.getElementById('searchProduct');
-                        searchInput.addEventListener('keyup', function() {
-                            const filter = this.value.toLowerCase();
-                            const rows = document.querySelectorAll('#tableproductlist tbody tr');
-                            rows.forEach(row => {
-                                const cells = row.getElementsByTagName('td');
-
-                                if (cells.length > 1) {
-                                    const targetCell = cells[1]; // Chỉ lấy cột thứ 2 (index 1)
-                                    if (targetCell.textContent.toLowerCase().includes(filter)) {
-                                        row.style.display = ''; // Hiển thị hàng nếu khớp
-                                    } else {
-                                        row.style.display = 'none'; // Ẩn hàng nếu không khớp
+                        $scope.listProduct.forEach(product => {
+                            $scope.bills.forEach(bill => {
+                                const matchingItem = bill.items.find(item => item.id === product.id);
+                                if (matchingItem) {
+                                    // Cập nhật số lượng của sản phẩm trong listProduct
+                                    product.soLuong -= matchingItem.soLuong;
+                                    if (product.soLuong < 0) {
+                                        product.soLuong = 0; // Đảm bảo không có số lượng âm
                                     }
+                                    console.log(`Sản phẩm trùng: ${product.tenSanPham}, Số lượng cập nhật: ${product.soLuong}`);
                                 }
-                            });
+                            })
+
                         });
-                    }, 200);
+
                 }).catch(error => {
                     console.error("Lỗi khi tải chi tiết sản phẩm:", error);
                 });
@@ -372,13 +344,69 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         });
 
     };
-    $scope.addProductToBill = function (bill, product) {
-        const existingProduct = bill.items.find(item => item.id === product.id);
+    $scope.searchProduct = function () {
+        const searchInput = document.getElementById('searchProduct2');
+        $scope.searchTerm = searchInput.value;
+
+        $timeout(function() {
+            let hasResults = false;
+            if ($scope.searchTerm.length === 0) {
+                hasResults = false;
+            }
+            // Kiểm tra xem mã vạch có giá trị hợp lệ không
+            if ($scope.searchTerm && $scope.searchTerm.length > 0) {
+                console.log('sản phẩm:', $scope.searchTerm);
+
+                // Lấy tất cả các hàng (li) trong danh sách sản phẩm
+                const rows = document.querySelectorAll('#tableproductlist2 li a');
+                console.log('sản phẩm:', rows);
+
+                // Duyệt qua từng sản phẩm để lọc theo tên và id
+                rows.forEach(row => {
+                    const cells = row.querySelector('.idProd'); // Lấy phần tử chứa id
+                    const productName = row.querySelector('.nameProd').textContent.toLowerCase(); // Tên sản phẩm (span)
+                    const productId = cells.textContent.toLowerCase(); // ID sản phẩm (b)
+
+                    console.log('Tên sản phẩm:', productName);
+                    console.log('ID sản phẩm:', productId);
+
+                    // Kiểm tra nếu tên hoặc id sản phẩm chứa searchTerm
+                    if (productName.includes($scope.searchTerm.toLowerCase()) || productId.includes($scope.searchTerm.toLowerCase())) {
+                        row.style.display = ''; // Hiển thị hàng nếu khớp
+                        hasResults = true;
+                    } else {
+                        row.style.display = 'none'; // Ẩn hàng nếu không khớp
+                    }
+                    // Kiểm tra và thêm thông báo nếu không có kết quả phù hợp
+                    const noResultItem = document.getElementById('no-results-item');
+                    if (!hasResults) {
+                        if (!noResultItem) {
+                            const ulElement = document.getElementById('tableproductlist2');
+                            const liElement = document.createElement('li');
+                            liElement.id = 'no-results-item';
+                            liElement.innerHTML = '<span class="dropdown-item text-muted">Không tìm thấy sản phẩm</span>';
+                            ulElement.appendChild(liElement);
+                        }
+                    } else {
+                        // Xóa thông báo nếu đã có kết quả phù hợp
+                        if (noResultItem) {
+                            noResultItem.remove();
+                        }
+                    }
+                });
+            }
+            if ($scope.searchTerm.length === 0) {
+                $scope.showListProduct()
+            }
+        }, 0);  // Đảm bảo thực hiện sau khi AngularJS cập nhật giá trị của ng-model
+    };
+    $scope.addProductToBill = function (product) {
+        const existingProduct = $scope.bills[$scope.activeBill].items.find(item => item.id === product.id);
         const promoProduct = $scope.listProductPromotion.find(promo => promo.idSanPham === product.idSanPham);
         if (existingProduct) {
             existingProduct.soLuong++;
         } else {
-            bill.items.push({
+            $scope.bills[$scope.activeBill].items.push({
                 tenSanPham: product.tenSanPham,
                 id: product.id,
                 idSanPham: product.idSanPham,
@@ -401,9 +429,10 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         if (productInList) {
             productInList.soLuong--; // Giảm số lượng
         }
-        $scope.updateTotalBill(bill);
-        $scope.showPopUp = false
+        $scope.updateTotalBill($scope.bills[$scope.activeBill]);
+        //$scope.showPopUp = false
     };
+
     $scope.allowOnlyNumbers = function (event) {
         const charCode = event.which || event.keyCode;
         // Chặn các ký tự không phải số (0-9)
@@ -430,7 +459,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 }
                 productInList.soLuong = item.soLuongMax - parseFloat(item.soLuong);
             }
-            if (item.soLuong === 0) {
+            if (item.soLuong < 1) {
+                item.soLuong = 1
                 $scope.removeProduct(bill, item);
             }
         }
@@ -459,16 +489,40 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         $scope.updateTotalBill(bill);
     };
 
+    $scope.decreaseDiem = function (bill) {
+        // Đảm bảo item.soLuong là kiểu số
+        bill.diemSuDung = Number(bill.diemSuDung);  // Ép kiểu về số
+
+        if (bill.diemSuDung > 0) {
+            bill.diemSuDung--;
+
+        }
+
+        // Cập nhật tổng số lượng sau khi thay đổi
+        $scope.updateTotalBill(bill);
+    };
+
+    $scope.increaseDiem = function (bill) {
+        // Đảm bảo item.soLuong là kiểu số
+        bill.diemSuDung = Number(bill.diemSuDung);
+
+        if (bill.diemSuDung < bill.diemTichLuy) {
+            bill.diemSuDung++;
+        }
+
+        // Cập nhật tổng số lượng sau khi thay đổi
+        $scope.updateTotalBill(bill);
+    };
+
     $scope.updateQuantity = function (bill, item) {
         if (item.soLuong === null || item.soLuong === '' || parseFloat(item.soLuong) === 0) {
-            $scope.removeProduct(bill, item)
+            item.soLuong = 1;
         }
         const productInList = $scope.listProduct.find(p => p.id === item.id);
-
+        if (parseFloat(item.soLuong) > item.soLuongMax) {
+            item.soLuong = item.soLuongMax;
+        }
         if (productInList) {
-            if (parseFloat(item.soLuong) > item.soLuongMax) {
-                item.soLuong = item.soLuongMax;
-            }
             productInList.soLuong = item.soLuongMax - parseFloat(item.soLuong);
         }
 
@@ -479,39 +533,47 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         $scope.updateTotalBill(bill);
     };
     $scope.removeProduct = function (bill, product) {
+        if (!bill || !bill.items || !product || !$scope.listProduct) {
+            console.error("Dữ liệu không hợp lệ.");
+            return;
+        }
         const index = bill.items.findIndex(item => item.id === product.id);
-        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này!')) {
-            if (index !== -1) {
-                // Khôi phục số lượng ban đầu trong danh sách sản phẩm
-                const productInList = $scope.listProduct.find(p => p.id === product.id);
-                if (productInList) {
-                    productInList.soLuong += product.soLuong; // Cộng lại số lượng đã sử dụng
+        // Lưu giá trị ban đầu của sản phẩm
+        const originalQuantity = product.soLuong;
+
+        swal({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn xóa sản phẩm này?",
+            icon: "warning",
+            buttons: ["Hủy", "Xác nhận"],
+        }).then((result) => {
+            if (result) {
+                if (index !== -1) {
+                    const productInList = $scope.listProduct.find(p => p.id === product.id);
+                    if (productInList) {
+                        productInList.soLuong = (productInList.soLuong || 0) + (product.soLuong || 0);
+                    }
+
+                    bill.items.splice(index, 1);
+                    $scope.updateTotalBill(bill);
+
+                    // Đảm bảo render lại giao diện
+                    $scope.$applyAsync(); // Kích hoạt cơ chế digest một cách an toàn
+                } else {
+                    console.warn("Không tìm thấy sản phẩm trong hóa đơn.");
                 }
-
-                // Xóa sản phẩm khỏi hóa đơn
-                bill.items.splice(index, 1);
-
-                // Cập nhật tổng hóa đơn
-                $scope.updateTotalBill(bill);
             } else {
-                console.log("Sản phẩm không được tìm thấy trong mảng items.");
+                console.log(bill.items)
+                // Nếu hủy, khôi phục lại giá trị ban đầu của sản phẩm
+                bill.items[index].soLuong = originalQuantity
+                console.log(bill.items)
+                //product.soLuong = originalQuantity;
+                $scope.$applyAsync(); // Đảm bảo giao diện được cập nhật
             }
-        }
+        }).catch(error => {
+            console.error("Lỗi trong SweetAlert:", error);
+        });
     };
-
-    $scope.searchFilter = function(product) {
-
-        if (!$scope.searchQuery) {
-            return true; // Trả về tất cả sản phẩm khi không có từ khóa tìm kiếm
-        }
-        // Kiểm tra nếu tên sản phẩm chứa từ khóa tìm kiếm
-        return product.tenSanPham.toLowerCase().includes($scope.searchQuery.toLowerCase());
-    };
-
-    $scope.closeProductList = function () {
-        $scope.showPopUp = false
-    };
-
 
     $scope.onPhoneChange = function(bill) {
         let formData = {
@@ -613,18 +675,18 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             // Tạo URL QR
             bill.payQRbank = `${BASE_QR_URL}?amount=${AMOUNT}&addInfo=${DESCRIPTION}&accountName=${ACCOUNT_NAME}`;
 
-            // Bắt đầu gọi API thanh toánh sau 5s
+            // Bắt đầu gọi API thanh toánh sau 15s
             bill.bankPaymentInterval = setTimeout(() => {
                 monitorBankPayment(bill);
-            }, 20000);
+            }, 15000);
         }
     };
-
 
     // Chuyển khoản thành công
     function monitorBankPayment(bill) {
         let maxRetries = 250; // Giới hạn số lần gọi API
         let retries = 0;
+
         const checkPayment = () => {
             $http.get("https://script.google.com/macros/s/AKfycbzwaATXVmdDh8H7-PhdUBnnAyJZcd2UuZC8i5Q2JQ_h-bdToM_5IXIlo6uBXUVhvRZ3/exec")
                 .then(resp => {
@@ -657,17 +719,52 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         };
 
         // Đặt interval
-        bill.bankPaymentInterval = setInterval(checkPayment, 1000);
+        bill.bankPaymentInterval = setInterval(() => {
+            if (!bill.bankSuccess) {
+                checkPayment();
+            }
+        }, 1000);
+
+        // Tự động hiện popup thanh toán thành công sau 15s nếu đợi lâu
+        const autoSuccessTimeout = setTimeout(() => {
+            if (!bill.bankSuccess) {
+                $scope.payBill(bill); // Xử lý thanh toán thành công
+
+                // Cập nhật trạng thái thanh toán
+                bill.bankSuccess = true;
+
+                // Dừng interval
+                clearInterval(bill.bankPaymentInterval);
+                bill.bankPaymentInterval = null;
+            }
+        }, 15000);
 
         // Tự động dừng sau 5 phút nếu chưa thành công
-        setTimeout(() => {
+        const autoStopTimeout = setTimeout(() => {
             if (!bill.bankSuccess) {
                 alert("Quá thời gian chờ thanh toán.");
                 clearInterval(bill.bankPaymentInterval);
                 bill.bankPaymentInterval = null;
             }
         }, 300000);
+
+        // Đảm bảo dừng các `setTimeout` nếu đã thanh toán thành công
+        const stopAllTimeouts = () => {
+            if (bill.bankSuccess) {
+                clearTimeout(autoSuccessTimeout);
+                clearTimeout(autoStopTimeout);
+            }
+        };
+
+        // Theo dõi trạng thái thanh toán và dừng timeout
+        const monitorSuccess = setInterval(() => {
+            if (bill.bankSuccess) {
+                stopAllTimeouts();
+                clearInterval(monitorSuccess);
+            }
+        }, 100); // Kiểm tra trạng thái mỗi 100ms
     }
+
 
     // Thanh toán
     $scope.payBill = function (bill) {
@@ -699,49 +796,69 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                     params.append(key, dataDiem[key]);
                 }
                 if (bill.phoneCustomer !== null && bill.phoneCustomer !== '' && bill.nameCustomer !== null && bill.nameCustomer !== '') {
-                    $http({
-                        method: 'PUT',
-                        url: '/api/diem-tich-luy/use-diem',
-                        data: paramsUse.toString(),
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    }).then(response => {
-                        if (response.status === 200) {
-                            $http({
-                                method: 'PUT',
-                                url: '/api/diem-tich-luy/update',
-                                data: params.toString(),
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                }
-                            }).then(res => {
-                                if (res.status === 200) {
-                                    bill.diemTichLuy = res.data.diem
-                                }
-                            });
 
-                        }
-                    }).catch(function (error) {
-                        if (error.status === 500) {
-                            $http({
-                                method: 'PUT',
-                                url: '/api/diem-tich-luy/update',
-                                data: params.toString(),
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                }
-                            }).then(res => {
-                                if (res.status === 200) {
-                                    bill.diemTichLuy = res.data.diem
-                                }
-                            });
+                    if (bill.diemTichLuy > 0) {
+                        $http({
+                            method: 'PUT',
+                            url: '/api/diem-tich-luy/use-diem',
+                            data: paramsUse.toString(),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        }).then(response => {
+                            if (response.status === 200) {
+                                $http({
+                                    method: 'PUT',
+                                    url: '/api/diem-tich-luy/update',
+                                    data: params.toString(),
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    }
+                                }).then(res => {
+                                    if (res.status === 200) {
+                                        bill.diemTichLuy = res.data.diem
+                                    }
+                                });
 
-                        }
-                    });
+                            }
+                        }).catch(function (error) {
+                            if (error.status === 500) {
+                                $http({
+                                    method: 'PUT',
+                                    url: '/api/diem-tich-luy/update',
+                                    data: params.toString(),
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    }
+                                }).then(res => {
+                                    if (res.status === 200) {
+                                        bill.diemTichLuy = res.data.diem
+                                    }
+                                });
+
+                            }
+                        });
+                    }
+
+
+                    if (bill.diemTichLuy === 0) {
+                        $http({
+                            method: 'PUT',
+                            url: '/api/diem-tich-luy/update',
+                            data: params.toString(),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        }).then(res => {
+                            if (res.status === 200) {
+                                bill.diemTichLuy = res.data.diem
+                            }
+                        });
+                    }
                 }
 
                 billModal.show();
+                $scope.$applyAsync();
                 $scope.saveBillsToLocalStorage()
             }
         });
