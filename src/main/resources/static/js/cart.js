@@ -59,7 +59,7 @@ function updateTotalSection() {
     const productItems = document.querySelectorAll('.product-item');
     let totalAmount = 0;
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
     };
     let selectedCount = 0;
 
@@ -108,13 +108,19 @@ function handleQuantityChange(itemId, isIncreasing) {
             if (result.code == '200') {
                 // Cập nhật hiển thị số lượng và tổng tiền
                 productItem.querySelector('.quantity span').textContent = newQuantity;
-                const price = parseFloat(productItem.querySelector('.price').textContent.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.'));
+                const price = parseFloat(
+                    productItem
+                        .querySelector('.price')
+                        .textContent
+                        .replace(/[^\d,.-]/g, '') // Loại bỏ ký tự không phải số, dấu `,`, `.` hoặc `-`
+                        .replace(/\./g, '')       // Xóa tất cả dấu `.`
+                        .replace(',', '.')        // Thay dấu `,` thành `.`
+                );
                 const total = newQuantity * price;
                 const formatCurrency = (amount) => {
-                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+                    return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
                 };
                 productItem.querySelector('.total').textContent = `${formatCurrency(total)}`;
-                console.log("total", total);
                 updateTotalSection();
             } else {
                 toastr.error(result.message || 'Cập nhật số lượng thất bại!', 'Lỗi');
@@ -202,9 +208,9 @@ function renderCart(items) {
     items.forEach(item => {
         const sanPham = item.sanPham || {}; // Xử lý trường hợp sanPham là null
         const sanPhamChiTiet = item.sanPhamChiTiet || {};
-        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.gia;
+        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.sanPham.gia;
         const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+            return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
         };
 
         const total = gia * item.soLuong;
@@ -334,6 +340,7 @@ function checkToken() {
         }
     }
 }
+
 $(document).ready(function () {
     // Hàm hiển thị sản phẩm
     function displayCategoryProducts(products, containerId) {
@@ -418,6 +425,7 @@ $(document).ready(function () {
     // Gọi hàm
     fetchAllProducts(); // Gọi API lấy toàn bộ sản phẩm
 });
+
 function attachWishlistEvent() {
     $('.add-to-wishlist-btn').off('click').on('click', function (e) {
         e.preventDefault();
@@ -473,6 +481,7 @@ function addProductToWishlist(productId, authToken, heartIcon, button) {
         }
     );
 }
+
 function sendAjax(url, method, authToken, data, successCallback, errorCallback) {
     $.ajax({
         url: url,
@@ -485,6 +494,7 @@ function sendAjax(url, method, authToken, data, successCallback, errorCallback) 
         error: errorCallback
     });
 }
+
 function showToast(message, type) {
     const toastBody = $('#toast .toast-body');
     toastBody.text(message);
