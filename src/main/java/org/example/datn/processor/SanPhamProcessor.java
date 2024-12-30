@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -57,6 +58,8 @@ public class SanPhamProcessor {
     private ApDungKhuyenMaiService apDungKhuyenMaiService;
     @Autowired
     private KhuyenMaiService khuyenMaiService;
+    @Autowired
+    private GioHangChiTietService gioHangChiTietService;
 
     public ServiceResult getById(Long id) {
         var sp = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin sản phẩm"));
@@ -180,6 +183,7 @@ public class SanPhamProcessor {
     }
 
     // Cập nhật thông tin sản phẩm
+    @Transactional(rollbackOn = Exception.class)
     public ServiceResult update(Long id, SanPhamModel model, MultipartFile file, UserAuthentication ua) {
         SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
 
@@ -214,29 +218,29 @@ public class SanPhamProcessor {
     }
 
 
-    // Cập nhật nếu không có ảnh mới
-    public ServiceResult update(Long id, SanPhamModel model, UserAuthentication ua) {
-        SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
-        LocalDateTime ngayTao = sanPham.getNgayTao();
-        Long nguoiTao = sanPham.getNguoiTao();
-
-        // Sao chép thuộc tính, ngoại trừ ngayTao và nguoiTao
-        BeanUtils.copyProperties(model, sanPham, "ngayTao", "nguoiTao");
-
-        // Khôi phục giá trị ngayTao và nguoiTao
-        sanPham.setNgayTao(ngayTao);
-        sanPham.setNguoiTao(nguoiTao);
-
-        sanPham.setNguoiCapNhat(ua.getPrincipal());
-        sanPham.setNgayCapNhat(LocalDateTime.now());
-
-
-        // Không thay đổi ảnh nếu không có ảnh mới
-        service.update(sanPham);
-        updateGiaSPCT(sanPham.getId(), sanPham.getGia());
-
-        return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
-    }
+//    // Cập nhật nếu không có ảnh mới
+//    public ServiceResult update(Long id, SanPhamModel model, UserAuthentication ua) {
+//        SanPham sanPham = service.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm để cập nhật"));
+//        LocalDateTime ngayTao = sanPham.getNgayTao();
+//        Long nguoiTao = sanPham.getNguoiTao();
+//
+//        // Sao chép thuộc tính, ngoại trừ ngayTao và nguoiTao
+//        BeanUtils.copyProperties(model, sanPham, "ngayTao", "nguoiTao");
+//
+//        // Khôi phục giá trị ngayTao và nguoiTao
+//        sanPham.setNgayTao(ngayTao);
+//        sanPham.setNguoiTao(nguoiTao);
+//
+//        sanPham.setNguoiCapNhat(ua.getPrincipal());
+//        sanPham.setNgayCapNhat(LocalDateTime.now());
+//
+//
+//        // Không thay đổi ảnh nếu không có ảnh mới
+//        service.update(sanPham);
+//        updateGiaSPCT(sanPham.getId(), sanPham.getGia());
+//
+//        return new ServiceResult("Sản phẩm đã được cập nhật thành công", SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+//    }
 
 
     public ServiceResult delete(Long id) {
@@ -262,10 +266,25 @@ public class SanPhamProcessor {
     }
 
     private void updateGiaSPCT(Long idSanPham, BigDecimal gia) {
-        var sanPhamChiTiet = sanPhamChiTietService.findByIdSanPham(idSanPham);
-        sanPhamChiTiet.forEach(e -> e.setGia(gia));
-        sanPhamChiTietService.saveAll(sanPhamChiTiet);
+        var sanPhamChiTiets = sanPhamChiTietService.findByIdSanPham(idSanPham);
+        if (sanPhamChiTiets.isEmpty()) {
+            return;
+        }
+
+        sanPhamChiTiets.forEach(spct -> spct.setGia(gia));
+        sanPhamChiTietService.saveAll(sanPhamChiTiets);
+
+        List<Long> idSanPhamChiTietList = sanPhamChiTiets.stream()
+                .map(SanPhamChiTiet::getId)
+                .collect(Collectors.toList());
+
+        var gioHangChiTiets = gioHangChiTietService.findByIdSanPhamChiTietInAndTrangThai(idSanPhamChiTietList, 0);
+        if (!gioHangChiTiets.isEmpty()) {
+            gioHangChiTiets.forEach(gioHangChiTiet -> gioHangChiTiet.setGia(gia));
+            gioHangChiTietService.saveAll(gioHangChiTiets);
+        }
     }
+
 
 //    public ServiceResult searchProducts(SanPhamRequest request) {
 //        List<SanPham> list = service.searchSanPham(request.getKeyword(), request.getIdChatLieu(), request.getIdThuongHieu(), request.getIdDanhMuc(), request.getGiaMin(), request.getGiaMax());

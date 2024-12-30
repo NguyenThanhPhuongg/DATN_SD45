@@ -19,6 +19,10 @@ public class GioHangChiTietService {
         repo.save(gioHangChiTiet);
     }
 
+    public void saveAll(List<GioHangChiTiet> gioHangChiTiets) {
+        repo.saveAll(gioHangChiTiets);
+    }
+
     public Optional<GioHangChiTiet> findById(Long id) {
         return repo.findById(id);
     }
@@ -40,6 +44,10 @@ public class GioHangChiTietService {
 
     public Optional<GioHangChiTiet> findByIdGioHangAndIdSanPhamChiTietAndTrangThai(Long idGioHang, Long idSanPhamChiTiet, Integer trangThai){
         return repo.findByIdGioHangAndIdSanPhamChiTietAndTrangThai(idGioHang, idSanPhamChiTiet, trangThai);
+    }
+
+    public List<GioHangChiTiet> findByIdSanPhamChiTietInAndTrangThai(List<Long> idSanPhamChiTiet, Integer trangThai){
+        return repo.findByIdSanPhamChiTietInAndTrangThai(idSanPhamChiTiet, trangThai);
     }
 
     public List<GioHangChiTiet> findByIdIn(List<Long> ids){

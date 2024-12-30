@@ -45,14 +45,7 @@ public class SanPhamController {
                                                 @RequestParam(value = "file", required = false) MultipartFile file,
                                                 @ModelAttribute SanPhamModel model,
                                                 UserAuthentication ua) {
-        // Kiểm tra nếu có file ảnh mới
-        if (file != null && !file.isEmpty()) {
-            // Nếu có ảnh mới, xử lý ảnh và cập nhật thông tin sản phẩm
             return ResponseEntity.ok(processor.update(id, model, file, ua));
-        } else {
-            // Nếu không có ảnh mới, chỉ cập nhật thông tin sản phẩm mà không thay đổi ảnh
-            return ResponseEntity.ok(processor.update(id, model, ua));
-        }
     }
 
     @PutMapping("/{id}/status")

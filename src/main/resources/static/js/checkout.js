@@ -409,7 +409,7 @@ function handleCheckboxChange(itemId) {
 
 
 // Gọi hàm fetchCartData để tải dữ liệu giỏ hàng khi trang được tải
-window.onload = fetchCartData;
+// window.onload = fetchCartData;
 
 
 async function fetchCartData() {
@@ -440,7 +440,7 @@ async function fetchCartData() {
                 }
             });
             const userData = await userResponse.json();
-            console.log('userDataa:',userData);
+            console.log('userDataa:', userData);
             populateTable(data.data, userData.data);
         } catch (error) {
             console.error('Có vấn đề với yêu cầu:', error);
@@ -481,10 +481,11 @@ function populateTable(data, userData) {
     tableBody.innerHTML = ''; // Clear old content
     let totalItemPrice = 0; // Variable to store total item price
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
     };
+
     data.forEach(item => {
-        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.gia;
+        const gia = item.giaSauKhuyenMai != null ? item.giaSauKhuyenMai : item.sanPham.gia;
         const soLuong = item.soLuong; // Get quantity
         const tongCong = gia * soLuong; // Calculate total
 
@@ -513,18 +514,31 @@ function populateTable(data, userData) {
     document.querySelector('.total-price').textContent = `Tổng Cộng: ${formatCurrency(totalItemPrice)}`;
 
     // Tính toán phí vận chuyển và tổng thanh toán dựa trên cấp bậc người dùng
-    let shippingFee = 30000; // Default shipping fee
-
+    let shippingFeeElement = document.getElementById("ship");
+    let originalShippingFee = shippingFeeElement.innerText; // Lấy giá trị phí vận chuyển ban đầu
+    console.log('Original Shipping Fee:', originalShippingFee);
+    let shippingFee = parseFloat(originalShippingFee.replace(/[^\d]/g, '')); // Convert to number for calculation
     let discount = 0; // Khởi tạo biến giảm giá
 
     if (userData.capBac === 'VANG') {
         discount = 0.1; // Giảm 10% cho cấp bậc VANG
         if (totalItemPrice >= 500000) {
             shippingFee = 0; // Miễn phí ship nếu tổng giá trị >= 500,000 và cấp bậc là VANG
+            shippingFeeElement.innerHTML = `
+    <del style="color: black;">${formatCurrency(parseFloat(originalShippingFee.replace(/[^\d]/g, '')))}</del> 
+    <span style="color: red;">0đ</span>`;
+
         }
     } else if (userData.capBac === 'KIM_CUONG') {
         discount = 0.2; // Giảm 20% cho cấp bậc KIM_CUONG
         shippingFee = 0; // Miễn phí ship cho cấp bậc KIM_CUONG
+        shippingFeeElement.innerHTML = `
+    <del style="color: black;">${formatCurrency(parseFloat(originalShippingFee.replace(/[^\d]/g, '')))}</del> 
+    <span style="color: red;">0đ</span>`;
+
+    } else {
+        // Hiển thị phí vận chuyển gốc nếu không miễn phí
+        shippingFeeElement.textContent = originalShippingFee;
     }
 
     const discountAmount = totalItemPrice * discount; // Số tiền giảm giá
@@ -535,6 +549,7 @@ function populateTable(data, userData) {
     updateMembershipBenefits(userData);
     document.getElementById('totalPayment').textContent = `${formatCurrency(totalPayment)}`;
 }
+
 function updateMembershipBenefits(userData) {
     const membershipBenefits = document.getElementById('membershipBenefits');
 
@@ -647,7 +662,10 @@ async function fetchShippingMethods() {
             if (shippingData.phiVanChuyen === 0 || shippingData.phiVanChuyen == null) {
                 shipElement.textContent = 'Miễn phí';
             } else {
-                shipElement.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(shippingData.phiVanChuyen);
+                shipElement.textContent = new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(shippingData.phiVanChuyen);
             }
 
         } else {
