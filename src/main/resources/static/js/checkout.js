@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', fetchCartData);
 //         console.error('Lỗi khi lấy dữ liệu người dùng');
 //     }
 // }
-
+let originalTotalPayment = 0;
 function populateTable(data, userData) {
     const tableBody = document.querySelector('#products tbody');
     tableBody.innerHTML = ''; // Clear old content
@@ -546,6 +546,7 @@ function populateTable(data, userData) {
 
     // Tính tổng thanh toán (sau giảm giá và cộng phí vận chuyển)
     const totalPayment = totalAfterDiscount + shippingFee;
+    originalTotalPayment = totalPayment; // Lưu tổng thanh toán ban đầu
     updateMembershipBenefits(userData);
     document.getElementById('totalPayment').textContent = `${formatCurrency(totalPayment)}`;
 }
@@ -922,18 +923,15 @@ function selectVoucher() {
 
 
 function updateTotalPayment() {
-    const totalPaymentText = document.getElementById('totalPayment').textContent;
-
-    // Loại bỏ dấu chấm phân cách hàng nghìn và các ký tự không phải số (bao gồm " đ")
-    const total = parseFloat(totalPaymentText.replace(/[^\d.-]/g, '').replace(/\./g, ''));
-
-    let totalPayment = total - selectedVoucherValue;
+    let totalPayment = originalTotalPayment - selectedVoucherValue;
 
     if (totalPayment < 0) {
         totalPayment = 0;
     }
-    document.getElementById('totalPayment').textContent = `${totalPayment.toLocaleString()} đ`;
-    // document.querySelector('.total-price').textContent = `Tổng Cộng: ${totalPriceWithoutShipping.toLocaleString()} ₫`;
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
+    };
+    document.getElementById('totalPayment').textContent = `${formatCurrency(totalPayment)}`;
     document.getElementById('voucherDiscount').textContent = `${selectedVoucherValue.toLocaleString()} đ`;
 }
 
