@@ -220,5 +220,12 @@ app.controller("hoadon-ctrl", function ($scope, $http, $location) {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
+    $scope.formatCurrency = function (amount) {
+        if (amount) {
+            // Định dạng thành số với dấu chấm phân cách hàng nghìn
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        return amount;
+    };
 
 });
