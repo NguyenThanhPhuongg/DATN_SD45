@@ -194,6 +194,10 @@ app.controller('taikhoan-ctrl', function ($scope, $http) {
             .then(function (response) {
                 if (response.data && response.data.code === "200") {
                     $scope.selectedUser = response.data.data;
+                    if ($scope.selectedUser.profile.ngaySinh) {
+                        // Chuyển đổi ngày sinh sang định dạng dd/MM/yyyy
+                        $scope.selectedUser.profile.ngaySinh = new Date($scope.selectedUser.profile.ngaySinh);
+                    }
                     $('#detailModal').modal('show');
                 } else {
                     alert('Có lỗi xảy ra: ' + response.data.message);

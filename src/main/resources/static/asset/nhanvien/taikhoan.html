@@ -33,6 +33,7 @@
                     <th>Tên đăng nhập</th>
                     <th>Vai trò</th>
                     <th>Xác thực</th>
+                    <th>Cấp bậc</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
                 </tr>
@@ -43,6 +44,16 @@
                     <td>{{user.userName}}</td>
                     <td>{{user.role}}</td>
                     <td>{{user.verified ? 'Đã xác thực' : 'Chưa xác thực'}}</td>
+                    <td>
+                        <span ng-switch="user.capBac">
+                            <span ng-switch-when="BAC">Bạc</span>
+                            <span ng-switch-when="VANG">Vàng</span>
+                            <span ng-switch-when="KIM_CUONG">Kim cương</span>
+                            <span ng-switch-default>{{user.capBac}}</span>
+                            <!-- Hiển thị giá trị gốc nếu không khớp với các điều kiện trên -->
+                        </span>
+                    </td>
+
                     <td>
                         <span ng-if="user.status === 'ACTIVE'" class="badge bg-success">Đang hoạt động</span>
                         <span ng-if="user.status === 'LOCKED'" class="badge bg-danger">Đã khóa</span>
@@ -97,18 +108,21 @@
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required"
+                                <input type="email"
+                                       class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required"
                                        id="email" ng-model="newAccount.email" required="" autocomplete="username">
 
                             </div>
                             <div class="mb-3">
                                 <label for="phoneAdd" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phoneAdd" ng-model="newAccount.phone" required>
+                                <input type="text" class="form-control" id="phoneAdd" ng-model="newAccount.phone"
+                                       required>
                             </div>
                             <div class="mb-3 position-relative">
                                 <label for="password" class="form-label">Mật khẩu</label>
                                 <input type="{{isPasswordVisible ? 'text' : 'password'}}" class="form-control"
-                                       id="password" ng-model="newAccount.password" required autocomplete="new-password">
+                                       id="password" ng-model="newAccount.password" required
+                                       autocomplete="new-password">
                                 <span id="togglePassword" class="bi"
                                       ng-class="{'bi-eye': isPasswordVisible, 'bi-eye-slash': !isPasswordVisible}"
                                       class="position-absolute"
@@ -128,10 +142,10 @@
                             </div>
 
                             <!--                            <div class="mb-3">-->
-<!--                                <label for="ngaySinh" class="form-label">Ngày sinh</label>-->
-<!--                                <input type="date" class="form-control" id="ngaySinh" ng-model="newAccount.ngaySinh"-->
-<!--                                       required>-->
-<!--                            </div>-->
+                            <!--                                <label for="ngaySinh" class="form-label">Ngày sinh</label>-->
+                            <!--                                <input type="date" class="form-control" id="ngaySinh" ng-model="newAccount.ngaySinh"-->
+                            <!--                                       required>-->
+                            <!--                            </div>-->
                             <div class="mb-3">
                                 <label for="role" class="form-label">Vai trò</label>
                                 <select class="form-control" id="role" ng-model="newAccount.role" required>
@@ -173,14 +187,16 @@
                             </div>
                             <div class="form-group">
                                 <label for="phoneDetail">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phoneDetail" ng-model="selectedUser.profile.phone"
+                                <input type="text" class="form-control" id="phoneDetail"
+                                       ng-model="selectedUser.profile.phone"
                                        readonly>
                             </div>
                             <div class="form-group">
                                 <label for="ngaySinh">Ngày sinh</label>
                                 <input type="text" class="form-control" id="ngaySinh"
-                                       ng-bind="selectedUser.profile.ngaySinh | date:'dd/MM/yyyy'" readonly>
+                                       ng-model="selectedUser.profile.ngaySinh | date:'dd/MM/yyyy'" readonly>
                             </div>
+
                             <div class="form-group">
                                 <label for="gioiTinh">Giới tính</label>
                                 <input type="text" class="form-control" id="gioiTinh"
