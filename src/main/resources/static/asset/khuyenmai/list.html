@@ -43,7 +43,7 @@
                         <span ng-if="item.loai === 1">Sản Phẩm</span>
                         <span ng-if="item.loai === 2">Người dùng</span>
                     </td>
-                    <td>{{formatCurrency(item.giaTri)}}</td>
+                    <td>{{ item.giaTri | dotCurrency }}</td>
                     <td>
                         <div class="badge"
                              ng-class="{'bg-success': isValidDate(item.ngayBatDau, item.ngayKetThuc),
@@ -194,7 +194,7 @@
                                         <td>{{sp.ma}}</td>
                                         <td>{{sp.ten}}</td>
                                         <td>{{sp.moTa}}</td>
-                                        <td>{{sp.gia | currency:'₫'}}</td>
+                                        <td>{{ sp.gia | dotCurrency }}</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -331,7 +331,7 @@
                                     <td>{{sp.ma}}</td>
                                     <td>{{sp.ten}}</td>
                                     <td>{{sp.moTa}}</td>
-                                    <td>{{sp.gia | number:0}}</td>
+                                    <td>{{ sp.gia | dotCurrency }}</td>
                                 </tr>
                                 </tbody>
                             </table>
