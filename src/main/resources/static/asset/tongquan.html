@@ -213,7 +213,7 @@
                                             <th>Họ tên</th>
                                             <th>Đơn mua</th>
                                             <th>Email</th>
-                                            <th>Điểm dùng</th>
+                                            <th>SDT</th>
                                             <th>Tổng tiền mua</th>
                                         </tr>
                                         </thead>
@@ -222,7 +222,7 @@
                                             <td>{{ khachHang.hoVaTen === 'ZiazaStore' ? 'Khách lẻ' : khachHang.hoVaTen }}</td>
                                             <td>{{khachHang.soLuongHoaDon}}</td>
                                             <td>{{ khachHang.email === 'nguyenvana@example.com' ? 'khachle@gmail.com' : khachHang.email }}</td>
-                                            <td>{{khachHang.diemDung}}</td>
+                                            <td>{{khachHang.sdt}}</td>
                                             <td>{{khachHang.doanhThu | number:0}}₫</td>
                                         </tr>
                                         </tbody>
@@ -407,7 +407,7 @@
                                         <tr>
                                             <th>Họ tên</th>
                                             <th>Đơn mua</th>
-                                            <th>Email</th>
+                                            <th>SDT</th>
                                             <th>Điểm dùng</th>
                                             <th>Tổng tiền mua</th>
                                         </tr>
@@ -416,7 +416,7 @@
                                         <tr ng-repeat="khachHang in chiTietKhachHangOffline">
                                             <td>{{ khachHang.hoVaTen === 'ZiazaStore' ? 'Khách lẻ' : khachHang.hoVaTen }}</td>
                                             <td>{{khachHang.soLuongHoaDon}}</td>
-                                            <td>{{ khachHang.email === 'nguyenvana@example.com' ? 'khachle@gmail.com' : khachHang.email }}</td>
+                                            <td>{{ khachHang.sdt}}</td>
                                             <td>{{khachHang.diemDung}}</td>
                                             <td>{{khachHang.doanhThu | number:0}}₫</td>
                                         </tr>
@@ -747,7 +747,7 @@
                                                 <th>Họ tên</th>
                                                 <th>Đơn mua</th>
                                                 <th>Email</th>
-                                                <th>Điểm dùng</th>
+                                                <th>SDT</th>
                                                 <th>Tổng tiền mua</th>
                                             </tr>
                                             </thead>
@@ -756,7 +756,7 @@
                                                 <td>{{ khachHang.hoVaTen === 'ZiazaStore' ? 'Khách lẻ' : khachHang.hoVaTen }}</td>
                                                 <td>{{khachHang.soLuongHoaDon}}</td>
                                                 <td>{{ khachHang.email === 'nguyenvana@example.com' ? 'khachle@gmail.com' : khachHang.email }}</td>
-                                                <td>{{khachHang.diemDung}}</td>
+                                                <td>{{khachHang.sdt}}</td>
                                                 <td>{{khachHang.doanhThu | number:0}}₫</td>
                                             </tr>
                                             </tbody>
@@ -837,7 +837,7 @@
                                             <tr>
                                                 <th>Họ tên</th>
                                                 <th>Đơn mua</th>
-                                                <th>Email</th>
+                                                <th>SDT</th>
                                                 <th>Điểm dùng</th>
                                                 <th>Tổng tiền mua</th>
                                             </tr>
@@ -846,7 +846,7 @@
                                             <tr ng-repeat="khachHang in chiTietKhachHangOffline1">
                                                 <td>{{ khachHang.hoVaTen === 'ZiazaStore' ? 'Khách lẻ' : khachHang.hoVaTen }}</td>
                                                 <td>{{khachHang.soLuongHoaDon}}</td>
-                                                <td>{{ khachHang.email === 'nguyenvana@example.com' ? 'khachle@gmail.com' : khachHang.email }}</td>
+                                                <td>{{ khachHang.sdt }}</td>
                                                 <td>{{khachHang.diemDung}}</td>
                                                 <td>{{khachHang.doanhThu | number:0}}₫</td>
                                             </tr>

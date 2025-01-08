@@ -328,15 +328,16 @@ $(document).ready(function () {
 
         // Hàm cập nhật số lượng còn lại dựa trên lựa chọn màu sắc và kích thước
         // Hàm cập nhật số lượng còn lại và giá tiền dựa trên lựa chọn màu sắc và kích thước
+        // Hàm cập nhật số lượng còn lại và giá tiền dựa trên lựa chọn màu sắc và kích thước
         function updateQuantity(product) {
             const selectedColor = $('input[name="color"]:checked').val(); // Lấy giá trị màu sắc được chọn
             const selectedSize = $('input[name="size"]:checked').val();   // Lấy giá trị kích thước được chọn
 
             if (selectedColor && selectedSize) {
-                // Lọc ra sản phẩm chi tiết với màu sắc và kích thước đã chọn
-                const selectedProductDetail = product.listSanPhamChiTiet.find(item =>
-                    item.idMauSac == selectedColor && item.idSize == selectedSize
-                );
+                // Lọc ra sản phẩm chi tiết với màu sắc và kích thước đã chọn và có trangThai = 1
+                const selectedProductDetail = product.listSanPhamChiTiet.filter(item =>
+                    item.idMauSac == selectedColor && item.idSize == selectedSize && item.trangThai === 1
+                )[0]; // Lấy sản phẩm chi tiết đầu tiên phù hợp
 
                 if (selectedProductDetail) {
                     // Cập nhật số lượng
@@ -350,27 +351,21 @@ $(document).ready(function () {
                     $('#productPrice').text('Không khả dụng');
                 }
             }
-            // else {
-            //     // Hiển thị yêu cầu chọn đầy đủ khi chưa chọn màu sắc và kích thước
-            //     $('#quantityLeft').text("Vui lòng chọn màu sắc và kích thước");
-            //     $('#productPrice').text("Vui lòng chọn màu sắc và kích thước");
-            // }
 
             // Cập nhật tình trạng vô hiệu hóa các lựa chọn
             disableUnavailableOptions(product);
         }
-
 
         // Hàm vô hiệu hóa các lựa chọn không hợp lệ (kích thước hoặc màu sắc không còn)
         function disableUnavailableOptions(product) {
             const selectedColor = $('input[name="color"]:checked').val(); // Lấy giá trị màu sắc được chọn
             const selectedSize = $('input[name="size"]:checked').val();   // Lấy giá trị kích thước được chọn
 
-            // Vô hiệu hóa các màu sắc không có kích thước tương ứng
+            // Vô hiệu hóa các màu sắc không có kích thước tương ứng và có trangThai = 1
             $('input[name="color"]').each(function () {
                 const colorId = $(this).val();
                 const availableSizes = product.listSanPhamChiTiet.filter(item =>
-                    item.idMauSac == colorId && item.soLuong > 0
+                    item.idMauSac == colorId && item.soLuong > 0 && item.trangThai === 1
                 ).map(item => item.idSize);
 
                 if (selectedSize && !availableSizes.includes(parseInt(selectedSize))) {
@@ -382,11 +377,11 @@ $(document).ready(function () {
                 }
             });
 
-            // Vô hiệu hóa các kích thước không có màu sắc tương ứng
+            // Vô hiệu hóa các kích thước không có màu sắc tương ứng và có trangThai = 1
             $('input[name="size"]').each(function () {
                 const sizeId = $(this).val();
                 const availableColors = product.listSanPhamChiTiet.filter(item =>
-                    item.idSize == sizeId && item.soLuong > 0
+                    item.idSize == sizeId && item.soLuong > 0 && item.trangThai === 1
                 ).map(item => item.idMauSac);
 
                 if (selectedColor && !availableColors.includes(parseInt(selectedColor))) {
@@ -398,6 +393,7 @@ $(document).ready(function () {
                 }
             });
         }
+
 
         // Lấy số lượng tối đa có thể chọn từ radio size và màu sắc
         function getMaxQuantity(product) {
@@ -921,20 +917,23 @@ $(document).ready(function () {
                 url: '/san-pham/search',
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({trangThai: 1}),
+                data: JSON.stringify({ trangThai: 1 }),  // Lọc theo trạng thái ngay khi gửi request
                 success: function (response) {
                     const products = response.data || [];
 
+                    // Lọc sản phẩm có trạng thái = 1 nếu không có trong dữ liệu trả về
+                    const activeProducts = products.filter(product => product.trangThai === 1);
+
                     // Phân loại sản phẩm theo danh mục
                     const categorizedProducts = {
-                        cardigan: products.filter(product => product.idDanhMuc === 10),
-                        quandai: products.filter(product => product.idDanhMuc === 6),
-                        len: products.filter(product => product.idDanhMuc === 9),
-                        hoodie: products.filter(product => product.idDanhMuc === 5),
-                        aophong: products.filter(product => product.idDanhMuc === 12),
-                        polo: products.filter(product => product.idDanhMuc === 11),
-                        aokhoac: products.filter(product => product.idDanhMuc === 8),
-                        somidaitay: products.filter(product => product.idDanhMuc === 13)
+                        cardigan: activeProducts.filter(product => product.idDanhMuc === 10),
+                        quandai: activeProducts.filter(product => product.idDanhMuc === 6),
+                        len: activeProducts.filter(product => product.idDanhMuc === 9),
+                        hoodie: activeProducts.filter(product => product.idDanhMuc === 5),
+                        aophong: activeProducts.filter(product => product.idDanhMuc === 12),
+                        polo: activeProducts.filter(product => product.idDanhMuc === 11),
+                        aokhoac: activeProducts.filter(product => product.idDanhMuc === 8),
+                        somidaitay: activeProducts.filter(product => product.idDanhMuc === 13)
                     };
 
                     // Hiển thị sản phẩm theo danh mục
@@ -947,19 +946,18 @@ $(document).ready(function () {
                     displayCategoryProducts(categorizedProducts.aokhoac, 'aokhoac');
                     displayCategoryProducts(categorizedProducts.somidaitay, 'somidaitay');
 
-                    // Lấy sản phẩm mới nhất
-                    const latestProducts = products.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao)).slice(0, 8);
+                    // Lấy sản phẩm mới nhất từ danh sách sản phẩm đã lọc
+                    const latestProducts = activeProducts.sort((a, b) => new Date(b.ngayTao) - new Date(a.ngayTao)).slice(0, 8);
                     if (latestProducts.length > 0) {
                         displayCategoryProducts(latestProducts, 'product-info');
                     }
 
                     // Lọc và hiển thị sản phẩm bán chạy
-                    const topSellingProducts = products.filter(product => product.isTopSelling);
+                    const topSellingProducts = activeProducts.filter(product => product.isTopSelling);
                     displayCategoryProducts(topSellingProducts, 'sanphambanchay'); // Hiển thị sản phẩm bán chạy
 
-                    // Hiển thị sản phẩm lên trang
-                    // displayProducts(currentPage);
-                    attachWishlistEvent(); // Gắn sự kiện wishlist
+                    // Gắn sự kiện wishlist
+                    attachWishlistEvent();
                 },
                 error: function (error) {
                     console.error('Error fetching products:', error);

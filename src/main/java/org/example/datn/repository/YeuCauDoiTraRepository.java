@@ -1,5 +1,6 @@
 package org.example.datn.repository;
 
+import feign.Param;
 import org.example.datn.entity.ChatLieu;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.YeuCauDoiTra;
@@ -20,4 +21,8 @@ public interface YeuCauDoiTraRepository extends JpaRepository<YeuCauDoiTra, Long
     List<YeuCauDoiTra> findByLoai(LoaiYeuCau loai);
 
     List<YeuCauDoiTra> findByIdNguoiDung(Long idNguoiDung);
+
+    @Query("SELECT y FROM YeuCauDoiTra y WHERE y.idHoaDon IN :hoaDonIds")
+    List<YeuCauDoiTra> findByHoaDonIds(@Param("idHoaDon") List<Long> hoaDonIds);
+
 }

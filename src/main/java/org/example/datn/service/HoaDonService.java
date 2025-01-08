@@ -59,7 +59,9 @@ public class HoaDonService {
     public List<HoaDon> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return repo.findByNgayTaoBetween(startDate, endDate);
     }
-
+    public List<HoaDon> findByDateRangeDoiTra(LocalDateTime startDate, LocalDateTime endDate) {
+        return repo.findByNgayTaoBetweenDoiTra(startDate, endDate);
+    }
     public List<HoaDon> findByDateRangeAndStatusAndReturnStatus(LocalDateTime startDate, LocalDateTime endDate, Integer trangThai) {
         return repo.findByDateRangeAndStatusAndReturnStatus(startDate, endDate, trangThai);
     }

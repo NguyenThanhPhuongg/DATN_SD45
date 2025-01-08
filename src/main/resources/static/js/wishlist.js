@@ -1,3 +1,42 @@
+async function fetchFilteredSearchResults(requestData, page = 1) {
+    try {
+        const response = await fetch('san-pham/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ...requestData, page: page })
+        });
+
+        if (!response.ok) {
+            throw new Error('Lỗi khi gửi yêu cầu API');
+        }
+
+        const data = await response.json();
+        console.log(data);
+
+        // Lọc chỉ các sản phẩm có trangThai = 1
+        const filteredProducts = data.data.filter(product => product.trangThai === 1);
+
+        // Lưu trữ sản phẩm mới và tính lại tổng số trang
+        allProducts = filteredProducts;
+        totalPages = Math.ceil(allProducts.length / 16); // 8 sản phẩm mỗi trang
+
+        if (allProducts.length === 0) {
+            displayMessage('Không tìm thấy sản phẩm nào!');
+            updateCategoryTitle(requestData.keyword, 0);
+        } else {
+            showPage(page);  // Hiển thị sản phẩm của trang hiện tại
+            updateCategoryTitle(requestData.keyword, allProducts.length);
+            attachWishlistEvent();  // Gắn sự kiện cho biểu tượng trái tim
+            updatePagination(page);  // Cập nhật phân trang
+        }
+    } catch (error) {
+        console.error('Lỗi khi gửi yêu cầu:', error);
+        alert('Đã xảy ra lỗi khi tìm kiếm sản phẩm');
+    }
+}
+
 $(document).ready(function () {
     // Lấy token từ localStorage
     const token = localStorage.getItem('token');
@@ -32,6 +71,11 @@ $(document).ready(function () {
                         // Lặp qua các sản phẩm cần hiển thị cho trang này
                         for (let i = startIndex; i < endIndex; i++) {
                             const product = products[i];
+
+                            // Kiểm tra trangThai, nếu khác 1 thì ẩn sản phẩm
+                            if (product.trangThai !== 1) {
+                                continue; // Bỏ qua sản phẩm này nếu trangThai không phải 1
+                            }
 
                             // Kiểm tra và định dạng giá
                             const price = product.gia ? product.gia : 0;
@@ -150,21 +194,4 @@ $(document).ready(function () {
     } else {
         console.log("Không tìm thấy token trong localStorage.");
     }
-});
-
-
-
-
-document.querySelectorAll('.page-num').forEach(page => {
-    page.addEventListener('click', function(e) {
-        e.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
-
-        // Xóa lớp active từ tất cả các liên kết
-        document.querySelectorAll('.page-num').forEach(link => {
-            link.classList.remove('active');
-        });
-
-        // Thêm lớp active vào liên kết được nhấn
-        this.classList.add('active');
-    });
 });

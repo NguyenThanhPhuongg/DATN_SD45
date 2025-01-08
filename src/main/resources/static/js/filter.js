@@ -219,8 +219,11 @@ $(document).ready(function () {
             const data = await response.json();
             console.log(data);
 
+            // Lọc chỉ các sản phẩm có trangThai = 1
+            const filteredProducts = data.data.filter(product => product.trangThai === 1);
+
             // Lưu trữ sản phẩm mới và tính lại tổng số trang
-            allProducts = data.data;
+            allProducts = filteredProducts;
             totalPages = Math.ceil(allProducts.length / 16); // 8 sản phẩm mỗi trang
 
             if (allProducts.length === 0) {
@@ -237,8 +240,6 @@ $(document).ready(function () {
             alert('Đã xảy ra lỗi khi tìm kiếm sản phẩm');
         }
     }
-
-
 
 
     // Lắng nghe sự kiện click vào nút lọc

@@ -34,7 +34,10 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     @Query("SELECT h FROM HoaDon h WHERE h.ngayThanhToan BETWEEN :startDate AND :endDate")
     List<HoaDon> findByNgayTaoBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT h FROM HoaDon h WHERE h.ngayThanhToan BETWEEN :startDate AND :endDate AND h.trangThai = :trangThai AND (h.trangThaiDoiTra IS NULL OR h.trangThaiDoiTra = 1)")
+    @Query("SELECT h FROM HoaDon h WHERE h.ngayCapNhat BETWEEN :startDate AND :endDate")
+    List<HoaDon> findByNgayTaoBetweenDoiTra(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT h FROM HoaDon h WHERE h.ngayThanhToan BETWEEN :startDate AND :endDate AND h.trangThai = :trangThai")
     List<HoaDon> findByDateRangeAndStatusAndReturnStatus(@Param("startDate") LocalDateTime startDate,
                                                          @Param("endDate") LocalDateTime endDate,
                                                          @Param("trangThai") Integer trangThai);

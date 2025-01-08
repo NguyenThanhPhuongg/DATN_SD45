@@ -4,11 +4,13 @@ import org.example.datn.constants.SystemConstant;
 import org.example.datn.entity.*;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
+import org.example.datn.model.enums.LoaiYeuCau;
 import org.example.datn.model.request.HoaDonChiTietRequest;
 import org.example.datn.model.response.HoaDonChiTietModel;
 import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
+import org.example.datn.repository.SanPhamChiTietRepository;
 import org.example.datn.service.*;
 import org.example.datn.transformer.HoaDonChiTietTransformer;
 import org.example.datn.transformer.HoaDonTransformer;
@@ -173,22 +175,61 @@ public class HoaDonChiTietProcessor {
 
     ///////////////////////////// THỐNG KÊ ///////////////////
 
+    @Autowired
+    YeuCauDoiTraService yeuCauDoiTraService;
+    @Autowired
+    YeuCauDoiTraChiTietService yeuCauDoiTraChiTietService;
+    @Autowired
+    SanPhamChiTietRepository sanPhamChiTietRepository;
     private ServiceResult thongKe(LocalDateTime startDate, LocalDateTime endDate, int status) {
-        // Lấy danh sách hóa đơn theo khoảng thời gian và trạng thái
         List<HoaDon> hoaDonList = hoaDonService.findByDateRangeAndStatusAndReturnStatus(startDate, endDate, status);
 
-        // Khởi tạo các biến tính toán tổng doanh thu, số hóa đơn, số lượng sản phẩm, điểm dùng
+        // Lấy danh sách YeuCauDoiTra liên quan đến các hóa đơn
+        List<YeuCauDoiTra> yeuCauDoiTraList = yeuCauDoiTraService.findByHoaDonIds(
+                hoaDonList.stream().map(HoaDon::getId).collect(Collectors.toList())
+        );
+
+        // Khởi tạo các biến tính toán tổng doanh thu
         BigDecimal totalRevenue = BigDecimal.ZERO;
-        int totalInvoices = hoaDonList.size();
+        int totalInvoices = 0;
         int totalQuantity = 0;
         BigDecimal totalDiemDung = BigDecimal.ZERO;
 
-        // Duyệt qua từng hóa đơn để tính tổng doanh thu và tổng điểm dùng
+        // Duyệt qua từng hóa đơn để tính toán
         for (HoaDon hoaDon : hoaDonList) {
-            totalRevenue = totalRevenue.add(hoaDon.getTongTien());  // Tính tổng doanh thu
-            if (hoaDon.getDiemSuDung() != null) {
-                totalDiemDung = totalDiemDung.add(BigDecimal.valueOf(hoaDon.getDiemSuDung()));  // Tính tổng điểm dùng
+            // Kiểm tra yêu cầu đổi trả liên quan đến hóa đơn
+            YeuCauDoiTra yeuCau = yeuCauDoiTraList.stream()
+                    .filter(y -> y.getIdHoaDon().equals(hoaDon.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            // Nếu có yêu cầu đổi trả liên quan đến hóa đơn
+            if (yeuCau != null) {
+                // Nếu yêu cầu đổi trả là TRA_HANG, kiểm tra trạng thái đổi trả của hóa đơn
+                if (yeuCau.getLoai() == LoaiYeuCau.TRA_HANG) {
+                    // Nếu trạng thái đổi trả của hóa đơn là 0, 1, hoặc 2 thì không tính vào doanh thu
+                    if (hoaDon.getTrangThaiDoiTra() != null && (hoaDon.getTrangThaiDoiTra() == 1 || hoaDon.getTrangThaiDoiTra() == 2)) {
+                        continue;  // Không tính doanh thu từ hóa đơn này
+                    }
+                }
+
+                // Nếu yêu cầu đổi trả là DOI_HANG, thì dù trạng thái của hóa đơn là gì cũng tính vào doanh thu
+                if (yeuCau.getLoai() == LoaiYeuCau.DOI_HANG) {
+                    // Không cần kiểm tra trạng thái đổi trả, luôn tính vào doanh thu
+                }
             }
+
+            // Tính tổng doanh thu từ hóa đơn này nếu không bị loại bỏ
+            totalRevenue = totalRevenue.add(hoaDon.getTongTien());
+
+            // Tính tổng điểm dùng nếu có
+            if (hoaDon.getDiemSuDung() != null) {
+                totalDiemDung = totalDiemDung.add(BigDecimal.valueOf(hoaDon.getDiemSuDung()));
+            }
+
+            // Tăng số lượng hóa đơn
+            totalInvoices++;
+
         }
 
         // Lấy chi tiết hóa đơn theo khoảng thời gian và trạng thái
@@ -268,6 +309,7 @@ public class HoaDonChiTietProcessor {
             userData.put("tenDangNhap", user.getUserName());
             userData.put("hoVaTen", profile.getHoVaTen());
             userData.put("email", profile.getEmail());
+            userData.put("sdt", profile.getPhone());
             userData.put("capBac", user.getCapBac().name());
 
             // Thêm người dùng vào danh sách theo cấp bậc
@@ -307,26 +349,31 @@ public class HoaDonChiTietProcessor {
     public ServiceResult thongKeDonHang(LocalDateTime startDate, LocalDateTime endDate) {
         // Lấy danh sách hóa đơn trong phạm vi ngày
         List<HoaDon> invoices = hoaDonService.findByDateRange(startDate, endDate);
+        List<HoaDon> invoicesDoiTra = hoaDonService.findByDateRangeDoiTra(startDate, endDate);
 
         // Khởi tạo biến đếm cho các trạng thái
-        long choXacNhan = invoices.stream().filter(hoaDon -> hoaDon.getTrangThai() == 0).count();
-        long choGiaoHang = invoices.stream().filter(hoaDon -> hoaDon.getTrangThai() == 2).count();
-        long dangGiaoHang = invoices.stream().filter(hoaDon -> hoaDon.getTrangThai() == 3).count();
-        long daGiao = invoices.stream().filter(hoaDon -> hoaDon.getTrangThai() == 4).count();
-        long daHuy = invoices.stream().filter(hoaDon -> hoaDon.getTrangThai() == 5).count();
-        long taiQuay = invoices.stream().filter(hoaDon -> hoaDon.getTrangThai() == 7).count();
+        long choXacNhan = invoicesDoiTra.stream().filter(hoaDon -> hoaDon.getTrangThai() == 0).count();
+        long choGiaoHang = invoicesDoiTra.stream().filter(hoaDon -> hoaDon.getTrangThai() == 2).count();
+        long dangGiaoHang = invoicesDoiTra.stream().filter(hoaDon -> hoaDon.getTrangThai() == 3).count();
+        long daGiao = invoicesDoiTra.stream().filter(hoaDon -> hoaDon.getTrangThai() == 4).count();
+        long daHuy = invoicesDoiTra.stream().filter(hoaDon -> hoaDon.getTrangThai() == 5).count();
+        long taiQuay = invoicesDoiTra.stream().filter(hoaDon -> hoaDon.getTrangThai() == 7).count();
 
         // Khởi tạo biến đếm cho trạng thái đổi trả
-        long YeuCauDoiTraChoXacNhan = invoices.stream()
+        long YeuCauDoiTraChoXacNhan = invoicesDoiTra.stream()
                 .filter(hoaDon -> hoaDon.getTrangThaiDoiTra() != null && hoaDon.getTrangThaiDoiTra() == 0)
                 .count();
 
-        long YeuCauDoiTraXacNhan = invoices.stream()
+        long YeuCauDoiTraDangXuLy = invoicesDoiTra.stream()
                 .filter(hoaDon -> hoaDon.getTrangThaiDoiTra() != null && hoaDon.getTrangThaiDoiTra() == 1)
                 .count();
 
-        long YeuCauDoiTraHuy = invoices.stream()
+        long YeuCauDoiTraXacNhan = invoicesDoiTra.stream()
                 .filter(hoaDon -> hoaDon.getTrangThaiDoiTra() != null && hoaDon.getTrangThaiDoiTra() == 2)
+                .count();
+
+        long YeuCauDoiTraHuy = invoicesDoiTra.stream()
+                .filter(hoaDon -> hoaDon.getTrangThaiDoiTra() != null && hoaDon.getTrangThaiDoiTra() == 3)
                 .count();
 
         // Đưa kết quả vào map
@@ -340,6 +387,7 @@ public class HoaDonChiTietProcessor {
         result.put("YeuCauDoiTraChoXacNhan", YeuCauDoiTraChoXacNhan);
         result.put("YeuCauDoiTraHuy", YeuCauDoiTraHuy);
         result.put("YeuCauDoiTraXacNhan", YeuCauDoiTraXacNhan);
+        result.put("YeuCauDoiTraDangXuLy", YeuCauDoiTraDangXuLy);
 
         // Trả về kết quả
         return new ServiceResult(result, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
