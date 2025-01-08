@@ -41,10 +41,10 @@
                     <td>
                         <div class="badge"
                              ng-class="{'bg-primary': item.trangThai === 0, 'bg-warning': item.trangThai === 1, 'bg-success': item.trangThai === 2, 'bg-danger': item.trangThai === 3}">
-                            <span ng-if="item.trangThai === 0">Pending</span>
-                            <span ng-if="item.trangThai === 1">In Progress</span>
-                            <span ng-if="item.trangThai === 2">Confirmed</span>
-                            <span ng-if="item.trangThai === 3">Rejected</span>
+                            <span ng-if="item.trangThai === 0">Chờ xử lý</span>
+                            <span ng-if="item.trangThai === 1">Đang xử lý</span>
+                            <span ng-if="item.trangThai === 2">Xác nhận</span>
+                            <span ng-if="item.trangThai === 3">Không xác nhận</span>
                         </div>
                     </td>
                     <td>
@@ -192,10 +192,10 @@
                                     <td>
                                         <div class="badge"
                                              ng-class="{'bg-primary': chiTiet.trangThai === 0, 'bg-warning': chiTiet.trangThai === 1, 'bg-success': chiTiet.trangThai === 2, 'bg-danger': chiTiet.trangThai === 3}">
-                                            <span ng-if="chiTiet.trangThai === 0">Pending</span>
-                                            <span ng-if="chiTiet.trangThai === 1">In Progress</span>
-                                            <span ng-if="chiTiet.trangThai === 2">Confirmed</span>
-                                            <span ng-if="chiTiet.trangThai === 3">Rejected</span>
+                                            <span ng-if="chiTiet.trangThai === 0">Chờ xử lý</span>
+                                            <span ng-if="chiTiet.trangThai === 1">Đang xử lý</span>
+                                            <span ng-if="chiTiet.trangThai === 2">Xác nhận</span>
+                                            <span ng-if="chiTiet.trangThai === 3">Không xác nhận</span>
                                         </div>
                                     </td>
                                     <td>

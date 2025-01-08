@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,5 +30,14 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("SELECT h FROM HoaDon h WHERE h.idNguoiDung = :idNguoiDung AND h.trangThaiDoiTra IS NOT NULL")
     List<HoaDon> findAllByIdNguoiDungAndTrangThaiDoiTraIsNotNull(@Param("idNguoiDung") Long idNguoiDung);
+
+    @Query("SELECT h FROM HoaDon h WHERE h.ngayThanhToan BETWEEN :startDate AND :endDate")
+    List<HoaDon> findByNgayTaoBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT h FROM HoaDon h WHERE h.ngayThanhToan BETWEEN :startDate AND :endDate AND h.trangThai = :trangThai AND (h.trangThaiDoiTra IS NULL OR h.trangThaiDoiTra = 1)")
+    List<HoaDon> findByDateRangeAndStatusAndReturnStatus(@Param("startDate") LocalDateTime startDate,
+                                                         @Param("endDate") LocalDateTime endDate,
+                                                         @Param("trangThai") Integer trangThai);
+
 
 }

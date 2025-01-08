@@ -1,1354 +1,893 @@
-app.controller("tongquan-ctrl", function ($scope, $http, $rootScope, $location) {
+app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
+    // Lấy ngày bắt đầu và kết thúc của ngày hôm nay, tuần này, tháng này, năm nay
+    let today = new Date();
+    let startToday = $filter('date')(new Date(), "yyyy-MM-ddT00:00:00");
+    let endToday = $filter('date')(new Date(), "yyyy-MM-ddT23:59:59");
 
-    // Hàm lọc và tính số lượng hóa đơn có trạng thái = 4 cho ngày hôm nay
-    $scope.ngay = function () {
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
+    let startOfWeek = $filter('date')(new Date(today.setDate(today.getDate() - today.getDay())), "yyyy-MM-ddT00:00:00");
+    let endOfWeek = $filter('date')(new Date(today.setDate(today.getDate() - today.getDay() + 6)), "yyyy-MM-ddT23:59:59");
 
-        const todayEnd = new Date();
-        todayEnd.setHours(23, 59, 59, 999);
+    let startOfMonth = $filter('date')(new Date(today.getFullYear(), today.getMonth(), 1), "yyyy-MM-ddT00:00:00");
+    let endOfMonth = $filter('date')(new Date(today.getFullYear(), today.getMonth() + 1, 0), "yyyy-MM-ddT23:59:59");
 
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 4;
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0);
-            return statusMatches && ngayCapNhat.getTime() === todayStart.getTime();
+    let startOfYear = $filter('date')(new Date(today.getFullYear(), 0, 1), "yyyy-MM-ddT00:00:00");
+    let endOfYear = $filter('date')(new Date(today.getFullYear(), 11, 31), "yyyy-MM-ddT23:59:59");
+
+    // Khởi tạo và tải dữ liệu
+    $scope.initialize = function () {
+        $http.get(`/hoa-don-chi-tiet/thong-ke-don-hang`, {
+            params: {startDate: startToday, endDate: endToday}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.choXacNhan = result.data.choXacNhan || 0;
+                $scope.choGiaoHang = result.data.choGiaoHang || 0;
+                $scope.dangGiaoHang = result.data.dangGiaoHang || 0;
+                $scope.daGiao = result.data.daGiao || 0;
+                $scope.daHuy = result.data.daHuy || 0;
+                $scope.taiQuay = result.data.taiQuay || 0;
+                $scope.YeuCauDoiTraChoXacNhan = result.data.YeuCauDoiTraChoXacNhan || 0;
+                $scope.YeuCauDoiTraHuy = result.data.YeuCauDoiTraHuy || 0;
+                $scope.YeuCauDoiTraXacNhan = result.data.YeuCauDoiTraXacNhan || 0;
+
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API thống kê đơn hàng: ", error);
         });
 
-        const filteredItems1 = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 0;
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0);
-            return statusMatches && ngayCapNhat.getTime() === todayStart.getTime();
+        // Tính toán tỷ lệ doanh thu online và offline
+        $scope.calculatePercentage = function (onlineValue, offlineValue) {
+            let total = onlineValue + offlineValue;
+            if (total === 0) return {online: 0, offline: 0};
+            return {
+                online: ((onlineValue / total) * 100).toFixed(2),
+                offline: ((offlineValue / total) * 100).toFixed(2)
+            };
+        };
+
+        // Theo dõi các thay đổi trong doanh thu online và offline
+        $scope.$watchGroup(['doanhThuTodayOnline1', 'doanhThuTodayOffline1'], function (newValues) {
+            if (newValues[0] !== undefined && newValues[1] !== undefined) {
+                $scope.doanhThuPercentage = $scope.calculatePercentage(newValues[0], newValues[1]);
+                $scope.createChartOnline();  // Tạo biểu đồ sau khi tỷ lệ đã được tính toán
+            }
         });
 
-        const filteredItems2 = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 5;
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0);
-            return statusMatches && ngayCapNhat.getTime() === todayStart.getTime();
+        $scope.$watchGroup(['soLuongBanRaTodayOnline1', 'soLuongBanRaTodayOffline1'], function (newValues) {
+            if (newValues[0] !== undefined && newValues[1] !== undefined) {
+                $scope.soLuongBanPercentage = $scope.calculatePercentage(newValues[0], newValues[1]);
+                $scope.createChartOnline();  // Tạo biểu đồ sau khi tỷ lệ đã được tính toán
+            }
         });
 
-        $scope.donHangCho = filteredItems1.length;
-        $scope.donHangHuy = filteredItems2.length;
-        $scope.donHangNgay = filteredItems.length;
-        $scope.doanhThuNgay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
+        $scope.$watchGroup(['soLuongHoaDonTodayOnline1', 'soLuongHoaDonTodayOffline1'], function (newValues) {
+            if (newValues[0] !== undefined && newValues[1] !== undefined) {
+                $scope.soLuongHoaDonPercentage = $scope.calculatePercentage(newValues[0], newValues[1]);
+                $scope.createChartOnline();  // Tạo biểu đồ sau khi tỷ lệ đã được tính toán
+            }
+        });
 
-        const invoiceIds = filteredItems.map(item => item.id);
+        $scope.$watchGroup([
+            'choXacNhan1',
+            'choGiaoHang1',
+            'dangGiaoHang1',
+            'daGiao1',
+            'daHuy1',
+            'taiQuay1',
+            'YeuCauDoiTraChoXacNhan1',
+            'YeuCauDoiTraHuy1',
+            'YeuCauDoiTraXacNhan1'
+        ], function (newValues) {
+            // Kiểm tra nếu tất cả giá trị đã được cập nhật
+            if (newValues.every(value => value !== undefined)) {
+                $scope.createChartOnline(); // Tạo biểu đồ khi dữ liệu thay đổi
+            }
+        });
 
-        // Lấy danh sách sản phẩm từ API /san-pham
-        $http.get('/san-pham')
-            .then(function (sanPhamResponse) {
-                const allSanPham = sanPhamResponse.data.data;
+        $scope.isDatePickerVisible = false;  // Ẩn/hiện ô chọn ngày
 
+        // Hàm toggle để hiển thị/ẩn ô chọn ngày
+        $scope.toggleDatePicker = function () {
+            $scope.isDatePickerVisible = !$scope.isDatePickerVisible;
+        };
+        // Hàm gọi API để lấy dữ liệu thống kê
+        $scope.itemsPerPageOnline1 = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageOnline1 = 1; // Trang hiện tại
+        $scope.totalItemsOnline1 = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietSanPhamPageOnline1 = []; // Mảng chứa các sản phẩm cho trang hiện tại
 
-                $http.get('/spct')
-                    .then(function (spctResponse) {
-                        const allSanPhamChiTiet = spctResponse.data.data;
+        $scope.getPageDataOnline1 = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageOnline1 - 1) * $scope.itemsPerPageOnline1;
+            const end = $scope.currentPageOnline1 * $scope.itemsPerPageOnline1;
 
-                        $http.get('/hoa-don-chi-tiet')
-                            .then(function (hdctResponse) {
-                                const allHoaDonChiTiet = hdctResponse.data.data;
-                                const filteredHdctItems = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-                                $scope.soLuongNgay = filteredHdctItems.reduce((total, item) => total + parseFloat(item.soLuong), 0);
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietSanPhamPageOnline1 = $scope.chiTietSanPhamOnline1.slice(start, end);
+        };
 
-                                const productQuantityMap = {};
-                                filteredHdctItems.forEach(hdctItem => {
-                                    const spct = allSanPhamChiTiet.find(spct => spct.id === hdctItem.idSanPhamChiTiet);
-                                    if (spct) {
-                                        const productId = spct.idSanPham;
-                                        const quantity = parseFloat(hdctItem.soLuong);
-                                        productQuantityMap[productId] = (productQuantityMap[productId] || 0) + quantity;
-                                    }
-                                });
+        $scope.itemsPerPageKHOnline1 = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageKHOnline1 = 1; // Trang hiện tại
+        $scope.totalItemsKHOnline1 = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietKhachHangPageOnline1 = []; // Mảng chứa các sản phẩm cho trang hiện tại
 
-                                // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
-                                $scope.topSanPhamBanChay = Object.entries(productQuantityMap)
-                                    .map(([productId, totalQuantity]) => {
-                                        const sanPham = allSanPham.find(sp => sp.id === parseInt(productId));
-                                        return { productId, totalQuantity, tenSanPham: sanPham ? sanPham.ten : 'N/A', maSanPham: sanPham ? sanPham.ma : 'N/A'
-                                            , giaSanPham: sanPham ? sanPham.gia : 'N/A'};
-                                    })
-                                    .sort((a, b) => b.totalQuantity - a.totalQuantity)
-                                    .slice(0, 10);
+        $scope.getPageDataKHOnline1 = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageKHOnline1 - 1) * $scope.itemsPerPageKHOnline1;
+            const end = $scope.currentPageKHOnline1 * $scope.itemsPerPageKHOnline1;
 
-                                $scope.renderTopProductsChart(); // Hiển thị biểu đồ sau khi tính toán xong
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietKhachHangPageOnline1 = $scope.chiTietKhachHangOnline1.slice(start, end);
+        };
 
-                                // Lấy sản phẩm bán chạy nhất
-                                $scope.topSanPhamBanChayNhat = $scope.topSanPhamBanChay[0];
+        $scope.itemsPerPage1 = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPage1 = 1; // Trang hiện tại
+        $scope.totalItems1 = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietSanPhamPageOffline1 = []; // Mảng chứa các sản phẩm cho trang hiện tại
 
-                                // Phân trang cho top 10 sản phẩm bán chạy
-                                $scope.Size = 5; // Số lượng sản phẩm mỗi trang
-                                $scope.Page = 1; // Trang hiện tại
+        $scope.getPageDataOffline1 = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPage1 - 1) * $scope.itemsPerPage1;
+            const end = $scope.currentPage1 * $scope.itemsPerPage1;
 
-                                // Tính tổng số trang
-                                $scope.Pages = Math.ceil($scope.topSanPhamBanChay.length / $scope.Size);
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietSanPhamPageOffline1 = $scope.chiTietSanPhamOffline1.slice(start, end);
+        };
 
-                                // Hàm lấy danh sách sản phẩm cho trang hiện tại
-                                $scope.getPageData1 = function () {
-                                    const startIndex = ($scope.Page - 1) * $scope.Size;
-                                    const endIndex = startIndex + $scope.Size;
-                                    return $scope.topSanPhamBanChay.slice(startIndex, endIndex);
-                                };
+        $scope.itemsPerPageKHOF1 = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageKHOF1 = 1; // Trang hiện tại
+        $scope.totalItemsKHOF1 = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietKhachHangPageOffline1 = []; // Mảng chứa các sản phẩm cho trang hiện tại
 
-                                console.log("Top 10 sản phẩm bán chạy nhất trong ngày:", $scope.topSanPhamBanChay);
-                                console.log("Sản phẩm bán chạy nhất:", $scope.topSanPhamBanChayNhat);
-                            })
-                            .catch(function (error) {
-                                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-                            });
-                    })
-                    .catch(function (error) {
-                        console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
+        $scope.getPageDataKHOffline1 = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPage1 - 1) * $scope.itemsPerPage1;
+            const end = $scope.currentPage1 * $scope.itemsPerPage1;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietKhachHangPageOffline1 = $scope.chiTietKhachHangOffline1.slice(start, end);
+        };
+
+        $scope.fetchData = function () {
+            let startDate = $scope.startDate ? $filter('date')($scope.startDate, "yyyy-MM-dd'T'HH:mm:ss") : $filter('date')(new Date(), "yyyy-MM-dd'T'00:00:00");
+            let endDate = $scope.endDate ? $filter('date')($scope.endDate, "yyyy-MM-dd'T'HH:mm:ss") : $filter('date')(new Date(), "yyyy-MM-dd'T'23:59:59");
+
+            console.log("Start Date: ", startDate);
+            console.log("End Date: ", endDate);
+
+            // Gọi API cho doanh thu online
+            $http.get(`/hoa-don-chi-tiet/thong-ke-online`, {
+                params: {startDate: startDate, endDate: endDate}
+            }).then(function (response) {
+                let result = response.data;
+                if (result && result.message === "Thành công") {
+                    $scope.doanhThuTodayOnline1 = result.data.doanhThu || 0;
+                    $scope.soLuongBanRaTodayOnline1 = result.data.soLuongBanRa || 0;
+                    $scope.soLuongHoaDonTodayOnline1 = result.data.soLuongHoaDon || 0;
+                    $scope.chiTietSanPhamOnline1 = result.data.chiTietSanPham || [];
+                    $scope.chiTietKhachHangOnline1 = result.data.tongHopKhachHang || [];
+
+                    // Sắp xếp danh sách sản phẩm theo số lượng bán giảm dần
+                    $scope.chiTietSanPhamOnline1 = $scope.chiTietSanPhamOnline1.sort(function (a, b) {
+                        return b.soLuong - a.soLuong; // Sắp xếp theo số lượng bán giảm dần
                     });
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
-            });
-    };
 
-    // Hàm lọc và tính số lượng hóa đơn có trạng thái = 4 cho tuần này
-    $scope.tuan = function () {
-        const today = new Date();
-        const dayOfWeek = today.getDay(); // Chủ nhật là 0, thứ 2 là 1, ...
+                    // Tính tổng số sản phẩm và tổng số trang cho sản phẩm
+                    $scope.totalItemsOnline1 = $scope.chiTietSanPhamOnline1.length;
+                    $scope.totalPagesOnline1 = Math.ceil($scope.totalItemsOnline1 / $scope.itemsPerPageOnline1);
 
-        // Tính ngày đầu tuần (Chủ nhật hoặc thứ hai tùy thuộc vào hệ thống)
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - dayOfWeek); // Lùi lại số ngày từ Chủ nhật
+                    // Phân trang sản phẩm
+                    $scope.getPageDataOnline1();  // Cập nhật dữ liệu cho trang hiện tại của sản phẩm
 
-        startOfWeek.setHours(0, 0, 0, 0); // Đặt giờ về 0
-
-        // Tính ngày cuối tuần (thường là thứ 7)
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6); // Thêm 6 ngày
-
-        endOfWeek.setHours(23, 59, 59, 999); // Đặt giờ đến cuối ngày
-
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 4;
-
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0); // Bỏ qua giờ, phút, giây khi so sánh
-
-            return statusMatches && ngayCapNhat >= startOfWeek && ngayCapNhat <= endOfWeek;
-        });
-
-        $scope.donHangTuan = filteredItems.length;
-        $scope.doanhThuTuan = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        $http.get('/hoa-don-chi-tiet') // API lấy tất cả hóa đơn chi tiết
-            .then(function (response) {
-                const allHoaDonChiTiet = response.data.data;
-                const filteredItems2 = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-                $scope.soLuongTuan = filteredItems2.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                // Hiển thị thông tin
-                console.log("Tổng số lượng của các hóa đơn chi tiết có trạng thái 4 trong tuần:", $scope.soLuongTuan);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-            });
-    };
-
-    // Hàm lọc và tính số lượng hóa đơn có trạng thái = 4 cho tháng này
-    $scope.thang = function () {
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
-        firstDayOfMonth.setHours(0, 0, 0, 0); // Đặt giờ về 0
-
-        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
-        lastDayOfMonth.setHours(23, 59, 59, 999); // Đặt giờ đến cuối ngày
-
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 4;
-
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0); // Bỏ qua giờ, phút, giây khi so sánh
-
-            return statusMatches && ngayCapNhat >= firstDayOfMonth && ngayCapNhat <= lastDayOfMonth;
-        });
-
-        $scope.donHangThang = filteredItems.length;
-        $scope.doanhThuThang = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        $http.get('/hoa-don-chi-tiet') // API lấy tất cả hóa đơn chi tiết
-            .then(function (response) {
-                const allHoaDonChiTiet = response.data.data;
-                const filteredItems2 = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-                $scope.soLuongThang = filteredItems2.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                // Hiển thị thông tin
-                console.log("Tổng số lượng của các hóa đơn chi tiết có trạng thái 4 trong tháng:", $scope.soLuongThang);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-            });
-    };
-
-    $scope.nam = function () {
-        const today = new Date();
-        const firstDayOfYear = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
-        firstDayOfYear.setHours(0, 0, 0, 0);
-
-        const lastDayOfYear = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
-        lastDayOfYear.setHours(23, 59, 59, 999);
-
-        // Lọc các hóa đơn có trạng thái = 4 và ngày cập nhật trong năm hiện tại
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 4;
-
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0); // Bỏ qua giờ, phút, giây khi so sánh
-
-            return statusMatches && ngayCapNhat >= firstDayOfYear && ngayCapNhat <= lastDayOfYear;
-        });
-
-        $scope.donHangNam = filteredItems.length;
-        $scope.doanhThuNam = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        // Lấy tất cả hóa đơn chi tiết
-        $http.get('/hoa-don-chi-tiet') // API lấy tất cả hóa đơn chi tiết
-            .then(function (response) {
-                const allHoaDonChiTiet = response.data.data;
-                const filteredItems2 = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-
-                // Tính tổng số lượng của các hóa đơn chi tiết có trạng thái = 4 trong năm
-                $scope.soLuongNam = filteredItems2.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                // Hiển thị thông tin
-                console.log("Tổng số lượng của các hóa đơn chi tiết có trạng thái 4 trong năm:", $scope.soLuongNam);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-            });
-    };
-
-    $scope.dsSP = function () {
-        // Lấy danh sách sản phẩm chi tiết
-        $http.get('/spct')
-            .then(function (spctResponse) {
-                const allSanPhamChiTiet = spctResponse.data.data;
-
-                // Tổng hợp số lượng của từng sản phẩm (tính tổng số lượng của tất cả sản phẩm chi tiết có chung id sản phẩm)
-                const productQuantityMap = {};
-
-                allSanPhamChiTiet.forEach(spct => {
-                    const productId = spct.idSanPham;  // idSanPham trong sản phẩm chi tiết
-                    const quantity = spct.soLuong || 0; // Số lượng tồn kho của sản phẩm chi tiết
-
-                    // Cộng dồn số lượng của tất cả sản phẩm chi tiết có chung id sản phẩm
-                    productQuantityMap[productId] = (productQuantityMap[productId] || 0) + quantity;
-                });
-
-                // Gọi API lấy danh sách sản phẩm để lấy tên sản phẩm
-                $http.get('/san-pham')
-                    .then(function (spResponse) {
-                        const allSanPham = spResponse.data.data;
-
-                        // Gắn tên sản phẩm vào mỗi sản phẩm trong danh sách
-                        $scope.allSanPhamWithTotalQuantity = Object.entries(productQuantityMap)
-                            .map(([productId, totalQuantity]) => {
-                                // Tìm sản phẩm theo idSanPham
-                                const product = allSanPham.find(sp => sp.id === parseInt(productId));
-                                return {
-                                    productId,
-                                    productName: product ? product.ten : 'Không tìm thấy tên sản phẩm',
-                                    productMa: product ? product.ma : 'Không tìm thấy tên mã phẩm',
-                                    totalQuantity,
-                                    productGia: product ? product.gia : 'Không tìm thấy tên mã phẩm',
-                                };
-                            });
-
-                        // Tính tổng số lượng của tất cả sản phẩm
-                        $scope.totalQuantityAllProducts = $scope.allSanPhamWithTotalQuantity
-                            .reduce((sum, sp) => sum + sp.totalQuantity, 0);
-
-                        // Cài đặt phân trang
-                        $scope.pageSize = 5; // Số lượng sản phẩm mỗi trang
-                        $scope.currentPage = 1; // Trang hiện tại
-
-                        // Tính tổng số trang
-                        $scope.totalPages = Math.ceil($scope.allSanPhamWithTotalQuantity.length / $scope.pageSize);
-
-                        // Hàm lấy danh sách sản phẩm cho trang hiện tại
-                        $scope.getPageData = function () {
-                            const startIndex = ($scope.currentPage - 1) * $scope.pageSize;
-                            const endIndex = startIndex + $scope.pageSize;
-                            return $scope.allSanPhamWithTotalQuantity.slice(startIndex, endIndex);
-                        };
-
-                        console.log("Danh sách sản phẩm với tổng số lượng từ tất cả sản phẩm chi tiết:", $scope.allSanPhamWithTotalQuantity);
-                    })
-                    .catch(function (error) {
-                        console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
+                    // Sắp xếp danh sách khách hàng theo doanh thu giảm dần
+                    $scope.chiTietKhachHangOnline1 = $scope.chiTietKhachHangOnline1.sort(function (a, b) {
+                        return b.doanhThu - a.doanhThu; // Sắp xếp theo doanh thu giảm dần
                     });
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
+
+                    // Tính tổng số sản phẩm và tổng số trang cho khách hàng
+                    $scope.totalItemsKHOnline1 = $scope.chiTietKhachHangOnline1.length;
+                    $scope.totalPagesKHOnline1 = Math.ceil($scope.totalItemsKHOnline1 / $scope.itemsPerPageKHOnline1);
+
+                    // Phân trang khách hàng
+                    $scope.getPageDataKHOnline1();  // Cập nhật dữ liệu cho trang hiện tại của khách hàng
+                }
+            }).catch(function (error) {
+                console.error("Lỗi khi gọi API cho doanh thu online: ", error);
             });
 
-        $http.get('/rest/hoadon')
-            .then(function (response) {
-                const allInvoices = response.data.data;
+            // Gọi API cho doanh thu offline
+            $http.get(`/hoa-don-chi-tiet/thong-ke-offline`, {
+                params: {startDate: startDate, endDate: endDate}
+            }).then(function (response) {
+                let result = response.data;
+                if (result && result.message === "Thành công") {
+                    $scope.doanhThuTodayOffline1 = result.data.doanhThu || 0;
+                    $scope.soLuongBanRaTodayOffline1 = result.data.soLuongBanRa || 0;
+                    $scope.soLuongHoaDonTodayOffline1 = result.data.soLuongHoaDon || 0;
+                    $scope.chiTietSanPhamOffline1 = result.data.chiTietSanPham || [];
+                    $scope.chiTietKhachHangOffline1 = result.data.tongHopKhachHang || [];
 
-                // Lọc hóa đơn có trangThai === 4
-                const filteredInvoices = allInvoices.filter(invoice => invoice.trangThai === 4);
+                    /// danh sách san phâm
+                    $scope.chiTietSanPhamOffline1 = $scope.chiTietSanPhamOffline1.sort(function (a, b) {
+                        return b.soLuong - a.soLuong; // Sắp xếp theo số lượng bán giảm dần
+                    });
+                    $scope.totalItems1 = $scope.chiTietSanPhamOffline1.length; // Tổng số sản phẩm
+                    $scope.totalPages1 = Math.ceil($scope.totalItems1 / $scope.itemsPerPage1); // Tính tổng số trang
 
-                // Tính tổng của trường tongTien
-                $scope.tongDoanhThu = filteredInvoices.reduce((sum, invoice) => {
-                    return sum + (parseFloat(invoice.tongTien) || 0);
-                }, 0);
+                    /// danh sách khách hàng
+                    $scope.chiTietKhachHangOffline1 = $scope.chiTietKhachHangOffline1.sort(function (a, b) {
+                        return b.doanhThu - a.doanhThu; // Sắp xếp theo số lượng bán giảm dần
+                    });
+                    $scope.totalItemsKHOF1 = $scope.chiTietKhachHangOffline1.length; // Tổng số sản phẩm
+                    $scope.totalPagesKHOF1 = Math.ceil($scope.totalItemsKHOF1 / $scope.itemsPerPageKHOF1); // Tính tổng số trang
 
-                console.log("Tổng tiền của các hóa đơn có trạng thái là 4:", $scope.tongDoanhThu);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn:', error);
-            });
-    };
+                    $scope.getPageDataOffline1(); // Gọi hàm để lấy dữ liệu trang đầu tiên
+                    $scope.getPageDataKHOffline1(); // Gọi hàm để lấy dữ liệu trang đầu tiên
 
-    $scope.loadData = function () {
-        $http.get('/rest/hoadon') // API lấy danh sách hóa đơn
-            .then(function (response) {
-                $scope.items = response.data.data; // Giả sử dữ liệu trả về là trong `data.data`
-                $scope.ngay(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.tuan(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.thang(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.nam(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.ngayTaiQuay(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.tuanTaiQuay(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.thangTaiQuay(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.namTaiQuay();
-                $scope.dsSP(); // Gọi hàm cập nhật sau khi dữ liệu được tải về
-                $scope.danhSachSanPhamBanChay();
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu:', error);
+                }
+            }).catch(function (error) {
+                console.error("Lỗi khi gọi API cho doanh thu offline: ", error);
             });
 
+            $http.get(`/hoa-don-chi-tiet/thong-ke-don-hang`, {
+                params: {startDate: startDate, endDate: endDate}
+            }).then(function (response) {
+                let result = response.data;
+                if (result && result.message === "Thành công") {
+                    $scope.choXacNhan1 = result.data.choXacNhan || 0;
+                    $scope.choGiaoHang1 = result.data.choGiaoHang || 0;
+                    $scope.dangGiaoHang1 = result.data.dangGiaoHang || 0;
+                    $scope.daGiao1 = result.data.daGiao || 0;
+                    $scope.daHuy1 = result.data.daHuy || 0;
+                    $scope.taiQuay1 = result.data.taiQuay || 0;
+                    $scope.YeuCauDoiTraChoXacNhan1 = result.data.YeuCauDoiTraChoXacNhan || 0;
+                    $scope.YeuCauDoiTraHuy1 = result.data.YeuCauDoiTraHuy || 0;
+                    $scope.YeuCauDoiTraXacNhan1 = result.data.YeuCauDoiTraXacNhan || 0;
+                }
+            }).catch(function (error) {
+                console.error("Lỗi khi gọi API thống kê đơn hàng: ", error);
+            });
+        };
 
-    };
-
-    // Hàm riêng để lấy danh sách sản phẩm bán chạy cho 'all'
-
-    $scope.loadData();
-
-    $scope.renderTopProductsChart = function () {
-        const ctx = document.getElementById('topProductsChart').getContext('2d');
-
-        // Dữ liệu từ topSanPhamBanChay
-        const labels = $scope.topSanPhamBanChay.map(product => product.tenSanPham); // Tên sản phẩm
-        const data = $scope.topSanPhamBanChay.map(product => product.totalQuantity); // Số lượng bán
-        const totalQuantity = data.reduce((sum, quantity) => sum + quantity, 0); // Tổng số lượng bán
-
-        // Tạo màu sắc ngẫu nhiên cho từng sản phẩm
-        const colors = labels.map(() => {
-            const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-            return randomColor;
+        // Gọi hàm fetchData khi trang tải hoặc khi người dùng thay đổi ngày
+        $scope.$watchGroup(['startDate', 'endDate'], function () {
+            $scope.fetchData();
         });
 
-        new Chart(ctx, {
-            type: 'pie', // Loại biểu đồ
-            data: {
-                labels: labels, // Danh sách tên sản phẩm
-                datasets: [{
-                    label: 'Top Sản Phẩm Bán Chạy',
-                    data: data, // Số lượng bán
-                    backgroundColor: colors, // Màu nền ngẫu nhiên
-                    borderColor: '#ffffff', // Đường viền màu trắng
-                    borderWidth: 2, // Độ rộng đường viền
-                    hoverOffset: 10 // Hiệu ứng phóng to khi hover
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top', // Vị trí của chú thích
-                        labels: {
-                            color: '#333', // Màu chữ
-                            font: {
-                                size: 14, // Cỡ chữ
-                                family: 'Arial, sans-serif' // Font chữ
-                            },
-                            padding: 20, // Khoảng cách giữa các mục chú thích
-                            usePointStyle: true, // Hiển thị dưới dạng dấu chấm
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#000', // Nền của tooltip
-                        titleColor: '#fff', // Màu tiêu đề
-                        bodyColor: '#ddd', // Màu nội dung
-                        titleFont: {
-                            size: 16, // Cỡ chữ tiêu đề
-                            family: 'Arial, sans-serif'
+        // Khởi động việc lấy dữ liệu khi trang tải
+        $scope.fetchData();
+
+        // Hàm tạo biểu đồ
+        $scope.createChartOnline = function () {
+            var ctx = document.getElementById('doanhThuPieChart').getContext('2d');
+            // Nếu biểu đồ đã tồn tại, hủy nó đi trước khi tạo mới
+            if ($scope.doanhThuPieChart) {
+                $scope.doanhThuPieChart.destroy();
+            }
+            // Tạo biểu đồ mới
+            $scope.doanhThuPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Online', 'Offline'],
+                    datasets: [{
+                        label: 'Tỷ lệ Doanh thu %',
+                        data: [$scope.doanhThuPercentage.online, $scope.doanhThuPercentage.offline], // Lấy giá trị từ $scope
+                        backgroundColor: ['#dcbe57', '#717503'],
+                        borderColor: ['#f64f4f', '#ff0000'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            ////////////////////////////////////////////////////////////////////
+            var ctxSL = document.getElementById('soLuongPieChart').getContext('2d');
+            // Nếu biểu đồ đã tồn tại, hủy nó đi trước khi tạo mới
+            if ($scope.soLuongPieChart) {
+                $scope.soLuongPieChart.destroy();
+            }
+            // Tạo biểu đồ mới
+            $scope.soLuongPieChart = new Chart(ctxSL, {
+                type: 'pie',
+                data: {
+                    labels: ['Online', 'Offline'],
+                    datasets: [{
+                        label: 'Tỷ lệ Doanh thu %',
+                        data: [$scope.soLuongBanPercentage.online, $scope.soLuongBanPercentage.offline], // Lấy giá trị từ $scope
+                        backgroundColor: ['#c962ba', '#860e33'],
+                        borderColor: ['#9b7dc0', '#7011ea'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            //////////////////////////////////////////////////////////////////////////
+            var ctxDH = document.getElementById('donHangPieChart').getContext('2d');
+            // Nếu biểu đồ đã tồn tại, hủy nó đi trước khi tạo mới
+            if ($scope.donHangPieChart) {
+                $scope.donHangPieChart.destroy();
+            }
+            // Tạo biểu đồ mới
+            $scope.donHangPieChart = new Chart(ctxDH, {
+                type: 'pie',
+                data: {
+                    labels: ['Online', 'Offline'],
+                    datasets: [{
+                        label: 'Tỷ lệ Doanh thu %',
+                        data: [$scope.soLuongHoaDonPercentage.online, $scope.soLuongHoaDonPercentage.offline], // Lấy giá trị từ $scope
+                        backgroundColor: ['#82ee79', '#0e7700'],
+                        borderColor: ['#43b5ce', '#1f4e9b'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            //////////////////////////////////////////////////////////
+            const ctxDonHang = document.getElementById('donhangChart').getContext('2d');
+
+            // Nếu đã có biểu đồ, hủy biểu đồ cũ trước khi vẽ mới
+            if ($scope.donhangChart) {
+                $scope.donhangChart.destroy();
+            }
+
+            // Dữ liệu biểu đồ
+            const labels = [
+                'Chờ XN',
+                'Chờ GH',
+                'Đang GH',
+                'Đã Giao',
+                'Đã Hủy',
+                'Tại Quầy',
+                'ĐT-Chờ XN',
+                'ĐT-Hủy',
+                'ĐT-XN'
+            ];
+
+            const data = [
+                $scope.choXacNhan1,
+                $scope.choGiaoHang1,
+                $scope.dangGiaoHang1,
+                $scope.daGiao1,
+                $scope.daHuy1,
+                $scope.taiQuay1,
+                $scope.YeuCauDoiTraChoXacNhan1,
+                $scope.YeuCauDoiTraHuy1,
+                $scope.YeuCauDoiTraXacNhan1
+            ];
+
+            $scope.donhangChart = new Chart(ctxDonHang, {
+                type: 'line', // Loại biểu đồ: 'line' thay vì 'bar'
+                data: {
+                    labels: labels, // Nhãn cho trục X
+                    datasets: [{
+                        label: 'Thống kê đơn hàng',
+                        data: data, // Dữ liệu của biểu đồ
+                        backgroundColor: 'rgba(0, 123, 255, 0.2)', // Màu nền của đường biểu đồ
+                        borderColor: '#007bff', // Màu của đường biểu đồ
+                        borderWidth: 2, // Độ rộng của đường
+                        fill: true // Điền màu phía dưới đường biểu đồ (nếu cần)
+                    }]
+                },
+                options: {
+                    responsive: true, // Biểu đồ tự động điều chỉnh kích thước theo màn hình
+                    scales: {
+                        x: {
+                            display: true // Hiển thị trục X
                         },
-                        bodyFont: {
-                            size: 14 // Cỡ chữ nội dung
-                        },
-                        padding: 10, // Khoảng cách bên trong tooltip
-                        callbacks: {
-                            label: function (tooltipItem) {
-                                const quantity = tooltipItem.raw; // Số lượng của sản phẩm
-                                const percentage = ((quantity / totalQuantity) * 100).toFixed(2); // Tính % sản phẩm
-                                const label = tooltipItem.label; // Tên sản phẩm
-                                return `${label}: ${quantity} sản phẩm (${percentage}%)`;
-                            },
-                            afterBody: function () {
-                                return `Tổng: ${totalQuantity} sản phẩm`; // Hiển thị tổng sản phẩm trong tooltip
+                        y: {
+                            beginAtZero: true, // Trục Y bắt đầu từ 0
+                            ticks: {
+                                stepSize: 1 // Chỉnh khoảng cách giữa các điểm trên trục Y
                             }
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true, // Hiển thị chú thích
+                            position: 'top' // Vị trí chú thích
+                        },
+                        tooltip: {
+                            enabled: true // Hiển thị tooltip khi hover vào các điểm trên biểu đồ
+                        }
                     }
                 }
+            });
+        };
+    };
+
+    $scope.loadDataOnline = function () {
+        $scope.itemsPerPageOnline = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageOnline = 1; // Trang hiện tại
+        $scope.totalItemsOnline = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietSanPhamPageOnline = []; // Mảng chứa các sản phẩm cho trang hiện tại
+
+        $scope.getPageDataOnline = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageOnline - 1) * $scope.itemsPerPageOnline;
+            const end = $scope.currentPageOnline * $scope.itemsPerPageOnline;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietSanPhamPageOnline = $scope.chiTietSanPhamOnline.slice(start, end);
+        };
+
+        $scope.itemsPerPageKHOnline = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageKHOnline = 1; // Trang hiện tại
+        $scope.totalItemsKHOnline = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietKhachHangPageOnline = []; // Mảng chứa các sản phẩm cho trang hiện tại
+
+        $scope.getPageDataKHOnline = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageKHOnline - 1) * $scope.itemsPerPageKHOnline;
+            const end = $scope.currentPageKHOnline * $scope.itemsPerPageKHOnline;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietKhachHangPageOnline = $scope.chiTietKhachHangOnline.slice(start, end);
+        };
+
+        $http.get(`/hoa-don-chi-tiet/thong-ke-online`, {
+            params: {startDate: startToday, endDate: endToday}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuTodayOnline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaTodayOnline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonTodayOnline = result.data.soLuongHoaDon || 0;
+                $scope.chiTietSanPhamOnline = result.data.chiTietSanPham || [];
+                $scope.chiTietKhachHangOnline = result.data.tongHopKhachHang || [];
+
+                /// danh sách san phâm
+                $scope.chiTietSanPhamOnline = $scope.chiTietSanPhamOnline.sort(function (a, b) {
+                    return b.soLuong - a.soLuong; // Sắp xếp theo số lượng bán giảm dần
+                });
+                $scope.totalItemsOnline = $scope.chiTietSanPhamOnline.length; // Tổng số sản phẩm
+                $scope.totalPagesOnline = Math.ceil($scope.totalItemsOnline / $scope.itemsPerPageOnline); // Tính tổng số trang
+
+                /// danh sách khách hàng
+                $scope.chiTietKhachHangOnline = $scope.chiTietKhachHangOnline.sort(function (a, b) {
+                    return b.doanhThu - a.doanhThu; // Sắp xếp theo số lượng bán giảm dần
+                });
+                $scope.totalItemsKHOnline = $scope.chiTietKhachHangOnline.length; // Tổng số sản phẩm
+
+                /// doanh thu theo cap bac
+                let doanhThuTheoCapBac = result.data.tongDoanhThuTheoCapBac || {};
+                // Dữ liệu để hiển thị trên biểu đồ
+                $scope.capBacLabels = Object.keys(doanhThuTheoCapBac); // ["KIM_CUONG", "BAC", "VANG"]
+                $scope.capBacData = Object.values(doanhThuTheoCapBac); // [0, 9725000, 0]
+
+                $scope.totalPagesKHOnline = Math.ceil($scope.totalItemsKHOnline / $scope.itemsPerPageKHOnline); // Tính tổng số trang
+                $scope.getPageDataOnline(); // Gọi hàm để lấy dữ liệu trang đầu tiên
+                $scope.getPageDataKHOnline(); // Gọi hàm để lấy dữ liệu trang đầu tiên
+                $scope.createChartOnline();  // tạo biểu đồ
+
+                let chiTietSanPham = result.data.chiTietSanPham || [];
+                let sanPhamBanChay = chiTietSanPham.reduce(function (max, current) {
+                    return (current.soLuong > max.soLuong) ? current : max;
+                }, {soLuong: 0});
+
+                // Lưu sản phẩm bán chạy nhất vào scope
+                $scope.sanPhamBanChayOnlineToday = sanPhamBanChay.ten || 'Không có sản phẩm bán chạy';
+
             }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu hôm nay online: ", error);
         });
-    };
 
-    $scope.showDatePicker = false;
-    $scope.startDate = null;
-    $scope.endDate = null;
-
-    $scope.toggleDatePicker = function() {
-        $scope.showDatePicker = !$scope.showDatePicker;
-    };
-
-    $scope.selectCustomTimeFrame = function() {
-        if ($scope.startDate && $scope.endDate) {
-            const startDate = new Date($scope.startDate);
-            const endDate = new Date($scope.endDate);
-
-            // Gọi filterAndCalculate để lọc và tính toán doanh thu, số lượng
-            $scope.filterAndCalculate(startDate, endDate);
-        }
-    };
-
-    $scope.filterAndCalculate = function(startDate, endDate) {
-        // Lọc các đơn hàng trong khoảng thời gian đã chọn
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 4;
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            return statusMatches && ngayCapNhat >= startDate && ngayCapNhat <= endDate;
+        $http.get(`/hoa-don-chi-tiet/thong-ke-online`, {
+            params: {startDate: startOfWeek, endDate: endOfWeek}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuThisWeekOnline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaThisWeekOnline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonThisWeekOnline = result.data.soLuongHoaDon || 0;
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu tuần này online: ", error);
         });
-        // Tính doanh thu và số lượng cho khoảng thời gian này
-        $scope.doanhThu = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-        $scope.soLuong = filteredItems.reduce((total, item) => total + parseFloat(item.soLuong), 0);
 
-        // Lấy danh sách sản phẩm từ API /san-pham
-        $http.get('/san-pham')
-            .then(function(sanPhamResponse) {
-                const SanPham = sanPhamResponse.data.data;
+        $http.get(`/hoa-don-chi-tiet/thong-ke-online`, {
+            params: {startDate: startOfMonth, endDate: endOfMonth}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuThisMonthOnline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaThisMonthOnline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonThisMonthOnline = result.data.soLuongHoaDon || 0;
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu tháng này online: ", error);
+        });
 
-                // Lấy chi tiết sản phẩm từ API /spct
-                $http.get('/spct')
-                    .then(function(spctResponse) {
-                        const SanPhamChiTiet = spctResponse.data.data;
+        $http.get(`/hoa-don-chi-tiet/thong-ke-online`, {
+            params: {startDate: startOfYear, endDate: endOfYear}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuThisYearOnline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaThisYearOnline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonThisYearOnline = result.data.soLuongHoaDon || 0;
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu năm nay online: ", error);
+        });
 
-                        // Lấy danh sách hóa đơn chi tiết từ API /hoa-don-chi-tiet
-                        $http.get('/hoa-don-chi-tiet')
-                            .then(function(hdctResponse) {
-                                const HoaDonChiTiet = hdctResponse.data.data;
-                                const invoiceIds = filteredItems.map(item => item.id);
-                                const filteredHdct = HoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
+        $scope.createChartOnline = function () {
+            // Sắp xếp chiTietSanPham theo số lượng bán giảm dần và lấy top 5 sản phẩm
+            let top5SanPham = $scope.chiTietSanPhamOnline.sort(function (a, b) {
+                return b.soLuong - a.soLuong; // Sắp xếp theo số lượng bán giảm dần
+            }).slice(0, 5); // Lấy 5 sản phẩm đầu tiên
 
-                                // Tính tổng số lượng các sản phẩm bán ra
-                                $scope.soLuongNgay = filteredHdct.reduce((total, item) => total + parseFloat(item.soLuong), 0);
+            const labels = []; // Tên sản phẩm
+            const soLuong = []; // Số lượng bán của các sản phẩm
+            const doanhThu = []; // Doanh thu của các sản phẩm
 
-                                const productQuantity = {};
-
-                                // Tính tổng số lượng của các sản phẩm
-                                filteredHdct.forEach(hdctItem => {
-                                    const spct = SanPhamChiTiet.find(spct => spct.id === hdctItem.idSanPhamChiTiet);
-                                    if (spct) {
-                                        const productId = spct.idSanPham;
-                                        const quantity = parseFloat(hdctItem.soLuong);
-                                        productQuantity[productId] = (productQuantity[productId] || 0) + quantity;
-                                    }
-                                });
-
-                                // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
-                                $scope.SanPhamBanChay = Object.entries(productQuantity)
-                                    .map(([productId, totalQuantity]) => {
-                                        const sanPham = SanPham.find(sp => sp.id === parseInt(productId));
-                                        return {
-                                            productId,
-                                            totalQuantity,
-                                            tenSanPham: sanPham ? sanPham.ten : 'N/A',
-                                            maSanPham: sanPham ? sanPham.ma : 'N/A'
-                                        };
-                                    })
-                                    .sort((a, b) => b.totalQuantity - a.totalQuantity)
-                                    .slice(0, 10); // Lấy top 10 sản phẩm bán chạy nhất
-
-                                // Lấy sản phẩm bán chạy nhất
-                                $scope.SanPhamBanChayNhat = $scope.SanPhamBanChay[0];
-                                $scope.renderTopProductsChart2();
-
-                                console.log("Top 10 sản phẩm bán chạy nhất trong khoảng thời gian:", $scope.SanPhamBanChay);
-                                console.log("Sản phẩm bán chạy nhất:", $scope.SanPhamBanChayNhat);
-                            })
-                            .catch(function(error) {
-                                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-                            });
-                    })
-                    .catch(function(error) {
-                        console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
-                    });
-            })
-            .catch(function(error) {
-                console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
+            // Duyệt qua top5SanPham để lấy tên, số lượng bán và doanh thu
+            angular.forEach(top5SanPham, function (item) {
+                labels.push(item.ten);
+                soLuong.push(item.soLuong);
+                doanhThu.push(item.doanhThu);
             });
 
-    };
-
-    $scope.selectTimeFrame = function(timeFrame) {
-        const today = new Date();
-        let startDate, endDate, startDonHang, endDonHang;
-
-        // Lấy ngày bắt đầu và kết thúc của khoảng thời gian đã chọn
-        if (timeFrame === 'today') {
-            startDate = new Date(today.setHours(0, 0, 0, 0));
-            endDate = new Date(today.setHours(23, 59, 59, 999));
-            startDonHang = new Date(today.setHours(0, 0, 0, 0));
-            endDonHang = new Date(today.setHours(23, 59, 59, 999));
-        } else if (timeFrame === 'week') {
-            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())); // Chủ nhật tuần này
-            startOfWeek.setHours(0, 0, 0, 0);
-            startDate = startOfWeek;
-            endDate = new Date(startOfWeek);
-            endDate.setDate(startOfWeek.getDate() + 6); // Cuối tuần
-            endDate.setHours(23, 59, 59, 999);
-
-            const startOfWeekDH = new Date(today.setDate(today.getDate() - today.getDay())); // Chủ nhật tuần này
-            startOfWeekDH.setHours(0, 0, 0, 0);
-            startDonHang = startOfWeekDH;
-            endDonHang = new Date(startOfWeekDH);
-            endDonHang.setDate(startOfWeekDH.getDate() + 6); // Cuối tuần
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'month') {
-            startDate = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
-            startDate.setHours(0, 0, 0, 0);
-            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
-            endDate.setHours(23, 59, 59, 999);
-
-            startDonHang = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
-            startDonHang.setHours(0, 0, 0, 0);
-            endDonHang = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'year') {
-            startDate = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
-            startDate.setHours(0, 0, 0, 0);
-            endDate = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
-            endDate.setHours(23, 59, 59, 999);
-
-            startDonHang = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
-            startDonHang.setHours(0, 0, 0, 0);
-            endDonHang = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'all') {
-            // startDate = new Date(0);  // Không giới hạn ngày bắt đầu (Epoch start)
-            startDate = new Date(0);  // Ngày bắt đầu hợp lý hơn
-            endDate = new Date();    // Không giới hạn ngày kết thúc (hiện tại)
-
-            startDonHang = new Date(0);  // Ngày bắt đầu hợp lý hơn
-            endDonHang = new Date();    // Không giới hạn ngày kết thúc (hiện tại)
-        }
-
-        // Gọi filterAndCalculate để lọc và tính toán doanh thu, số lượng và danh sách sản phẩm bán chạy
-        $scope.filterAndCalculate(startDate, endDate);
-        $scope.filterAndCalculate(startDonHang, endDonHang);
-
-    };
-
-    $scope.renderTopProductsChart2 = function() {
-        // Kiểm tra nếu biểu đồ đã tồn tại, hủy nó trước khi vẽ mới
-        if ($scope.topProductsChart) {
-            $scope.topProductsChart.destroy(); // Hủy bỏ biểu đồ cũ
-        }
-
-        // Dữ liệu cho biểu đồ
-        const labels = $scope.SanPhamBanChay.map(product => product.tenSanPham);
-        const quantities = $scope.SanPhamBanChay.map(product => product.totalQuantity);
-
-        // Cấu hình biểu đồ
-        const ctx = document.getElementById('topProductsChart2').getContext('2d');
-        $scope.topProductsChart = new Chart(ctx, {
-            type: 'bar',  // Loại biểu đồ: bar (cột)
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Sản phẩm bán chạy',
-                    data: quantities,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền của các cột
-                    borderColor: 'rgba(75, 192, 192, 1)', // Màu viền của các cột
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true // Đảm bảo trục y bắt đầu từ 0
-                    }
-                }
-            }
-        });
-    };
-
-    //////////////////ĐƠN HÀNG/////////////////
-
-    $scope.filterDonhang = function(startDate, endDate) {
-        $scope.filteredItemsForChart = $scope.items.filter(item => {
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            return ngayCapNhat >= startDate && ngayCapNhat <= endDate;
-        });
-
-        // Đếm số lượng đơn hàng theo trạng thái trong dữ liệu đã lọc
-        $scope.donHangDaGiao = $scope.filteredItemsForChart.filter(item => item.trangThai === 4).length;
-        $scope.donHangDaHuy = $scope.filteredItemsForChart.filter(item => item.trangThai === 5).length;
-        $scope.tongDonHang = $scope.filteredItemsForChart.length;
-    };
-
-
-    $scope.selectTimeFrame1 = function(timeFrame) {
-        const today = new Date();
-        let startDonHang, endDonHang;
-
-        if (timeFrame === 'today') {
-            startDonHang = new Date(today.setHours(0, 0, 0, 0));
-            endDonHang = new Date(today.setHours(23, 59, 59, 999));
-        } else if (timeFrame === 'week') {
-            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-            startDonHang = new Date(startOfWeek.setHours(0, 0, 0, 0));
-            endDonHang = new Date(today.setDate(startOfWeek.getDate() + 6));
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'month') {
-            startDonHang = new Date(today.getFullYear(), today.getMonth(), 1);
-            endDonHang = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'year') {
-            startDonHang = new Date(today.getFullYear(), 0, 1);
-            endDonHang = new Date(today.getFullYear(), 11, 31);
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'all') {
-            startDonHang = new Date(0);
-            endDonHang = new Date();
-        }
-
-        $scope.filterDonhang(startDonHang, endDonHang);
-        $scope.renderTopProductsChart3();
-    };
-
-    $scope.selectCustomTimeFrameDonHang = function() {
-        if ($scope.startDonHang && $scope.endDonHang) {
-            const startDonHang = new Date($scope.startDonHang);
-            const endDonHang = new Date($scope.endDonHang);
-
-            $scope.filterDonhang(startDonHang, endDonHang);
-            $scope.renderTopProductsChart3();
-        }
-    };
-
-    $scope.donHang = false;
-    $scope.startDonHang = null;
-    $scope.endDonHang = null;
-
-    $scope.locDonHang = function() {
-        $scope.donHang = !$scope.donHang;
-    };
-
-
-
-
-    $scope.renderTopProductsChart3 = function() {
-        if (!$scope.filteredItemsForChart || $scope.filteredItemsForChart.length === 0) {
-            console.log('Không có dữ liệu để vẽ biểu đồ.');
-            return;
-        }
-
-        // Đếm số lượng đơn hàng theo trạng thái
-        const countTrangThai4 = $scope.filteredItemsForChart.filter(item => item.trangThai === 4).length;
-        const countTrangThai5 = $scope.filteredItemsForChart.filter(item => item.trangThai === 5).length;
-        const countTrangThai0 = $scope.filteredItemsForChart.filter(item => item.trangThai === 0).length;
-        const countTrangThai2 = $scope.filteredItemsForChart.filter(item => item.trangThai === 2).length;
-        const countTrangThai3 = $scope.filteredItemsForChart.filter(item => item.trangThai === 3).length;
-
-        // Dữ liệu cho biểu đồ
-        const labels = ['Đã giao', 'Đã hủy', 'Chờ xác nhận', 'Chờ vận chuyển', 'Đang vận chuyển'];
-        const data = [countTrangThai4, countTrangThai5, countTrangThai0, countTrangThai2, countTrangThai3];
-
-        // Hủy biểu đồ cũ nếu tồn tại
-        if ($scope.topProductsChart) {
-            $scope.topProductsChart.destroy();
-        }
-
-        // Cấu hình và vẽ biểu đồ
-        const ctx = document.getElementById('topProductsChart3').getContext('2d');
-        $scope.topProductsChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Số lượng đơn hàng',
-                    data: data,
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 99, 132, 0.6)',
-                        'rgba(255, 206, 86, 0.6)',
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(153, 102, 255, 0.6)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            // Vẽ biểu đồ
+            var ctx = document.getElementById('chartOnline').getContext('2d');
+            var chartOnlne = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượng bán',
+                        data: soLuong,
+                        type: 'bar',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Doanh thu',
+                        data: doanhThu,
+                        type: 'bar',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: false // Ẩn tên sản phẩm dưới cột
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
-    };
-
-//////////////////// đơn hàng//////////////////////////
-    $scope.danhSachSanPhamBanChay = function () {
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 4;
-            return statusMatches;
-        });
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        // Lấy danh sách sản phẩm từ API /san-pham
-        $http.get('/san-pham')
-            .then(function (sanPhamResponse) {
-                const allSanPham = sanPhamResponse.data.data;
-
-                $http.get('/spct')
-                    .then(function (spctResponse) {
-                        const allSanPhamChiTiet = spctResponse.data.data;
-
-                        $http.get('/hoa-don-chi-tiet')
-                            .then(function (hdctResponse) {
-                                const allHoaDonChiTiet = hdctResponse.data.data;
-                                const filteredHdctItems = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-
-                                const productQuantityMap = {};
-                                filteredHdctItems.forEach(hdctItem => {
-                                    const spct = allSanPhamChiTiet.find(spct => spct.id === hdctItem.idSanPhamChiTiet);
-                                    if (spct) {
-                                        const productId = spct.idSanPham;
-                                        const quantity = parseFloat(hdctItem.soLuong);
-                                        productQuantityMap[productId] = (productQuantityMap[productId] || 0) + quantity;
-                                    }
-                                });
-
-                                // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
-                                $scope.danhSachSanPhamBanChay = Object.entries(productQuantityMap)
-                                    .map(([productId, totalQuantity]) => {
-                                        const sanPham = allSanPham.find(sp => sp.id === parseInt(productId));
-                                        return { productId, totalQuantity, tenSanPham: sanPham ? sanPham.ten : 'N/A', maSanPham: sanPham ? sanPham.ma : 'N/A' };
-                                    })
-                                    .sort((a, b) => b.totalQuantity - a.totalQuantity)
-                                    .slice(0, 100);
-
-                                // Phân trang cho top 10 sản phẩm bán chạy
-                                $scope.sanPhamSize = 5; // Số lượng sản phẩm mỗi trang
-                                $scope.sanPhamPage = 1; // Trang hiện tại
-
-                                // Tính tổng số trang
-                                $scope.SanPhamPages = Math.ceil($scope.danhSachSanPhamBanChay.length / $scope.sanPhamSize);
-
-                                // Hàm lấy danh sách sản phẩm cho trang hiện tại
-                                $scope.getPageData2 = function () {
-                                    const startIndex = ($scope.sanPhamPage - 1) * $scope.sanPhamSize;
-                                    const endIndex = startIndex + $scope.sanPhamSize;
-                                    return $scope.danhSachSanPhamBanChay.slice(startIndex, endIndex);
-                                };
-
-                            })
-                            .catch(function (error) {
-                                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-                            });
-                    })
-                    .catch(function (error) {
-                        console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
-                    });
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
             });
-    };
-
-    $scope.exportExcel = function () {
-        // Sheet 1: Dữ liệu doanh thu và đơn hàng
-        const currentDateTime = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-
-        const data1 = [
-            { Loại: 'Đơn Hàng Đã Giao', Số_Lượng: $scope.donHangNgay },
-            { Loại: 'Đơn Hàng Chờ', Số_Lượng: $scope.donHangCho },
-            { Loại: 'Đơn Hàng Hủy', Số_Lượng: $scope.donHangHuy },
-            {
-                Loại: 'Doanh Thu',
-                Tổng: $scope.doanhThuNgay.toLocaleString('vi-VN') + ' đ' // Định dạng với dấu chấm và thêm "đ"
-            },
-            { Loại: '', },
-            { Loại: 'Thời gian xuất', currentDateTime },
-        ];
-
-        // Sheet 2: Top 10 Sản Phẩm Bán Chạy
-        const data2 = $scope.topSanPhamBanChay.map((sp, index) => ({
-            STT: index + 1,
-            Tên_Sản_Phẩm: sp.tenSanPham,
-            Mã_Sản_Phẩm: sp.maSanPham,
-            Số_Lượng_Bán: sp.totalQuantity,
-            Giá_Bán: sp.giaSanPham.toLocaleString('vi-VN') + ' đ',
-        }));
-        const data3 = $scope.allSanPhamWithTotalQuantity.map((sp, index) => ({
-            STT: index + 1,
-            Tên_Sản_Phẩm: sp.productName,
-            Mã_Sản_Phẩm: sp.productMa,
-            Số_Lượng_Còn: sp.totalQuantity,
-            Giá_Bán: sp.productGia.toLocaleString('vi-VN') + ' đ',
-        }));
-
-        // Tạo workbook và các sheet
-        const worksheet1 = XLSX.utils.json_to_sheet(data1); // Sheet Doanh Thu
-        const worksheet2 = XLSX.utils.json_to_sheet(data2); // Sheet Top Sản Phẩm
-        const worksheet3 = XLSX.utils.json_to_sheet(data3); // Sheet Top Sản Phẩm
-
-        // Tạo workbook
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet1, 'Báo Cáo Doanh Thu');
-        XLSX.utils.book_append_sheet(workbook, worksheet2, 'Sản Phẩm Bán');
-        XLSX.utils.book_append_sheet(workbook, worksheet3, 'Sản Phẩm Còn');
-
-        // Xuất file Excel
-        XLSX.writeFile(workbook, `bao_cao_doanh_thu_${currentDateTime}.xlsx`);
-    };
-
-    /////////////////////////// Tại quầy ////////////////////////
-    $scope.ngayTaiQuay = function () {
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-
-        const todayEnd = new Date();
-        todayEnd.setHours(23, 59, 59, 999);
-
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 7;
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0);
-            return statusMatches && ngayCapNhat.getTime() === todayStart.getTime();
-        });
-
-
-        $scope.donHangNgayTaiQuay = filteredItems.length;
-        $scope.doanhThuNgayTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        // Lấy danh sách sản phẩm từ API /san-pham
-        $http.get('/san-pham')
-            .then(function (sanPhamResponse) {
-                const allSanPham = sanPhamResponse.data.data;
-
-
-                $http.get('/spct')
-                    .then(function (spctResponse) {
-                        const allSanPhamChiTiet = spctResponse.data.data;
-
-                        $http.get('/hoa-don-chi-tiet')
-                            .then(function (hdctResponse) {
-                                const allHoaDonChiTiet = hdctResponse.data.data;
-                                const filteredHdctItems = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-                                $scope.soLuongNgayTaiQuay = filteredHdctItems.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                                const productQuantityMap = {};
-                                filteredHdctItems.forEach(hdctItem => {
-                                    const spct = allSanPhamChiTiet.find(spct => spct.id === hdctItem.idSanPhamChiTiet);
-                                    if (spct) {
-                                        const productId = spct.idSanPham;
-                                        const quantity = parseFloat(hdctItem.soLuong);
-                                        productQuantityMap[productId] = (productQuantityMap[productId] || 0) + quantity;
-                                    }
-                                });
-
-                                // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
-                                $scope.topSanPhamBanChayTaiQuay = Object.entries(productQuantityMap)
-                                    .map(([productId, totalQuantity]) => {
-                                        const sanPham = allSanPham.find(sp => sp.id === parseInt(productId));
-                                        return { productId, totalQuantity, tenSanPham: sanPham ? sanPham.ten : 'N/A', maSanPham: sanPham ? sanPham.ma : 'N/A'
-                                            , giaSanPham: sanPham ? sanPham.gia : 'N/A'};
-                                    })
-                                    .sort((a, b) => b.totalQuantity - a.totalQuantity)
-                                    .slice(0, 10);
-
-                                $scope.renderTopProductsChart(); // Hiển thị biểu đồ sau khi tính toán xong
-
-                                // Lấy sản phẩm bán chạy nhất
-                                $scope.topSanPhamBanChayNhatTaiQuay = $scope.topSanPhamBanChayTaiQuay[0];
-
-                                // Phân trang cho top 10 sản phẩm bán chạy
-                                $scope.Size = 5; // Số lượng sản phẩm mỗi trang
-                                $scope.Page = 1; // Trang hiện tại
-
-                                // Tính tổng số trang
-                                $scope.Pages = Math.ceil($scope.topSanPhamBanChayTaiQuay.length / $scope.Size);
-
-                                // Hàm lấy danh sách sản phẩm cho trang hiện tại
-                                $scope.getPageData3 = function () {
-                                    const startIndex = ($scope.Page - 1) * $scope.Size;
-                                    const endIndex = startIndex + $scope.Size;
-                                    return $scope.topSanPhamBanChayTaiQuay.slice(startIndex, endIndex);
-                                };
-
-                                console.log("Top 10 sản phẩm bán chạy nhất trong ngày:", $scope.topSanPhamBanChayTaiQuay);
-                                console.log("Sản phẩm bán chạy nhất:", $scope.topSanPhamBanChayNhatTaiQuay);
-                            })
-                            .catch(function (error) {
-                                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-                            });
-                    })
-                    .catch(function (error) {
-                        console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
-                    });
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
-            });
-    };
-
-    // Hàm lọc và tính số lượng hóa đơn có trạng thái = 4 cho tuần này
-    $scope.tuanTaiQuay = function () {
-        const today = new Date();
-        const dayOfWeek = today.getDay(); // Chủ nhật là 0, thứ 2 là 1, ...
-
-        // Tính ngày đầu tuần (Chủ nhật hoặc thứ hai tùy thuộc vào hệ thống)
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - dayOfWeek); // Lùi lại số ngày từ Chủ nhật
-
-        startOfWeek.setHours(0, 0, 0, 0); // Đặt giờ về 0
-
-        // Tính ngày cuối tuần (thường là thứ 7)
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6); // Thêm 6 ngày
-
-        endOfWeek.setHours(23, 59, 59, 999); // Đặt giờ đến cuối ngày
-
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 7 ;
-
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0); // Bỏ qua giờ, phút, giây khi so sánh
-
-            return statusMatches && ngayCapNhat >= startOfWeek && ngayCapNhat <= endOfWeek;
-        });
-
-        $scope.donHangTuanTaiQuay = filteredItems.length;
-        $scope.doanhThuTuanTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        $http.get('/hoa-don-chi-tiet') // API lấy tất cả hóa đơn chi tiết
-            .then(function (response) {
-                const allHoaDonChiTiet = response.data.data;
-                const filteredItems2 = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-                $scope.soLuongTuanTaiQuay = filteredItems2.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                // Hiển thị thông tin
-                console.log("Tổng số lượng của các hóa đơn chi tiết có trạng thái 4 trong tuần:", $scope.soLuongTuan);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-            });
-    };
-
-    // Hàm lọc và tính số lượng hóa đơn có trạng thái =  cho tháng này
-    $scope.thangTaiQuay = function () {
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
-        firstDayOfMonth.setHours(0, 0, 0, 0); // Đặt giờ về 0
-
-        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
-        lastDayOfMonth.setHours(23, 59, 59, 999); // Đặt giờ đến cuối ngày
-
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 7 ;
-
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0); // Bỏ qua giờ, phút, giây khi so sánh
-
-            return statusMatches && ngayCapNhat >= firstDayOfMonth && ngayCapNhat <= lastDayOfMonth;
-        });
-
-        $scope.donHangThangTaiQuay = filteredItems.length;
-        $scope.doanhThuThangTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        $http.get('/hoa-don-chi-tiet') // API lấy tất cả hóa đơn chi tiết
-            .then(function (response) {
-                const allHoaDonChiTiet = response.data.data;
-                const filteredItems2 = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-                $scope.soLuongThangTaiQuay = filteredItems2.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                // Hiển thị thông tin
-                console.log("Tổng số lượng của các hóa đơn chi tiết có trạng thái 4 trong tháng:", $scope.soLuongThang);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-            });
-    };
-
-    $scope.namTaiQuay = function () {
-        const today = new Date();
-        const firstDayOfYear = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
-        firstDayOfYear.setHours(0, 0, 0, 0);
-
-        const lastDayOfYear = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
-        lastDayOfYear.setHours(23, 59, 59, 999);
-
-        // Lọc các hóa đơn có trạng thái =  và ngày cập nhật trong năm hiện tại
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 7;
-
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            ngayCapNhat.setHours(0, 0, 0, 0); // Bỏ qua giờ, phút, giây khi so sánh
-
-            return statusMatches && ngayCapNhat >= firstDayOfYear && ngayCapNhat <= lastDayOfYear;
-        });
-
-        $scope.donHangNamTaiQuay = filteredItems.length;
-        $scope.doanhThuNamTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-
-        const invoiceIds = filteredItems.map(item => item.id);
-
-        // Lấy tất cả hóa đơn chi tiết
-        $http.get('/hoa-don-chi-tiet') // API lấy tất cả hóa đơn chi tiết
-            .then(function (response) {
-                const allHoaDonChiTiet = response.data.data;
-                const filteredItems2 = allHoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-
-                // Tính tổng số lượng của các hóa đơn chi tiết có trạng thái = 4 trong năm
-                $scope.soLuongNamTaiQuay = filteredItems2.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                // Hiển thị thông tin
-                console.log("Tổng số lượng của các hóa đơn chi tiết có trạng thái 4 trong năm:", $scope.soLuongNam);
-            })
-            .catch(function (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-            });
-    };
-
-    $scope.selectTimeFrameTaiQuay = function(timeFrame) {
-        const today = new Date();
-        let startDate, endDate, startDonHang, endDonHang;
-
-        // Lấy ngày bắt đầu và kết thúc của khoảng thời gian đã chọn
-        if (timeFrame === 'today') {
-            startDate = new Date(today.setHours(0, 0, 0, 0));
-            endDate = new Date(today.setHours(23, 59, 59, 999));
-            startDonHang = new Date(today.setHours(0, 0, 0, 0));
-            endDonHang = new Date(today.setHours(23, 59, 59, 999));
-        } else if (timeFrame === 'week') {
-            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())); // Chủ nhật tuần này
-            startOfWeek.setHours(0, 0, 0, 0);
-            startDate = startOfWeek;
-            endDate = new Date(startOfWeek);
-            endDate.setDate(startOfWeek.getDate() + 6); // Cuối tuần
-            endDate.setHours(23, 59, 59, 999);
-
-            const startOfWeekDH = new Date(today.setDate(today.getDate() - today.getDay())); // Chủ nhật tuần này
-            startOfWeekDH.setHours(0, 0, 0, 0);
-            startDonHang = startOfWeekDH;
-            endDonHang = new Date(startOfWeekDH);
-            endDonHang.setDate(startOfWeekDH.getDate() + 6); // Cuối tuần
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'month') {
-            startDate = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
-            startDate.setHours(0, 0, 0, 0);
-            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
-            endDate.setHours(23, 59, 59, 999);
-
-            startDonHang = new Date(today.getFullYear(), today.getMonth(), 1); // Ngày đầu tháng
-            startDonHang.setHours(0, 0, 0, 0);
-            endDonHang = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'year') {
-            startDate = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
-            startDate.setHours(0, 0, 0, 0);
-            endDate = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
-            endDate.setHours(23, 59, 59, 999);
-
-            startDonHang = new Date(today.getFullYear(), 0, 1); // Ngày đầu năm
-            startDonHang.setHours(0, 0, 0, 0);
-            endDonHang = new Date(today.getFullYear(), 11, 31); // Ngày cuối năm
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'all') {
-            // startDate = new Date(0);  // Không giới hạn ngày bắt đầu (Epoch start)
-            startDate = new Date(0);  // Ngày bắt đầu hợp lý hơn
-            endDate = new Date();    // Không giới hạn ngày kết thúc (hiện tại)
-
-            startDonHang = new Date(0);  // Ngày bắt đầu hợp lý hơn
-            endDonHang = new Date();    // Không giới hạn ngày kết thúc (hiện tại)
-        }
-
-        // Gọi filterAndCalculate để lọc và tính toán doanh thu, số lượng và danh sách sản phẩm bán chạy
-        $scope.filterAndCalculateTaiQuay(startDate, endDate);
-        $scope.filterAndCalculateTaiQuay(startDonHang, endDonHang);
-
-    };
-
-    $scope.filterAndCalculateTaiQuay = function(startDate, endDate) {
-        // Lọc các đơn hàng trong khoảng thời gian đã chọn
-        const filteredItems = $scope.items.filter(item => {
-            const statusMatches = item.trangThai === 7;
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            return statusMatches && ngayCapNhat >= startDate && ngayCapNhat <= endDate;
-        });
-        // Tính doanh thu và số lượng cho khoảng thời gian này
-        $scope.doanhThuTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.tongTien), 0);
-        $scope.soLuongTaiQuay = filteredItems.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-        // Lấy danh sách sản phẩm từ API /san-pham
-        $http.get('/san-pham')
-            .then(function(sanPhamResponse) {
-                const SanPham = sanPhamResponse.data.data;
-
-                // Lấy chi tiết sản phẩm từ API /spct
-                $http.get('/spct')
-                    .then(function(spctResponse) {
-                        const SanPhamChiTiet = spctResponse.data.data;
-
-                        // Lấy danh sách hóa đơn chi tiết từ API /hoa-don-chi-tiet
-                        $http.get('/hoa-don-chi-tiet')
-                            .then(function(hdctResponse) {
-                                const HoaDonChiTiet = hdctResponse.data.data;
-                                const invoiceIds = filteredItems.map(item => item.id);
-                                const filteredHdct = HoaDonChiTiet.filter(item => invoiceIds.includes(item.idHoaDon));
-
-                                // Tính tổng số lượng các sản phẩm bán ra
-                                $scope.soLuongNgayTaiQuay = filteredHdct.reduce((total, item) => total + parseFloat(item.soLuong), 0);
-
-                                const productQuantity = {};
-
-                                // Tính tổng số lượng của các sản phẩm
-                                filteredHdct.forEach(hdctItem => {
-                                    const spct = SanPhamChiTiet.find(spct => spct.id === hdctItem.idSanPhamChiTiet);
-                                    if (spct) {
-                                        const productId = spct.idSanPham;
-                                        const quantity = parseFloat(hdctItem.soLuong);
-                                        productQuantity[productId] = (productQuantity[productId] || 0) + quantity;
-                                    }
-                                });
-
-                                // Chuyển sang mảng, gán tên sản phẩm và sắp xếp để lấy top 10 sản phẩm bán chạy
-                                $scope.SanPhamBanChayTaiQuay = Object.entries(productQuantity)
-                                    .map(([productId, totalQuantity]) => {
-                                        const sanPham = SanPham.find(sp => sp.id === parseInt(productId));
-                                        return {
-                                            productId,
-                                            totalQuantity,
-                                            tenSanPham: sanPham ? sanPham.ten : 'N/A',
-                                            maSanPham: sanPham ? sanPham.ma : 'N/A'
-                                        };
-                                    })
-                                    .sort((a, b) => b.totalQuantity - a.totalQuantity)
-                                    .slice(0, 10); // Lấy top 10 sản phẩm bán chạy nhất
-
-                                // Lấy sản phẩm bán chạy nhất
-                                $scope.SanPhamBanChayNhatTaiQuay = $scope.SanPhamBanChayTaiQuay[0];
-                                $scope.renderTopProductsChart4();
-
-                                console.log("Top 10 sản phẩm bán chạy nhất trong khoảng thời gian:", $scope.SanPhamBanChayTaiQuay);
-                                console.log("Sản phẩm bán chạy nhất:", $scope.SanPhamBanChayNhatTaiQuay);
-                            })
-                            .catch(function(error) {
-                                console.error('Lỗi khi lấy dữ liệu hóa đơn chi tiết:', error);
-                            });
-                    })
-                    .catch(function(error) {
-                        console.error('Lỗi khi lấy dữ liệu sản phẩm chi tiết:', error);
-                    });
-            })
-            .catch(function(error) {
-                console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            let top5KH = $scope.chiTietKhachHangOnline.sort(function (a, b) {
+                return b.doanhThu - a.doanhThu;
+            }).slice(0, 5);
+
+            const labelsKH = [];
+            const soLuongKH = [];
+            const doanhThuKH = [];
+
+            // Duyệt qua top5SanPham để lấy tên, số lượng bán và doanh thu
+            angular.forEach(top5KH, function (item) {
+                labelsKH.push(item.hoVaTen);
+                soLuongKH.push(item.soLuongHoaDon);
+                doanhThuKH.push(item.doanhThu);
             });
 
-    };
-
-    $scope.selectCustomTimeFrameTaiQuay = function() {
-        if ($scope.startDate && $scope.endDate) {
-            const startDate = new Date($scope.startDate);
-            const endDate = new Date($scope.endDate);
-
-            // Gọi filterAndCalculate để lọc và tính toán doanh thu, số lượng
-            $scope.filterAndCalculateTaiQuay(startDate, endDate);
-        }
-    };
-
-    $scope.renderTopProductsChart4 = function() {
-        // Kiểm tra nếu biểu đồ đã tồn tại, hủy nó trước khi vẽ mới
-        if ($scope.topProductsChart) {
-            $scope.topProductsChart.destroy(); // Hủy bỏ biểu đồ cũ
-        }
-
-        // Dữ liệu cho biểu đồ
-        const labels = $scope.SanPhamBanChayTaiQuay.map(product => product.tenSanPham);
-        const quantities = $scope.SanPhamBanChayTaiQuay.map(product => product.totalQuantity);
-
-        // Cấu hình biểu đồ
-        const ctx = document.getElementById('topProductsChart4').getContext('2d');
-        $scope.topProductsChart = new Chart(ctx, {
-            type: 'bar',  // Loại biểu đồ: bar (cột)
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Sản phẩm bán chạy',
-                    data: quantities,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền của các cột
-                    borderColor: 'rgba(75, 192, 192, 1)', // Màu viền của các cột
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true // Đảm bảo trục y bắt đầu từ 0
-                    }
-                }
-            }
-        });
-    };
-
-    $scope.selectTimeFrame1TaiQuay = function(timeFrame) {
-        const today = new Date();
-        let startDonHang, endDonHang;
-
-        if (timeFrame === 'today') {
-            startDonHang = new Date(today.setHours(0, 0, 0, 0));
-            endDonHang = new Date(today.setHours(23, 59, 59, 999));
-        } else if (timeFrame === 'week') {
-            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-            startDonHang = new Date(startOfWeek.setHours(0, 0, 0, 0));
-            endDonHang = new Date(today.setDate(startOfWeek.getDate() + 6));
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'month') {
-            startDonHang = new Date(today.getFullYear(), today.getMonth(), 1);
-            endDonHang = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'year') {
-            startDonHang = new Date(today.getFullYear(), 0, 1);
-            endDonHang = new Date(today.getFullYear(), 11, 31);
-            endDonHang.setHours(23, 59, 59, 999);
-        } else if (timeFrame === 'all') {
-            startDonHang = new Date(0);
-            endDonHang = new Date();
-        }
-
-        $scope.filterDonhangTaiQuay(startDonHang, endDonHang);
-        $scope.renderTopProductsChart5();
-    };
-
-    $scope.filterDonhangTaiQuay = function(startDate, endDate) {
-        $scope.filteredItemsForChartTaiQuay = $scope.items.filter(item => {
-            const ngayCapNhat = new Date(item.ngayCapNhat);
-            return ngayCapNhat >= startDate && ngayCapNhat <= endDate;
-        });
-        $scope.donHangThanhCongOnline = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 5).length;
-        // Đếm số lượng đơn hàng theo trạng thái trong dữ liệu đã lọc
-        $scope.donHangThanhCongTaiQuay = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 7).length;
-    };
-
-    $scope.renderTopProductsChart5 = function() {
-        if (!$scope.filteredItemsForChartTaiQuay || $scope.filteredItemsForChartTaiQuay.length === 0) {
-            console.log('Không có dữ liệu để vẽ biểu đồ.');
-            return;
-        }
-
-        // Đếm số lượng đơn hàng theo trạng thái
-        const countTrangThai5 = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 5).length;
-        const countTrangThai7 = $scope.filteredItemsForChartTaiQuay.filter(item => item.trangThai === 7).length;
-
-        // Dữ liệu cho biểu đồ
-        const labels = ['Tại quầy','Online'];
-        const data = [ countTrangThai7, countTrangThai5];
-
-        // Hủy biểu đồ cũ nếu tồn tại
-        if ($scope.topProductsChart) {
-            $scope.topProductsChart.destroy();
-        }
-
-        // Cấu hình và vẽ biểu đồ
-        const ctx = document.getElementById('topProductsChart5').getContext('2d');
-        $scope.topProductsChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Số lượng đơn hàng',
-                    data: data,
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 99, 132, 0.6)',
-                        'rgba(255, 206, 86, 0.6)',
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(153, 102, 255, 0.6)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            // Vẽ biểu đồ
+            var ctxKH = document.getElementById('chartKHOnline').getContext('2d');
+            var chartKHOfflne = new Chart(ctxKH, {
+                type: 'bar',
+                data: {
+                    labels: labelsKH,
+                    datasets: [{
+                        label: 'Số lượng đơn mua',
+                        data: soLuongKH,
+                        type: 'bar',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Tổng tiền mua',
+                        data: doanhThuKH,
+                        type: 'bar',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: false // Ẩn tên sản phẩm dưới cột
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
+            });
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            const ctxDT = document.getElementById('combinedChartOffline').getContext('2d');
+            new Chart(ctxDT, {
+                type: 'bar', // Loại biểu đồ chính là bar
+                data: {
+                    labels: $scope.capBacLabels, // ["KIM_CUONG", "BAC", "VANG"]
+                    datasets: [
+                        {
+                            type: 'bar', // Biểu đồ cột
+                            label: 'Doanh thu theo cấp bậc (Bar)',
+                            data: $scope.capBacData, // [0, 9725000, 0]
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Màu sắc cột
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            type: 'line', // Biểu đồ đường
+                            label: 'Doanh thu theo cấp bậc (Line)',
+                            data: $scope.capBacData, // [0, 9725000, 0]
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4 // Đường cong mềm mại
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Cấp bậc'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Doanh thu (VND)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        };
+    }
+
+    $scope.loadDataOffline = function () {
+        $scope.itemsPerPage = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPage = 1; // Trang hiện tại
+        $scope.totalItems = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietSanPhamPageOffline = []; // Mảng chứa các sản phẩm cho trang hiện tại
+
+        $scope.getPageDataOffline = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPage - 1) * $scope.itemsPerPage;
+            const end = $scope.currentPage * $scope.itemsPerPage;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietSanPhamPageOffline = $scope.chiTietSanPhamOffline.slice(start, end);
+        };
+
+        $scope.itemsPerPageKHOF = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageKHOF = 1; // Trang hiện tại
+        $scope.totalItemsKHOF = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.chiTietKhachHangPageOffline = []; // Mảng chứa các sản phẩm cho trang hiện tại
+
+        $scope.getPageDataKHOffline = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPage - 1) * $scope.itemsPerPage;
+            const end = $scope.currentPage * $scope.itemsPerPage;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.chiTietKhachHangPageOffline = $scope.chiTietKhachHangOffline.slice(start, end);
+        };
+
+        $http.get(`/hoa-don-chi-tiet/thong-ke-offline`, {
+            params: {startDate: startToday, endDate: endToday}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuTodayOffline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaTodayOffline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonTodayOffline = result.data.soLuongHoaDon || 0;
+                $scope.diemDungTodayOffline = result.data.diemDung || 0;
+                $scope.chiTietSanPhamOffline = result.data.chiTietSanPham || [];
+                $scope.chiTietKhachHangOffline = result.data.tongHopKhachHang || [];
+
+                /// danh sách san phâm
+                $scope.chiTietSanPhamOffline = $scope.chiTietSanPhamOffline.sort(function (a, b) {
+                    return b.soLuong - a.soLuong; // Sắp xếp theo số lượng bán giảm dần
+                });
+                $scope.totalItems = $scope.chiTietSanPhamOffline.length; // Tổng số sản phẩm
+                $scope.totalPages = Math.ceil($scope.totalItems / $scope.itemsPerPage); // Tính tổng số trang
+
+                /// danh sách khách hàng
+                $scope.chiTietKhachHangOffline = $scope.chiTietKhachHangOffline.sort(function (a, b) {
+                    return b.doanhThu - a.doanhThu; // Sắp xếp theo số lượng bán giảm dần
+                });
+                $scope.totalItemsKHOF = $scope.chiTietKhachHangOffline.length; // Tổng số sản phẩm
+                $scope.totalPagesKHOF = Math.ceil($scope.totalItemsKHOF / $scope.itemsPerPageKHOF); // Tính tổng số trang
+
+                $scope.getPageDataOffline(); // Gọi hàm để lấy dữ liệu trang đầu tiên
+                $scope.getPageDataKHOffline(); // Gọi hàm để lấy dữ liệu trang đầu tiên
+
+                $scope.createChartOffline();  // tạo biểu đồ
+
+                // Lấy sản phẩm có số lượng bán nhiều nhất
+                let chiTietSanPham = result.data.chiTietSanPham || [];
+                let sanPhamBanChay = chiTietSanPham.reduce(function (max, current) {
+                    return (current.soLuong > max.soLuong) ? current : max;
+                }, {soLuong: 0});
+
+                // Lưu sản phẩm bán chạy nhất vào scope
+                $scope.sanPhamBanChayOfflineToday = sanPhamBanChay.ten || 'Không có sản phẩm bán chạy';
+
             }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu hôm nay offline: ", error);
         });
-    };
 
-    $scope.selectCustomTimeFrameDonHangTaiQuay = function() {
-        if ($scope.startDonHang && $scope.endDonHang) {
-            const startDonHang = new Date($scope.startDonHang);
-            const endDonHang = new Date($scope.endDonHang);
+        $http.get(`/hoa-don-chi-tiet/thong-ke-offline`, {
+            params: {startDate: startOfWeek, endDate: endOfWeek}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuThisWeekOffline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaThisWeekOffline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonThisWeekOffline = result.data.soLuongHoaDon || 0;
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu tuần này offline: ", error);
+        });
 
-            $scope.filterDonhangTaiQuay(startDonHang, endDonHang);
-            $scope.renderTopProductsChart5();
-        }
-    };
+        $http.get(`/hoa-don-chi-tiet/thong-ke-offline`, {
+            params: {startDate: startOfMonth, endDate: endOfMonth}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuThisMonthOffline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaThisMonthOffline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonThisMonthOffline = result.data.soLuongHoaDon || 0;
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu tháng này offline: ", error);
+        });
 
+        $http.get(`/hoa-don-chi-tiet/thong-ke-offline`, {
+            params: {startDate: startOfYear, endDate: endOfYear}
+        }).then(function (response) {
+            let result = response.data;
+            if (result && result.message === "Thành công") {
+                $scope.doanhThuThisYearOffline = result.data.doanhThu || 0;
+                $scope.soLuongBanRaThisYearOffline = result.data.soLuongBanRa || 0;
+                $scope.soLuongHoaDonThisYearOffline = result.data.soLuongHoaDon || 0;
+            }
+        }).catch(function (error) {
+            console.error("Lỗi khi gọi API cho doanh thu năm nay offline: ", error);
+        });
+
+        $scope.createChartOffline = function () {
+            // Sắp xếp chiTietSanPham theo số lượng bán giảm dần và lấy top 5 sản phẩm
+            let top5SanPham = $scope.chiTietSanPhamOffline.sort(function (a, b) {
+                return b.soLuong - a.soLuong; // Sắp xếp theo số lượng bán giảm dần
+            }).slice(0, 5); // Lấy 5 sản phẩm đầu tiên
+
+            const labels = []; // Tên sản phẩm
+            const soLuong = []; // Số lượng bán của các sản phẩm
+            const doanhThu = []; // Doanh thu của các sản phẩm
+
+            // Duyệt qua top5SanPham để lấy tên, số lượng bán và doanh thu
+            angular.forEach(top5SanPham, function (item) {
+                labels.push(item.ten);
+                soLuong.push(item.soLuong);
+                doanhThu.push(item.doanhThu);
+            });
+
+            // Vẽ biểu đồ
+            var ctx = document.getElementById('chartOffline').getContext('2d');
+            var chartOfflne = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượng bán',
+                        data: soLuong,
+                        type: 'bar',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Doanh thu',
+                        data: doanhThu,
+                        type: 'bar',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: false // Ẩn tên sản phẩm dưới cột
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            let top5KH = $scope.chiTietKhachHangOffline.sort(function (a, b) {
+                return b.doanhThu - a.doanhThu;
+            }).slice(0, 5);
+
+            const labelsKH = [];
+            const soLuongKH = [];
+            const doanhThuKH = [];
+
+            // Duyệt qua top5SanPham để lấy tên, số lượng bán và doanh thu
+            angular.forEach(top5KH, function (item) {
+                labelsKH.push(item.hoVaTen);
+                soLuongKH.push(item.soLuongHoaDon);
+                doanhThuKH.push(item.doanhThu);
+            });
+
+            // Vẽ biểu đồ
+            var ctxKH = document.getElementById('chartKHOffline').getContext('2d');
+            var chartKHOfflne = new Chart(ctxKH, {
+                type: 'bar',
+                data: {
+                    labels: labelsKH,
+                    datasets: [{
+                        label: 'Số lượng đơn mua',
+                        data: soLuongKH,
+                        type: 'bar',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Tổng tiền mua',
+                        data: doanhThuKH,
+                        type: 'bar',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: false // Ẩn tên sản phẩm dưới cột
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        };
+
+    }
+
+    $scope.loadDataOnline();
 });

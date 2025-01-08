@@ -1,6 +1,7 @@
 package org.example.datn.service;
 
 import org.example.datn.entity.Profile;
+import org.example.datn.entity.SanPham;
 import org.example.datn.entity.User;
 import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.repository.ProfileRepository;
@@ -58,4 +59,7 @@ public class ProfileService {
                 .orElseThrow(NotFoundEntityException.ofSupplier("email.not-found"));
     }
 
+    public Profile ById(Long id) {
+        return profileRepository.findById(id).orElse(null); // Nếu không tìm thấy trả về null
+    }
 }

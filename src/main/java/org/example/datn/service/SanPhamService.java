@@ -108,4 +108,7 @@ public class SanPhamService {
         return topSellingProducts.subList(0, Math.min(topSellingProducts.size(), 8));
     }
 
+    public SanPham ById(Long id) {
+        return sanPhamRepository.findById(id).orElse(null); // Nếu không tìm thấy trả về null
+    }
 }

@@ -871,16 +871,16 @@ $(document).ready(function () {
                     style: 'currency',
                     currency: 'VND'
                 }).format(product.gia);
-                const formattedSalePrice = product.giaSauKhuyenMai
+                const formattedSalePrice = product.giaSauKhuyenMai !== null
                     ? new Intl.NumberFormat('vi-VN', {
                         style: 'currency',
                         currency: 'VND'
                     }).format(product.giaSauKhuyenMai)
                     : '';
-                const salePriceHTML = product.giaSauKhuyenMai
+                const salePriceHTML = product.giaSauKhuyenMai !== null
                     ? `<p class="discount-price fw-bold" style="font-size: 25px; color: red;">${formattedSalePrice}</p>`
                     : '';
-                const oldPriceClass = product.giaSauKhuyenMai ? 'text-decoration: line-through;' : '';
+                const oldPriceClass = product.giaSauKhuyenMai !== null ? 'text-decoration: line-through;' : '';
 
                 const productHtml = `
             <div class="product d-flex flex-column align-items-center justify-content-between">
@@ -888,7 +888,7 @@ $(document).ready(function () {
                     <a href="/productDetail/${product.id}">
                         <img class="product-image" src="/images/${product.anh}" alt="${product.ten}">
                     </a>
-                    ${product.giaSauKhuyenMai ? `
+                    ${product.giaSauKhuyenMai !== null ? `
                     <div class="hot-sale-badge position-absolute translate-middle">
                         <img src="/images/hotsale3.gif" alt="Hot Sale" class="img-fluid" />
                     </div>` : ''}
