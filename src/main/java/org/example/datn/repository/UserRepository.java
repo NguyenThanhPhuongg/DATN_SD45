@@ -4,6 +4,7 @@ import feign.Param;
 import org.example.datn.entity.User;
 import org.example.datn.model.enums.UserRoles;
 import org.example.datn.model.enums.UserStatus;
+import org.example.datn.model.enums.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,7 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUserName(String username);
 
-    List<User> findByRole(UserRoles role);
+    List<User> findByRoleAndTypeNot(UserRoles role, UserType type);
 
     @Query("SELECT u FROM User u JOIN Profile p ON u.id = p.userId " +
             "WHERE (p.hoVaTen LIKE %:hoVaTen% OR p.phone LIKE %:phone%) " +

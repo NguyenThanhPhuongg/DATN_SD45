@@ -39,6 +39,7 @@ import javax.transaction.Transactional;
 import static org.example.datn.utils.CalendarUtil.*;
 import static org.example.datn.utils.CalendarUtil.DateTimeUtils.now;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -212,6 +213,7 @@ public class UserProcessor {
         user.setXacThuc(false);
         user.setNgayTao(LocalDateTime.now());
         user.setNgayCapNhat(LocalDateTime.now());
+        user.setTongChiTieu(BigDecimal.ZERO);
         userService.save(user);
 
         var profile = new Profile();
