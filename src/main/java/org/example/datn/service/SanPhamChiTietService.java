@@ -111,4 +111,8 @@ public class SanPhamChiTietService {
     public void saveAll(List<SanPhamChiTiet> sanPhamChiTiets) {
         repo.saveAll(sanPhamChiTiets);
     }
+
+    public SanPhamChiTiet ById(Long id) {
+        return sanPhamChiTietRepository.findById(id).orElse(null); // Nếu không tìm thấy trả về null
+    }
 }

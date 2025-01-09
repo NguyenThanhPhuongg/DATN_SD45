@@ -57,7 +57,7 @@
                     <td>{{item.ma}}</td>
                     <td>{{item.ten}}</td>
                     <td>{{item.moTa}}</td>
-                    <td>{{item.gia || 0 | currency:'₫ '}}</td>
+                    <td>{{ item.gia | dotCurrency }}</td>
                     <td>
                         <img ng-src="/images/{{item.anh}}" alt="Ảnh sản phẩm"
                              style="width: 50px; height: 50px; object-fit: cover;"/>

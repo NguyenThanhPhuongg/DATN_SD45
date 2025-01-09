@@ -108,7 +108,8 @@
                                 <label>Mã hóa đơn</label>
                                 <input type="text" class="form-control" ng-model="form.ma" readonly>
                                 <label>Tổng tiền</label>
-                                <input format-number type="text" class="form-control" ng-model="form.tongTien" readonly>
+                                <input format-number type="text" class="form-control" ng-model="form.tongTien"
+                                       ng-value="{{ form.tongTien <= 0 ? 0 : form.tongTien }}"readonly>
                                 <label>Điểm sử dụng</label>
                                 <input type="text" class="form-control" ng-model="form.diemSuDung" readonly>
                                 <label>Ngày đặt hàng</label>

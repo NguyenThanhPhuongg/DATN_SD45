@@ -3,6 +3,7 @@ package org.example.datn.service;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
+import org.example.datn.entity.SanPham;
 import org.example.datn.entity.User;
 import org.example.datn.exception.NotFoundEntityException;
 import org.example.datn.model.enums.UserRoles;
@@ -121,5 +122,9 @@ public class UserService {
         Pageable pageable = PageRequest.of(pageIndex, size, Sort.by(Sort.Order.desc("ngayTao")));
 
         return repo.getList(hoVaTen, role, phone, pageable);
+    }
+
+    public User ById(Long id) {
+        return repo.findById(id).orElse(null); // Nếu không tìm thấy trả về null
     }
 }

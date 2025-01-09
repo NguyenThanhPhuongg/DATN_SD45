@@ -7,6 +7,7 @@ import org.example.datn.repository.HoaDonChiTietRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,5 +50,11 @@ public class HoaDonChiTietService {
 
     public Optional<HoaDonChiTiet> getHoaDonChiTietByHoaDonAndSanPhamChiTiet(Long idHoaDon, Long idSanPhamChiTiet) {
         return repo.findByIdHoaDonAndIdSanPhamChiTiet(idHoaDon, idSanPhamChiTiet);
+    }
+
+    ///////////// thống kê /////////////////
+    // Lấy danh sách chi tiết hóa đơn theo thời gian
+    public List<HoaDonChiTiet> findByDateRange(LocalDateTime startDate, LocalDateTime endDate, Integer trangThai) {
+        return repo.findByNgayTaoBetween(startDate, endDate, trangThai);
     }
 }

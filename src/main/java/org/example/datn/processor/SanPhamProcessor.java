@@ -1,10 +1,7 @@
 package org.example.datn.processor;
 
 import org.example.datn.constants.SystemConstant;
-import org.example.datn.entity.ApDungKhuyenMai;
-import org.example.datn.entity.KhuyenMai;
-import org.example.datn.entity.SanPham;
-import org.example.datn.entity.SanPhamChiTiet;
+import org.example.datn.entity.*;
 import org.example.datn.model.ServiceResult;
 import org.example.datn.model.UserAuthentication;
 import org.example.datn.model.request.SanPhamRequest;
@@ -23,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -379,4 +377,31 @@ public class SanPhamProcessor {
         return new ServiceResult(models, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
 
+    //////////////////thống kê ////////////////
+    @Autowired
+    private HoaDonChiTietService hoaDonChiTietService;
+
+    @Autowired
+    private SanPhamService sanPhamService;
+    // Thống kê sản phẩm bán ra theo thời gian
+//    public ServiceResult getProductsSoldByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+//        List<HoaDonChiTiet> list = hoaDonChiTietService.findByDateRange(startDate, endDate);
+//        Map<Long, Integer> productSales = new HashMap<>();
+//
+//        for (HoaDonChiTiet hoaDonChiTiet : list) {
+//            Long productId = hoaDonChiTiet.getSanPhamChiTiet().getSanPham().getId();
+//            int quantity = hoaDonChiTiet.getSoLuong();
+//            productSales.put(productId, productSales.getOrDefault(productId, 0) + quantity);
+//        }
+//
+//        List<ProductSalesModel> salesModels = productSales.entrySet().stream()
+//                .map(entry -> {
+//                    ProductSalesModel model = new ProductSalesModel();
+//                    model.setProductId(entry.getKey());
+//                    model.setSoldQuantity(entry.getValue());
+//                    return model;
+//                }).collect(Collectors.toList());
+//
+//        return new ServiceResult(salesModels, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
+//    }
 }

@@ -139,6 +139,17 @@ app.directive('formatNumber', function () {
     };
 });
 
+app.filter('dotCurrency', function() {
+    return function(input) {
+        if (!input) return '';
+        // Đảm bảo đầu vào là số
+        let num = parseInt(input, 10);
+        if (isNaN(num)) return input;
+        // Định dạng số với dấu chấm
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '₫';
+    };
+});
+
 app.config(function ($routeProvider) {
     $routeProvider
         // tổng quan

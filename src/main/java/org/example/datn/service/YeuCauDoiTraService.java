@@ -50,4 +50,9 @@ public class YeuCauDoiTraService {
     public List<YeuCauDoiTra> findByIdNguoiDung(Long idNguoiDung){
         return repo.findByIdNguoiDung(idNguoiDung);
     }
+
+    public List<YeuCauDoiTra> findByHoaDonIds(List<Long> hoaDonIds) {
+        return repo.findByHoaDonIds(hoaDonIds);
+    }
+
 }

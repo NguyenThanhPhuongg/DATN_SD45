@@ -512,6 +512,7 @@ public class YeuCauDoiTraProcessor {
         }
         HoaDon hoaDon = hoaDonService.findById(target.getIdHoaDon()).orElseThrow(() -> NotFoundEntityException.of("Hóa đơn không tồn tại"));
         hoaDon.setTrangThaiDoiTra(TrangThaiDoiTra.CHO_XU_LY.getValue());
+        hoaDon.setNgayCapNhat(LocalDateTime.now());
         hoaDonService.save(hoaDon);
         hoaDonChiTietService.saveAll(
                 hoaDonChiTietService.getHoaDonChiTietByHoaDonAndSanPhamChiTiet(target.getIdHoaDon(),
