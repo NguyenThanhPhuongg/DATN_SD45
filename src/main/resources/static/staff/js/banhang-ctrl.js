@@ -75,12 +75,14 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
         .then(function (response) {
             let arrKm = response.data.data;
+            console.log($scope.listProductPromotion)
             $http.get('/ap-dung-khuyen-mai')
                 .then(function (res) {
                     $scope.listProductPromotion = res.data.data;
                     $scope.listProductPromotion.forEach(function (product) {
                         const khuyenMai = arrKm.find(km => km.id === product.idKhuyenMai);
                         product.tenKhuyenMai = khuyenMai ? khuyenMai.ten : "Không có tên khuyến mãi";
+                        // product.trangThaiKhuyenMai = khuyenMai ? khuyenMai.trangThai : null
                     });
                     console.log($scope.listProductPromotion)
                 }, function (error) {
@@ -143,7 +145,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                     console.error(`Lỗi khi gọi API cho sản phẩm ID ${$scope.barcode}:`, error);
                 });
             }
-        }, 0);
+        }, 1000);
     };
 
     $http.get("/khuyen-mai").then(resp => {
@@ -297,27 +299,31 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         if (noResultItem) {
             noResultItem.remove()
         }
-        $http.get('/san-pham').then(resp => {
-            if (resp.status === 200) {
-                const productList = resp.data.data; // Danh sách sản phẩm
-                const requests = productList.map(item =>
-                    $http.get(`/san-pham/${item.id}`).then(detailResp => {
-                        const productDetails = detailResp.data.data.listSanPhamChiTiet;
-                        productDetails.forEach(detail => {
-                            detail.tenSanPham = item.ten;
-                            detail.image = item.anh;
-                            detail.listMauSac = detailResp.data.data.listMauSac;
-                            detail.listSize = detailResp.data.data.listSize;
-                        });
-                        $scope.$applyAsync();
-                        return productDetails;
-                    })
-                );
+        $timeout(function() {
+            $http.get('/san-pham').then(resp => {
+                if (resp.status === 200) {
+                    const productList = resp.data.data; // Danh sách sản phẩm
+                    const requests = productList
+                        .filter(item => item.trangThai === 1)  // Chỉ lấy sản phẩm có trangThai === 1
+                        .map(item => $http.get(`/san-pham/${item.id}`).then(detailResp => {
+                            const productDetails = detailResp.data.data.listSanPhamChiTiet;
+                            productDetails.forEach(detail => {
+                                detail.tenSanPham = item.ten;
+                                detail.image = item.anh;
+                                detail.listMauSac = detailResp.data.data.listMauSac;
+                                detail.listSize = detailResp.data.data.listSize;
+                            });
+                            return productDetails;
+                        }).catch(error => {
+                            console.error(`Lỗi khi tải chi tiết sản phẩm với ID ${item.id}:`, error);
+                            return []; // Trả về mảng rỗng nếu có lỗi
+                        }));
 
-                // Xử lý tất cả yêu cầu đồng thời với Promise.all
-                Promise.all(requests).then(allDetails => {
-                    $scope.listProduct = allDetails.flat(); // Gộp tất cả chi tiết lại thành một mảng
-
+                    // Xử lý tất cả yêu cầu đồng thời với Promise.all
+                    Promise.all(requests).then(allDetails => {
+                        $scope.listProduct = allDetails.flat(); // Gộp tất cả chi tiết lại thành một mảng
+                        $scope.$applyAsync()
+                        // Cập nhật số lượng sản phẩm trong listProduct
                         $scope.listProduct.forEach(product => {
                             $scope.bills.forEach(bill => {
                                 const matchingItem = bill.items.find(item => item.id === product.id);
@@ -329,20 +335,20 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                                     }
                                     console.log(`Sản phẩm trùng: ${product.tenSanPham}, Số lượng cập nhật: ${product.soLuong}`);
                                 }
-                            })
-
+                            });
                         });
-
-                }).catch(error => {
-                    console.error("Lỗi khi tải chi tiết sản phẩm:", error);
-                });
-            } else {
-                console.error("Không thể lấy danh sách sản phẩm:", resp);
-            }
-        }).catch(error => {
-            console.error("Lỗi khi gọi API sản phẩm:", error);
-        });
-
+                    }).catch(error => {
+                        console.error("Lỗi khi tải chi tiết sản phẩm:", error);
+                    });
+                } else {
+                    console.error("Không thể lấy danh sách sản phẩm:", resp);
+                }
+            }).catch(error => {
+                console.error("Lỗi khi gọi API sản phẩm:", error);
+            });
+            $scope.$applyAsync()
+        },0)
+        $scope.$applyAsync()
     };
     $scope.searchProduct = function () {
         const searchInput = document.getElementById('searchProduct2');
@@ -403,6 +409,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     $scope.addProductToBill = function (product) {
         const existingProduct = $scope.bills[$scope.activeBill].items.find(item => item.id === product.id);
         const promoProduct = $scope.listProductPromotion.find(promo => promo.idSanPham === product.idSanPham);
+        console.log('>>>>>>>', promoProduct)
         if (existingProduct) {
             existingProduct.soLuong++;
         } else {
@@ -414,7 +421,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 gia: product.gia,
                 giaTriGiam: promoProduct ? promoProduct.giaTriGiam : 0,
                 tenKhuyenMai: promoProduct ? promoProduct.tenKhuyenMai : null,
-                trangThai: promoProduct ? promoProduct.trangThai : null,
+                trangThaiKhuyenMai: promoProduct ? promoProduct.trangThai : null,
                 ghiChu: product.ghiChu,
                 soLuong: 1 || null,
                 soLuongMax: product.soLuong,
@@ -423,6 +430,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 listSize: product.listSize,
                 listMauSac: product.listMauSac
             });
+            console.log($scope.bills[$scope.activeBill].items)
         }
         // Giảm số lượng sản phẩm trong danh sách sản phẩm
         const productInList = $scope.listProduct.find(p => p.id === product.id);
@@ -563,10 +571,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                     console.warn("Không tìm thấy sản phẩm trong hóa đơn.");
                 }
             } else {
-                console.log(bill.items)
                 // Nếu hủy, khôi phục lại giá trị ban đầu của sản phẩm
                 bill.items[index].soLuong = originalQuantity
-                console.log(bill.items)
                 //product.soLuong = originalQuantity;
                 $scope.$applyAsync(); // Đảm bảo giao diện được cập nhật
             }
@@ -619,6 +625,14 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                             retypePassword: "Ziaza@123",
                             ngaySinh: "2000-12-11T17:00:00.000Z",
                         }
+                        if (!bill.phoneCustomer || !bill.phoneCustomer.startsWith('0') || bill.phoneCustomer.length !== 10) {
+                            toastr.error("Số điện thoại phải bắt đầu bằng số 0 và có đúng 10 chữ số!");
+                            return false;
+                        }
+                        if (!bill.nameCustomer || bill.nameCustomer.trim() === '' || bill.nameCustomer.startsWith(' ')) {
+                            toastr.error("Tên khách hàng không được để trống hoặc bắt đầu bằng dấu cách!");
+                            return false;
+                        }
                         $http.post("/register", dataUser).then(res => {
                             if (res.data.code === '200') {
                                 var toastLiveExample = document.getElementById('liveToast')
@@ -633,6 +647,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                         })
                     }
                 };
+
             } else if (resp.data.data.length >= 1)  {
                 bill.nameCustomer = null;
                 bill.diemTichLuy = 0;
@@ -768,7 +783,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
     // Thanh toán
     $scope.payBill = function (bill) {
-        //bill.totalBillLast = $scope.getTotalAmount(bill)
+        bill.totalBillLast = $scope.getTotalAmount(bill) // tổng tiền hóa đơn sau khuyến mãi
         bill.billDiem = Math.floor($scope.getTotalAmount(bill) / 1000)
         $http.post("/api/hoa-don/thanh-toan", bill).then(resp => {
             if (resp.status === 200) {
