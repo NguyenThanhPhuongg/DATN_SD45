@@ -19,8 +19,8 @@ public class ApDungKhuyenMaiService {
         repo.save(entity);
     }
 
-    public void deleteByKhuyenMaiAndNotIn(Long idKhuyenMai, List<Long> idList){
-        repo.deleteByKhuyenMaiAndNotIn(idKhuyenMai,idList);
+    public void deleteByIdKhuyenMaiAndIdIn(Long idKhuyenMai, List<Long> idList){
+        repo.deleteByIdKhuyenMaiAndIdIn(idKhuyenMai,idList);
     }
 
     public List<ApDungKhuyenMai> findByIdKhuyenMai(Long idKhuyenMai){

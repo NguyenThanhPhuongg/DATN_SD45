@@ -27,8 +27,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -116,6 +115,7 @@ public class KhuyenMaiProcessor {
         if (request.getMa() != null && !request.getMa().isEmpty()) {
             validateUpdateDuplicated(request, id);
         }
+
         existingKhuyenMai.setMa(request.getMa());
         existingKhuyenMai.setTen(request.getTen());
         existingKhuyenMai.setMoTa(request.getMoTa());
@@ -130,21 +130,42 @@ public class KhuyenMaiProcessor {
         existingKhuyenMai.setNguoiCapNhat(ua.getPrincipal());
         existingKhuyenMai.setNgayCapNhat(LocalDateTime.now());
 
-        // Lưu lại khuyến mãi đã cập nhật
         service.saveKm(existingKhuyenMai);
 
+        // Lấy danh sách ID sản phẩm hoặc người dùng từ request
         List<Long> idList = (existingKhuyenMai.getLoai() == SystemConstant.KHUYEN_MAI_SAN_PHAM)
                 ? request.getIdSanPhamList()
                 : request.getIdNguoiDungList();
 
-        if (idList != null && !idList.isEmpty()) {
-            // Xóa các bản ghi cũ của sản phẩm/người dùng không có trong idList
-            apDungKhuyenMaiService.deleteByKhuyenMaiAndNotIn(existingKhuyenMai.getId(), idList);
+        if (idList == null || idList.isEmpty()) {
+            throw new IllegalArgumentException("Danh sách ID không thể rỗng");
         }
 
-        // Cập nhật các sản phẩm hoặc người dùng liên quan
-        idList.forEach(ids -> {
-            ApDungKhuyenMai apDungKhuyenMai = createApDungKhuyenMai(existingKhuyenMai, ids, request.getGiaTri(), existingKhuyenMai.getLoai(), ua);
+        var apDungKhuyenMais = apDungKhuyenMaiService.findByIdKhuyenMai(existingKhuyenMai.getId());
+
+        // Tạo danh sách ID cũ của sản phẩm hoặc người dùng
+        List<Long> oldIds = apDungKhuyenMais.stream()
+                .map(e -> e.getIdSanPham() != null ? e.getIdSanPham() : e.getIdNguoiDung())
+                .collect(Collectors.toList());
+
+        // Lọc các ID cần xóa (ID cũ không có trong idList mới)
+        List<Long> idsToDelete = oldIds.stream()
+                .filter(idItem -> !idList.contains(idItem))
+                .collect(Collectors.toList());
+
+        // Lọc các ID cần thêm mới (ID mới không có trong oldIds)
+        List<Long> idsToAdd = idList.stream()
+                .filter(idItem -> !oldIds.contains(idItem))
+                .collect(Collectors.toList());
+
+        if (!idsToDelete.isEmpty()) {
+            // Gọi hàm xóa tất cả các bản ghi liên quan đến những ID cũ không có trong idList mới
+            apDungKhuyenMaiService.deleteByIdKhuyenMaiAndIdIn(existingKhuyenMai.getId(), idsToDelete);
+        }
+
+        // Thêm các bản ghi ApDungKhuyenMai mới
+        idsToAdd.forEach(itemId -> {
+            ApDungKhuyenMai apDungKhuyenMai = createApDungKhuyenMai(existingKhuyenMai, itemId, request.getGiaTri(), existingKhuyenMai.getLoai(), ua);
             apDungKhuyenMai.setTrangThai(existingKhuyenMai.getLoai() == SystemConstant.KHUYEN_MAI_NGUOI_DUNG
                     ? SystemConstant.CHUA_AP_DUNG
                     : (existingKhuyenMai.getTrangThai() == SystemConstant.DA_AP_DUNG ? SystemConstant.DA_AP_DUNG : SystemConstant.CHUA_AP_DUNG)
@@ -154,6 +175,7 @@ public class KhuyenMaiProcessor {
 
         return new ServiceResult();
     }
+
 
     private ApDungKhuyenMai createApDungKhuyenMai(KhuyenMai km, Long id, BigDecimal giaTriGiam, Integer loaiKhuyenMai, UserAuthentication ua) {
         ApDungKhuyenMai apDungKhuyenMai = new ApDungKhuyenMai();

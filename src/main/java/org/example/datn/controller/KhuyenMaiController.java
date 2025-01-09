@@ -60,7 +60,7 @@ public class KhuyenMaiController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ServiceResult> create(@PathVariable Long id, @RequestBody KhuyenMaiCreateUpdateRequest request, UserAuthentication ua) throws DuplicatedException {
+    public ResponseEntity<ServiceResult> edit(@PathVariable Long id, @RequestBody KhuyenMaiCreateUpdateRequest request, UserAuthentication ua) throws DuplicatedException {
         return ResponseEntity.ok(processor.update(id, request, ua));
     }
 

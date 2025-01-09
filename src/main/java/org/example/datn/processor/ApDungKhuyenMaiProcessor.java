@@ -24,6 +24,7 @@ public class ApDungKhuyenMaiProcessor {
         service.save(a);
         return new ServiceResult();
     }
+
     public ServiceResult getList() {
         return new ServiceResult(service.findAll(), SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
