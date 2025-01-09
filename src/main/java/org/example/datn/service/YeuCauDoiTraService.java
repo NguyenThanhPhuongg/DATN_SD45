@@ -55,4 +55,8 @@ public class YeuCauDoiTraService {
         return repo.findByHoaDonIds(hoaDonIds);
     }
 
+    public List<YeuCauDoiTra> findByHoaDonId(Long idHoaDon) {
+        return repo.findByIdHoaDon(idHoaDon);
+    }
+
 }
