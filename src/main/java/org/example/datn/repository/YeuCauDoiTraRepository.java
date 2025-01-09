@@ -25,4 +25,5 @@ public interface YeuCauDoiTraRepository extends JpaRepository<YeuCauDoiTra, Long
     @Query("SELECT y FROM YeuCauDoiTra y WHERE y.idHoaDon IN :hoaDonIds")
     List<YeuCauDoiTra> findByHoaDonIds(@Param("idHoaDon") List<Long> hoaDonIds);
 
+    List<YeuCauDoiTra> findByIdHoaDon(Long idHoaDon);
 }
