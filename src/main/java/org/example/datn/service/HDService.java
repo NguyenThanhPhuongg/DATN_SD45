@@ -71,7 +71,7 @@ public class HDService {
         // Tạo hóa đơn
         HoaDon hoaDon = new HoaDon();
         hoaDon.setIdNguoiDung(hdRequest.getIdCustomer());
-        hoaDon.setTongTien(hdRequest.getTotalBill());
+        hoaDon.setTongTien(hdRequest.getTotalBillLast());
         hoaDon.setDiemSuDung(hdRequest.getDiemSuDung()); // Lưu số điểm đã sử dụng
         hoaDon.setNgayTao(LocalDateTime.now());
         hoaDon.setTrangThai(hdRequest.getTrangThai());
