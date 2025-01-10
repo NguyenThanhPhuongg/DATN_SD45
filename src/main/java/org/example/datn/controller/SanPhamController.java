@@ -77,4 +77,10 @@ public class SanPhamController {
     public List<Map<String, Object>> getTopSellingProducts() {
         return sanPhamService.getTopSellingProducts();
     }
+
+    @GetMapping("/san-pham-trong-kho")
+    public List<Map<String, Object>> getTongSanPham() {
+        return sanPhamService.getTongSanPham();
+    }
+
 }

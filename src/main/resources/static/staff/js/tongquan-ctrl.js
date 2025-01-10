@@ -147,6 +147,34 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
             $scope.chiTietKhachHangPageOffline1 = $scope.chiTietKhachHangOffline1.slice(start, end);
         };
 
+        $scope.itemsPerPageDH = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageDH = 1; // Trang hiện tại
+        $scope.totalItemsDH = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.dsSanPhamDoiPage = []; // Mảng chứa các sản phẩm cho trang hiện tại
+
+        $scope.getPageDataDH = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageDH - 1) * $scope.itemsPerPageDH;
+            const end = $scope.currentPageDH * $scope.itemsPerPageDH;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.dsSanPhamDoiPage = $scope.dsSanPhamDoi.slice(start, end);
+        };
+
+        $scope.itemsPerPageTH = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageTH = 1; // Trang hiện tại
+        $scope.totalItemsTH = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.dsSanPhamTraPage = []; // Mảng chứa các sản phẩm cho trang hiện tại
+
+        $scope.getPageDataTH = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageTH - 1) * $scope.itemsPerPageTH;
+            const end = $scope.currentPageTH * $scope.itemsPerPageTH;
+
+            // Cập nhật danh sách sản phẩm cho trang hiện tại
+            $scope.dsSanPhamTraPage = $scope.dsSanPhamTra.slice(start, end);
+        };
+
         $scope.fetchData = function () {
             let startDate = $scope.startDate ? $filter('date')($scope.startDate, "yyyy-MM-dd'T'HH:mm:ss") : $filter('date')(new Date(), "yyyy-MM-dd'T'00:00:00");
             let endDate = $scope.endDate ? $filter('date')($scope.endDate, "yyyy-MM-dd'T'HH:mm:ss") : $filter('date')(new Date(), "yyyy-MM-dd'T'23:59:59");
@@ -165,6 +193,8 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
                     $scope.soLuongHoaDonTodayOnline1 = result.data.soLuongHoaDon || 0;
                     $scope.chiTietSanPhamOnline1 = result.data.chiTietSanPham || [];
                     $scope.chiTietKhachHangOnline1 = result.data.tongHopKhachHang || [];
+                    $scope.dsSanPhamDoi = result.data.sanPhamDoiHang || [];
+                    $scope.dsSanPhamTra = result.data.sanPhamTraHang || [];
 
                     // Sắp xếp danh sách sản phẩm theo số lượng bán giảm dần
                     $scope.chiTietSanPhamOnline1 = $scope.chiTietSanPhamOnline1.sort(function (a, b) {
@@ -189,6 +219,24 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
 
                     // Phân trang khách hàng
                     $scope.getPageDataKHOnline1();  // Cập nhật dữ liệu cho trang hiện tại của khách hàng
+
+                    $scope.dsSanPhamDoi = $scope.dsSanPhamDoi.sort(function (a, b) {
+                        return b.soLuong - a.soLuong; // Sắp xếp theo doanh thu giảm dần
+                    });
+
+                    $scope.totalItemsDH = $scope.dsSanPhamDoi.length;
+                    $scope.totalPagesDH = Math.ceil($scope.totalItemsDH / $scope.itemsPerPageDH);
+
+                    $scope.getPageDataDH();
+
+                    $scope.dsSanPhamTra = $scope.dsSanPhamTra.sort(function (a, b) {
+                        return b.soLuong - a.soLuong; // Sắp xếp theo doanh thu giảm dần
+                    });
+
+                    $scope.totalItemsTH = $scope.dsSanPhamTra.length;
+                    $scope.totalPagesTH = Math.ceil($scope.totalItemsTH / $scope.itemsPerPageTH);
+
+                    $scope.getPageDataTH();
                 }
             }).catch(function (error) {
                 console.error("Lỗi khi gọi API cho doanh thu online: ", error);
@@ -247,6 +295,67 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
                 console.error("Lỗi khi gọi API thống kê đơn hàng: ", error);
             });
         };
+
+        $scope.sanPhamTrongKho = [];
+        $scope.itemsPerPageTK = 5; // Số sản phẩm trên mỗi trang
+        $scope.currentPageTK = 1; // Trang hiện tại
+        $scope.totalItemsTK = 0; // Tổng số sản phẩm, sẽ được tính toán khi có dữ liệu
+        $scope.SanPhamTKPage = []; // Mảng chứa các sản phẩm cho trang hiện tại
+        $scope.totalPagesTK = 0; // Tổng số trang
+
+        $scope.top5SanPham = []; // Mảng chứa top 5 sản phẩm có số lượng nhiều nhất
+
+        $scope.getTop5SanPham = function () {
+            // Sắp xếp sản phẩm theo số lượng giảm dần và lấy 5 sản phẩm đầu tiên
+            $scope.top5SanPham = $scope.sanPhamTrongKho.sort(function (a, b) {
+                return b.tongSoLuong - a.tongSoLuong; // Sắp xếp theo số lượng giảm dần
+            }).slice(0, 5);
+
+            // Cập nhật dữ liệu biểu đồ
+            $scope.updateChart();
+        };
+
+        $scope.updateChart = function () {
+            const labels = $scope.top5SanPham.map(function (sanPham) {
+                return sanPham.ten; // Tên sản phẩm
+            });
+
+            const data = $scope.top5SanPham.map(function (sanPham) {
+                return sanPham.tongSoLuong; // Số lượng sản phẩm
+            });
+
+            // Cập nhật biểu đồ với dữ liệu mới
+            $scope.chart.data.labels = labels;
+            $scope.chart.data.datasets[0].data = data;
+            $scope.chart.update();
+        };
+
+        $scope.getPageDataTK = function () {
+            // Tính chỉ số bắt đầu và kết thúc của các sản phẩm cho trang hiện tại
+            const start = ($scope.currentPageTK - 1) * $scope.itemsPerPageTK;
+            const end = $scope.currentPageTK * $scope.itemsPerPageTK;
+
+            $scope.SanPhamTKPage = $scope.sanPhamTrongKho.slice(start, end);
+        };
+
+        $http.get(`/san-pham/san-pham-trong-kho`)
+            .then(function (response) {
+                $scope.sanPhamTrongKho = response.data;
+
+                $scope.sanPhamTrongKho = $scope.sanPhamTrongKho.sort(function (a, b) {
+                    return b.soLuong - a.soLuong; // Sắp xếp theo số lượng giảm dần
+                });
+
+                $scope.totalItemsTK = $scope.sanPhamTrongKho.length;
+                $scope.totalPagesTK = $scope.totalItemsTK > 0 ? Math.ceil($scope.totalItemsTK / $scope.itemsPerPageTK) : 1;
+
+                $scope.getPageDataTK();
+                $scope.getTop5SanPham(); // Lấy top 5 sản phẩm khi nhận được dữ liệu
+                $scope.createChartOnline();
+            }).catch(function (error) {
+            console.error("Lỗi khi gọi API thống kê đơn hàng: ", error);
+        });
+
 
         // Gọi hàm fetchData khi trang tải hoặc khi người dùng thay đổi ngày
         $scope.$watchGroup(['startDate', 'endDate'], function () {
@@ -396,6 +505,28 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
                     }
                 }
             });
+  ///////////////////////////////////////////////////////
+            const top5Chart = document.getElementById('top5Chart').getContext('2d');
+            $scope.chart = new Chart(top5Chart, {
+                type: 'bar', // Chọn loại biểu đồ (bar, line, pie, etc.)
+                data: {
+                    labels: [], // Tên sản phẩm (sẽ được cập nhật)
+                    datasets: [{
+                        label: 'Số lượng sản phẩm',
+                        data: [], // Số lượng sản phẩm (sẽ được cập nhật)
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền cột
+                        borderColor: 'rgba(75, 192, 192, 1)', // Màu viền cột
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         };
     };
 
@@ -533,8 +664,8 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
             });
 
             // Vẽ biểu đồ
-            var ctx = document.getElementById('chartOnline').getContext('2d');
-            var chartOnlne = new Chart(ctx, {
+            var ctx = document.getElementById('chartSanPhamOnline').getContext('2d');
+            var chartSanPhamOnline = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,

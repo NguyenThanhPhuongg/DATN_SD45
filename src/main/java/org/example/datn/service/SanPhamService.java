@@ -111,4 +111,48 @@ public class SanPhamService {
     public SanPham ById(Long id) {
         return sanPhamRepository.findById(id).orElse(null); // Nếu không tìm thấy trả về null
     }
+
+    // Hàm lấy tổng số sản phẩm, nhóm theo idSanPham và cộng dồn số lượng
+    public List<Map<String, Object>> getTongSanPham() {
+        // Lấy tất cả sản phẩm chi tiết
+        List<SanPhamChiTiet> sanPhamChiTietList = sanPhamChiTietRepository.findAll();
+
+        // Tạo một map để nhóm sản phẩm chi tiết theo idSanPham
+        Map<Long, Integer> tongSanPhamMap = new HashMap<>();
+
+        // Duyệt qua tất cả sản phẩm chi tiết và cộng dồn số lượng
+        for (SanPhamChiTiet sanPhamChiTiet : sanPhamChiTietList) {
+            Long idSanPham = sanPhamChiTiet.getIdSanPham();
+            Integer soLuong = sanPhamChiTiet.getSoLuong();
+
+            // Cộng dồn số lượng cho mỗi sản phẩm
+            tongSanPhamMap.put(idSanPham, tongSanPhamMap.getOrDefault(idSanPham, 0) + soLuong);
+        }
+
+        // Tạo một danh sách để trả về kết quả
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        // Duyệt qua các idSanPham và lấy thông tin sản phẩm từ bảng SanPham
+        for (Map.Entry<Long, Integer> entry : tongSanPhamMap.entrySet()) {
+            Long idSanPham = entry.getKey();
+            Integer tongSoLuong = entry.getValue();
+
+            // Lấy thông tin sản phẩm từ idSanPham
+            SanPham sanPham = sanPhamRepository.findById(idSanPham).orElse(null);
+            if (sanPham != null) {
+                // Tạo một Map chứa thông tin sản phẩm và số lượng
+                Map<String, Object> sanPhamData = new HashMap<>();
+                sanPhamData.put("id", sanPham.getId());
+                sanPhamData.put("ten", sanPham.getTen());
+                sanPhamData.put("ma", sanPham.getMa());
+                sanPhamData.put("gia", sanPham.getGia());
+                sanPhamData.put("tongSoLuong", tongSoLuong);
+
+                // Thêm vào danh sách kết quả
+                result.add(sanPhamData);
+            }
+        }
+
+        return result;
+    }
 }

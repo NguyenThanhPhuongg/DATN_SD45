@@ -236,7 +236,7 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
                     toastr.success("Duyệt sản phẩm yêu cầu thành công", "Thành công!");
-                    $scope.initialize();
+                    chiTiet.trangThai = 2;
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");
                     console.error("Lỗi khi duyệt sản phẩm yêu cầu:", error);
@@ -271,8 +271,8 @@ app.controller("yeucaudoitra-ctrl", function ($scope, $http, $routeParams, $loca
                     }
                 }).then(function (response) {
                     // Cập nhật trạng thái trực tiếp trên giao diện
-                    $('#sanPhamDoiTraChiTiet').modal('hide');
                     toastr.success("Hủy sản phẩm yêu cầu thành công", "Thành công!");
+                    chiTiet.trangThai = 3;
                 }).catch(function (error) {
                     toastr.error("Có lỗi xảy ra", "Lỗi!");
                     console.error("Lỗi khi hủy sản phẩm yêu cầu:", error);

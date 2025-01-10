@@ -1,5 +1,6 @@
 package org.example.datn.service;
 
+import org.example.datn.entity.HoaDon;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.YeuCauDoiTra;
 import org.example.datn.model.enums.LoaiYeuCau;
@@ -42,6 +43,10 @@ public class YeuCauDoiTraService {
 
     public List<YeuCauDoiTra> findByLoaiAndTrangThai(LoaiYeuCau loai, Integer trangThai) {
         return repo.findByLoaiAndTrangThai(loai, trangThai);
+    }
+
+    public List<YeuCauDoiTra> findByHoaDonIdAndLoaiAndTrangThai(Long idHoaDon, LoaiYeuCau loai, Integer trangThai) {
+        return repo.findByIdHoaDonAndLoaiAndTrangThai(idHoaDon, loai, trangThai);
     }
     public List<YeuCauDoiTra> findByLoai(LoaiYeuCau loai) {
         return repo.findByLoai(loai);

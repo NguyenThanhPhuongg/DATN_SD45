@@ -2,6 +2,7 @@ package org.example.datn.repository;
 
 import feign.Param;
 import org.example.datn.entity.ChatLieu;
+import org.example.datn.entity.HoaDon;
 import org.example.datn.entity.SanPham;
 import org.example.datn.entity.YeuCauDoiTra;
 import org.example.datn.model.enums.LoaiYeuCau;
@@ -26,4 +27,6 @@ public interface YeuCauDoiTraRepository extends JpaRepository<YeuCauDoiTra, Long
     List<YeuCauDoiTra> findByHoaDonIds(@Param("idHoaDon") List<Long> hoaDonIds);
 
     List<YeuCauDoiTra> findByIdHoaDon(Long idHoaDon);
+    List<YeuCauDoiTra> findByIdHoaDonAndLoaiAndTrangThai(Long idHoaDon, LoaiYeuCau loai, Integer trangThai);
+
 }

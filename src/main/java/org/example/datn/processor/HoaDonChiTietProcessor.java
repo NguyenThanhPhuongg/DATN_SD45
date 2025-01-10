@@ -212,19 +212,19 @@ public class HoaDonChiTietProcessor {
                 totalValueBeforeDiscount = totalValueBeforeDiscount.add(productTotal);
             }
 
-// Kiểm tra tổng giá trị trước giảm giá
+            // Kiểm tra tổng giá trị trước giảm giá
             System.out.println("Total value before discount: " + totalValueBeforeDiscount);
 
-// Tính tỷ lệ giảm giá (không tính phí vận chuyển)
+            // Tính tỷ lệ giảm giá (không tính phí vận chuyển)
             BigDecimal totalPaid = hoaDon.getTongTien(); // Tổng tiền khách trả
             BigDecimal discountRate = BigDecimal.ONE.subtract(
                     totalPaid.divide(totalValueBeforeDiscount, MathContext.DECIMAL64)
             );
 
-// Kiểm tra tỷ lệ giảm giá trước khi áp dụng quy tắc giảm giá
+            // Kiểm tra tỷ lệ giảm giá trước khi áp dụng quy tắc giảm giá
             System.out.println("Calculated discount rate: " + discountRate);
 
-// Kiểm tra tỷ lệ giảm giá và áp dụng quy tắc giảm giá
+            // Kiểm tra tỷ lệ giảm giá và áp dụng quy tắc giảm giá
             if (discountRate.compareTo(new BigDecimal("0.20")) >= 0) {
                 discountRate = new BigDecimal("0.20"); // Áp dụng giảm giá tối đa 20%
             } else if (discountRate.compareTo(new BigDecimal("0.10")) >= 0) {
@@ -234,16 +234,16 @@ public class HoaDonChiTietProcessor {
             }
 
 
-// Kiểm tra tỷ lệ giảm giá sau khi áp dụng quy tắc
+            // Kiểm tra tỷ lệ giảm giá sau khi áp dụng quy tắc
             System.out.println("Applied discount rate: " + discountRate);
 
-// Kiểm tra yêu cầu đổi trả
+            // Kiểm tra yêu cầu đổi trả
             YeuCauDoiTra yeuCau = yeuCauDoiTraList.stream()
                     .filter(y -> y.getIdHoaDon().equals(hoaDon.getId()))
                     .findFirst()
                     .orElse(null);
 
-// Xử lý yêu cầu đổi trả nếu có
+            // Xử lý yêu cầu đổi trả nếu có
             if (yeuCau != null) {
                 if (yeuCau.getLoai() == LoaiYeuCau.DOI_HANG) {
                     totalRevenue = totalRevenue.add(totalPaid);
@@ -279,14 +279,14 @@ public class HoaDonChiTietProcessor {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Lấy chi tiết hóa đơn theo khoảng thời gian và trạng thái
+        // Lấy chi tiết hóa đơn theo khoảng thời gian và trạng thái
         List<HoaDonChiTiet> hoaDonChiTietList = service.findByDateRange(startDate, endDate, status);
 
-// Map để lưu trữ doanh thu và số lượng sản phẩm theo id sản phẩm
+        // Map để lưu trữ doanh thu và số lượng sản phẩm theo id sản phẩm
         Map<Long, BigDecimal> productRevenueMap = new HashMap<>();
         Map<Long, Integer> productQuantityMap = new HashMap<>();
 
-// Duyệt qua chi tiết hóa đơn để tính doanh thu và số lượng của từng sản phẩm
+        // Duyệt qua chi tiết hóa đơn để tính doanh thu và số lượng của từng sản phẩm
         for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
             totalQuantity += hoaDonChiTiet.getSoLuong();  // Cộng số lượng sản phẩm vào tổng
             Long productDetailId = hoaDonChiTiet.getIdSanPhamChiTiet();
@@ -325,7 +325,7 @@ public class HoaDonChiTietProcessor {
             productRevenueMap.put(productId, productRevenueMap.getOrDefault(productId, BigDecimal.ZERO).add(productRevenue));
         }
 
-// Tạo danh sách chi tiết doanh thu và số lượng của các sản phẩm
+        // Tạo danh sách chi tiết doanh thu và số lượng của các sản phẩm
         List<Map<String, Object>> revenueAndQuantityModels = new ArrayList<>();
         for (Long productId : productRevenueMap.keySet()) {
             BigDecimal productRevenue = productRevenueMap.get(productId);
@@ -349,13 +349,72 @@ public class HoaDonChiTietProcessor {
         Map<Long, BigDecimal> userRevenueMap = new HashMap<>();
         Map<Long, Integer> userInvoiceCountMap = new HashMap<>();
         Map<Long, Integer> userPointsMap = new HashMap<>(); // Map lưu trữ điểm thưởng của người dùng
+
         for (HoaDon hoaDon : hoaDonList) {
             Long userId = hoaDon.getIdNguoiDung();
-            userRevenueMap.put(userId, userRevenueMap.getOrDefault(userId, BigDecimal.ZERO).add(hoaDon.getTongTien()));  // Tính doanh thu của người dùng
-            userInvoiceCountMap.put(userId, userInvoiceCountMap.getOrDefault(userId, 0) + 1);  // Tính số hóa đơn của người dùng
+            BigDecimal tongTienGoc = BigDecimal.ZERO; // Tổng tiền trước giảm giá
+
+            // Lấy danh sách chi tiết hóa đơn
+            List<HoaDonChiTiet> chiTietList = service.findByIdHoaDon(hoaDon.getId());
+
+            // Tính tổng tiền gốc
+            for (HoaDonChiTiet chiTiet : chiTietList) {
+                // Lấy sản phẩm chi tiết qua idSPCT
+                SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(chiTiet.getIdSanPhamChiTiet()).orElse(null);
+                if (sanPhamChiTiet != null) {
+                    BigDecimal giaSanPham = sanPhamChiTiet.getGia(); // Giá sản phẩm
+                    BigDecimal soLuong = BigDecimal.valueOf(chiTiet.getSoLuong());
+                    tongTienGoc = tongTienGoc.add(giaSanPham.multiply(soLuong)); // Tính tổng tiền gốc
+                }
+            }
+
+            BigDecimal tongTienSauGiam = hoaDon.getTongTien(); // Tổng tiền sau giảm giá
+            BigDecimal tongTienGiam = tongTienGoc.subtract(tongTienSauGiam); // Tổng số tiền giảm
+            BigDecimal tyLeGiamGiaThucTe = tongTienGiam.divide(tongTienGoc, 2, RoundingMode.HALF_UP); // Tỷ lệ giảm giá thực tế
+
+            BigDecimal refundAmount = BigDecimal.ZERO; // Giá trị hoàn trả
+
+            // Kiểm tra nếu có yêu cầu đổi trả liên quan đến hóa đơn này
+            YeuCauDoiTra yeuCau = yeuCauDoiTraList.stream()
+                    .filter(y -> y.getIdHoaDon().equals(hoaDon.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (yeuCau != null && yeuCau.getLoai() == LoaiYeuCau.TRA_HANG && yeuCau.getTrangThai() != null && yeuCau.getTrangThai() == 2) {
+                // Lấy danh sách chi tiết đổi trả
+                List<YeuCauDoiTraChiTiet> chiTietTraHang = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(yeuCau.getId());
+
+                for (YeuCauDoiTraChiTiet traChiTiet : chiTietTraHang) {
+                    // Lấy sản phẩm chi tiết qua idSPCT
+                    SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(traChiTiet.getIdSPCT()).orElse(null);
+                    if (sanPhamChiTiet != null) {
+                        BigDecimal giaSanPham = sanPhamChiTiet.getGia(); // Giá sản phẩm
+                        BigDecimal soLuong = BigDecimal.valueOf(traChiTiet.getSoLuong());
+
+                        // Tính tiền hoàn lại cho từng sản phẩm trả
+                        BigDecimal tienHoanTra = giaSanPham.multiply(soLuong)
+                                .multiply(BigDecimal.ONE.subtract(tyLeGiamGiaThucTe)); // Áp dụng tỷ lệ giảm giá
+
+                        refundAmount = refundAmount.add(tienHoanTra);
+                    }
+                }
+
+                // Đảm bảo giá trị hoàn trả không vượt quá tổng tiền sau giảm giá
+                if (refundAmount.compareTo(tongTienSauGiam) > 0) {
+                    refundAmount = tongTienSauGiam;
+                }
+
+                // Cập nhật doanh thu
+                tongTienSauGiam = tongTienSauGiam.subtract(refundAmount);
+            }
+
+            // Cộng doanh thu vào map doanh thu của người dùng
+            userRevenueMap.put(userId, userRevenueMap.getOrDefault(userId, BigDecimal.ZERO).add(tongTienSauGiam));
+            userInvoiceCountMap.put(userId, userInvoiceCountMap.getOrDefault(userId, 0) + 1);
             Integer currentPoints = hoaDon.getDiemSuDung() != null ? hoaDon.getDiemSuDung() : 0;
             userPointsMap.put(userId, userPointsMap.getOrDefault(userId, 0) + currentPoints);
         }
+
 
         // Map để lưu trữ doanh thu theo cấp bậc
         Map<String, BigDecimal> revenueByCapBacTotal = new HashMap<>();
@@ -394,6 +453,61 @@ public class HoaDonChiTietProcessor {
 
             userRevenueList.add(userData);
         }
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Danh sách sản phẩm đổi trả loại DOI_HANG và trạng thái 2
+        List<Map<String, Object>> dsSanPhamDoiHang = new ArrayList<>();
+
+        // Danh sách sản phẩm đổi trả loại TRA_HANG và trạng thái 2
+        List<Map<String, Object>> dsSanPhamTraHang = new ArrayList<>();
+
+        // Duyệt qua các hóa đơn
+        for (HoaDon hoaDon : hoaDonList) {
+            // Lấy các yêu cầu đổi trả từ hóa đơn (sử dụng idHoaDon thay vì hoaDon trực tiếp)
+            List<YeuCauDoiTra> yeuCauDoiTraListDT = yeuCauDoiTraService.findByHoaDonIdAndLoaiAndTrangThai(hoaDon.getId(), LoaiYeuCau.DOI_HANG, 2);
+            yeuCauDoiTraListDT.addAll(yeuCauDoiTraService.findByHoaDonIdAndLoaiAndTrangThai(hoaDon.getId(), LoaiYeuCau.TRA_HANG, 2));
+
+            // Duyệt qua các yêu cầu đổi trả của hóa đơn
+            for (YeuCauDoiTra yeuCau : yeuCauDoiTraListDT) {
+                // Lấy danh sách chi tiết yêu cầu đổi trả từ yêu cầu đổi trả
+                List<YeuCauDoiTraChiTiet> chiTietDoiTraList = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(yeuCau.getId());
+
+                // Duyệt qua từng chi tiết yêu cầu đổi trả
+                for (YeuCauDoiTraChiTiet chiTiet : chiTietDoiTraList) {
+                    // Lấy id sản phẩm chi tiết (SPCT) từ chi tiết đổi trả
+                    Long idSPCT = chiTiet.getIdSPCT();
+
+                    // Lấy thông tin sản phẩm chi tiết từ idSPCT
+                    SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(idSPCT).orElse(null);
+                    if (sanPhamChiTiet != null) {
+                        // Lấy id sản phẩm từ sản phẩm chi tiết
+                        Long idSanPham = sanPhamChiTiet.getIdSanPham();
+
+                        // Lấy thông tin sản phẩm từ idSanPham
+                        SanPham sanPham = sanPhamService.findById(idSanPham).orElse(null);
+                        if (sanPham != null) {
+                            // Tạo đối tượng chứa thông tin sản phẩm đổi trả
+                            Map<String, Object> sanPhamData = new HashMap<>();
+                            sanPhamData.put("idSPCT", sanPhamChiTiet.getId());
+                            sanPhamData.put("idSanPham", sanPham.getId());
+                            sanPhamData.put("ma", sanPham.getMa());
+                            sanPhamData.put("tenSanPham", sanPham.getTen()); // Lấy tên sản phẩm từ bảng sản phẩm
+                            sanPhamData.put("gia", sanPhamChiTiet.getGia());
+                            sanPhamData.put("soLuong", chiTiet.getSoLuong()); // Số lượng từ chi tiết đổi trả
+                            sanPhamData.put("idYeuCau", yeuCau.getId()); // idYeuCau của yêu cầu
+
+                            // Kiểm tra loại yêu cầu
+                            if (yeuCau.getLoai() == LoaiYeuCau.DOI_HANG) {
+                                dsSanPhamDoiHang.add(sanPhamData); // Thêm vào danh sách sản phẩm đổi hàng
+                            } else if (yeuCau.getLoai() == LoaiYeuCau.TRA_HANG) {
+                                dsSanPhamTraHang.add(sanPhamData); // Thêm vào danh sách sản phẩm trả hàng
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         // Sắp xếp danh sách người dùng theo doanh thu giảm dần
         userRevenueList.sort((a, b) -> ((BigDecimal) b.get("doanhThu")).compareTo((BigDecimal) a.get("doanhThu")));
@@ -408,7 +522,8 @@ public class HoaDonChiTietProcessor {
         result.put("tongHopKhachHang", userRevenueList);
         result.put("thongKeTheoCapBac", revenueByCapBac);
         result.put("tongDoanhThuTheoCapBac", revenueByCapBacTotal);
-
+        result.put("sanPhamDoiHang", dsSanPhamDoiHang);
+        result.put("sanPhamTraHang", dsSanPhamTraHang);
         // Trả kết quả
         return new ServiceResult(result, SystemConstant.STATUS_SUCCESS, SystemConstant.CODE_200);
     }
