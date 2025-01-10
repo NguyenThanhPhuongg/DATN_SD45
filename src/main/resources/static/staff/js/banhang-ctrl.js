@@ -30,7 +30,6 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
         if ($scope.sliderPosition > 0) {
             $scope.sliderPosition--;
             $scope.sliderOffset += 20;
-            console.log($scope.sliderPosition)
         }
     };
     $scope.nextTab = function () {
@@ -50,44 +49,13 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
     //Lưu thông tin hóa đơn vào bộ nhớ trình duyệt
     $scope.saveBillsToLocalStorage = function() {
-        localStorage.setItem('bills', JSON.stringify($scope.bills));
+        //localStorage.setItem('bills', JSON.stringify($scope.bills));
     };
 
     // Ds sp khuyến mãi
-    $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
+    $http.post('/san-pham/search', {trangThai:1})
         .then(function (response) {
-            let arrKm = response.data.data;
-            $http.get('/ap-dung-khuyen-mai')
-                .then(function (res) {
-                    $scope.listProductPromotion = res.data.data;
-                    $scope.listProductPromotion.forEach(function (product) {
-                        const khuyenMai = arrKm.find(km => km.id === product.idKhuyenMai);
-                        product.tenKhuyenMai = khuyenMai ? khuyenMai.ten : "Không có tên khuyến mãi";
-                    });
-                }, function (error) {
-                    console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
-                });
-        }, function (error) {
-            console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
-        });
-
-    // Ds chương trình khuyến mãi
-    $http.post('/khuyen-mai/get-list', {keyword:'', loai:null})
-        .then(function (response) {
-            let arrKm = response.data.data;
-            console.log($scope.listProductPromotion)
-            $http.get('/ap-dung-khuyen-mai')
-                .then(function (res) {
-                    $scope.listProductPromotion = res.data.data;
-                    $scope.listProductPromotion.forEach(function (product) {
-                        const khuyenMai = arrKm.find(km => km.id === product.idKhuyenMai);
-                        product.tenKhuyenMai = khuyenMai ? khuyenMai.ten : "Không có tên khuyến mãi";
-                        // product.trangThaiKhuyenMai = khuyenMai ? khuyenMai.trangThai : null
-                    });
-                    console.log($scope.listProductPromotion)
-                }, function (error) {
-                    console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
-                });
+            $scope.listProductPromotion= response.data.data;
         }, function (error) {
             console.error("Có lỗi xảy ra khi gọi API sản phẩm: ", error);
         });
@@ -194,6 +162,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             type: 'OFFLINE',
             stt: $scope.bills.length + 1,
             name: newBillName,
+            totalBillOrigin: 0,
             totalBill: 0,
             totalBillLast: 0,
             disabled: false,
@@ -258,16 +227,16 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
 
     $scope.getTotalAmount = function (bill) {
-        bill.totalPricePromo = 0;
-        bill.items.forEach(function (item) {
-            if (item.trangThai) {
-                bill.totalPricePromo += item.giaTriGiam;
-            }
-        })
+        // bill.totalPricePromo = 0;
+        // bill.items.forEach(function (item) {
+        //     if (item.trangThai) {
+        //         bill.totalPricePromo += item.giaTriGiam;
+        //     }
+        // })
         const discount = (100 - (bill.diemThuong || 0)) / 100;
         const totalAfterDiscount = bill.totalBill * discount;
         const pointsDiscount = (bill.diemSuDung || 0) * 10; // 1 điểm = 10 VNĐ
-        return Math.max(totalAfterDiscount - pointsDiscount - bill.totalPricePromo, 0); // Tổng tiền không âm
+        return Math.max(totalAfterDiscount - pointsDiscount, 0); // Tổng tiền không âm
     };
 
     $scope.updatePointsToUse = function (bill) {
@@ -286,8 +255,11 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
 
     $scope.updateTotalBill = function (bill) {
+        bill.totalBillOrigin = bill.items.reduce(function (total, product) {
+            return total + (parseFloat(product.soLuong * product.gia));
+        }, 0);
         bill.totalBill = bill.items.reduce(function (total, product) {
-            return total + (parseFloat(product.soLuong) * product.gia);
+            return total + (parseFloat(product.giaSauKhuyenMai !== product.gia ? product.soLuong * product.giaSauKhuyenMai : product.soLuong * product.gia));
         }, 0);
         bill.totalQuantity = bill.items.reduce(function (total, product) {
             return total + parseFloat(product.soLuong);
@@ -408,8 +380,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
     };
     $scope.addProductToBill = function (product) {
         const existingProduct = $scope.bills[$scope.activeBill].items.find(item => item.id === product.id);
-        const promoProduct = $scope.listProductPromotion.find(promo => promo.idSanPham === product.idSanPham);
-        console.log('>>>>>>>', promoProduct)
+        const promoProduct = $scope.listProductPromotion.find(promo => promo.id === product.idSanPham);
+        //console.log('>>>>>>>', promoProduct)
         if (existingProduct) {
             existingProduct.soLuong++;
         } else {
@@ -420,8 +392,8 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 image: product.image,
                 gia: product.gia,
                 giaTriGiam: promoProduct ? promoProduct.giaTriGiam : 0,
+                giaSauKhuyenMai: promoProduct && promoProduct.giaSauKhuyenMai !== promoProduct.gia ? promoProduct.giaSauKhuyenMai : promoProduct.gia,
                 tenKhuyenMai: promoProduct ? promoProduct.tenKhuyenMai : null,
-                trangThaiKhuyenMai: promoProduct ? promoProduct.trangThai : null,
                 ghiChu: product.ghiChu,
                 soLuong: 1 || null,
                 soLuongMax: product.soLuong,
