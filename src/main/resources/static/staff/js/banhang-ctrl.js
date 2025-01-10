@@ -259,7 +259,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
             return total + (parseFloat(product.soLuong * product.gia));
         }, 0);
         bill.totalBill = bill.items.reduce(function (total, product) {
-            return total + (parseFloat(product.giaSauKhuyenMai !== product.gia ? product.soLuong * product.giaSauKhuyenMai : product.soLuong * product.gia));
+            return total + (parseFloat(product.giaSauKhuyenMai !== product.gia && product.giaSauKhuyenMai !== null ? product.soLuong * product.giaSauKhuyenMai : product.soLuong * product.gia));
         }, 0);
         bill.totalQuantity = bill.items.reduce(function (total, product) {
             return total + parseFloat(product.soLuong);
@@ -392,7 +392,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
                 image: product.image,
                 gia: product.gia,
                 giaTriGiam: promoProduct ? promoProduct.giaTriGiam : 0,
-                giaSauKhuyenMai: promoProduct && promoProduct.giaSauKhuyenMai !== promoProduct.gia ? promoProduct.giaSauKhuyenMai : promoProduct.gia,
+                giaSauKhuyenMai: promoProduct && promoProduct.giaSauKhuyenMai !== promoProduct.gia && promoProduct.giaSauKhuyenMai !== null ? promoProduct.giaSauKhuyenMai : promoProduct.gia,
                 tenKhuyenMai: promoProduct ? promoProduct.tenKhuyenMai : null,
                 ghiChu: product.ghiChu,
                 soLuong: 1 || null,

@@ -1,7 +1,7 @@
 <div class="container-fluid px-4 pb-3">
     <div class="d-grid gap-2 d-flex align-items-center justify-content-between mb-2">
         <h2 class="mt-4">Bán hàng tại quầy</h2>
-        <button class="btn btn-dark btn-sm me-md-2" ng-click="addBill()" >
+        <button ng-if="bills.length < 7" class="btn btn-dark btn-sm me-md-2" ng-click="addBill()" >
             <svg style="vertical-align: sub;" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
@@ -83,13 +83,13 @@
                                         type="button"> Hóa đơn {{bill.name}}
                                 </button>
                                 <span ng-click="removeBill(index)">
-                        <svg width="14" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                    </span>
+                                    <svg width="14" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                </span>
                             </li>
-                            <li ng-style="{'transform': 'translateX(' + sliderOffset + 'px)'}">
-                                <button class="btn" ng-click="addBill()" >
+                            <li  ng-style="{'transform': 'translateX(' + sliderOffset + 'px)'}">
+                                <button ng-if="bills.length < 7" class="btn" ng-click="addBill()" >
                                     <svg style="vertical-align: sub;" xmlns="http://www.w3.org/2000/svg" width="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                     </svg>
@@ -191,7 +191,7 @@
                                     <td class="text-end">
                                         <span>
                                             {{ formatCurrency(
-                                            item.giaSauKhuyenMai !== item.gia ? item.soLuong * item.giaSauKhuyenMai :  item.soLuong * item.gia
+                                            item.giaSauKhuyenMai !== item.gia && item.giaSauKhuyenMai !== null ? item.soLuong * item.giaSauKhuyenMai :  item.soLuong * item.gia
                                             ) }}
                                         </span>
                                     </td>
