@@ -10,6 +10,7 @@ import org.example.datn.model.response.HoaDonChiTietModel;
 import org.example.datn.model.response.HoaDonModel;
 import org.example.datn.model.response.SanPhamChiTietModel;
 import org.example.datn.model.response.SanPhamModel;
+import org.example.datn.repository.HoaDonChiTietRepository;
 import org.example.datn.repository.SanPhamChiTietRepository;
 import org.example.datn.service.*;
 import org.example.datn.transformer.HoaDonChiTietTransformer;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import javax.persistence.EntityNotFoundException;
@@ -181,78 +184,148 @@ public class HoaDonChiTietProcessor {
     YeuCauDoiTraChiTietService yeuCauDoiTraChiTietService;
     @Autowired
     SanPhamChiTietRepository sanPhamChiTietRepository;
+    @Autowired
+    HoaDonChiTietRepository hoaDonChiTietRepository;
+
     private ServiceResult thongKe(LocalDateTime startDate, LocalDateTime endDate, int status) {
         List<HoaDon> hoaDonList = hoaDonService.findByDateRangeAndStatusAndReturnStatus(startDate, endDate, status);
 
-        // Lấy danh sách YeuCauDoiTra liên quan đến các hóa đơn
+        // Lấy danh sách yêu cầu đổi trả liên quan đến các hóa đơn
         List<YeuCauDoiTra> yeuCauDoiTraList = yeuCauDoiTraService.findByHoaDonIds(
                 hoaDonList.stream().map(HoaDon::getId).collect(Collectors.toList())
         );
 
-        // Khởi tạo các biến tính toán tổng doanh thu
+        // Khởi tạo các biến để tính toán doanh thu
         BigDecimal totalRevenue = BigDecimal.ZERO;
         int totalInvoices = 0;
         int totalQuantity = 0;
         BigDecimal totalDiemDung = BigDecimal.ZERO;
 
-        // Duyệt qua từng hóa đơn để tính toán
+        // Duyệt qua từng hóa đơn
         for (HoaDon hoaDon : hoaDonList) {
-            // Kiểm tra yêu cầu đổi trả liên quan đến hóa đơn
+            // Lấy danh sách chi tiết hóa đơn
+            List<HoaDonChiTiet> chiTietList = hoaDonChiTietRepository.findByIdHoaDon(hoaDon.getId());
+            // Tính tổng giá trị trước giảm giá
+            BigDecimal totalValueBeforeDiscount = BigDecimal.ZERO;
+            for (HoaDonChiTiet chiTiet : chiTietList) {
+                BigDecimal productTotal = chiTiet.getGia().multiply(BigDecimal.valueOf(chiTiet.getSoLuong()));
+                totalValueBeforeDiscount = totalValueBeforeDiscount.add(productTotal);
+            }
+
+// Kiểm tra tổng giá trị trước giảm giá
+            System.out.println("Total value before discount: " + totalValueBeforeDiscount);
+
+// Tính tỷ lệ giảm giá (không tính phí vận chuyển)
+            BigDecimal totalPaid = hoaDon.getTongTien(); // Tổng tiền khách trả
+            BigDecimal discountRate = BigDecimal.ONE.subtract(
+                    totalPaid.divide(totalValueBeforeDiscount, MathContext.DECIMAL64)
+            );
+
+// Kiểm tra tỷ lệ giảm giá trước khi áp dụng quy tắc giảm giá
+            System.out.println("Calculated discount rate: " + discountRate);
+
+// Kiểm tra tỷ lệ giảm giá và áp dụng quy tắc giảm giá
+            if (discountRate.compareTo(new BigDecimal("0.20")) >= 0) {
+                discountRate = new BigDecimal("0.20"); // Áp dụng giảm giá tối đa 20%
+            } else if (discountRate.compareTo(new BigDecimal("0.10")) >= 0) {
+                discountRate = new BigDecimal("0.10"); // Áp dụng giảm giá 10%
+            } else {
+                discountRate = BigDecimal.ZERO; // Không áp dụng giảm giá
+            }
+
+
+// Kiểm tra tỷ lệ giảm giá sau khi áp dụng quy tắc
+            System.out.println("Applied discount rate: " + discountRate);
+
+// Kiểm tra yêu cầu đổi trả
             YeuCauDoiTra yeuCau = yeuCauDoiTraList.stream()
                     .filter(y -> y.getIdHoaDon().equals(hoaDon.getId()))
                     .findFirst()
                     .orElse(null);
 
-            // Nếu có yêu cầu đổi trả liên quan đến hóa đơn
+// Xử lý yêu cầu đổi trả nếu có
             if (yeuCau != null) {
-                // Nếu yêu cầu đổi trả là TRA_HANG, kiểm tra trạng thái đổi trả của hóa đơn
-                if (yeuCau.getLoai() == LoaiYeuCau.TRA_HANG) {
-                    // Nếu trạng thái đổi trả của hóa đơn là 0, 1, hoặc 2 thì không tính vào doanh thu
-                    if (hoaDon.getTrangThaiDoiTra() != null && (hoaDon.getTrangThaiDoiTra() == 1 || hoaDon.getTrangThaiDoiTra() == 2)) {
-                        continue;  // Không tính doanh thu từ hóa đơn này
+                if (yeuCau.getLoai() == LoaiYeuCau.DOI_HANG) {
+                    totalRevenue = totalRevenue.add(totalPaid);
+                } else if (yeuCau.getLoai() == LoaiYeuCau.TRA_HANG) {
+                    if (yeuCau.getTrangThai() == 2) { // Đã hoàn tất trả hàng
+                        List<YeuCauDoiTraChiTiet> chiTietTraHang = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(yeuCau.getId());
+                        BigDecimal refundAmount = BigDecimal.ZERO;
+                        for (YeuCauDoiTraChiTiet traChiTiet : chiTietTraHang) {
+                            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(traChiTiet.getIdSPCT()).orElse(null);
+                            if (sanPhamChiTiet != null) {
+                                // Tính số tiền hoàn lại cho từng sản phẩm chi tiết
+                                BigDecimal productRefund = sanPhamChiTiet.getGia()
+                                        .multiply(BigDecimal.ONE.subtract(discountRate)) // Áp dụng tỷ lệ giảm giá
+                                        .multiply(BigDecimal.valueOf(traChiTiet.getSoLuong()));
+                                refundAmount = refundAmount.add(productRefund);
+                            }
+                        }
+                        totalRevenue = totalRevenue.add(totalPaid.subtract(refundAmount));
+                    } else {
+                        totalRevenue = totalRevenue.add(totalPaid);
                     }
                 }
-
-                // Nếu yêu cầu đổi trả là DOI_HANG, thì dù trạng thái của hóa đơn là gì cũng tính vào doanh thu
-                if (yeuCau.getLoai() == LoaiYeuCau.DOI_HANG) {
-                    // Không cần kiểm tra trạng thái đổi trả, luôn tính vào doanh thu
-                }
+            } else {
+                totalRevenue = totalRevenue.add(totalPaid);
             }
 
-            // Tính tổng doanh thu từ hóa đơn này nếu không bị loại bỏ
-            totalRevenue = totalRevenue.add(hoaDon.getTongTien());
-
-            // Tính tổng điểm dùng nếu có
+            // Tăng tổng hóa đơn và điểm sử dụng
+            totalInvoices++;
             if (hoaDon.getDiemSuDung() != null) {
                 totalDiemDung = totalDiemDung.add(BigDecimal.valueOf(hoaDon.getDiemSuDung()));
             }
-
-            // Tăng số lượng hóa đơn
-            totalInvoices++;
-
         }
 
-        // Lấy chi tiết hóa đơn theo khoảng thời gian và trạng thái
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Lấy chi tiết hóa đơn theo khoảng thời gian và trạng thái
         List<HoaDonChiTiet> hoaDonChiTietList = service.findByDateRange(startDate, endDate, status);
 
-        // Map để lưu trữ doanh thu và số lượng sản phẩm theo id sản phẩm
+// Map để lưu trữ doanh thu và số lượng sản phẩm theo id sản phẩm
         Map<Long, BigDecimal> productRevenueMap = new HashMap<>();
         Map<Long, Integer> productQuantityMap = new HashMap<>();
 
-        // Duyệt qua chi tiết hóa đơn để tính doanh thu và số lượng của từng sản phẩm
+// Duyệt qua chi tiết hóa đơn để tính doanh thu và số lượng của từng sản phẩm
         for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
             totalQuantity += hoaDonChiTiet.getSoLuong();  // Cộng số lượng sản phẩm vào tổng
             Long productDetailId = hoaDonChiTiet.getIdSanPhamChiTiet();
             SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietService.ById(productDetailId);  // Lấy thông tin sản phẩm chi tiết
             Long productId = sanPhamChiTiet.getIdSanPham();  // Lấy id sản phẩm từ sản phẩm chi tiết
 
-            // Tính doanh thu cho sản phẩm
-            BigDecimal revenue = hoaDonChiTiet.getGia().multiply(new BigDecimal(hoaDonChiTiet.getSoLuong()));
-            productRevenueMap.put(productId, productRevenueMap.getOrDefault(productId, BigDecimal.ZERO).add(revenue));
-            productQuantityMap.put(productId, productQuantityMap.getOrDefault(productId, 0) + hoaDonChiTiet.getSoLuong());
+            // Lấy yêu cầu đổi trả theo id hóa đơn (idHoaDon)
+            List<YeuCauDoiTra> yeuCauDoiTraLists = yeuCauDoiTraService.findByHoaDonId(hoaDonChiTiet.getIdHoaDon());
+
+            int adjustedQuantity = hoaDonChiTiet.getSoLuong();  // Biến lưu số lượng đã điều chỉnh sau khi trừ số lượng trả hàng
+
+            for (YeuCauDoiTra yeuCau : yeuCauDoiTraLists) {
+                if (yeuCau.getLoai() == LoaiYeuCau.TRA_HANG) {
+                    // Nếu yêu cầu đổi trả là TRẢ HÀNG
+                    if (yeuCau.getTrangThai() == 2) { // Đã hoàn tất trả hàng
+                        // Lấy chi tiết trả hàng từ yêu cầu đổi trả
+                        List<YeuCauDoiTraChiTiet> chiTietTraHang = yeuCauDoiTraChiTietService.findByIdYeuCauDoiTra(yeuCau.getId());
+                        for (YeuCauDoiTraChiTiet chiTiet : chiTietTraHang) {
+                            if (chiTiet.getIdSPCT().equals(productDetailId)) {
+                                // Trừ số lượng sản phẩm đã trả lại
+                                adjustedQuantity -= chiTiet.getSoLuong();
+                            }
+                        }
+                    }
+                } else {
+                    // Nếu yêu cầu đổi trả là ĐỔI HÀNG, không thay đổi số lượng
+                    adjustedQuantity = hoaDonChiTiet.getSoLuong();
+                }
+            }
+
+            // Cập nhật số lượng sản phẩm vào map
+            productQuantityMap.put(productId, productQuantityMap.getOrDefault(productId, 0) + adjustedQuantity);
+
+            // Tính doanh thu: productRevenue = adjustedQuantity * giaSPCT
+            BigDecimal productRevenue = new BigDecimal(adjustedQuantity).multiply(sanPhamChiTiet.getGia());
+            productRevenueMap.put(productId, productRevenueMap.getOrDefault(productId, BigDecimal.ZERO).add(productRevenue));
         }
 
-        // Tạo danh sách chi tiết doanh thu và số lượng của các sản phẩm
+// Tạo danh sách chi tiết doanh thu và số lượng của các sản phẩm
         List<Map<String, Object>> revenueAndQuantityModels = new ArrayList<>();
         for (Long productId : productRevenueMap.keySet()) {
             BigDecimal productRevenue = productRevenueMap.get(productId);
@@ -270,6 +343,8 @@ public class HoaDonChiTietProcessor {
             revenueAndQuantityModels.add(productData);
         }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
         // Map để lưu trữ doanh thu và số hóa đơn của người dùng
         Map<Long, BigDecimal> userRevenueMap = new HashMap<>();
         Map<Long, Integer> userInvoiceCountMap = new HashMap<>();

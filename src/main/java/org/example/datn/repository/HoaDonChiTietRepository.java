@@ -28,9 +28,10 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
     Optional<HoaDonChiTiet> findByIdHoaDonAndIdSanPhamChiTiet(Long idHoaDon, Long idSanPhamChiTiet);
     List<HoaDonChiTiet> findByTrangThai(Integer trangThai);
 
-    @Query("SELECT h FROM HoaDonChiTiet h WHERE h.ngayCapNhat BETWEEN :startDate AND :endDate AND h.trangThai = :trangThai AND (h.trangThaiDoiTra IS NULL OR h.trangThaiDoiTra = 1)")
+    @Query("SELECT h FROM HoaDonChiTiet h WHERE h.ngayCapNhat BETWEEN :startDate AND :endDate AND h.trangThai = :trangThai ")
     List<HoaDonChiTiet> findByNgayTaoBetween(@Param("startDate") LocalDateTime startDate,
                                                          @Param("endDate") LocalDateTime endDate,
                                                          @Param("trangThai") Integer trangThai);
+//    AND (h.trangThaiDoiTra IS NULL OR h.trangThaiDoiTra = 1)
 
 }

@@ -23,7 +23,7 @@
                                ng-focus="showListProduct()" ng-model="searchTerm">
                         <!-- Dropdown với danh sách được lọc -->
                         <ul class="dropdown-menu px-0" id="tableproductlist2">
-                            <li ng-repeat="(index, product) in listProduct" ng-if="product.trangThai === 1 || product.soLuong > 0 ">
+                            <li ng-repeat="(index, product) in listProduct" ng-if="product.trangThai == 1 && product.soLuong > 0 ">
                                 <a class="dropdown-item px-1" href="javascript:void(0)"
                                    ng-style="{
                                    'pointer-events': product.soLuong <= 0 ? 'none' : 'auto',
@@ -185,12 +185,15 @@
                                         {{ formatCurrency(item.gia) }}
                                     </td>
                                     <td class="text-end">
-                                        {{ formatCurrency( item.trangThai ? item.gia - item.giaTriGiam : item.gia ) }} <br>
-                                        <small class="text-muted" ng-if="item.trangThai">{{item.tenKhuyenMai}}</small>
+                                        <span ng-if="item.giaTriGiam < item.gia">{{ formatCurrency(  item.gia - item.giaTriGiam ) }}</span>
+                                        <span ng-if="item.giaTriGiam >= item.gia">0</span>
+                                         <br>
+                                        <small class="text-muted" >{{item.tenKhuyenMai}}</small>
                                     </td>
 
                                     <td class="text-end">
-                                        {{ item.trangThai ? formatCurrency(item.soLuong * (item.gia - item.giaTriGiam)) :  formatCurrency(item.soLuong * (item.gia))}}
+                                        <span ng-if="item.giaTriGiam < item.gia">{{ formatCurrency(item.soLuong * (item.gia - item.giaTriGiam)) }}</span>
+                                        <span ng-if="item.giaTriGiam >= item.gia">0</span>
                                     </td>
                                     <td class="text-center">
                                         <button ng-click="removeProduct(bill, item)" class="btn text-danger py-0">
@@ -219,7 +222,12 @@
                                                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
                                                 </svg>
                                             </span>
-                                                    <input type="text" ng-model="bill.phoneCustomer" class="form-control form-control-sm" maxlength="10" ng-change="onPhoneChange(bill)" placeholder="Số điện thoại khách hàng" id="phoneInput-{{ index + 1 }}">
+                                                    <input type="text"
+                                                           ng-model="bill.phoneCustomer"
+                                                           class="form-control form-control-sm"
+                                                           ng-keypress="allowOnlyNumbers($event)"
+                                                           maxlength="10" ng-change="onPhoneChange(bill)"
+                                                           placeholder="Số điện thoại khách hàng" id="phoneInput-{{ index + 1 }}">
                                                 </div>
                                             </td>
 
@@ -227,13 +235,15 @@
                                         <tr>
                                             <td>
                                                 <div class="input-group">
-                                            <span class="input-group-text">
-                                                <svg width="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                                </svg>
-                                            </span>
+                                                    <span class="input-group-text">
+                                                        <svg width="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                                        </svg>
+                                                    </span>
                                                     <input type="text" ng-model="bill.nameCustomer"
                                                            placeholder="Tên khách hàng"
+                                                           ng-readonly="bill.diemTichLuy > 0"
+                                                           ng-disabled="bill.diemTichLuy > 0"
                                                            class="form-control form-control-sm" ng-keydown="onKeyDownName(bill)"
                                                            id="nameInput-{{ index + 1 }}">
                                                 </div>
@@ -375,16 +385,23 @@
                                         </td>
                                         <td>{{item.soLuong}}</td>
                                         <td class="text-end">
-                                            <div ng-if="item.giaTriGiam > 0 && item.trangThai">
-                                                {{ formatCurrency( item.trangThai ? item.gia - item.giaTriGiam : item.gia ) }} <br>
+                                            <div ng-if="item.giaTriGiam > 0 && item.trangThaiKhuyenMai">
+                                                <span ng-if="item.giaTriGiam < item.giamGia">
+                                                    {{ formatCurrency( item.trangThai ? item.gia - item.giaTriGiam : item.gia ) }}
+                                                </span>
+                                                <span ng-if="item.giaTriGiam >= item.gia">0</span>
+                                                 <br>
                                                 <del><small class="text-muted">{{ formatCurrency(item.gia)}}</small></del>
                                             </div>
-                                            <span ng-if="item.giamGia === 0 || !item.trangThai">
+                                            <span ng-if="item.giamGia === 0 || !item.trangThaiKhuyenMai">
                                                 {{ formatCurrency(item.gia)}}
                                             </span>
                                         </td>
                                         <td class="text-end">
-                                            {{ item.trangThai ? formatCurrency(item.soLuong * (item.gia - item.giaTriGiam)) :  formatCurrency(item.soLuong * (item.gia))}}
+                                            <span ng-if="item.giaTriGiam < item.gia">
+                                                {{ item.trangThai ? formatCurrency(item.soLuong * (item.gia - item.giaTriGiam)) :  formatCurrency(item.soLuong * (item.gia))}}
+                                            </span>
+                                            <span ng-if="item.giaTriGiam >= item.gia">0</span>
                                         </td>
                                     </tr>
                                     </tbody>

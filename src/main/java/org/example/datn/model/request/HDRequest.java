@@ -10,7 +10,7 @@ import java.util.List;
 public class HDRequest {
     private Long idCustomer;
     private String ma;
-    private BigDecimal totalBill;
+    private BigDecimal totalBillLast;
     private Integer trangThai;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayThanhToan;
