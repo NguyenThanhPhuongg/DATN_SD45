@@ -288,7 +288,7 @@ public class HoaDonChiTietProcessor {
 
         // Duyệt qua chi tiết hóa đơn để tính doanh thu và số lượng của từng sản phẩm
         for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
-            totalQuantity += hoaDonChiTiet.getSoLuong();  // Cộng số lượng sản phẩm vào tổng
+//            totalQuantity += hoaDonChiTiet.getSoLuong();  // Cộng số lượng sản phẩm vào tổng
             Long productDetailId = hoaDonChiTiet.getIdSanPhamChiTiet();
             SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietService.ById(productDetailId);  // Lấy thông tin sản phẩm chi tiết
             Long productId = sanPhamChiTiet.getIdSanPham();  // Lấy id sản phẩm từ sản phẩm chi tiết
@@ -323,6 +323,8 @@ public class HoaDonChiTietProcessor {
             // Tính doanh thu: productRevenue = adjustedQuantity * giaSPCT
             BigDecimal productRevenue = new BigDecimal(adjustedQuantity).multiply(sanPhamChiTiet.getGia());
             productRevenueMap.put(productId, productRevenueMap.getOrDefault(productId, BigDecimal.ZERO).add(productRevenue));
+            // Cộng tổng số lượng đã điều chỉnh vào totalQuantity
+            totalQuantity += adjustedQuantity;
         }
 
         // Tạo danh sách chi tiết doanh thu và số lượng của các sản phẩm
