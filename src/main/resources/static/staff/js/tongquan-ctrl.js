@@ -401,7 +401,7 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
                 data: {
                     labels: ['Online', 'Offline'],
                     datasets: [{
-                        label: 'Tỷ lệ Doanh thu %',
+                        label: 'Tỷ lệ số lượng %',
                         data: [$scope.soLuongBanPercentage.online, $scope.soLuongBanPercentage.offline], // Lấy giá trị từ $scope
                         backgroundColor: ['#c962ba', '#860e33'],
                         borderColor: ['#9b7dc0', '#7011ea'],
@@ -424,7 +424,7 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
                 data: {
                     labels: ['Online', 'Offline'],
                     datasets: [{
-                        label: 'Tỷ lệ Doanh thu %',
+                        label: 'Tỷ lệ đơn hàng %',
                         data: [$scope.soLuongHoaDonPercentage.online, $scope.soLuongHoaDonPercentage.offline], // Lấy giá trị từ $scope
                         backgroundColor: ['#82ee79', '#0e7700'],
                         borderColor: ['#43b5ce', '#1f4e9b'],
@@ -1021,4 +1021,86 @@ app.controller("tongquan-ctrl", function ($scope, $http, $filter) {
     }
 
     $scope.loadDataOnline();
+
+    $scope.exportExcel = function () {
+        const currentDateTime = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+        // Sheet 1: Dữ liệu doanh thu và đơn hàng online
+        const data1 = [
+            { Loại: 'Doanh thu', Số_Lượng: $scope.doanhThuTodayOnline.toLocaleString('vi-VN') + ' đ' },
+            { Loại: 'Số lượng bán ra', Số_Lượng: $scope.soLuongBanRaTodayOnline },
+            { Loại: 'Số đơn hàng mua', Số_Lượng: $scope.soLuongHoaDonTodayOnline },
+            // Thêm danh sách chi tiết sản phẩm bán ra dưới mục "Số đơn hàng mua"
+            { Loại: 'Thời gian xuất', currentDateTime }
+        ];
+        // Sheet 2: Dữ liệu danh sách sản phẩm bán
+        const data2 = [
+            ...$scope.chiTietSanPhamOnline.map((sp, index) => ({
+                Tên_sản_phẩm: `${sp.ten}`,
+                Mã_SP: `${sp.ma}`,
+                Số_Lượng_bán: `${sp.soLuong}`,
+                Doanh_thu:`${sp.doanhThu.toLocaleString('vi-VN')} đ`
+            })),
+        ];
+        // Sheet 3: Dữ liệu danh sách khách hàng mua
+        const data3 = [
+            ...$scope.chiTietKhachHangOnline.map((sp, index) => ({
+                Họ_ten: `${sp.hoVaTen}`,
+                Số_lượng_hóa_đơn: `${sp.soLuongHoaDon}`,
+                Email: `${sp.email}`,
+                SDT: `${sp.sdt}`,
+                Doanh_thu:`${sp.doanhThu.toLocaleString('vi-VN')} đ`
+            })),
+        ];
+        // Sheet 4: Dữ liệu doanh thu và đơn hàng offline
+        const data4 = [
+            { Loại: 'Doanh thu', Số_Lượng: $scope.doanhThuTodayOffline.toLocaleString('vi-VN') + ' đ' },
+            { Loại: 'Số lượng bán ra', Số_Lượng: $scope.soLuongBanRaTodayOffline },
+            { Loại: 'Số đơn hàng mua', Số_Lượng: $scope.soLuongHoaDonTodayOffline },
+            // Thêm danh sách chi tiết sản phẩm bán ra dưới mục "Số đơn hàng mua"
+            { Loại: 'Thời gian xuất', currentDateTime }
+        ];
+        // Dữ liệu danh sách sản phẩm bán
+        const data5 = [
+            ...$scope.chiTietSanPhamOffline.map((sp, index) => ({
+                Tên_sản_phẩm: `${sp.ten}`,
+                Mã_SP: `${sp.ma}`,
+                Số_Lượng_bán: `${sp.soLuong}`,
+                Doanh_thu:`${sp.doanhThu.toLocaleString('vi-VN')} đ`
+            })),
+        ];
+        // Dữ liệu danh sách khách hàng mua
+        const data6 = [
+            ...$scope.chiTietKhachHangOffline.map((sp, index) => ({
+                Họ_ten: `${sp.hoVaTen}`,
+                Số_lượng_hóa_đơn: `${sp.soLuongHoaDon}`,
+                Điểm_dùng: `${sp.diemDung}`,
+                SDT: `${sp.sdt}`,
+                Doanh_thu:`${sp.doanhThu.toLocaleString('vi-VN')} đ`
+            })),
+        ];
+
+        // Tạo workbook và các sheet
+        const worksheet1 = XLSX.utils.json_to_sheet(data1); // Sheet Doanh Thu
+        const worksheet2 = XLSX.utils.json_to_sheet(data2); // Sheet Top Sản Phẩm
+        const worksheet3 = XLSX.utils.json_to_sheet(data3); // Sheet Top Sản Phẩm
+        const worksheet4 = XLSX.utils.json_to_sheet(data4); // Sheet Top Sản Phẩm
+        const worksheet5 = XLSX.utils.json_to_sheet(data5); // Sheet Top Sản Phẩm
+        const worksheet6 = XLSX.utils.json_to_sheet(data6); // Sheet Top Sản Phẩm
+
+        // const worksheet3 = XLSX.utils.json_to_sheet(data3); // Sheet Top Sản Phẩm
+
+        // Tạo workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet1, 'Báo Cáo Online');
+        XLSX.utils.book_append_sheet(workbook, worksheet2, 'Báo Cáo Sản phẩm bán online');
+        XLSX.utils.book_append_sheet(workbook, worksheet3, 'Báo Cáo khách hàng mua online');
+        XLSX.utils.book_append_sheet(workbook, worksheet4, 'Báo Cáo Offline');
+        XLSX.utils.book_append_sheet(workbook, worksheet5, 'Báo Cáo sản phẩm bán Offline');
+        XLSX.utils.book_append_sheet(workbook, worksheet6, 'Báo Cáo khách hàng mua Offline');
+
+        // XLSX.utils.book_append_sheet(workbook, worksheet3, 'Sản Phẩm Còn');
+
+        // Xuất file Excel
+        XLSX.writeFile(workbook, `bao_cao_doanh_thu_${currentDateTime}.xlsx`);
+    };
 });
