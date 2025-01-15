@@ -92,11 +92,11 @@ $(document).ready(function () {
                                         </div>
                                     </div>
                                     <h3>${product.ten}</h3>
-                                    <div>${formattedPrice}đ</div>
                                 </div>
                             `;
                             container.append(productHTML);
                         }
+                        // <div>${formattedPrice}đ</div>
 
                         // Gắn sự kiện click cho nút xóa trong trang này
                         $(".delete-wishlist-item").click(function (e) {

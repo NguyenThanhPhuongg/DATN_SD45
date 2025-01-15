@@ -104,23 +104,27 @@
                 <div class="modal-body">
                     <div class="container-fluid px-4">
                         <div class="row">
-                            <div class="col-md-6 mt-2">
+                            <div class="col-md-6 mt-2" ng-class="{'col-md-12': form.trangThai === 7, 'col-md-6': form.trangThai !== 7}">
                                 <label>Mã hóa đơn</label>
                                 <input type="text" class="form-control" ng-model="form.ma" readonly>
                                 <label>Tổng tiền</label>
-                                <input format-number type="text" class="form-control" ng-model="form.tongTien"
-                                       ng-value="{{ form.tongTien <= 0 ? 0 : form.tongTien }}"readonly>
-                                <label>Điểm sử dụng</label>
-                                <input type="text" class="form-control" ng-model="form.diemSuDung" readonly>
+                                <input type="text" class="form-control" ng-model="form.tongTien" number-formatter readonly>
+                                <label ng-show="form.trangThai === 7">Điểm sử dụng</label>
+                                <input type="text" class="form-control" ng-model="form.diemSuDung" ng-show="form.trangThai === 7" number-formatter readonly>
                                 <label>Ngày đặt hàng</label>
-                                <input type="text" class="form-control" ng-model="form.ngayDatHang" readonly>
-                                <label>Ngày thanh toán</label>
-                                <div>
+                                <input type="text" class="form-control" ng-model="form.ngayDatHang" ng-value="form.ngayDatHang | date:'yyyy-MM-dd hh:mm a'" readonly>
+                                <label ng-show="form.trangThai !== 5">Ngày thanh toán</label>
+                                <div ng-show="form.trangThai !== 5">
                                     <input type="text" class="form-control" ng-model="form.ngayDatHang" readonly
-                                           ng-if="form.ngayThanhToan"/>
+                                           ng-if="form.ngayThanhToan" ng-value="form.ngayThanhToan | date:'yyyy-MM-dd hh:mm a'"/>
                                     <span class="form-control" ng-if="!form.ngayThanhToan"
                                           style="background-color: #f8f9fa; color: #6c757d; border: 1px solid #ced4da;">Chưa thanh toán</span>
                                 </div>
+                                <label ng-show="form.trangThai == 5">Lý do hủy</label>
+                                <input type="text" class="form-control" ng-model="form.lyDoHuy" ng-show="form.trangThai == 5" readonly>
+                                <label ng-show="form.trangThai == 5">Ngày hủy đơn</label>
+                                <input type="text" class="form-control" ng-model="form.ngayCapNhat" ng-show="form.trangThai == 5" readonly
+                                       ng-value="form.ngayCapNhat | date:'yyyy-MM-dd hh:mm a'">
                                 <label>Người đặt hàng</label>
                                 <input type="text" class="form-control" ng-model="form.userModel.profile.hoVaTen"
                                        readonly>
@@ -131,7 +135,7 @@
                                 <input type="text" class="form-control" ng-model="form.userModel.profile.email"
                                        readonly>
                             </div>
-                            <div class="col-md-6 mt-2">
+                            <div class="col-md-6 mt-2" ng-show="form.trangThai !== 7">
                                 <label>Địa chỉ giao hàng</label>
                                 <input type="text" class="form-control" ng-model="form.diaChiGiaoHangModel.diaChi"
                                        readonly>
@@ -141,14 +145,14 @@
                                 <label>Số điện thoại người nhân</label>
                                 <input type="text" class="form-control" ng-model="form.diaChiGiaoHangModel.sdt"
                                        readonly>
-                                <label>Phương thức vận chuyển</label>
-                                <input type="text" class="form-control" ng-model="form.phuongThucVanChuyenModel.ten"
-                                       readonly>
-                                <label>Phí vận chuyển</label>
-                                <input type="text" class="form-control" format-number
-                                       ng-model="form.phuongThucVanChuyenModel.phiVanChuyen"
-                                       ng-value="(form.userModel.capBac === 'VANG' && form.tongTien >= 500000) || form.userModel.capBac === 'KIM_CUONG' ? 0 : form.phuongThucVanChuyenModel.phiVanChuyen"
-                                       readonly>
+<!--                                <label>Phương thức vận chuyển</label>-->
+<!--                                <input type="text" class="form-control" ng-model="form.phuongThucVanChuyenModel.ten"-->
+<!--                                       readonly>-->
+<!--                                <label>Phí vận chuyển</label>-->
+<!--                                <input type="text" class="form-control" format-number-->
+<!--                                       ng-model="form.phuongThucVanChuyenModel.phiVanChuyen"-->
+<!--                                       ng-value="(form.userModel.capBac === 'VANG' && form.tongTien >= 500000) || form.userModel.capBac === 'KIM_CUONG' ? 0 : form.phuongThucVanChuyenModel.phiVanChuyen"-->
+<!--                                       readonly>-->
 
                             </div>
                         </div>

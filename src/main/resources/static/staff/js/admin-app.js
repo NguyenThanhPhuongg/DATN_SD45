@@ -149,6 +149,38 @@ app.filter('dotCurrency', function() {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '₫';
     };
 });
+app.directive('numberFormatter', function($filter) {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelCtrl) {
+            // Định dạng giá trị khi hiển thị trong input
+            ngModelCtrl.$formatters.push(function(value) {
+                if (value === null || value === undefined || value <= 0) {
+                    return '0'; // Hiển thị 0 khi giá trị là null, undefined hoặc <= 0
+                }
+                return new Intl.NumberFormat('vi-VN').format(value);
+            });
+
+            // Xử lý giá trị nhập vào
+            ngModelCtrl.$parsers.push(function(value) {
+                if (!value) {
+                    return 0; // Trả về 0 nếu giá trị nhập là null, undefined, hoặc chuỗi rỗng
+                }
+                let plainNumber = value.replace(/\./g, ''); // Loại bỏ dấu chấm
+                return parseInt(plainNumber, 10) || 0; // Trả về 0 nếu không hợp lệ
+            });
+
+            // Định dạng lại khi rời khỏi ô input
+            element.on('blur', function() {
+                let formattedValue = ngModelCtrl.$modelValue > 0
+                    ? new Intl.NumberFormat('vi-VN').format(ngModelCtrl.$modelValue)
+                    : '0';
+                element.val(formattedValue);
+            });
+        }
+    };
+});
+
 
 app.config(function ($routeProvider) {
     $routeProvider
