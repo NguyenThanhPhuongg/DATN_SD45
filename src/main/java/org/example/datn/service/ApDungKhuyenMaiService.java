@@ -7,6 +7,8 @@ import org.example.datn.repository.ApDungKhuyenMaiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,5 +51,12 @@ public class ApDungKhuyenMaiService {
         return repo.findByIdSanPham(idSanPham);
     }
 
+
+    @Transactional
+    public void updateGiaTriByKhuyenMaiId(Long khuyenMaiId, BigDecimal newGiaTri) {
+        List<ApDungKhuyenMai> apDungKhuyenMais = repo.findByIdKhuyenMai(khuyenMaiId);
+        apDungKhuyenMais.forEach(apDungKhuyenMai -> apDungKhuyenMai.setGiaTriGiam(newGiaTri));
+        repo.saveAll(apDungKhuyenMais);
+    }
 
 }

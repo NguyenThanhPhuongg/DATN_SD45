@@ -116,6 +116,8 @@ public class KhuyenMaiProcessor {
             validateUpdateDuplicated(request, id);
         }
 
+        boolean isGiaTriChanged = !Objects.equals(existingKhuyenMai.getGiaTri(), request.getGiaTri());
+
         existingKhuyenMai.setMa(request.getMa());
         existingKhuyenMai.setTen(request.getTen());
         existingKhuyenMai.setMoTa(request.getMoTa());
@@ -173,8 +175,14 @@ public class KhuyenMaiProcessor {
             apDungKhuyenMaiService.save(apDungKhuyenMai);
         });
 
+        // Nếu giá trị thay đổi, cập nhật giá trị trong ApDungKhuyenMai
+        if (isGiaTriChanged) {
+            apDungKhuyenMaiService.updateGiaTriByKhuyenMaiId(existingKhuyenMai.getId(), request.getGiaTri());
+        }
+
         return new ServiceResult();
     }
+
 
 
     private ApDungKhuyenMai createApDungKhuyenMai(KhuyenMai km, Long id, BigDecimal giaTriGiam, Integer loaiKhuyenMai, UserAuthentication ua) {
