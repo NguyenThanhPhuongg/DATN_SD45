@@ -49,7 +49,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
     //Lưu thông tin hóa đơn vào bộ nhớ trình duyệt
     $scope.saveBillsToLocalStorage = function() {
-        //localStorage.setItem('bills', JSON.stringify($scope.bills));
+        localStorage.setItem('bills', JSON.stringify($scope.bills));
     };
 
     // Ds sp khuyến mãi
@@ -210,7 +210,7 @@ app.controller("banhang-ctrl", function ($scope, $http, $rootScope, $firebase, $
 
         // Xóa hóa đơn
         $scope.bills.splice(index, 1);
-        $scope.saveBillsToLocalStorage()
+        localStorage.setItem('bills', JSON.stringify($scope.bills));
         // Đặt lại hóa đơn đang hoạt động (activeBill)
         if ($scope.activeBill >= $scope.bills.length) {
             $scope.activeBill = $scope.bills.length - 1; // Chuyển activeBill về hóa đơn cuối nếu vượt quá

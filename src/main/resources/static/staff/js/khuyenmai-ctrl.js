@@ -398,10 +398,12 @@ app.controller("khuyenmai-ctrl", function ($scope, $http) {
             return;  // Dừng hàm nếu không chọn loại
         }
 
-        // Nếu bạn sử dụng Day.js để định dạng lại ngày tháng
-        var ngayBatDau = dayjs($scope.detailForm.ngayBatDau).format('YYYY-MM-DDTHH:mm:ss');
-        var ngayKetThuc = dayjs($scope.detailForm.ngayKetThuc).format('YYYY-MM-DDTHH:mm:ss');
-
+        var ngayBatDau = dayjs($scope.detailForm.ngayBatDau);
+        var ngayKetThuc = dayjs($scope.detailForm.ngayKetThuc);
+        if (ngayKetThuc.isBefore(ngayBatDau)) {
+            toastr.error("Ngày kết thúc phải lớn hơn ngày bắt đầu.", "Lỗi!");
+            return;
+        }
         // Tạo đối tượng request data để gửi lên API
         var requestData = {
             ma: $scope.detailForm.ma,  // Nếu loai là Sản phẩm, không gửi mã
